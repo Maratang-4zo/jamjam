@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: jamjam
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    dirver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${HOST}:${PORT}/${DATABASE_NAME}?${OPTIONS}
+    username: ${USER_NAME}
+    password: ${USER_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+      open-in-view: true
+      show-sql: true
+
+  springdoc:
+    swagger-ui:
+      path: /swagger-ui.html
+      display-request-duration: true
+
+  logging:
+    level:
+      com.app: debug
+
+  kakao:
+    client:
+      id: ${CLIENT_ID}
+      secret: ${CLIENT_SECRET}

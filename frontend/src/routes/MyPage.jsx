@@ -7,23 +7,26 @@ import MeetingList from "../components/MyPage/MeetingList";
 const BackGround = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 0px 60px 30px 60px;
   height: 100vh;
-  padding: 30px 80px 80px 80px;
   background-color: ${(props) => props.theme.subPointBgColor};
 `;
 
 const Container = styled.div`
-  height: 80vh;
+  height: 700px;
+  width: 1440px;
   border-radius: 20px;
   border: 3px black solid;
   display: flex;
-  justify-content: space-between;
-  padding: 70px 70px;
+  justify-content: space-evenly;
+  padding: 60px 30px;
   background-color: ${(props) => props.theme.mainBgColor};
 `;
 
 const LogoImg = styled.img`
-  width: 100px;
+  width: 150px;
 `;
 
 function Mypage() {
@@ -33,7 +36,7 @@ function Mypage() {
         <LogoImg src={logoImg} />
       </Link>
       <Container>
-        <InfoBox></InfoBox>
+        <InfoBox />
         <MeetingList></MeetingList>
       </Container>
     </BackGround>

@@ -18,7 +18,7 @@ const Container = styled.div`
   border: 3px black solid;
   display: flex;
   justify-content: space-between;
-  padding: 50px 30px;
+  padding: 70px 70px;
   background-color: ${(props) => props.theme.mainBgColor};
 `;
 

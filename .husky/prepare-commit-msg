@@ -11,7 +11,8 @@ Comment=🏷
 Chore=🍎
 Docs=📝
 Hotfix=🔥
-Test=🧪"
+Test=🧪
+Init=🎉"
 
 COMMIT_MESSAGE_FILE_PATH=$1
 

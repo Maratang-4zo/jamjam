@@ -6,5 +6,8 @@ export const defaultTheme = {
   btnColor: "#FFD459", // 노란색
   chartColor: "#61B752", //탁한 연두
   pointBtnColor: "#fc94c0", // 쨍한 핑크
+  roomChatBgColor: "#D9D9D9",
   // a: "#369CCA",
+  widthLength: "1400px",
+  heightLength: "650px",
 };

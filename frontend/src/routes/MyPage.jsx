@@ -15,8 +15,8 @@ const BackGround = styled.div`
 `;
 
 const Container = styled.div`
-  height: 700px;
-  width: 1440px;
+  height: ${(props) => props.theme.heightLength};
+  width: ${(props) => props.theme.widthLength};
   border-radius: 20px;
   border: 3px black solid;
   display: flex;

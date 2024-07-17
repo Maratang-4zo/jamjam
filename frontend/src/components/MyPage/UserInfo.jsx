@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 const Info = styled.div`
   display: flex;
-  width: 340px;
-  height: 50px;
+  width: 300px;
+  height: 30px;
   padding: 10px 20px;
   margin-bottom: 20px;
   justify-content: space-between;

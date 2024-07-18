@@ -16,10 +16,10 @@ function Router() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/:userId" element={<Mypage />} />
-        <Route path="/:roomId" element={<Room />} />
-        <Route path="/:roomId/create" element={<CreateRoom />} />
-        <Route path="/:roomId/gamechoice" element={<GameChoice />} />
-        <Route path="/:roomId/game" element={<Game />} />
+        <Route path="/room/:roomId" element={<Room />} />
+        <Route path="/room/:roomId/create" element={<CreateRoom />} />
+        <Route path="/room/:roomId/gamechoice" element={<GameChoice />} />
+        <Route path="/room/:roomId/game" element={<Game />} />
       </Routes>
     </BrowserRouter>
   );

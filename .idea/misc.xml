@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" project-jdk-name="liberica-21" project-jdk-type="JavaSDK">
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="corretto-21" project-jdk-type="JavaSDK">
+>>>>>>> c75bdfe760c1c686c25647d727172db34504b9b1
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

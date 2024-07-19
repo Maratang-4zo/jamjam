@@ -2,14 +2,35 @@
 <project version="4">
   <component name="CheckStyle-IDEA" serialisationVersion="2">
     <checkstyleVersion>10.17.0</checkstyleVersion>
+<<<<<<< HEAD
     <scanScope>JavaOnly</scanScope>
     <copyLibs>true</copyLibs>
     <option name="thirdPartyClasspath" />
     <option name="activeLocationIds" />
+=======
+    <scanScope>AllSourcesWithTests</scanScope>
+    <suppressErrors>true</suppressErrors>
+    <copyLibs>true</copyLibs>
+    <option name="thirdPartyClasspath" />
+    <option name="activeLocationIds">
+      <option value="210c006b-19f2-4189-b706-c43160b4b786" />
+    </option>
+>>>>>>> c75bdfe760c1c686c25647d727172db34504b9b1
     <option name="locations">
       <list>
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="bundled-google-checks" type="BUNDLED" scope="All" description="Google Checks">(bundled)</ConfigurationLocation>
+<<<<<<< HEAD
+=======
+        <ConfigurationLocation id="210c006b-19f2-4189-b706-c43160b4b786" type="LOCAL_FILE" scope="All" description="naver-checkstyle-rules">
+          $USER_HOME$/Downloads/naver-checkstyle-rules.xml
+          <option name="properties">
+            <map>
+              <entry key="suppressionFile" value="naver-checkstyle-suppressions.xml" />
+            </map>
+          </option>
+        </ConfigurationLocation>
+>>>>>>> c75bdfe760c1c686c25647d727172db34504b9b1
       </list>
     </option>
   </component>

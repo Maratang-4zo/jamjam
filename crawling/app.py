@@ -1,10 +1,5 @@
-from flask import Flask
+from map_info import app
+from config import APP_PORT
 
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-	return 'Hello, Flask!'
-
-if __name__ == '__main__':
-	app.run(debug=True)
+if __name__ == "__main__":
+    app.run(port=APP_PORT, debug=True)

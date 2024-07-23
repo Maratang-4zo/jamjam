@@ -1,7 +1,7 @@
 from map_info.kakao_map_crawling import getPlaces
 from map_info import app, db
 from flask import jsonify
-from ..models.model import Result
+from ..models.place import Place
 
 # 지도 데이터 크롤링 후 db 저장
 @app.route('/crawling', methods=["POST"])
@@ -11,7 +11,7 @@ def addData():
 
     if isinstance(data, list): # data가 리스트 형태로 반환되었는지 확인
         for item in data:
-            new_result = Result(**item)
+            new_result = Place(**item)
             db.session.add(new_result)
         db.session.commit()
         return jsonify({"response": "complete"}), 201

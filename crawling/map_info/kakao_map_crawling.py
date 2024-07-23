@@ -25,6 +25,8 @@ def getPlaces(keyword, center_lat, center_lon):
     # 파싱
     places = []
     for place in data['documents']:
+        print(place)
+        print('---------------------------------')
         place_info = {
             'name': place['place_name'],
             'road_address': place['road_address_name'],

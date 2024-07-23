@@ -35,7 +35,6 @@ public class BoardService {
 	@Transactional
 	public void createBoard(BoardCreateReq boardCreateReq) {
 		Board board = BoardMapper.INSTANCE.boardCreateReqToBoard(boardCreateReq);
-		System.out.println("hihi");
 		boardRepository.save(board);
 	}
 

@@ -7,3 +7,6 @@ flask-marshmallow==0.14.0
 greenlet==2.0.2
 pymysql==1.0.2
 mysqlclient==2.2.4
+requests~=2.32.3
+pandas~=2.2.2
+alembic~=1.13.2

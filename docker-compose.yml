@@ -1,42 +1,37 @@
-#version: '3.9' # docker compose version
-#
-#services: # container setting info
-#    db:
-#      image: mysql:8.0
-#      volumes:
-#        - db:/var/lib/mysql
-#      restart: unless-stopped
-#      environment:
-#        - MYSQL_ROOT_PASSWORD=jamjam
-#        - MYSQL_DATABASE=jamjam
-#        - MYSQL_USER=user
-#        - MYSQL_PASSWORD=jamjam
-#      networks:
-#        - wordpress
-#    redis:
-#      image: redis:8.0.3-alpine
-#      ports:
-#        - "6379:80"
-#      volumes:
-#        -
-#
-#    wordpress:
-#      depends_on:
-#        - db
-#      image: wordpress:latest
-#      ports:
-#        - "8000:80"
-#      restart: unless-stopped
-#      environment:
-#        WORDPRESS_DB_HOST: db:3306
-#        WORDPRESS_DB_USER: jamjam
-#        WORDPRESS_DB_PASSWORD: jamjam
-#        WORDPRESS_DB_NAME: jamjam
-#      networks:
-#        - wordpress
-#volumes:
-#  db: {}
-#
-#networks:
-#  wordpress: {}
+#version: '3.0' # docker compose version -> delete, 2.25.0 이상부터는 version 필요 없음
+
+services: # container setting info
+    mysql-docker:
+      container_name: mysql-container
+      image: mysql:8.0
+      volumes:
+        - db-mysql:/var/lib/mysql
+      restart: unless-stopped
+      environment:
+        - MYSQL_ROOT_PASSWORD=jamjam
+        - MYSQL_DATABASE=jamjam
+        - MYSQL_USER=jamjam
+        - MYSQL_PASSWORD=jamjama604
+      networks:
+        - db-network
+      ports:
+        - "3306:3306"
+    redis-docker:
+      container_name: redis-container
+      image: redis:7.0
+      ports:
+        - "6379:6379"
+      volumes:
+        - db-redis:/var/lib/redis
+      networks:
+        - db-network
+
+volumes:
+  db-mysql:
+  db-redis:
+
+
+networks:
+  db-network:
+    driver: bridge
 

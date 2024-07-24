@@ -2,7 +2,7 @@ import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { defaultTheme } from "./theme";
 import Router from "./Router";
 
-// 기본 CSS 세팅
+// 기본 CSS 초기화하는 세팅
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,

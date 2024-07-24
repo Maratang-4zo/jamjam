@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import NavBarLeft from "../components/fixed/NavBarLeft";
+import Map from "../components/mainroom/Map";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -15,7 +16,7 @@ function Room() {
   return (
     <Wrapper>
       <NavBarLeft />
-      <h1>room</h1>
+      <Map />
     </Wrapper>
   );
 }

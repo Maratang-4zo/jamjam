@@ -1,7 +1,8 @@
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { defaultTheme } from "./theme";
 import Router from "./Router";
-
+import { ReactQueryDevtools } from "react-query/devtools";
+import { NavermapsProvider } from "react-naver-maps";
 // 기본 CSS 초기화하는 세팅
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -64,13 +65,17 @@ a {
   color: inherit;
 }
 `;
-
 function App() {
   return (
     <>
       <ThemeProvider theme={defaultTheme}>
-        <GlobalStyle />
-        <Router />
+        <NavermapsProvider
+          ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
+        >
+          <GlobalStyle />
+          <Router />
+          <ReactQueryDevtools initialIsOpen={true} />
+        </NavermapsProvider>
       </ThemeProvider>
     </>
   );

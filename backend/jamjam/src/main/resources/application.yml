@@ -32,3 +32,7 @@ spring:
     client:
       id: ${CLIENT_ID}
       secret: ${CLIENT_SECRET}
+
+openvidu:
+  openvidu-url: ${OPENVIDU_URL:http://localhost:4443/}
+  openvidu-secret: ${OPENVIDU_SECRET:MY_SECRET}

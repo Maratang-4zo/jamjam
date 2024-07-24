@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import NavBarLeft from "../components/fixed/NavBarLeft";
+import NavBarUp from "../components/fixed/NavBarUp";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -8,16 +8,17 @@ const Wrapper = styled.div`
   color: ${(props) => props.theme.textColor};
   border: 3px solid ${(props) => props.theme.accentColor};
   display: flex;
+  flex-direction: column;
   align-items: center;
 `;
 
-function GameChoice() {
+function FinalResult() {
   return (
     <Wrapper>
-      <NavBarLeft />
-      <h1>게임 선택</h1>
+      <NavBarUp />
+      <h1>최종 결과 화면</h1>
     </Wrapper>
   );
 }
 
-export default GameChoice;
+export default FinalResult;

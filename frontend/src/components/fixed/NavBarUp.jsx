@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-const Container = styled.div`
+const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
-  width: ${(props) => props.theme.containerWidth};
+  width: ${(props) => props.theme.wrapperWidth};
   height: 70px;
   color: ${(props) => props.theme.textColor};
   display: flex;
   padding: 0px 24px;
   justify-content: space-between;
   align-items: center;
-  border-top: 3px solid ${(props) => props.theme.accentColor};
+  border-bottom: 3px solid ${(props) => props.theme.accentColor};
   border-left: 3px solid ${(props) => props.theme.accentColor};
   border-right: 3px solid ${(props) => props.theme.accentColor};
 `;
@@ -30,18 +30,18 @@ const Right = styled.div`
   flex: 1 0 0;
 `;
 
-function NavBar() {
+function NavBarUp() {
   return (
-    <Container>
+    <Wrapper>
       <Left>
         <Link to={`/room/:roomId/create`}>CREATE</Link>
       </Left>
-      <h3>Logo</h3>
+      <Link to={`/`}>로고자리입니다</Link>
       <Right>
         <Link to={`/`}>LOGIN</Link>
       </Right>
-    </Container>
+    </Wrapper>
   );
 }
 
-export default NavBar;
+export default NavBarUp;

@@ -11,13 +11,13 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-function GameChoice() {
+function Room() {
   return (
     <Wrapper>
       <NavBarLeft />
-      <h1>게임 선택</h1>
+      <h1>room</h1>
     </Wrapper>
   );
 }
 
-export default GameChoice;
+export default Room;

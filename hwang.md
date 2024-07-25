@@ -23,3 +23,8 @@
 - docker 설치 후 mysql container 생성 및 실행 시도
 - mysql과 mysql workbench의 버전 차이 + docker desktop 위에 다운받은 mysql을 latest로 했더니 버전 충돌 발생
 - 다 지우고 새로 깔았음.
+
+07.25
+
+- login 구현하고 user정보 가져오는 과정 진행중입니다.
+- 에러 처리중에 막혀서 오늘 집가서 코드 비교해볼 예정입니다..

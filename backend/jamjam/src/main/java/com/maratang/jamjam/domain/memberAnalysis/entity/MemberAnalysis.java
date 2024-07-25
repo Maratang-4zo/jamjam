@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 @Table(name = "member_analysis")
 public class MemberAnalysis {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String rate;

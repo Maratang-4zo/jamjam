@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 @Table(name = "attendee")
 public class Attendee {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long attendee_id;
 
 	private String nickname;

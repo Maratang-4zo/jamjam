@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 @Table(name = "room")
 public class Room {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long room_id;
 
 	private String name;

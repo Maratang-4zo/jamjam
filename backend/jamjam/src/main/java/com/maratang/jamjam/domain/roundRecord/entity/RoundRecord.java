@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 @Table(name = "round_record")
 public class RoundRecord {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long round_record_id;
 
 	private Integer round;

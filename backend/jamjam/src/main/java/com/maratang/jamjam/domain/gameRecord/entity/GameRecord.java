@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 @Table(name = "game_record")
 public class GameRecord {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long game_record_id;
 
 	private Integer round_cnt;

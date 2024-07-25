@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 @Table(name = "member_round_record")
 public class MemberRoundRecord {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long member_round_record_id;
 
 	@ManyToOne(fetch = FetchType.LAZY)

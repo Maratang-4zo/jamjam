@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import styled from "styled-components";
+import LoginModal from "./LoginModal"; // LoginModal import
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -13,6 +15,7 @@ const Wrapper = styled.div`
   border-bottom: 3px solid ${(props) => props.theme.accentColor};
   border-left: 3px solid ${(props) => props.theme.accentColor};
   border-right: 3px solid ${(props) => props.theme.accentColor};
+  position: relative;
 `;
 
 const Left = styled.div`
@@ -31,16 +34,25 @@ const Right = styled.div`
 `;
 
 function NavBarUp() {
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   return (
-    <Wrapper>
-      <Left>
-        <Link to={`/room/:roomId/create`}>CREATE</Link>
-      </Left>
-      <Link to={`/`}>로고자리입니다</Link>
-      <Right>
-        <Link to={`/`}>LOGIN</Link>
-      </Right>
-    </Wrapper>
+    <>
+      <Wrapper>
+        <Left>
+          <Link to={`/room/:roomId/create`}>CREATE</Link>
+        </Left>
+        <Link to={`/`}>로고자리입니다</Link>
+        <Right>
+          <button onClick={toggleModal}>LOGIN</button>
+        </Right>
+      </Wrapper>
+      <LoginModal isVisible={isModalVisible} toggleModal={toggleModal} />
+    </>
   );
 }
 

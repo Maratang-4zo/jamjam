@@ -1,0 +1,24 @@
+@font-face {
+  font-family: "DungGeunMo"; /* 사용할 폰트의 이름을 정의 */
+  src: url("./fonts/DungGeunMo.ttf"); /* 폰트 파일의 위치 */
+}
+
+@font-face {
+  font-family: "OldGalmuri";
+  src: url("./fonts/Galmuri11.ttf");
+}
+
+@font-face {
+  font-family: "NewGalmuriBold";
+  src: url("./fonts/ONE(Ed.) Galmuri11 Bold.ttf");
+}
+
+@font-face {
+  font-family: "NewGalmuriRegular";
+  src: url("./fonts/ONE(Ed.) Galmuri11 Regular.ttf");
+}
+
+@font-face {
+  font-family: "pixel";
+  src: url("./fonts/pixelroborobo.otf");
+}

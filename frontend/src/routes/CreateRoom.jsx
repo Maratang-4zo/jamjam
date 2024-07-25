@@ -4,6 +4,7 @@ import Background from "../assets/CreateRoomBg.png";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState } from "react";
+import "../index.css";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -63,6 +64,23 @@ const Select = styled.select`
   box-sizing: border-box;
 `;
 
+const Button = styled.button`
+  width: 100px;
+  height: 50px;
+  flex-shrink: 0;
+  border-radius: 15px;
+  border: 3px solid var(--Color, #000);
+  background: #fff;
+  margin-top: 100px; /* 버튼을 FormWrapper로부터 떨어뜨리기 위한 마진 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ButtonText = styled.p`
+  font-family: "pixel" !important;
+`;
+
 function CreateRoom() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -99,7 +117,9 @@ function CreateRoom() {
             </Select>
           </InputWrapper>
         </FormWrapper>
-        <button>생성</button>
+        <Button>
+          <ButtonText>생성</ButtonText>
+        </Button>
       </Content>
     </Wrapper>
   );

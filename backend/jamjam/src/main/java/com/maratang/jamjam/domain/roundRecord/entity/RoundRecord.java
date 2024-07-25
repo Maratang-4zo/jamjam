@@ -4,19 +4,33 @@ import java.time.LocalDateTime;
 
 import com.maratang.jamjam.domain.game.entity.Game;
 import com.maratang.jamjam.domain.gameRecord.entity.GameRecord;
+import com.maratang.jamjam.global.auditing.BaseTimeEntity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "round_record")
-public class RoundRecord {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class RoundRecord extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long round_record_id;
+	@Column(columnDefinition = "INT UNSIGNED")
+	private Long roundRecordId;
 
 	private Integer round;
-	private LocalDateTime created_at;
-	private LocalDateTime ended_at;
+
+	private LocalDateTime endedAt;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "game_id")
@@ -26,6 +40,17 @@ public class RoundRecord {
 	@JoinColumn(name = "game_record_id")
 	private GameRecord gameRecord;
 
-	private String station_name;
+	private String stationName;
+
+	@Builder
+	public RoundRecord(Long roundRecordId, Integer round, LocalDateTime endedAt, Game game, GameRecord gameRecord,
+		String stationName) {
+		this.roundRecordId = roundRecordId;
+		this.round = round;
+		this.endedAt = endedAt;
+		this.game = game;
+		this.gameRecord = gameRecord;
+		this.stationName = stationName;
+	}
 }
 

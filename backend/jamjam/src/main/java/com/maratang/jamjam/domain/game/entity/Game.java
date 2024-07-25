@@ -7,7 +7,8 @@ import jakarta.persistence.*;
 public class Game {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@Column(columnDefinition = "INT UNSIGNED")
+	private Long gameId;
 
 	private String name;
 

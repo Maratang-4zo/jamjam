@@ -71,6 +71,7 @@ function App() {
       <ThemeProvider theme={defaultTheme}>
         <NavermapsProvider
           ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
+          submodules={["geocoder"]}
         >
           <GlobalStyle />
           <Router />

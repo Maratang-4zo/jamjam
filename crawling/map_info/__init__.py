@@ -1,16 +1,17 @@
+import pymysql
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_marshmallow import Marshmallow
 from config import DB_USERNAME, DB_PASSWORD, DB_HOST, DB_NAME, DB_PORT
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+db = pymysql.connect(
+    host=f'{DB_HOST}',     # MySQL Server Address
+    port=DB_PORT,     # MySQL Server Port
+    user=f'{DB_USERNAME}',      # MySQL username
+    passwd=f'{DB_PASSWORD}',    # password for MySQL username
+    db=f'{DB_NAME}',   # Database name
+    charset='utf8'
+)
 
-ma = Marshmallow(app)
-
-from map_info.models import *  # 모델 import
+# from map_info.models import *  # 모델 import
 from map_info.apis import *

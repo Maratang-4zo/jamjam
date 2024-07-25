@@ -7,8 +7,6 @@ from config import KAKAO_REST_API_KEY, KAKAO_SEARCH_KEYWORD_URL
 file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'subwayinfo.csv')
 df = pd.read_csv(file_path, header=None, names=['C1', 'C2', 'C3', 'C4', 'C5'])
 
-
-
 # 지하철 이름으로 위/경도 반환
 def get_station_info(station_name):
     try:

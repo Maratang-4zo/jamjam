@@ -27,7 +27,13 @@ public enum ErrorCode {
 	USER_EMAIL_DUPLICATE(HttpStatus.CONFLICT, "US002", "사용중인 이메일 입니다."),
 	USER_NICKNAME_DUPLICATE(HttpStatus.CONFLICT, "US003", "사용중인 닉네임 입니다."),
 	USER_CANNOT_DELETE(HttpStatus.NOT_ACCEPTABLE, "US004", "유저를 삭제할 수 없습니다."),
-	ADMIN_CANNOT_DELETE(HttpStatus.NOT_ACCEPTABLE, "US005", "관리자는 삭제할 수 없습니다.");
+	ADMIN_CANNOT_DELETE(HttpStatus.NOT_ACCEPTABLE, "US005", "관리자는 삭제할 수 없습니다."),
+
+	// openvidu
+	OV_SERVER_ERROR(HttpStatus.BAD_REQUEST, "OV000", "OV 처리 중 오류가 발생했습니다."),
+	OV_CANNOT_CREATE_SESSION(HttpStatus.BAD_REQUEST, "OV001", "OV 세션을 생성하지 못했습니다."),
+	OV_CANNOT_CREATE_CONNECTION(HttpStatus.BAD_REQUEST, "OV002", "OV 커넥션을 생성하지 못했습니다."),
+	OV_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "OV003", "OV 세션을 찾을 수 없습니다.");
 
 	private final HttpStatus status;
 	private final String code;

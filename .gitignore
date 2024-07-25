@@ -443,3 +443,4 @@ dist
 
 # custom
 .env
+.idea/

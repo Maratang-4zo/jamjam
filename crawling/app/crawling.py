@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 from app.config import KAKAO_REST_API_KEY, KAKAO_SEARCH_KEYWORD_URL
 
-# Load the CSV file
 file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'subwayinfo.csv')
 df = pd.read_csv(file_path, header=None, names=['C1', 'C2', 'C3', 'C4', 'C5'])
 
@@ -35,32 +34,45 @@ def get_places(keyword):
             print(f"Coordinates for {keyword} not found.")
             return []
 
-        params = {
-            'query': keyword,
-            'x': center_lat,
-            'y': center_lon,
-            'radius': 1000,  # 반경 1km (미터 단위)
-            'size': 1  # 한 페이지에 가져올 결과 수 (최대 15개)
-            # 'sort': 'distance'  # 정렬 옵션 (거리순)
-        }
-
-        response = requests.get(KAKAO_SEARCH_KEYWORD_URL, headers=headers, params=params) # API 호출
-
-        data = response.json() # JSON 응답
-
-        # 파싱
-        for place in data['documents']:
-            place_info = {
-                'station_name': station_name,
-                'name': place['place_name'],
-                'id': place['id'],
-                'category': keyword,
-                'road_address': place['road_address_name'],
-                'address': place['address_name'],
-                'phone': place.get('phone', '정보 없음'),
-                'latitude': place['y'],
-                'longitude': place['x']
+        page = 1
+        while True: # 모든 페이지 순회
+            params = {
+                'query': keyword,
+                'x': center_lat,
+                'y': center_lon,
+                'radius': 1000,  # 반경 1km (미터 단위)
+                'size': 15,  # 한 페이지에 가져올 결과 수 (최대 15개)
+                'page': page
+                # 'sort': 'distance'  # 정렬 옵션 (거리순)
             }
-            places.append(place_info)
+
+            response = requests.get(KAKAO_SEARCH_KEYWORD_URL, headers=headers, params=params) # API 호출
+
+            data = response.json() # JSON 응답
+
+            # 결과가 없으면 루프 종료
+            if not data['documents']:
+                break
+
+            # 파싱
+            for place in data['documents']:
+                place_info = {
+                    'station_name': station_name,
+                    'name': place['place_name'],
+                    'id': place['id'],
+                    'category': keyword,
+                    'road_address': place['road_address_name'],
+                    'address': place['address_name'],
+                    'phone': place.get('phone', '정보 없음'),
+                    'latitude': place['y'],
+                    'longitude': place['x']
+                }
+                places.append(place_info)
+
+            # 다음 페이지 확인
+            if data.get('meta', {}).get('is_end'):
+                break
+
+            page += 1  # 다음 페이지로 이동
 
     return places

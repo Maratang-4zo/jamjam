@@ -27,9 +27,9 @@ def create_table():
         phone VARCHAR(20),
         latitude FLOAT,
         longitude FLOAT,
-        is_delete TINYINT(1),
-        create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        update_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        is_deleted TINYINT(1) DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
     """
     with db.cursor() as cursor:

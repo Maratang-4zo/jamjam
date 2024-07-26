@@ -1,10 +1,8 @@
-from datetime import datetime
 import time
-
 import pandas as pd
-
 from app.crawling import get_places
-from app import app, db
+from app.models import Place
+from app import app
 from flask import jsonify
 
 # 지도 데이터 크롤링 후 db 저장
@@ -28,39 +26,32 @@ def addData():
     end_kakao_request = time.time() # 카카오맵 API로 장소 요청 후 받아오는 시간 측정
 
     # DB에 있는 Place 정보를 DataFrame으로 가져오기
-    all_places_df = pd.read_sql_query('select * from place_tb', con=db)
+    all_places = Place.get_all_places()
+    all_places_df = pd.DataFrame(all_places)
 
-    # id 열의 데이터 타입을 동일하게 맞추기
-    all_places_df['id'] = all_places_df['id'].astype(str)
+    all_places_df['id'] = all_places_df['id'].astype(str) # id 열의 데이터 타입을 동일하게 맞추기
 
     # API로 가져온 새로운 데이터를 DataFrame으로 변환
     new_data_df = pd.DataFrame(all_data)
     new_data_df['id'] = new_data_df['id'].astype(str)
 
     # id를 기준으로 교집합, 차집합 찾기
-    common_ids = all_places_df.merge(new_data_df, on='id')['id']
-    to_delete = all_places_df[~all_places_df['id'].isin(common_ids)]
-    to_insert = new_data_df[~new_data_df['id'].isin(all_places_df['id'])]
+    common_ids = all_places_df.merge(new_data_df, on='id')['id'] # 합집합
+    to_delete = all_places_df[~all_places_df['id'].isin(common_ids)] # 차집합: old-new
+    to_insert = new_data_df[~new_data_df['id'].isin(all_places_df['id'])] # 차집합: new-old
+    to_update = new_data_df[new_data_df['id'].isin(all_places_df['id'])] # 교집합
 
     # 삭제 필드 업데이트
-    if not to_delete.empty:
-        delete_query = (f"UPDATE place_tb SET is_delete = TRUE, update_at = '{datetime.now()}' "
-                        f"WHERE id IN ({','.join(map(str, to_delete['id'].tolist()))})")
-        with db.cursor() as cursor:
-            cursor.execute(delete_query)
-            db.commit()
+    for place_id in to_delete['id'].tolist():
+        Place.delete_place(place_id)
 
     # 새로운 데이터 삽입
-    if not to_insert.empty:
-        to_insert_records = to_insert.to_dict(orient='records')
-        for record in to_insert_records:
-            columns = ', '.join(record.keys())
-            values = ', '.join([f"'{str(v)}'" for v in record.values()])
-            insert_query = f"INSERT INTO place_tb ({columns}) VALUES ({values})"
-            with db.cursor() as cursor:
-                cursor.execute(insert_query)
+    for _, row in to_insert.iterrows():
+        Place.insert_place(row.to_dict())
 
-        db.commit()
+    # 교집합 부분 업데이트
+    for _, row in to_update.iterrows():
+        Place.update_place(row['id'], row.to_dict())
 
     end_db_update = time.time()
 

@@ -15,8 +15,8 @@ function Router() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/:userId" element={<Mypage />} />
+        <Route path="/room/create" element={<CreateRoom />} />
         <Route path="/room/:roomId" element={<Room />} />
-        <Route path="/room/:roomId/create" element={<CreateRoom />} />
         <Route path="/room/:roomId/join" element={<JoinRoom />} />
         <Route path="/room/:roomId/gamechoice" element={<GameChoice />} />
         <Route path="/room/:roomId/game" element={<Game />} />

@@ -25,33 +25,37 @@ def addData():
 
     end_kakao_request = time.time() # 카카오맵 API로 장소 요청 후 받아오는 시간 측정
 
-    # DB에 있는 Place 정보를 DataFrame으로 가져오기
-    all_places = Place.get_all_places()
-    all_places_df = pd.DataFrame(all_places)
-
-    all_places_df['id'] = all_places_df['id'].astype(str) # id 열의 데이터 타입을 동일하게 맞추기
-
     # API로 가져온 새로운 데이터를 DataFrame으로 변환
     new_data_df = pd.DataFrame(all_data)
     new_data_df['id'] = new_data_df['id'].astype(str)
 
-    # id를 기준으로 교집합, 차집합 찾기
-    common_ids = all_places_df.merge(new_data_df, on='id')['id'] # 합집합
-    to_delete = all_places_df[~all_places_df['id'].isin(common_ids)] # 차집합: old-new
-    to_insert = new_data_df[~new_data_df['id'].isin(all_places_df['id'])] # 차집합: new-old
-    to_update = new_data_df[new_data_df['id'].isin(all_places_df['id'])] # 교집합
+    # DB에 있는 Place 데이터 가져오기
+    all_places = Place.get_all_places()
 
-    # 삭제 필드 업데이트
-    for place_id in to_delete['id'].tolist():
-        Place.delete_place(place_id)
+    if len(all_places) == 0: # DB에 아무 데이터가 없다면 새로운 데이터 삽입
+        for _, row in new_data_df.iterrows():
+            Place.insert_place(row.to_dict())
+    else:
+        all_places_df = pd.DataFrame(all_places)
+        all_places_df['id'] = all_places_df['id'].astype(str) # id 열의 데이터 타입을 동일하게 맞추기
 
-    # 새로운 데이터 삽입
-    for _, row in to_insert.iterrows():
-        Place.insert_place(row.to_dict())
+        # id를 기준으로 교집합, 차집합 찾기
+        common_ids = all_places_df.merge(new_data_df, on='id')['id'] # 합집합
+        to_delete = all_places_df[~all_places_df['id'].isin(common_ids)] # 차집합: old-new
+        to_insert = new_data_df[~new_data_df['id'].isin(all_places_df['id'])] # 차집합: new-old
+        to_update = new_data_df[new_data_df['id'].isin(all_places_df['id'])] # 교집합
 
-    # 교집합 부분 업데이트
-    for _, row in to_update.iterrows():
-        Place.update_place(row['id'], row.to_dict())
+        # 삭제 필드 업데이트
+        for place_id in to_delete['id'].tolist():
+            Place.delete_place(place_id)
+
+        # 새로운 데이터 삽입
+        for _, row in to_insert.iterrows():
+            Place.insert_place(row.to_dict())
+
+        # 교집합 부분 업데이트
+        for _, row in to_update.iterrows():
+            Place.update_place(row['id'], row.to_dict())
 
     end_db_update = time.time()
 

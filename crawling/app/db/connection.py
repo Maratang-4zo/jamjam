@@ -38,4 +38,4 @@ def create_table():
 
 
 db = get_db_connection()
-# create_table()
+create_table()

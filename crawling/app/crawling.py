@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import requests
-from config import KAKAO_REST_API_KEY, KAKAO_SEARCH_KEYWORD_URL
+from app.config import KAKAO_REST_API_KEY, KAKAO_SEARCH_KEYWORD_URL
 
 # Load the CSV file
 file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'subwayinfo.csv')
@@ -16,6 +16,7 @@ def get_station_info(station_name):
     except IndexError:
         return None, None
 
+# 카카오 API로 모든 지하철역에 대해 상권정보 요청 & 파싱
 def get_places(keyword):
 
     # 요청 헤더

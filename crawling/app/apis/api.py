@@ -3,8 +3,8 @@ import time
 
 import pandas as pd
 
-from map_info.kakao_map_crawling import get_places
-from map_info import app, db
+from app.crawling import get_places
+from app import app, db
 from flask import jsonify
 
 # 지도 데이터 크롤링 후 db 저장

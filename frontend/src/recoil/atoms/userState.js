@@ -8,3 +8,10 @@ export const userPlaceAtom = atom({
     longitude: 0,
   },
 });
+
+export const userInfoAtom = atom({
+  key: "userInfo",
+  default: {
+    isHost: true,
+  },
+});

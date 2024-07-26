@@ -3,6 +3,7 @@ import NavBarLeft from "../components/fixed/NavBarLeft";
 import Map from "../components/mainroom/Map";
 import { useEffect, useState } from "react";
 import FindDeparture from "../components/mainroom/Departure";
+import Buttons from "../components/mainroom/Buttons";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -36,15 +37,8 @@ function Room() {
           onAddressSelect={handleAddressSelect}
         />
       )}
-      {selectedAddress && (
-        <div>
-          <h2>선택한 주소:</h2>
-          <p>{selectedAddress.address}</p>
-          <p>위도: {selectedAddress.latitude}</p>
-          <p>경도: {selectedAddress.longitude}</p>
-        </div>
-      )}
       <Map />
+      <Buttons />
     </Wrapper>
   );
 }

@@ -33,7 +33,10 @@ public enum ErrorCode {
 	OV_SERVER_ERROR(HttpStatus.BAD_REQUEST, "OV000", "OV 처리 중 오류가 발생했습니다."),
 	OV_CANNOT_CREATE_SESSION(HttpStatus.BAD_REQUEST, "OV001", "OV 세션을 생성하지 못했습니다."),
 	OV_CANNOT_CREATE_CONNECTION(HttpStatus.BAD_REQUEST, "OV002", "OV 커넥션을 생성하지 못했습니다."),
-	OV_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "OV003", "OV 세션을 찾을 수 없습니다.");
+	OV_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "OV003", "OV 세션을 찾을 수 없습니다."),
+
+	// room
+	ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "RM001", "미팅룸을 찾을 수 없습니다.");
 
 	private final HttpStatus status;
 	private final String code;

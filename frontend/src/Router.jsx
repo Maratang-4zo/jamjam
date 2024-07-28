@@ -8,6 +8,7 @@ import Game from "./routes/Game";
 import FinalResult from "./routes/FinalResult";
 import JoinRoom from "./routes/JoinRoom";
 import Reconnect from "./routes/Reconnect";
+import Ws from "./routes/ws";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
         <Route path="/room/:roomId/game" element={<Game />} />
         <Route path="/room/:roomId/result" element={<FinalResult />} />
         <Route path="/room/:roomId/reconnect" element={<Reconnect />} />
+        <Route path="/room/:roomId/ws" element={<Ws />} />
       </Routes>
     </BrowserRouter>
   );

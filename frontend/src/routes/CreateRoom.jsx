@@ -7,7 +7,6 @@ import NavBarUp from "../components/fixed/NavBarUp";
 import Background from "../assets/CreateRoomBg.png";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
 import "../index.css";
 
 const Wrapper = styled.div`

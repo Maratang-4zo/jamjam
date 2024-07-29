@@ -4,7 +4,8 @@ import styled from "styled-components";
 import { roomAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
-import TutorialModal from "./Tutorial"; // TutorialModal 임포트
+import TutorialModal from "./Tutorial";
+import EditModal from "./EditModal"; // EditModal 임포트
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -27,16 +28,16 @@ const BigBtn = styled.button`
   border-radius: 15px;
   border: 3px solid #000;
   background-color: ${(props) => {
-    if (props.isModalOpen) {
+    if (props.isTutorialModalOpen) {
       return props.highlight ? props.theme.bgColor : "gray";
     }
     return props.disabled ? "gray" : props.theme.bgColor;
   }};
   color: ${(props) => {
-    if (props.isModalOpen) {
-      return props.highlight ? "black" : "darkgray";
+    if (props.isTutorialModalOpen) {
+      return props.highlight ? "black" : "lightgray";
     }
-    return props.disabled ? "darkgray" : "inherit";
+    return props.disabled ? "lightgray" : "inherit";
   }};
   &:hover {
     background-color: ${(props) => (props.disabled ? "gray" : "black")};
@@ -44,9 +45,9 @@ const BigBtn = styled.button`
     transition: 0.3s;
   }
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
-  position: ${(props) => (props.isModalOpen ? "relative" : "static")};
-  z-index: ${(props) => (props.isModalOpen ? 1100 : "auto")};
-  pointer-events: ${(props) => (props.isModalOpen ? "none" : "auto")};
+  position: ${(props) => (props.isTutorialModalOpen ? "relative" : "static")};
+  z-index: ${(props) => (props.isTutorialModalOpen ? 1100 : "auto")};
+  pointer-events: ${(props) => (props.isTutorialModalOpen ? "none" : "auto")};
 `;
 
 const SmallBtn = styled.button`
@@ -65,9 +66,9 @@ const SmallBtn = styled.button`
     color: ${(props) => (props.disabled ? "none" : props.theme.subaccentColor)};
     transition: 0.3s;
   }
-  position: ${(props) => (props.isModalOpen ? "relative" : "static")};
-  z-index: ${(props) => (props.isModalOpen ? 1100 : "auto")};
-  pointer-events: ${(props) => (props.isModalOpen ? "none" : "auto")};
+  position: ${(props) => (props.isTutorialModalOpen ? "relative" : "static")};
+  z-index: ${(props) => (props.isTutorialModalOpen ? 1100 : "auto")};
+  pointer-events: ${(props) => (props.isTutorialModalOpen ? "none" : "auto")};
 `;
 
 const RightBtns = styled.div`
@@ -85,32 +86,35 @@ const SmallIcon = styled.img`
   height: 35px;
 `;
 
-function Buttons() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+function Buttons({ onOpenEditModal }) {
+  const [isTutorialModalOpen, setIsTutorialModalOpen] = useState(false);
+  const [currentTutorialPage, setCurrentTutorialPage] = useState(1);
   const roomState = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
 
-  const openModal = () => {
-    setIsModalOpen(true);
+  const openTutorialModal = () => {
+    setIsTutorialModalOpen(true);
     document.body.classList.add("modal-open");
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeTutorialModal = () => {
+    setIsTutorialModalOpen(false);
     document.body.classList.remove("modal-open");
   };
 
   return (
     <>
       <BottomBtns>
-        <SmallBtn onClick={openModal} isModalOpen={isModalOpen}>
+        <SmallBtn
+          onClick={openTutorialModal}
+          isTutorialModalOpen={isTutorialModalOpen}
+        >
           <SmallIcon src={alertIcon} />
         </SmallBtn>
         <BigBtn
           disabled={!roomState.isCenterExist || !userInfo.isHost}
-          isModalOpen={isModalOpen}
-          highlight={currentPage === 2}
+          isTutorialModalOpen={isTutorialModalOpen}
+          highlight={currentTutorialPage === 2}
         >
           GAME
         </BigBtn>
@@ -120,22 +124,27 @@ function Buttons() {
             !userInfo.isHost ||
             roomState.isCenterExist
           }
-          isModalOpen={isModalOpen}
-          highlight={currentPage === 1}
+          isTutorialModalOpen={isTutorialModalOpen}
+          highlight={currentTutorialPage === 1}
         >
           중심 찾기
         </BigBtn>
       </BottomBtns>
       <RightBtns>
-        <SmallBtn isModalOpen={isModalOpen}>수정</SmallBtn>
-        <SmallBtn isModalOpen={isModalOpen}>초대</SmallBtn>
-        <SmallBtn isModalOpen={isModalOpen}>공유</SmallBtn>
+        <SmallBtn
+          onClick={onOpenEditModal}
+          isTutorialModalOpen={isTutorialModalOpen}
+        >
+          수정
+        </SmallBtn>
+        <SmallBtn isTutorialModalOpen={isTutorialModalOpen}>초대</SmallBtn>
+        <SmallBtn isTutorialModalOpen={isTutorialModalOpen}>공유</SmallBtn>
       </RightBtns>
       <TutorialModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
+        isOpen={isTutorialModalOpen}
+        onClose={closeTutorialModal}
+        currentPage={currentTutorialPage}
+        setCurrentPage={setCurrentTutorialPage}
       />
     </>
   );

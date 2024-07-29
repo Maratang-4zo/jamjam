@@ -1,9 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { roomAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
+import TutorialModal from "./Tutorial"; // TutorialModal 임포트
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -25,14 +26,27 @@ const BigBtn = styled.button`
   flex-shrink: 0;
   border-radius: 15px;
   border: 3px solid #000;
-  background-color: ${(props) =>
-    props.disabled ? "gray" : props.theme.bgColor};
+  background-color: ${(props) => {
+    if (props.isModalOpen) {
+      return props.highlight ? props.theme.bgColor : "gray";
+    }
+    return props.disabled ? "gray" : props.theme.bgColor;
+  }};
+  color: ${(props) => {
+    if (props.isModalOpen) {
+      return props.highlight ? "black" : "darkgray";
+    }
+    return props.disabled ? "darkgray" : "inherit";
+  }};
   &:hover {
     background-color: ${(props) => (props.disabled ? "gray" : "black")};
     color: ${(props) => (props.disabled ? "none" : props.theme.bgColor)};
     transition: 0.3s;
   }
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  position: ${(props) => (props.isModalOpen ? "relative" : "static")};
+  z-index: ${(props) => (props.isModalOpen ? 1100 : "auto")};
+  pointer-events: ${(props) => (props.isModalOpen ? "none" : "auto")};
 `;
 
 const SmallBtn = styled.button`
@@ -51,6 +65,9 @@ const SmallBtn = styled.button`
     color: ${(props) => (props.disabled ? "none" : props.theme.subaccentColor)};
     transition: 0.3s;
   }
+  position: ${(props) => (props.isModalOpen ? "relative" : "static")};
+  z-index: ${(props) => (props.isModalOpen ? 1100 : "auto")};
+  pointer-events: ${(props) => (props.isModalOpen ? "none" : "auto")};
 `;
 
 const RightBtns = styled.div`
@@ -69,15 +86,32 @@ const SmallIcon = styled.img`
 `;
 
 function Buttons() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const roomState = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    document.body.classList.add("modal-open");
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    document.body.classList.remove("modal-open");
+  };
+
   return (
     <>
       <BottomBtns>
-        <SmallBtn>
+        <SmallBtn onClick={openModal} isModalOpen={isModalOpen}>
           <SmallIcon src={alertIcon} />
         </SmallBtn>
-        <BigBtn disabled={!roomState.isCenterExist || !userInfo.isHost}>
+        <BigBtn
+          disabled={!roomState.isCenterExist || !userInfo.isHost}
+          isModalOpen={isModalOpen}
+          highlight={currentPage === 2}
+        >
           GAME
         </BigBtn>
         <BigBtn
@@ -86,15 +120,23 @@ function Buttons() {
             !userInfo.isHost ||
             roomState.isCenterExist
           }
+          isModalOpen={isModalOpen}
+          highlight={currentPage === 1}
         >
           중심 찾기
         </BigBtn>
       </BottomBtns>
       <RightBtns>
-        <SmallBtn>수정</SmallBtn>
-        <SmallBtn>초대</SmallBtn>
-        <SmallBtn>공유</SmallBtn>
+        <SmallBtn isModalOpen={isModalOpen}>수정</SmallBtn>
+        <SmallBtn isModalOpen={isModalOpen}>초대</SmallBtn>
+        <SmallBtn isModalOpen={isModalOpen}>공유</SmallBtn>
       </RightBtns>
+      <TutorialModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </>
   );
 }

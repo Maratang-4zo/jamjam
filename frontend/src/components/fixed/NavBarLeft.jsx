@@ -17,6 +17,7 @@ const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
   padding: 10px 0 0 0;
   border-right: 3px solid ${(props) => props.theme.accentColor};
+  z-index: 10000;
 `;
 
 const Attendants = styled.div`

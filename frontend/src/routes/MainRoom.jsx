@@ -3,7 +3,6 @@ import NavBarLeft from "../components/fixed/NavBarLeft";
 import Map from "../components/mainroom/Map";
 import { useEffect, useState } from "react";
 import FindDeparture from "../components/mainroom/Departure";
-import Buttons from "../components/mainroom/Buttons";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -38,7 +37,6 @@ function Room() {
         />
       )}
       <Map />
-      <Buttons />
     </Wrapper>
   );
 }

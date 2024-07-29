@@ -35,7 +35,7 @@ function Ws() {
 
     const subscribe = () => {
         setConnected(true);
-        client.current.subscribe(`/sub/rooms/${roomId}`, (message) => {
+        client.current.subscribe(`/topic/rooms/${roomId}`, (message) => {
            handleMessage(JSON.parse(message.body));
         });
     }
@@ -63,7 +63,7 @@ function Ws() {
 
     const sendChat = () => {
         client.current.publish({
-            destination: `/pub/${roomId}/chat/send`,
+            destination: `/app/${roomId}/chat/send`,
             body: JSON.stringify({
                 nickname: "hi",
                 content: chat,

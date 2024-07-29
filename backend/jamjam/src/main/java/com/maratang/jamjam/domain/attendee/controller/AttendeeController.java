@@ -1,10 +1,5 @@
 package com.maratang.jamjam.domain.attendee.controller;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import com.maratang.jamjam.global.error.ErrorCode;
-import com.maratang.jamjam.global.error.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
-import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.service.AttendeeService;
 import com.maratang.jamjam.global.room.RoomTokenProvider;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
@@ -36,15 +30,7 @@ public class AttendeeController {
 	@PostMapping
 	@Operation(summary = "참여자 추가하기", description = "해당 방에 참여자가 입장한다.")
 	public ResponseEntity<?> createAttendee(@RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response) {
-		Attendee attendee = attendeeService.createAttendee(attendeeCreateReq);
-
-		UUID roomUUID = Optional.ofNullable(attendee.getRoom().getRoomUUID())
-				.orElseThrow(()->new BusinessException(ErrorCode.RO_NOT_VALID_ROOM));
-
-		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
-				.roomUUID(roomUUID)
-				.AttendeeUUID(attendee.getAttendeeUUID())
-				.build();
+		RoomJwtTokenCliams roomJwtTokenCliams = attendeeService.createAttendee(attendeeCreateReq);
 
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenCliams);
 

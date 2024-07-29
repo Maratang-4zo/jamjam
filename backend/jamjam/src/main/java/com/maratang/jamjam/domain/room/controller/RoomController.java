@@ -1,13 +1,5 @@
 package com.maratang.jamjam.domain.room.controller;
 
-import com.maratang.jamjam.domain.attendee.entity.Attendee;
-import com.maratang.jamjam.global.error.ErrorCode;
-import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenDto;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,12 +12,14 @@ import com.maratang.jamjam.domain.attendee.service.AttendeeService;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.service.RoomService;
+import com.maratang.jamjam.global.room.RoomTokenProvider;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenDto;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/room")
@@ -38,15 +32,7 @@ public class RoomController {
 	@PostMapping
 	@Operation(summary = "방 만들기", description = "방을 만들며, 방장을 설정하고, 사용자도 만든다.")
 	public ResponseEntity<?> createRoom(@RequestBody RoomCreateReq roomCreateReq, HttpServletResponse response) {
-		Attendee attendee = roomService.createRoom(roomCreateReq);
-
-		UUID roomUUID = Optional.ofNullable(attendee.getRoom().getRoomUUID())
-				.orElseThrow(()->new BusinessException(ErrorCode.RO_NOT_VALID_ROOM));
-
-		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
-				.roomUUID(roomUUID)
-				.AttendeeUUID(attendee.getAttendeeUUID())
-				.build();
+		RoomJwtTokenCliams roomJwtTokenCliams = roomService.createRoom(roomCreateReq);
 
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenCliams);
 

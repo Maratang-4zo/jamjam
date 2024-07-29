@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RoomJwtTokenCliams {
 	private UUID roomUUID;
-	private UUID AttendeeUUID;
+	private UUID attendeeUUID;
 }

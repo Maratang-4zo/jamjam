@@ -1,7 +1,7 @@
 package com.maratang.jamjam.domain.room.service;
 
-import com.maratang.jamjam.global.error.ErrorCode;
-import com.maratang.jamjam.global.error.exception.BusinessException;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +13,9 @@ import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.mapper.RoomMapper;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
+import com.maratang.jamjam.global.error.ErrorCode;
+import com.maratang.jamjam.global.error.exception.BusinessException;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +27,7 @@ public class RoomService {
 	private final AttendeeRepository attendeeRepository;
 
 	@Transactional
-	public Attendee createRoom(RoomCreateReq roomCreateReq) {
+	public RoomJwtTokenCliams createRoom(RoomCreateReq roomCreateReq) {
 		Room room = RoomMapper.INSTANCE.roomCreateReqToAttendee(roomCreateReq);
 		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(roomCreateReq.getNickname(), room);
 
@@ -33,7 +36,14 @@ public class RoomService {
 		attendeeRepository.save(attendee);
 		roomRepository.save(room);
 
-		return attendee;
+		UUID roomUUID = room.getRoomUUID();
+
+		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
+			.roomUUID(roomUUID)
+			.attendeeUUID(attendee.getAttendeeUUID())
+			.build();
+
+		return roomJwtTokenCliams;
 	}
 
 	@Transactional

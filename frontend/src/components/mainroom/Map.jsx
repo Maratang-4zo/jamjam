@@ -8,6 +8,7 @@ import {
 import { useRecoilValue } from "recoil";
 import { userPlaceAtom } from "../../recoil/atoms/userState";
 import Avatar1 from "../../assets/avatars/1.png";
+import Buttons from "./Buttons";
 
 function MyMap() {
   const navermaps = useNavermaps();
@@ -40,6 +41,7 @@ function Map() {
   return (
     <MapDiv style={{ width: "100%", height: "100%" }}>
       <MyMap />
+      <Buttons />
     </MapDiv>
   );
 }

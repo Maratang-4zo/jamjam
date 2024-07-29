@@ -7,8 +7,5 @@ import lombok.Getter;
 public class AttendeeCreateReq {
 	@NotBlank
 	private Long roomId;
-	@NotBlank
-	private Double lat;
-	@NotBlank
-	private Double lon;
+	private String nickname;
 }

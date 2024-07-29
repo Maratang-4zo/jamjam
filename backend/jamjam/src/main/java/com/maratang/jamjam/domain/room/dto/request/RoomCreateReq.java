@@ -1,14 +1,17 @@
 package com.maratang.jamjam.domain.room.dto.request;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
 public class RoomCreateReq {
 	@NotBlank
-	private Long roomId;
+	private String name;
 	@NotBlank
-	private Double lat;
+	private String purpose;
 	@NotBlank
-	private Double lon;
+	private LocalDateTime meetingDate;
+	private String nickname;
 }

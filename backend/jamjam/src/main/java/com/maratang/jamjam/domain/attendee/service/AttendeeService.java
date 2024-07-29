@@ -20,18 +20,18 @@ public class AttendeeService {
 	private final AttendeeRepository attendeeRepository;
 
 	@Transactional
-	public void createAttendee(AttendeeCreateReq attendeeCreateReq) {
+	public Attendee createAttendee(AttendeeCreateReq attendeeCreateReq) {
 		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(attendeeCreateReq);
 		attendeeRepository.save(attendee);
+
+		return attendee;
 	}
 
 	@Transactional
-	public Attendee updateAttendee(AttendeeUpdateReq attendeeUpdateReq) {
+	public void updateAttendee(AttendeeUpdateReq attendeeUpdateReq) {
 		Attendee attendee = attendeeRepository.findById(attendeeUpdateReq.getAttendeeId())
 			.orElseThrow(()->new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
 		attendee.updateAttendeeLocation(attendeeUpdateReq);
-
-		return attendee;
 	}
 }

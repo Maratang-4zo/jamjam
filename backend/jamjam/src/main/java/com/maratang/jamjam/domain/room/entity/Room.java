@@ -36,7 +36,7 @@ public class Room extends BaseTimeEntity {
 	private String purpose;
 
 	@Column(name = "`start`")
-	private String start;
+	private String startStation;
 
 	private LocalDateTime meetingDate;
 
@@ -47,15 +47,15 @@ public class Room extends BaseTimeEntity {
 	private Attendee attendee;
 
 	@Column(nullable = false, unique = true, updatable = false)
-	private UUID RoomUUID;
+	private UUID roomUUID;
 
 	@Builder
-	public Room(Long roomId, String name, String purpose, String start, LocalDateTime meetingDate,
+	public Room(Long roomId, String name, String purpose, String startStation, LocalDateTime meetingDate,
 		LocalDateTime endedAt, Attendee attendee) {
 		this.roomId = roomId;
 		this.name = name;
 		this.purpose = purpose;
-		this.start = start;
+		this.startStation = startStation;
 		this.meetingDate = meetingDate;
 		this.endedAt = endedAt;
 		this.attendee = attendee;
@@ -63,7 +63,7 @@ public class Room extends BaseTimeEntity {
 
 	@PrePersist
 	protected void onCreate() {
-		this.RoomUUID = UUID.randomUUID();
+		this.roomUUID = UUID.randomUUID();
 	}
 
 	public void updateAttendee(Attendee attendee) {

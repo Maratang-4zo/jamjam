@@ -1,5 +1,7 @@
 package com.maratang.jamjam.domain.room.service;
 
+import com.maratang.jamjam.global.error.ErrorCode;
+import com.maratang.jamjam.global.error.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,21 +24,22 @@ public class RoomService {
 	private final AttendeeRepository attendeeRepository;
 
 	@Transactional
-	public void createRoom(RoomCreateReq roomCreateReq) {
+	public Attendee createRoom(RoomCreateReq roomCreateReq) {
 		Room room = RoomMapper.INSTANCE.roomCreateReqToAttendee(roomCreateReq);
-
 		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(roomCreateReq.getNickname(), room);
 
 		room.updateAttendee(attendee);
 
 		attendeeRepository.save(attendee);
-
 		roomRepository.save(room);
+
+		return attendee;
 	}
 
 	@Transactional
 	public void updateRoom(RoomUpdateReq roomUpdateReq) {
-		Room room = roomRepository.getReferenceById(roomUpdateReq.getRoomId());
+		Room room = roomRepository.findById(roomUpdateReq.getRoomId())
+				.orElseThrow(()->new BusinessException(ErrorCode.RO_NOT_VALID_ROOM));
 
 		room.updateRoom(roomUpdateReq);
 	}

@@ -1,7 +1,10 @@
 package com.maratang.jamjam.domain.attendee.controller;
 
 import java.util.Optional;
+import java.util.UUID;
 
+import com.maratang.jamjam.global.error.ErrorCode;
+import com.maratang.jamjam.global.error.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -32,23 +35,16 @@ public class AttendeeController {
 
 	@PostMapping
 	@Operation(summary = "참여자 추가하기", description = "해당 방에 참여자가 입장한다.")
-	public ResponseEntity<?> createAttendee(@RequestBody AttendeeCreateReq attendeeCreateReq) {
-		attendeeService.createAttendee(attendeeCreateReq);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
-	}
+	public ResponseEntity<?> createAttendee(@RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response) {
+		Attendee attendee = attendeeService.createAttendee(attendeeCreateReq);
 
-	@PatchMapping
-	@Operation(summary = "참여자 업데이트 하기", description = "해당 방에 참여자의 위치 정보를 업데이트 한다.")
-	public ResponseEntity<?> updateAttendee(@RequestBody AttendeeUpdateReq attendeeUpdateReq, HttpServletResponse response) {
-		Attendee attendee = attendeeService.updateAttendee(attendeeUpdateReq);
-
-		String start = Optional.ofNullable(attendee.getRoom().getStart()).orElse(" ");
+		UUID roomUUID = Optional.ofNullable(attendee.getRoom().getRoomUUID())
+				.orElseThrow(()->new BusinessException(ErrorCode.RO_NOT_VALID_ROOM));
 
 		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
-			.AttendeeUUID(attendee.getAttendeeUUID())
-			.nickname(attendee.getNickname())
-			.start(start)
-			.build();
+				.roomUUID(roomUUID)
+				.AttendeeUUID(attendee.getAttendeeUUID())
+				.build();
 
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenCliams);
 
@@ -57,6 +53,14 @@ public class AttendeeController {
 		cookie.setPath("/");
 
 		response.addCookie(cookie);
+
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@PatchMapping
+	@Operation(summary = "참여자 업데이트 하기", description = "해당 방에 참여자의 위치 정보를 업데이트 한다.")
+	public ResponseEntity<?> updateAttendee(@RequestBody AttendeeUpdateReq attendeeUpdateReq) {
+		attendeeService.updateAttendee(attendeeUpdateReq);
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}

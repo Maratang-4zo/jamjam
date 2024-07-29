@@ -28,7 +28,7 @@ public class RoomTokenProvider {
 
 	public static final String AUTHORIZATION_HEADER = "Authorization";
 
-	@Value("${jwt.roomTokenExpiration:10}")
+	@Value("${jwt.roomTokenExpiration:60}")
 	private String roomTokenExpirationTime;
 
 	// openssl rand -hex 32
@@ -60,9 +60,8 @@ public class RoomTokenProvider {
 			.setSubject(TokenType.ROOM.name())
 			.setIssuedAt(new Date())
 			.setExpiration(expireTime)
-			.claim("nickname", roomJwtTokenCliams.getNickname())
-			.claim("start", roomJwtTokenCliams.getStart())
-			.claim("UUID", roomJwtTokenCliams.getAttendeeUUID())
+			.claim("roomUUID", roomJwtTokenCliams.getRoomUUID())
+			.claim("attendeeUUID", roomJwtTokenCliams.getAttendeeUUID())
 			.signWith(SignatureAlgorithm.HS512, tokenSecret.getBytes(StandardCharsets.UTF_8))
 			.setHeaderParam("typ", "JWT")
 			.compact();

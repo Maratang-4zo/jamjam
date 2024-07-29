@@ -17,7 +17,7 @@ def get_db_connection():
 def create_table():
     create_table_query = """
     CREATE TABLE IF NOT EXISTS local_info (
-        place_id INT AUTO_INCREMENT PRIMARY KEY,
+        local_info_id INT AUTO_INCREMENT PRIMARY KEY,
         station_name VARCHAR(255),
         name VARCHAR(255),
         id INT,

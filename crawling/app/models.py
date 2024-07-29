@@ -5,7 +5,7 @@ import pymysql
 class Place:
     @staticmethod
     def get_all_places():
-        query = 'SELECT * FROM place_tb WHERE is_deleted = 0'
+        query = 'SELECT * FROM local_info WHERE is_deleted = 0'
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(query)
             result = cursor.fetchall()
@@ -14,7 +14,7 @@ class Place:
     @staticmethod
     def insert_place(place_data):
         query = (
-            "INSERT INTO place_tb (station_name, name, id, category, road_address, address, phone, latitude, longitude) "
+            "INSERT INTO local_info (station_name, name, id, category, road_address, address, phone, latitude, longitude) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
         values = (
@@ -35,7 +35,7 @@ class Place:
     @staticmethod
     def update_place(place_id, update_data):
         query = f"""
-        UPDATE place_tb SET
+        UPDATE local_info SET
             station_name = %s,
             name = %s,
             category = %s,
@@ -66,7 +66,7 @@ class Place:
 
     @staticmethod
     def delete_place(place_id):
-        query = "UPDATE place_tb SET is_deleted = TRUE, updated_at = %s WHERE id = %s"
+        query = "UPDATE local_info SET is_deleted = TRUE, updated_at = %s WHERE id = %s"
         values = (
             datetime.now(),
             place_id

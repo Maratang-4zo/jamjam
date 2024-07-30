@@ -8,6 +8,8 @@ import Background from "../assets/CreateRoomBg.png";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../index.css";
+import { useForm, Controller } from "react-hook-form";
+import { axiosCreateRoom } from "../apis/roomApi";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -34,7 +36,7 @@ const Content = styled.div`
   padding-top: 200px; /* 입력창들을 위로 옮기기 위한 패딩 */
 `;
 
-const FormWrapper = styled.div`
+const FormWrapper = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -74,7 +76,7 @@ const Button = styled.button`
   border-radius: 15px;
   border: 3px solid var(--Color, #000);
   background: #fff;
-  margin-top: 100px; /* 버튼을 FormWrapper로부터 떨어뜨리기 위한 마진 */
+  margin-top: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,13 +86,18 @@ const ButtonText = styled.p`
   font-family: "pixel" !important;
 `;
 
+const ErrorBox = styled.div`
+  width: 200px;
+  height: 50px;
+  margin-top: 10px;
+  text-align: center;
+`;
+
 function CreateRoom() {
   const sessionRef = useRef(null);
   const ovRef = useRef(null);
   const [sessionId, setSessionId] = useState("");
   const [inputSessionId, setInputSessionId] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("");
 
   const APPLICATION_SERVER_URL = "http://localhost:8080/";
 
@@ -191,26 +198,56 @@ function CreateRoom() {
     });
   }, []);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    control,
+  } = useForm();
+
+  const createRoomFn = (data) => {
+    console.log(data);
+    axiosCreateRoom(
+      data.purpose,
+      data.meetingDate.toISOString(),
+      data.nickname,
+    );
+  };
+
   return (
     <Wrapper>
       <NavBarUp />
       <Content>
-        <h1>방 만들기</h1>
-        <FormWrapper>
+        <FormWrapper onSubmit={handleSubmit(createRoomFn)}>
+          <InputWrapper>
+            <Label>닉네임:</Label>
+            <input type="text" {...register("nickname")} />
+          </InputWrapper>
           <InputWrapper>
             <Label>모임 날짜:</Label>
-            <DatePickerStyled
-              selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
-              dateFormat="yyyy/MM/dd"
-              placeholderText="날짜를 선택하세요"
+            <Controller
+              name="meetingDate"
+              control={control}
+              defaultValue={null}
+              rules={{ required: "날짜를 선택하세요" }}
+              render={({ field }) => (
+                <DatePickerStyled
+                  selected={field.value}
+                  onChange={(date) => field.onChange(date)}
+                  dateFormat="yyyy/MM/dd"
+                  placeholderText="날짜를 선택하세요"
+                />
+              )}
             />
           </InputWrapper>
+
           <InputWrapper>
             <Label>모임 목적:</Label>
             <Select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              {...register("purpose", {
+                required: "카테고리를 입력해주세요.",
+              })}
             >
               <option value="" disabled hidden>
                 카테고리를 선택하세요
@@ -222,10 +259,15 @@ function CreateRoom() {
               <option value="food">음식</option>
             </Select>
           </InputWrapper>
+          <Button type="submit">
+            <ButtonText>생성</ButtonText>
+          </Button>
         </FormWrapper>
-        <Button>
-          <ButtonText>생성</ButtonText>
-        </Button>
+        <ErrorBox>
+          {errors.meetingDate && (
+            <p style={{ color: "red" }}>{errors.meetingDate.message}</p>
+          )}
+        </ErrorBox>
       </Content>
       <div>
         <h1>방 만들기</h1>

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
-
+import ResultBox from "../components/finalresult/ResultBox";
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: ${(props) => props.theme.wrapperWidth};
@@ -12,11 +12,19 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
+// const Container = styled.div`
+//   display: flex;
+//   /* justify-content: center; */
+//   /* text-align: center; */
+// `;
+
 function FinalResult() {
   return (
     <Wrapper>
       <NavBarUp />
-      <h1>최종 결과 화면</h1>
+      {/* <Container> */}
+      <ResultBox></ResultBox>
+      {/* </Container> */}
     </Wrapper>
   );
 }

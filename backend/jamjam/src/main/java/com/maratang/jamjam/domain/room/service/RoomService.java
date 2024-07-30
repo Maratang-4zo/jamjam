@@ -46,12 +46,15 @@ public class RoomService {
 	@Transactional
 	public RoomJwtTokenCliams createRoom(RoomCreateReq roomCreateReq) {
 		Room room = RoomMapper.INSTANCE.roomCreateReqToAttendee(roomCreateReq);
-		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(roomCreateReq.getNickname(), room);
+
+		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(roomCreateReq);
 
 		room.updateAttendee(attendee);
 
 		attendeeRepository.save(attendee);
 		roomRepository.save(room);
+
+		attendee.updateRoom(room);
 
 		UUID roomUUID = room.getRoomUUID();
 

@@ -27,12 +27,14 @@ public class AttendeeService {
 
 	@Transactional
 	public RoomJwtTokenCliams createAttendee(AttendeeCreateReq attendeeCreateReq) {
-		Room room = roomRepository.findById(attendeeCreateReq.getRoomId())
-			.orElseThrow(()->new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-
-		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(attendeeCreateReq.getNickname(), room);
+		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(attendeeCreateReq);
 
 		attendeeRepository.save(attendee);
+
+		Room room = roomRepository.findById(attendeeCreateReq.getRoomId())
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		attendee.updateRoom(room);
 
 		UUID attendeeUUID = attendee.getAttendeeUUID();
 		UUID roomUUID = roomRepository.findById(attendeeCreateReq.getRoomId())

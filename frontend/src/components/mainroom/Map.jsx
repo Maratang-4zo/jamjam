@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container as MapDiv,
   NaverMap,
@@ -8,26 +8,49 @@ import {
 import { useRecoilValue } from "recoil";
 import { userPlaceAtom } from "../../recoil/atoms/userState";
 import Avatar1 from "../../assets/avatars/1.png";
-import Buttons from "./Buttons";
 
-function MyMap() {
+function MyMap({ selectedAddress }) {
   const navermaps = useNavermaps();
-  const point = useRecoilValue(userPlaceAtom);
+  const userPlace = useRecoilValue(userPlaceAtom);
   const [map, setMap] = useState(null);
+
   useEffect(() => {
-    if (map) {
-      map.panTo(new navermaps.LatLng(point.latitude, point.longitude));
+    if (selectedAddress && map) {
+      const { latitude, longitude } = selectedAddress;
+      map.panTo(new navermaps.LatLng(latitude, longitude));
     }
-  }, [point]);
+  }, [selectedAddress, map, navermaps]);
+
+  useEffect(() => {
+    if (map && userPlace.latitude && userPlace.longitude) {
+      map.panTo(new navermaps.LatLng(userPlace.latitude, userPlace.longitude));
+    }
+  }, [userPlace, map, navermaps]);
+
   return (
     <NaverMap
       defaultCenter={new navermaps.LatLng(37.5012748, 127.039625)}
       defaultZoom={17}
       ref={setMap}
     >
-      {point.latitude && point.longitude && (
+      {userPlace.latitude && userPlace.longitude && (
         <Marker
-          position={new navermaps.LatLng(point.latitude, point.longitude)}
+          position={
+            new navermaps.LatLng(userPlace.latitude, userPlace.longitude)
+          }
+          icon={{
+            content: `<img src="${Avatar1}" style="width:40px;height:40px;" />`,
+          }}
+        />
+      )}
+      {selectedAddress && (
+        <Marker
+          position={
+            new navermaps.LatLng(
+              selectedAddress.latitude,
+              selectedAddress.longitude,
+            )
+          }
           icon={{
             content: `<img src="${Avatar1}" style="width:40px;height:40px;" />`,
           }}
@@ -37,11 +60,10 @@ function MyMap() {
   );
 }
 
-function Map() {
+function Map({ selectedAddress }) {
   return (
     <MapDiv style={{ width: "100%", height: "100%" }}>
-      <MyMap />
-      <Buttons />
+      <MyMap selectedAddress={selectedAddress} />
     </MapDiv>
   );
 }

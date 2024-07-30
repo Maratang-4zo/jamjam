@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
+  z-index: 10000;
 `;
 
 const ModalContent = styled.div`
@@ -28,6 +28,7 @@ const ModalContent = styled.div`
   justify-content: space-evenly;
   align-items: center;
 `;
+
 function FindDeparture({ onClose, onAddressSelect }) {
   const navermaps = useNavermaps();
   const [fullAddress, setFullAddress] = useState(null);
@@ -42,22 +43,17 @@ function FindDeparture({ onClose, onAddressSelect }) {
             console.log("error");
             return alert("Something went wrong!");
           }
-          // console.log("응답 = ", response);
           const result = response.result;
-          // console.log("결과 = ", result); // Container of the search result
-          const items = result.items; // Array of the search result
-          // console.log("아이템 = ", items);
-          // do Something
+          const items = result.items;
           const latitude = items[0].point.y;
           const longitude = items[0].point.x;
-          // console.log("위도 = ", latitude, " 경도 = ", longitude);
 
           // 데이터 전달 후 모달 닫기
-          setUserPlace({ address: fullAddress, latitude, longitude });
+          setUserPlace({ addressText: fullAddress, latitude, longitude });
+          onAddressSelect({ addressText: fullAddress, latitude, longitude });
           onClose();
         },
       );
-      // console.log("지오코더 = ", geocoder);
     }
   }, [fullAddress, navermaps, onAddressSelect, onClose]);
 
@@ -76,8 +72,7 @@ function FindDeparture({ onClose, onAddressSelect }) {
       address += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
 
-    // console.log("Address:", address); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
-    setFullAddress(address); // 주소 상태 업데이트
+    setFullAddress(address);
   };
 
   return (
@@ -85,9 +80,9 @@ function FindDeparture({ onClose, onAddressSelect }) {
       <ModalContent>
         <h1>출발지를 입력해주세요.</h1>
         <DaumPostcodeEmbed onComplete={handleComplete} />
-        <button onClick={onClose}>찾기</button>
       </ModalContent>
     </Wrapper>
   );
 }
+
 export default FindDeparture;

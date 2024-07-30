@@ -4,7 +4,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    dirver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${HOST}:${PORT}/${DATABASE_NAME}?${OPTIONS}
     username: ${USER_NAME}
     password: ${USER_PASSWORD}

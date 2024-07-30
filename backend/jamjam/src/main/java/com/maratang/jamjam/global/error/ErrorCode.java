@@ -49,8 +49,8 @@ public enum ErrorCode {
 	AU_FORBIDDEN_ADMIN(HttpStatus.FORBIDDEN, "AU008", "관리자 Role이 아닙니다."),
 	AU_ACCESS_TOKEN_REFRESH(HttpStatus.UNAUTHORIZED, "AU009", "액세스 토큰 재발급 하였습니다."),
 
-	// ROOM
-	RO_NOT_VALID_ROOM(HttpStatus.NOT_FOUND, "RO001", "해당 미팅룸을 찾을 수 없습니다.");
+	// room
+	ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "RM001", "미팅룸을 찾을 수 없습니다.");
 
 	private final HttpStatus status;
 	private final String code;

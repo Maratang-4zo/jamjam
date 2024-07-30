@@ -31,7 +31,7 @@ public class AttendeeService {
 
 		UUID attendeeUUID = attendee.getAttendeeUUID();
 		UUID roomUUID = roomRepository.findById(attendeeCreateReq.getRoomId())
-			.orElseThrow(()->new BusinessException(ErrorCode.RO_NOT_VALID_ROOM)).getRoomUUID();
+			.orElseThrow(()->new BusinessException(ErrorCode.ROOM_NOT_FOUND)).getRoomUUID();
 
 		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
 			.roomUUID(roomUUID)

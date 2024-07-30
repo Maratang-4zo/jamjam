@@ -1,6 +1,9 @@
 package com.maratang.jamjam.domain.room.service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -18,7 +21,13 @@ import com.maratang.jamjam.domain.room.mapper.RoomMapper;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
+import com.maratang.jamjam.global.middle.GeometryUtils;
+import com.maratang.jamjam.global.middle.GrahamScan;
+import com.maratang.jamjam.global.middle.HaversineDistance;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
+import com.maratang.jamjam.global.station.Point;
+import com.maratang.jamjam.global.station.SubwayDataLoader;
+import com.maratang.jamjam.global.station.SubwayInfo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +39,9 @@ public class RoomService {
 	private final String ROOM_SUBSCRIBE_DEST = "/sub/rooms/{roomId}";
 	private final RoomRepository roomRepository;
 	private final AttendeeRepository attendeeRepository;
+	private final GrahamScan grahamScan;
+	private final GeometryUtils geometryUtils;
+	private final SubwayDataLoader subwayDataLoader;
 
 	@Transactional
 	public RoomJwtTokenCliams createRoom(RoomCreateReq roomCreateReq) {
@@ -59,6 +71,30 @@ public class RoomService {
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		room.updateRoom(roomUpdateReq);
+	}
+
+
+	public List<SubwayInfo> getMiddleStation(Long roomId) {
+		Room room = roomRepository.findById(roomId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		// Transforming attendees' coordinates into Point instances, skipping null values
+		List<Point> points = room.getAttendees().stream()
+			.filter(attendee -> attendee.getLat() != null && attendee.getLon() != null)
+			.map(attendee -> new Point(attendee.getLat(), attendee.getLon()))
+			.collect(Collectors.toList());
+
+		Point centroid = geometryUtils.calculateCentroid(grahamScan.convexHull(points));
+
+		Map<String, SubwayInfo> subwayMap = subwayDataLoader.getSubwayInfoMap();
+
+		double searchRadius = 5.0; // 5km
+		short stationCnt = 5;
+
+		List<SubwayInfo> nearbyStations = HaversineDistance.findNearbyStations(subwayMap, centroid.getX(),
+			centroid.getY(), searchRadius,stationCnt);
+
+		return nearbyStations;
 	}
 
 	public void enterRoom(Long roomId, RoomEnterReq enterRequest) {

@@ -1,19 +1,17 @@
 package com.maratang.jamjam.domain.room.service;
 
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import com.maratang.jamjam.domain.board.dto.request.AttendeeUpdateReq;
-import com.maratang.jamjam.domain.room.dto.request.RoomEnterReq;
-import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
-import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import java.util.UUID;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.mapper.AttendeeMapper;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
+import com.maratang.jamjam.domain.board.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
+import com.maratang.jamjam.domain.room.dto.request.RoomEnterReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.mapper.RoomMapper;
@@ -54,11 +52,11 @@ public class RoomService {
 	}
 
 	@Transactional
-	public void updateRoom(RoomUpdateReq roomUpdateReq) {
+	public void updateRoom(Long roomId, RoomUpdateReq roomUpdateReq) {
 		// 1. DB 상태 변경
 		// 2. 참여자들에게 알리기
-		Room room = roomRepository.findById(roomUpdateReq.getRoomId())
-				.orElseThrow(()->new BusinessException(ErrorCode.RO_NOT_VALID_ROOM));
+		Room room = roomRepository.findById(roomId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		room.updateRoom(roomUpdateReq);
 	}
@@ -69,7 +67,7 @@ public class RoomService {
 		// 3. 기존 참여자들에게 입장 알림
 		// 4. 새 참여자에게는 현재 참여자 목록 알려주기
 
-		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST, enterRequest.getNickname()+"입장");
+		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST, enterRequest.getNickname() + "입장");
 		messagingTemplate.convertAndSendToUser("userUUID", "", null);
 	}
 
@@ -88,4 +86,5 @@ public class RoomService {
 		// 1. DB 상태 변경
 		// 2. 참여자들에게 알리기
 		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST, "");
+	}
 }

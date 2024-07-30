@@ -8,8 +8,6 @@ import com.maratang.jamjam.domain.room.entity.Room;
 
 @Mapper
 public interface RoomMapper {
-
-
 	RoomMapper INSTANCE = Mappers.getMapper(RoomMapper.class);
 
 	Room roomCreateReqToAttendee(RoomCreateReq roomCreateReq);

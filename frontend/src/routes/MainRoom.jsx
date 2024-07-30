@@ -36,14 +36,6 @@ function Room() {
           onAddressSelect={handleAddressSelect}
         />
       )}
-      {selectedAddress && (
-        <div>
-          <h2>선택한 주소:</h2>
-          <p>{selectedAddress.address}</p>
-          <p>위도: {selectedAddress.latitude}</p>
-          <p>경도: {selectedAddress.longitude}</p>
-        </div>
-      )}
       <Map />
     </Wrapper>
   );

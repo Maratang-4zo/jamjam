@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import MicOn from "../../assets/micon.png";
-import HomeIcon from "../../assets/homeIcon.png";
-import MicOff from "../../assets/micoff.png";
-import ChatOn from "../../assets/chaton.png";
-import ChatOff from "../../assets/chatoff.png";
+import MicOn from "../../assets/icons/micon.png";
+import HomeIcon from "../../assets/icons/homeIcon.png";
+import MicOff from "../../assets/icons/micoff.png";
+import ChatOn from "../../assets/icons/chaton.png";
+import ChatOff from "../../assets/icons/chatoff.png";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
@@ -17,6 +17,7 @@ const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
   padding: 10px 0 0 0;
   border-right: 3px solid ${(props) => props.theme.accentColor};
+  z-index: 10000;
 `;
 
 const Attendants = styled.div`

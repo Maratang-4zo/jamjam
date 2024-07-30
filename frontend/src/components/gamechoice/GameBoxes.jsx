@@ -5,15 +5,6 @@ import wavebutton from "../../assets/wavebutton.svg";
 import polygon from "../../assets/polygon.svg";
 import YellowChatBubble from "../../assets/YellowChatBubble.svg"; // Assuming the correct path
 
-const Header = styled.div`
-  color: #000000;
-  font-family: "Pixelroborobo-Medium", Helvetica;
-  font-size: 49px;
-  font-weight: 500;
-  text-align: center;
-  margin-bottom: 14px;
-`;
-
 const GamesContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -143,7 +134,6 @@ const PlayButtonText = styled.div`
 function GameBoxes() {
   return (
     <>
-      <Header>Choose The Game</Header>
       <GamesContainer>
         <GameCard>
           <Middle className="middle" top="50%">

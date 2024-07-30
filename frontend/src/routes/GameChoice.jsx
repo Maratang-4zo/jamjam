@@ -22,22 +22,31 @@ const Wrapper = styled.div`
 `;
 
 const NavBarContainer = styled.div`
-  position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
   width: 150px;
 `;
 
+const Header = styled.div`
+  color: #000000;
+  font-family: "pixel", Helvetica;
+  font-size: 60px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 14px;
+  margin-top: -20px;
+`;
+
 const ContentContainer = styled.div`
-  margin-left: 100px;
+  margin-right: 40px;
   width: calc(100% - 150px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0 35px;
-  /* z-index: 1; */
+  z-index: 1;
 `;
 function GameChoice() {
   return (
@@ -48,6 +57,7 @@ function GameChoice() {
           <NavBarLeft />
         </NavBarContainer>
         <ContentContainer>
+          <Header>Choose The Game</Header>
           <GameBoxes></GameBoxes>
         </ContentContainer>
       </Wrapper>

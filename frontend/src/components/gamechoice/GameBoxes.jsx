@@ -1,54 +1,9 @@
 import React from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { Link } from "react-router-dom";
-import NavBarLeft from "../../components/fixed/NavBarLeft";
 import wavebutton from "../../assets/wavebutton.svg";
 import polygon from "../../assets/polygon.svg";
 import YellowChatBubble from "../../assets/YellowChatBubble.svg"; // Assuming the correct path
-
-const GlobalStyle = createGlobalStyle`
-  body, html {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-`;
-
-const Wrapper = styled.div`
-  background-color: ${(props) => props.theme.bgColor};
-  width: 100%;
-  height: 100vh;
-  color: ${(props) => props.theme.textColor};
-  display: flex;
-  overflow: hidden;
-`;
-
-const NavBarContainer = styled.div`
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 150px;
-`;
-
-const ContentContainer = styled.div`
-  margin-left: 100px;
-  width: calc(100% - 150px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0 35px;
-`;
-
-const Header = styled.div`
-  color: #000000;
-  font-family: "Pixelroborobo-Medium", Helvetica;
-  font-size: 49px;
-  font-weight: 500;
-  text-align: center;
-  margin-bottom: 14px;
-`;
 
 const GamesContainer = styled.div`
   display: flex;
@@ -56,6 +11,7 @@ const GamesContainer = styled.div`
   flex-wrap: wrap;
   gap: 14px;
   width: 100%;
+  /* z-index: 1; */
 `;
 
 const GameCard = styled.div`
@@ -72,6 +28,7 @@ const GameCard = styled.div`
   background-position: center;
   position: relative;
   transition: 0.5s ease;
+  /* z-index: 1; */
 
   &:hover .image {
     opacity: 0.3;
@@ -92,6 +49,7 @@ const GameCard2 = styled.div`
   background-position: center;
   position: relative;
   transition: 0.5s ease;
+  z-index: 1;
 
   &:hover .image {
     opacity: 0.3;
@@ -176,50 +134,41 @@ const PlayButtonText = styled.div`
 function GameBoxes() {
   return (
     <>
-      <GlobalStyle />
-      <Wrapper>
-        <NavBarContainer>
-          <NavBarLeft />
-        </NavBarContainer>
-        <ContentContainer>
-          <Header>Choose The Game</Header>
-          <GamesContainer>
-            <GameCard>
-              <Middle className="middle" top="50%">
-                <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
-              </Middle>
-              <GameName>
-                <OverlapGroup>
-                  <TextWrapper>CHICKEN</TextWrapper>
-                </OverlapGroup>
-              </GameName>
-            </GameCard>
-            <GameCard2 style={{ backgroundImage: `url(${polygon})` }}>
-              <Middle className="middle" top="80%">
-                <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
-              </Middle>
-              <GameName>
-                <OverlapGroup>
-                  <TextWrapper>COFFEE</TextWrapper>
-                </OverlapGroup>
-              </GameName>
-            </GameCard2>
-            <GameCard>
-              <Middle className="middle" top="50%">
-                <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
-              </Middle>
-              <GameName>
-                <OverlapGroup>
-                  <TextWrapper>PIZZA</TextWrapper>
-                </OverlapGroup>
-              </GameName>
-            </GameCard>
-          </GamesContainer>
-          <PlayButton>
-            <PlayButtonText>PLAY</PlayButtonText>
-          </PlayButton>
-        </ContentContainer>
-      </Wrapper>
+      <GamesContainer>
+        <GameCard>
+          <Middle className="middle" top="50%">
+            <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
+          </Middle>
+          <GameName>
+            <OverlapGroup>
+              <TextWrapper>CHICKEN</TextWrapper>
+            </OverlapGroup>
+          </GameName>
+        </GameCard>
+        <GameCard2 style={{ backgroundImage: `url(${polygon})` }}>
+          <Middle className="middle" top="80%">
+            <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
+          </Middle>
+          <GameName>
+            <OverlapGroup>
+              <TextWrapper>COFFEE</TextWrapper>
+            </OverlapGroup>
+          </GameName>
+        </GameCard2>
+        <GameCard>
+          <Middle className="middle" top="50%">
+            <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
+          </Middle>
+          <GameName>
+            <OverlapGroup>
+              <TextWrapper>PIZZA</TextWrapper>
+            </OverlapGroup>
+          </GameName>
+        </GameCard>
+      </GamesContainer>
+      <PlayButton>
+        <PlayButtonText>PLAY</PlayButtonText>
+      </PlayButton>
     </>
   );
 }

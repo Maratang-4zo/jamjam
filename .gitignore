@@ -215,7 +215,7 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
-.env
+backend/.env
 .env.development.local
 .env.test.local
 .env.production.local
@@ -375,7 +375,7 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
-.env
+backend/.env
 .env.development.local
 .env.test.local
 .env.production.local
@@ -442,5 +442,5 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/node
 
 # custom
-.env
+backend/.env
 .idea/

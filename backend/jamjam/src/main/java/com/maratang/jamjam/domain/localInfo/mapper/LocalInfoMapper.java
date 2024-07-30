@@ -10,15 +10,15 @@ import com.maratang.jamjam.domain.localInfo.dto.response.LocalInfoRes;
 public class LocalInfoMapper implements RowMapper<LocalInfoRes> {
 	@Override
 	public LocalInfoRes mapRow(ResultSet rs, int rowNum) throws SQLException {
-		LocalInfoRes localInfo = new LocalInfoRes();
-		localInfo.setName(rs.getString("name"));
-		localInfo.setCategory(rs.getString("category"));
-		localInfo.setRoadAddress(rs.getString("road_address"));
-		localInfo.setAddress(rs.getString("address"));
-		localInfo.setPhone(rs.getString("phone"));
-		localInfo.setLatitude(rs.getFloat("latitude"));
-		localInfo.setLongitude(rs.getFloat("longitude"));
-		localInfo.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-		return localInfo;
+		return LocalInfoRes.builder()
+			.name(rs.getString("name"))
+			.category(rs.getString("category"))
+			.roadAddress(rs.getString("road_address"))
+			.address(rs.getString("address"))
+			.phone(rs.getString("phone"))
+			.latitude(rs.getFloat("latitude"))
+			.longitude(rs.getFloat("longitude"))
+			.updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+			.build();
 	}
 }

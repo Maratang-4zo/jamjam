@@ -39,7 +39,7 @@ public class Attendee {
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "room_id")
+	@JoinColumn(name = "room_id") // DB의 room_id 컬럼과 매핑
 	private Room room;
 
 	private LocalDateTime created_at;

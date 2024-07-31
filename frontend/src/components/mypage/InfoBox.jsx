@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
 import pie from "../../assets/pie.png";
+import { useRecoilState } from "recoil";
+import { userInfoAtom } from "../../recoil/atoms/userState";
+import { getUserInfo, updateUserNickname } from "../../apis/loginApi";
 
 const Info = styled.div`
   align-self: stretch;
   border-right: 1.4px solid #000000;
   width: 35%;
   position: relative;
+`;
+
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 `;
 
 const ProfileWrapper = styled.div`
@@ -98,31 +108,72 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
+const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  font-size: 16px;
+`;
+
+const SaveButton = styled.button`
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+`;
+
 function InfoBox() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState("");
+  const [newNickname, setNewNickname] = useState("");
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const data = await getUserInfo();
+        setUserInfo(data);
+      } catch (error) {
+        console.error("사용자 정보 가져오기 실패", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, [setUserInfo]);
 
   const handleModalOpen = (content) => {
     setModalContent(content);
     setModalVisible(true);
+    setNewNickname(userInfo.nickname);
   };
 
   const handleModalClose = () => {
     setModalVisible(false);
     setModalContent("");
   };
+
+  const handleSaveNickname = async () => {
+    try {
+      await updateUserNickname(newNickname);
+      setUserInfo((prevState) => ({
+        ...prevState,
+        nickname: newNickname,
+      }));
+      handleModalClose();
+    } catch (error) {
+      console.error("닉네임 수정 실패 ", error);
+    }
+  };
   return (
     <>
       <Info>
         <ProfileWrapper>
-          <Profile>{"{profile}"}</Profile>
+          <ProfileImage src={userInfo.profile} alt="profile" />
         </ProfileWrapper>
         <Nickname onClick={() => handleModalOpen("닉네임 수정")}>
-          {"{nickname}"}
+          {userInfo.nickname}
         </Nickname>
-        <Email onClick={() => handleModalOpen("이메일 수정")}>
-          {"{email}"}
-        </Email>
+        <Email>{userInfo.email}</Email>
       </Info>
       <WinningRate>
         <PieChart alt="Pie chart" src={pie} />
@@ -131,6 +182,16 @@ function InfoBox() {
         <ModalContent>
           <CloseButton onClick={handleModalClose}>X</CloseButton>
           {modalContent}
+          {modalContent === "닉네임 수정" && (
+            <>
+              <Input
+                type="text"
+                value={newNickname}
+                onChange={(e) => setNewNickname(e.target.value)}
+              />
+              <SaveButton onClick={handleSaveNickname}>저장</SaveButton>
+            </>
+          )}
         </ModalContent>
       </ModalOverlay>
     </>

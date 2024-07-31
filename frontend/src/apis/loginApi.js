@@ -27,12 +27,12 @@ export const getToken = async (code) => {
 };
 
 // getUserData 함수: 카카오 API 로부터 사용자 데이터를 받아옴
-export const getUserData = async (token) => {
-  const user = await axios.get(`https://kapi.kakao.com/v2/user/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
-    },
-  });
-  return user.data;
-};
+// export const getUserData = async (token) => {
+//   const user = await axios.get(`https://kapi.kakao.com/v2/user/me`, {
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+//     },
+//   });
+//   return user.data;
+// };

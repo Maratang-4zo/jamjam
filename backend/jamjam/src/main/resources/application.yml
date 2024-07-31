@@ -1,6 +1,7 @@
 server:
   servlet:
     context-path: /api
+
 spring:
   application:
     name: jamjam
@@ -22,12 +23,6 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
       open-in-view: true
 
-
-  springdoc:
-    swagger-ui:
-      path: /swagger-ui.html
-      display-request-duration: true
-
   kakao:
     client:
       id: ${CLIENT_ID}
@@ -36,3 +31,8 @@ spring:
 openvidu:
   openvidu-url: ${OPENVIDU_URL:http://localhost:4443/}
   openvidu-secret: ${OPENVIDU_SECRET:MY_SECRET}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true

@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/attendees")
+@RequestMapping("/attendees")
 @RequiredArgsConstructor
 public class AttendeeController {
 	private final AttendeeService attendeeService;

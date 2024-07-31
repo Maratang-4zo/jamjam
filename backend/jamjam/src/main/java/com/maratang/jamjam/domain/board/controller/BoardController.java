@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/boards")
+@RequestMapping("/boards")
 @RequiredArgsConstructor
 public class BoardController {
 	private final BoardService boardService;

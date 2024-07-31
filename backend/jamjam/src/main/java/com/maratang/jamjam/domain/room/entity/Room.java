@@ -11,6 +11,8 @@ import com.maratang.jamjam.global.auditing.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,6 +44,9 @@ public class Room extends BaseTimeEntity {
 
 	private LocalDateTime meetingDate;
 
+	@Enumerated(EnumType.STRING)
+	private RoomStatus roomStatus;
+
 	private LocalDateTime endedAt;
 
 	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -55,13 +60,17 @@ public class Room extends BaseTimeEntity {
 
 	@Builder
 	public Room(Long roomId, String name, String purpose, String startStation, LocalDateTime meetingDate,
-		LocalDateTime endedAt) {
+		RoomStatus roomStatus, LocalDateTime endedAt, List<Attendee> attendees, UUID roomUUID, Attendee root) {
 		this.roomId = roomId;
 		this.name = name;
 		this.purpose = purpose;
 		this.startStation = startStation;
 		this.meetingDate = meetingDate;
+		this.roomStatus = roomStatus;
 		this.endedAt = endedAt;
+		this.attendees = attendees;
+		this.roomUUID = roomUUID;
+		this.root = root;
 	}
 
 	@PrePersist
@@ -76,6 +85,10 @@ public class Room extends BaseTimeEntity {
 	public void updateRoom(RoomUpdateReq roomUpdateReq){
 		this.name = roomUpdateReq.getName();
 		this.purpose = roomUpdateReq.getPurpose();
+	}
+
+	public void updateStatus(RoomStatus newStatus) {
+		this.roomStatus = newStatus;
 	}
 }
 

@@ -3,7 +3,7 @@ import DaumPostcodeEmbed from "react-daum-postcode";
 import { useNavermaps } from "react-naver-maps";
 import { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
-import { userPlaceAtom } from "../../recoil/atoms/userState";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 
 const Wrapper = styled.div`
   position: fixed;
@@ -32,7 +32,7 @@ const ModalContent = styled.div`
 function FindDeparture({ onClose, onAddressSelect }) {
   const navermaps = useNavermaps();
   const [fullAddress, setFullAddress] = useState(null);
-  const setUserPlace = useSetRecoilState(userPlaceAtom);
+  const setUserInfo = useSetRecoilState(userInfoAtom);
 
   useEffect(() => {
     if (fullAddress) {
@@ -49,7 +49,14 @@ function FindDeparture({ onClose, onAddressSelect }) {
           const longitude = items[0].point.x;
 
           // 데이터 전달 후 모달 닫기
-          setUserPlace({ addressText: fullAddress, latitude, longitude });
+          setUserInfo((prevState) => ({
+            ...prevState,
+            departure: {
+              addressText: fullAddress,
+              latitude,
+              longitude,
+            },
+          }));
           onAddressSelect({ addressText: fullAddress, latitude, longitude });
           onClose();
         },

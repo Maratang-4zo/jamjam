@@ -67,7 +67,7 @@ const LeftBottomFixed = styled.div`
   align-items: center;
   position: absolute;
   bottom: 10px;
-  left: 0px;
+  left: 40px;
   gap: 10px;
 `;
 
@@ -77,7 +77,7 @@ const LeftTopFixed = styled.div`
   align-items: center;
   position: absolute;
   top: 10px;
-  left: 0px;
+  left: 40px;
 `;
 
 const PixelChat = styled.div`

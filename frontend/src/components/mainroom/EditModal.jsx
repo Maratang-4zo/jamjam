@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
-import { useRecoilValue } from "recoil";
-import { userInfoAtom, userPlaceAtom } from "../../recoil/atoms/userState";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 import FindDeparture from "./Departure";
 
 const GlobalStyle = createGlobalStyle`
@@ -88,7 +88,7 @@ const FindBtn = styled.button`
 
 function EditModal({ isOpen, onClose, onAddressSelect }) {
   const { isHost } = useRecoilValue(userInfoAtom);
-  const userPlace = useRecoilValue(userPlaceAtom);
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const [address, setAddress] = useState(null);
   const [isFindDepartureOpen, setIsFindDepartureOpen] = useState(false);
 
@@ -130,7 +130,7 @@ function EditModal({ isOpen, onClose, onAddressSelect }) {
           <Calendar isHost={isHost}>캘린더 자리입니다</Calendar>
           {!address && !isFindDepartureOpen && (
             <FindBtn onClick={() => setIsFindDepartureOpen(true)}>
-              {userPlace.addressText}
+              {userInfo.departure.addressText}
               <hr />
               다시 찾을래요
             </FindBtn>

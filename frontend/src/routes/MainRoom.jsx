@@ -4,7 +4,8 @@ import Map from "../components/mainroom/Map";
 import { useEffect, useState } from "react";
 import FindDeparture from "../components/mainroom/Departure";
 import EditModal from "../components/mainroom/EditModal";
-import Buttons from "../components/mainroom/Buttons"; // Buttons 컴포넌트 임포트
+import Buttons from "../components/mainroom/Buttons";
+import { useParams } from "react-router-dom";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -17,6 +18,7 @@ const Wrapper = styled.div`
 `;
 
 function Room() {
+  const { roomId } = useParams();
   const [isFindDepartureModalOpen, setIsFindDepartureModalOpen] =
     useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

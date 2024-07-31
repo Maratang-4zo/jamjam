@@ -8,7 +8,7 @@ import Game from "./routes/Game";
 import FinalResult from "./routes/FinalResult";
 import JoinRoom from "./routes/JoinRoom";
 import Reconnect from "./routes/Reconnect";
-import Ws from "./routes/Ws";
+import Ws from "./routes/ws";
 import ConnectOpenVidu from "./routes/OpenVidu";
 
 function Router() {

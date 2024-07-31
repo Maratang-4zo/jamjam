@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/rooms")
+@RequestMapping("/rooms")
 @RequiredArgsConstructor
 public class RoomController {
 	private final RoomService roomService;

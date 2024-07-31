@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/sessions")
+@RequestMapping("/sessions")
 @RequiredArgsConstructor
 public class VoiceChatController {
 

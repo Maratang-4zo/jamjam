@@ -11,11 +11,12 @@ export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
     nickname,
   };
 
-  axios
+  return axios
     .post(BASE_URL + "/api/rooms", params)
     .then((res) => {
       console.log("방 생성 완료");
       console.log(res);
+      return res.data;
     })
     .catch((err) => {
       console.error("방 생성 실패");

@@ -1,14 +1,5 @@
 import { atom } from "recoil";
 
-export const userPlaceAtom = atom({
-  key: "userPlace",
-  default: {
-    addressText: "",
-    latitude: null,
-    longitude: null,
-  },
-});
-
 export const userInfoAtom = atom({
   key: "userInfo",
   default: {
@@ -21,10 +12,10 @@ export const userInfoAtom = atom({
     },
     time: null,
     route: null,
-    profile: null,
+    profile: null, // 이미지
     nickname: "",
     email: "",
-    // winningRate: {},
-    // meetingHistory: [],
+    winningRate: {},
+    meetingHistory: [],
   },
 });

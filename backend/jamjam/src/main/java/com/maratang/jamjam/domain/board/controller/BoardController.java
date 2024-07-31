@@ -18,6 +18,7 @@ import com.maratang.jamjam.domain.board.dto.request.BoardUpdateReq;
 import com.maratang.jamjam.domain.board.dto.response.BoardRes;
 import com.maratang.jamjam.domain.board.service.BoardService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,30 +28,35 @@ public class BoardController {
 	private final BoardService boardService;
 
 	@GetMapping
+	@Operation(summary = "🚌 기본 템플릿")
 	public ResponseEntity<?> getBoardList() {
 		List<BoardRes> boardList = boardService.getBoardList();
 		return ResponseEntity.status(HttpStatus.OK).body(boardList); // int or HttpStatus
 	}
 
 	@GetMapping("/{boardId}")
+	@Operation(summary = "🚌 기본 템플릿")
 	public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
 		BoardRes board = boardService.getBoard(boardId);
 		return ResponseEntity.status(HttpStatus.OK).body(board);
 	}
 
 	@PostMapping
+	@Operation(summary = "🚌 기본 템플릿")
 	public ResponseEntity<?> createBoard(@RequestBody BoardCreateReq boardCreateReq) {
 		boardService.createBoard(boardCreateReq);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	@PatchMapping("/{boardId}")
+	@Operation(summary = "🚌 기본 템플릿")
 	public ResponseEntity<?> updateBoard(@PathVariable Long boardId, @RequestBody BoardUpdateReq boardUpdateReq) {
 		boardService.updateBoard(boardId, boardUpdateReq);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@DeleteMapping("/{boardId}")
+	@Operation(summary = "🚌 기본 템플릿")
 	public ResponseEntity<?> deleteBoard(@PathVariable Long boardId) {
 		boardService.deleteBoard(boardId);
 		return ResponseEntity.status(HttpStatus.OK).build();

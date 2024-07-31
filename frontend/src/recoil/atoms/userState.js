@@ -3,7 +3,7 @@ import { atom } from "recoil";
 export const userPlaceAtom = atom({
   key: "userPlace",
   default: {
-    addressText: "hi",
+    addressText: "",
     latitude: null,
     longitude: null,
   },

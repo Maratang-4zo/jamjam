@@ -11,6 +11,7 @@ import com.maratang.jamjam.domain.game.dto.request.GameAnswerReq;
 import com.maratang.jamjam.domain.game.dto.request.GameSettingReq;
 import com.maratang.jamjam.domain.game.service.GameService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -21,6 +22,7 @@ public class GameController {
 
 	// 게임 설정값 저장
 	@MessageMapping("/{roomUUID}/game/setting")
+	@Operation(summary = "🚗 구현 중")
 	public void setNewGame(@DestinationVariable UUID UUID, @Payload GameSettingReq gameSettingReq){
 		// 세팅값 따로 저장되나???? create???
 		gameService.setNewGame(gameSettingReq);
@@ -28,12 +30,14 @@ public class GameController {
 
 	// 게임 시작하기
 	@MessageMapping("/{roomId}/game/start")
+	@Operation(summary = "🚗 구현 중")
 	public void startNewGame(@DestinationVariable UUID roomUUID) {
         gameService.startNewGame(roomUUID);
     }
 
 	// 게임 답 입력
 	@MessageMapping("/{roomId}/game/answer")
+	@Operation(summary = "🚗 구현 중")
     public void answerGameQuestion(@DestinationVariable UUID roomUUID, @Payload GameAnswerReq gameAnswerReq) {
         gameService.answerGameQuestion(roomUUID, gameAnswerReq);
     }

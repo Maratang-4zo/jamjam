@@ -14,6 +14,9 @@ function Auth() {
         const res = await getToken(code);
         localStorage.setItem("token", JSON.stringify(res.data.access_token));
         // 로그인 이후 사용자를 홈 페이지로 redirect
+
+        await sendTokenToBackend(accessToken);
+
         navigate("/");
       } catch (err) {
         console.log(err);
@@ -22,6 +25,23 @@ function Auth() {
     //  fetchToken 비동기 함수: 카카오로부터 인가 코드를 이용해 액세스 토큰을 받아오고, 'localStorage' 에 저장
     fetchToken();
   }, [navigate]);
+
+  const sendTokenToBackend = async (token) => {
+    try {
+      const response = await axios.post(
+        "https://localhost:8080/api/oauth/login",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error("백엔드에게 토큰 보내기 실패", error);
+    }
+  };
 
   return <></>;
 }

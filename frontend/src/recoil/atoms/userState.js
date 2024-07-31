@@ -21,10 +21,10 @@ export const userInfoAtom = atom({
     },
     time: null,
     route: null,
-    profile: null,
+    profile: null, // 이미지
     nickname: "",
     email: "",
-    // winningRate: {},
-    // meetingHistory: [],
+    winningRate: {},
+    meetingHistory: [],
   },
 });

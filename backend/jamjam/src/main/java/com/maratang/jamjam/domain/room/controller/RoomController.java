@@ -1,10 +1,7 @@
 package com.maratang.jamjam.domain.room.controller;
 
-<<<<<<< backend/jamjam/src/main/java/com/maratang/jamjam/domain/room/controller/RoomController.java
 import java.util.UUID;
-=======
 import java.util.List;
->>>>>>> backend/jamjam/src/main/java/com/maratang/jamjam/domain/room/controller/RoomController.java
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

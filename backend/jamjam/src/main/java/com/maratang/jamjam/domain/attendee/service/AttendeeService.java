@@ -31,6 +31,7 @@ public class AttendeeService {
 
 		attendeeRepository.save(attendee);
 
+		UUID attendeeUUID = attendee.getAttendeeUUID();
 		UUID roomUUID = attendeeCreateReq.getRoomUUID();
 
 		Room room = roomRepository.findByRoomUUID(roomUUID)
@@ -39,7 +40,7 @@ public class AttendeeService {
 		attendee.updateRoom(room);
 
 		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
-			.roomUUID(attendeeCreateReq.getRoomUUID())
+			.roomUUID(roomUUID)
 			.attendeeUUID(attendeeUUID)
 			.build();
 

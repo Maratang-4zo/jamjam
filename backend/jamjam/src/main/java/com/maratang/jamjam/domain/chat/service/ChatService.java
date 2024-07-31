@@ -1,5 +1,7 @@
 package com.maratang.jamjam.domain.chat.service;
 
+import java.util.UUID;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +23,7 @@ public class ChatService {
 
 	private static final ChatMapper mapper = ChatMapper.INSTANCE;
 
-	public void sendMessage(Long roomId, ChatReq chatReq) {
+	public void sendMessage(UUID roomId, ChatReq chatReq) {
 		// Room room = roomRepository.findById(roomId).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 		// member
 		// Chat chat = mapper.chatReqToChat(chatReq, room);

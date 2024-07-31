@@ -1,5 +1,7 @@
 package com.maratang.jamjam.domain.room.controller;
 
+import java.util.UUID;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -20,32 +22,32 @@ public class WsRoomController {
 
 	// 참여자 방 입장
 	@MessageMapping("/{roomId}/enter")
-	public void enterRoom(@DestinationVariable Long roomId, @Payload RoomEnterReq roomEnterReq){
-		roomService.enterRoom(roomId, roomEnterReq);
+	public void enterRoom(@DestinationVariable UUID roomUUID, @Payload RoomEnterReq roomEnterReq){
+		roomService.enterRoom(roomUUID, roomEnterReq);
 
 	}
 
 	// 참여자가 떠남
 	@MessageMapping("/{roomId}/leave")
-	public void leaveRoom(@DestinationVariable Long roomId){
-		roomService.leaveRoom(roomId);
+	public void leaveRoom(@DestinationVariable UUID roomUUID){
+		roomService.leaveRoom(roomUUID);
 	}
 
 	// 방 아예 종료
 	@MessageMapping("/{roomId}/close")
-	public void closeRoom(@DestinationVariable Long roomId){
-		roomService.closeRoom(roomId);
+	public void closeRoom(@DestinationVariable UUID roomUUID){
+		roomService.closeRoom(roomUUID);
 	}
 
 	// 방 정보 수정
 	@MessageMapping("/{roomId}/info")
-	public void updateRoom(@DestinationVariable Long roomId, @Payload RoomUpdateReq roomUpdateReq){
-		roomService.updateRoom(roomId, roomUpdateReq);
+	public void updateRoom(@DestinationVariable UUID roomUUID, @Payload RoomUpdateReq roomUpdateReq){
+		roomService.updateRoom(roomUUID, roomUpdateReq);
     }
 
 	// 사용자 정보 수정
 	@MessageMapping("/{roomId}/my")
-	public void updateAttendeeInfo(@DestinationVariable	Long roomId, @Payload AttendeeUpdateReq attendeeUpdateReq){
-		roomService.updateAttendeeInfo(roomId, attendeeUpdateReq);
+	public void updateAttendeeInfo(@DestinationVariable UUID roomUUID, @Payload AttendeeUpdateReq attendeeUpdateReq){
+		roomService.updateAttendeeInfo(roomUUID, attendeeUpdateReq);
 	}
 }

@@ -19,7 +19,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -53,11 +52,10 @@ public class Attendee {
 	private MemberRoundRecord memberRoundRecord;
 
 	@Column(nullable = false, unique = true, updatable = false)
-	private UUID AttendeeUUID;
+	private UUID attendeeUUID;
 
-	@Builder
 	public Attendee(Long attendeeId, String nickname, Member member, Room room, LocalDateTime created_at, Double lat,
-		Double lon, String address, MemberRoundRecord memberRoundRecord) {
+		Double lon, String address, MemberRoundRecord memberRoundRecord, UUID attendeeUUID) {
 		this.attendeeId = attendeeId;
 		this.nickname = nickname;
 		this.member = member;
@@ -67,17 +65,22 @@ public class Attendee {
 		this.lon = lon;
 		this.address = address;
 		this.memberRoundRecord = memberRoundRecord;
+		this.attendeeUUID = attendeeUUID;
 	}
 
 	@PrePersist
 	protected void onCreate() {
-		this.AttendeeUUID = UUID.randomUUID();
+		this.attendeeUUID = UUID.randomUUID();
 	}
 
 	public void updateAttendeeLocation(AttendeeUpdateReq attendeeUpdateReq) {
 		this.lat = attendeeUpdateReq.getLat();
 		this.lon = attendeeUpdateReq.getLon();
 		this.address = attendeeUpdateReq.getAddress();
+	}
+
+	public void updateRoom(Room room) {
+		this.room = room;
 	}
 }
 

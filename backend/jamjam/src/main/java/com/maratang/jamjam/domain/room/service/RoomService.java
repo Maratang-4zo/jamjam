@@ -52,16 +52,16 @@ public class RoomService {
 	}
 
 	@Transactional
-	public void updateRoom(Long roomId, RoomUpdateReq roomUpdateReq) {
+	public void updateRoom(UUID roomUUID, RoomUpdateReq roomUpdateReq) {
 		// 1. DB 상태 변경
 		// 2. 참여자들에게 알리기
-		Room room = roomRepository.findById(roomId)
+		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		room.updateRoom(roomUpdateReq);
 	}
 
-	public void enterRoom(Long roomId, RoomEnterReq enterRequest) {
+	public void enterRoom(UUID roomUUID, RoomEnterReq enterRequest) {
 		// 1. 미팅룸 유효성 검사
 		// 2. 닉네임, 출발지 등 입력하는 시점 확인 필요
 		// 3. 기존 참여자들에게 입장 알림
@@ -71,18 +71,18 @@ public class RoomService {
 		messagingTemplate.convertAndSendToUser("userUUID", "", null);
 	}
 
-	public void leaveRoom(Long roomId) {
+	public void leaveRoom(UUID roomUUID) {
 		// 1. DB 상태 변경
 		// 2. 참여자가 떠남을 알리기
 		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST, "누가 나옴");
 	}
 
-	public void closeRoom(Long roomId) {
+	public void closeRoom(UUID roomUUID) {
 		// 1. DB 상태 변경
 		// 2. 남은 참여자 쫓아내기
 	}
 
-	public void updateAttendeeInfo(Long roomId, AttendeeUpdateReq attendeeUpdateReq) {
+	public void updateAttendeeInfo(UUID roomUUID, AttendeeUpdateReq attendeeUpdateReq) {
 		// 1. DB 상태 변경
 		// 2. 참여자들에게 알리기
 		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST, "");

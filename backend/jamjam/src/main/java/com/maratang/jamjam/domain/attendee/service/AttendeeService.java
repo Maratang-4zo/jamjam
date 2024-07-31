@@ -31,14 +31,13 @@ public class AttendeeService {
 
 		attendeeRepository.save(attendee);
 
-		Room room = roomRepository.findById(attendeeCreateReq.getRoomId())
-			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		UUID attendeeUUID = attendee.getAttendeeUUID();
+		UUID roomUUID = attendeeCreateReq.getRoomUUID();
+
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+			.orElseThrow(()-> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		attendee.updateRoom(room);
-
-		UUID attendeeUUID = attendee.getAttendeeUUID();
-		UUID roomUUID = roomRepository.findById(attendeeCreateReq.getRoomId())
-			.orElseThrow(()->new BusinessException(ErrorCode.ROOM_NOT_FOUND)).getRoomUUID();
 
 		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
 			.roomUUID(roomUUID)
@@ -50,7 +49,7 @@ public class AttendeeService {
 
 	@Transactional
 	public void updateAttendee(AttendeeUpdateReq attendeeUpdateReq) {
-		Attendee attendee = attendeeRepository.findById(attendeeUpdateReq.getAttendeeId())
+		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUpdateReq.getAttendeeUUID())
 			.orElseThrow(()->new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
 		attendee.updateAttendeeLocation(attendeeUpdateReq);

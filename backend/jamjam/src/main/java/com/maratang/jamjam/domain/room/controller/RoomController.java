@@ -1,5 +1,6 @@
 package com.maratang.jamjam.domain.room.controller;
 
+import java.util.UUID;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -60,8 +61,8 @@ public class RoomController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
-	@PostMapping("/{roomId}/join")
-	public ResponseEntity<?> joinRoom(@PathVariable Long roomId){
+	@PostMapping("/{roomUUID}/join")
+	public ResponseEntity<?> joinRoom(@PathVariable UUID roomUUID){
 		// 미팅룸에서 사용할 닉네임을 입력받아 사용자를 저장한다.
 		return ResponseEntity.status(HttpStatus.CREATED).body(null);
 	}

@@ -1,20 +1,22 @@
 package com.maratang.jamjam.domain.room.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -42,23 +44,24 @@ public class Room extends BaseTimeEntity {
 
 	private LocalDateTime endedAt;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "attendee_id")
-	private Attendee attendee;
+	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<Attendee> attendees;
 
 	@Column(nullable = false, unique = true, updatable = false)
 	private UUID roomUUID;
 
+	@OneToOne(fetch = FetchType.LAZY)
+	private Attendee root;
+
 	@Builder
 	public Room(Long roomId, String name, String purpose, String startStation, LocalDateTime meetingDate,
-		LocalDateTime endedAt, Attendee attendee) {
+		LocalDateTime endedAt) {
 		this.roomId = roomId;
 		this.name = name;
 		this.purpose = purpose;
 		this.startStation = startStation;
 		this.meetingDate = meetingDate;
 		this.endedAt = endedAt;
-		this.attendee = attendee;
 	}
 
 	@PrePersist
@@ -67,7 +70,7 @@ public class Room extends BaseTimeEntity {
 	}
 
 	public void updateAttendee(Attendee attendee) {
-		this.attendee = attendee;
+		this.root = attendee;
 	}
 
 	public void updateRoom(RoomUpdateReq roomUpdateReq){

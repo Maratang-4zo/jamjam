@@ -10,6 +10,7 @@ import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.mapper.AttendeeMapper;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
+import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -27,7 +28,13 @@ public class AttendeeService {
 	@Transactional
 	public RoomJwtTokenCliams createAttendee(AttendeeCreateReq attendeeCreateReq) {
 		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(attendeeCreateReq);
+
 		attendeeRepository.save(attendee);
+
+		Room room = roomRepository.findById(attendeeCreateReq.getRoomId())
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		attendee.updateRoom(room);
 
 		UUID attendeeUUID = attendee.getAttendeeUUID();
 		UUID roomUUID = roomRepository.findById(attendeeCreateReq.getRoomId())
@@ -37,7 +44,6 @@ public class AttendeeService {
 			.roomUUID(roomUUID)
 			.attendeeUUID(attendeeUUID)
 			.build();
-
 
 		return roomJwtTokenCliams;
 	}

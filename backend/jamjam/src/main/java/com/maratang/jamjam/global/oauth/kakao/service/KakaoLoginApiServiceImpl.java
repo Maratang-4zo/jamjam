@@ -6,7 +6,7 @@ import org.springframework.util.StringUtils;
 
 import com.maratang.jamjam.global.jwt.constant.GrantType;
 import com.maratang.jamjam.global.oauth.kakao.client.KakaoUserInfoClient;
-import com.maratang.jamjam.global.oauth.kakao.dto.KakaoUserInfoResponseDto;
+import com.maratang.jamjam.global.oauth.kakao.dto.response.KakaoUserInfoRes;
 import com.maratang.jamjam.global.oauth.model.OAuthAttributes;
 import com.maratang.jamjam.global.oauth.service.SocialLoginApiService;
 
@@ -24,17 +24,16 @@ public class KakaoLoginApiServiceImpl implements SocialLoginApiService {
 
 	@Override
 	public OAuthAttributes getUserInfo(String accessToken) {
-		System.out.println(accessToken);
-		KakaoUserInfoResponseDto kakaoUserInfoResponseDto = kakaoUserInfoClient.getKakaoUserInfo(CONTENT_TYPE,
+		KakaoUserInfoRes kakaoUserInfoRes = kakaoUserInfoClient.getKakaoUserInfo(CONTENT_TYPE,
 			GrantType.BEARER.getType() + " " + accessToken);
-		log.info("Authorization Header: {}", kakaoUserInfoResponseDto);
-		KakaoUserInfoResponseDto.KakaoAccount kakaoAccount = kakaoUserInfoResponseDto.getKakaoAccount();
-		String providerId = kakaoUserInfoResponseDto.getId();
+		log.info("Authorization Header: {}", kakaoUserInfoRes);
+		KakaoUserInfoRes.KakaoAccount kakaoAccount = kakaoUserInfoRes.getKakaoAccount();
+		String providerId = kakaoUserInfoRes.getId();
 		String email = kakaoAccount.getEmail();
 		String provider = "KAKAO";
 
 		return OAuthAttributes.builder()
-			.email(!StringUtils.hasText(email) ? kakaoUserInfoResponseDto.getId() : email)
+			.email(!StringUtils.hasText(email) ? kakaoUserInfoRes.getId() : email)
 			.name(kakaoAccount.getName())
 			.nickname(kakaoAccount.getProfile().getNickname())
 			.providerId(providerId)

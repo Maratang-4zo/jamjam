@@ -6,9 +6,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MemberInfoRequestDto {
+public class MemberPatchReq {
 
-	private String email;
 	private String nickname;
 
 }

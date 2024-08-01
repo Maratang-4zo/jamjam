@@ -1,4 +1,4 @@
-package com.maratang.jamjam.global.jwt.service;
+package com.maratang.jamjam.global.jwt.manager;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -97,7 +97,7 @@ public class TokenManager {
 				.parseClaimsJws(token);
 			return true;
 		} catch (ExpiredJwtException e) {
-			log.info("accesstoken 만료", e);
+			log.info("accessToken 만료", e);
 			return false;
 		} catch (Exception e) {
 			log.info("유효하지 않은 인증", e);

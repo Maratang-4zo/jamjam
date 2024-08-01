@@ -15,6 +15,7 @@ public class SocialLoginApiServiceFactory {
 		this.socialLoginApiServices = socialLoginApiServices;
 	}
 
+	// 확장 가능성
 	public static SocialLoginApiService getSocialLoginApiService() {
 		// String socialLoginApiServiceBeanName = "";
 		//

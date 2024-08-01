@@ -1,4 +1,4 @@
-package com.maratang.jamjam.global.oauth.kakao.dto;
+package com.maratang.jamjam.global.oauth.kakao.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class KakaoUserInfoResponseDto {
+public class KakaoUserInfoRes {
 
 	private String id;
 

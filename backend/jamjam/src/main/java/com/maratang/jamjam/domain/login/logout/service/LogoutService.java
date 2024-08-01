@@ -10,7 +10,7 @@ import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.jwt.constant.TokenType;
-import com.maratang.jamjam.global.jwt.service.TokenManager;
+import com.maratang.jamjam.global.jwt.manager.TokenManager;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;

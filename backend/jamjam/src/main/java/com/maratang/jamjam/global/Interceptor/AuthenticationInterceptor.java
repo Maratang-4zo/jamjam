@@ -6,7 +6,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.jwt.constant.TokenType;
-import com.maratang.jamjam.global.jwt.service.TokenManager;
+import com.maratang.jamjam.global.jwt.manager.TokenManager;
 import com.maratang.jamjam.global.util.AuthorizationHeaderUtils;
 
 import io.jsonwebtoken.Claims;
@@ -14,13 +14,15 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
 	private final TokenManager tokenManager;
-
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws
@@ -35,22 +37,23 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		String accessToken = authorizationHeader.split(" ")[1];
 		Claims tokenClaims = tokenManager.getTokenClaims(accessToken);
 
+		log.info("여기는 들림?"+accessToken);
 		Cookie[] cookie = request.getCookies();
 
 		String refreshToken = null;
-		for(int i = 0; i<cookie.length; i++) {
-			if(cookie[i].getName().equals("refreshToken")) {
+		for (int i = 0; i < cookie.length; i++) {
+			if (cookie[i].getName().equals("refreshToken")) {
 				refreshToken = cookie[i].getValue();
 			}
 		}
 
 		String newAccessToken = null;
 
-		if(!tokenManager.validateAccessToken(accessToken)){
+		if (!tokenManager.validateAccessToken(accessToken)) {
 			newAccessToken = tokenManager.reissueToken(refreshToken);
 		}
 
-		if(newAccessToken!=null){
+		if (newAccessToken != null) {
 			accessToken = newAccessToken;
 		}
 
@@ -61,7 +64,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 			throw new AuthenticationException(ErrorCode.NOT_ACCESS_TOKEN);
 		}
 
-		if(newAccessToken!=null){
+		if (newAccessToken != null) {
 			request.setAttribute("accessToken", accessToken);
 		}
 		request.setAttribute("email", tokenClaims.get("email"));

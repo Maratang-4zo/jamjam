@@ -18,16 +18,20 @@ public enum ErrorCode {
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AT001", "인증 토큰이 올바르지 않습니다."),
 	FORBIDDEN(HttpStatus.FORBIDDEN, "AT002", "권한이 없습니다."),
 
-	// oauth2
-	OAUTH2_PROVIDER_NOT_FOUND(HttpStatus.BAD_REQUEST, "OA001", "해당 Provider는 지원되지 않습니다."),
-	OAUTH2_AUTHENTICATION_FAILED(HttpStatus.BAD_REQUEST, "OA002", "OAUTH2 사용자 정보를 가져오는 중 오류가 발생했습니다."),
+	// 인증(auth)
+	TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AT001", "만료된 토큰입니다."),
+	NOT_VALID_TOKEN(HttpStatus.UNAUTHORIZED, "AT002", "해당 토큰은 유효한 토큰이 아닙니다."),
+	NOT_EXISTS_AUTHORIZATION(HttpStatus.UNAUTHORIZED, "AT003", "Authorization 헤더가 빈 값입니다."),
+	NOT_VALID_BEARER_GRANT_TYPE(HttpStatus.UNAUTHORIZED, "AT004", "Bearer type이 아닙니다."),
+	REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT005", "해당 refresh token은 존재하지 않습니다."),
+	REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AT006", "해당 refresh token은 만료되었습니다."),
+	NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "AT007", "해당 토큰은 access token이 아닙니다."),
+	FORBIDDEN_ADMIN(HttpStatus.FORBIDDEN, "AT008", "관리자 ROLE이 아닙니다."),
 
-	// user
-	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "US001", "유저를 찾을 수 없습니다."),
-	USER_EMAIL_DUPLICATE(HttpStatus.CONFLICT, "US002", "사용중인 이메일 입니다."),
-	USER_NICKNAME_DUPLICATE(HttpStatus.CONFLICT, "US003", "사용중인 닉네임 입니다."),
-	USER_CANNOT_DELETE(HttpStatus.NOT_ACCEPTABLE, "US004", "유저를 삭제할 수 없습니다."),
-	ADMIN_CANNOT_DELETE(HttpStatus.NOT_ACCEPTABLE, "US005", "관리자는 삭제할 수 없습니다."),
+	// member
+	INVALID_MEMBER_TYPE(HttpStatus.BAD_REQUEST, "MB001", "잘못된 회원 타입입니다.(memberType : KAKAO"),
+	ALREADY_REGISTERED_MEMBER(HttpStatus.BAD_REQUEST, "MB002", "이미 가입된 회원입니다."),
+	MEMBER_NOT_EXISTS(HttpStatus.BAD_REQUEST, "MB003", "존재하지 않는 회원입니다."),
 
 	// openvidu
 	OV_SERVER_ERROR(HttpStatus.BAD_REQUEST, "OV000", "OV 처리 중 오류가 발생했습니다."),

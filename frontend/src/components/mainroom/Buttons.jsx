@@ -86,7 +86,7 @@ const SmallIcon = styled.img`
   height: 35px;
 `;
 
-function Buttons({ onOpenEditModal }) {
+function Buttons({ onOpenEditModal, onOpenShareModal }) {
   const [isTutorialModalOpen, setIsTutorialModalOpen] = useState(false);
   const [currentTutorialPage, setCurrentTutorialPage] = useState(1);
   const roomState = useRecoilValue(roomAtom);
@@ -152,8 +152,18 @@ function Buttons({ onOpenEditModal }) {
         >
           수정
         </SmallBtn>
-        <SmallBtn isTutorialModalOpen={isTutorialModalOpen}>초대</SmallBtn>
-        <SmallBtn isTutorialModalOpen={isTutorialModalOpen}>공유</SmallBtn>
+        <SmallBtn
+          onClick={() => onOpenShareModal("초대 링크 공유", "50px")}
+          isTutorialModalOpen={isTutorialModalOpen}
+        >
+          초대
+        </SmallBtn>
+        <SmallBtn
+          onClick={() => onOpenShareModal("모임 정보 공유", "110px")}
+          isTutorialModalOpen={isTutorialModalOpen}
+        >
+          공유
+        </SmallBtn>
       </RightBtns>
       <TutorialModal
         isOpen={isTutorialModalOpen}

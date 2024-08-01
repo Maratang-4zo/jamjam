@@ -11,6 +11,5 @@ import lombok.Getter;
 public class ChatRes {
 	private UUID attendeeUUID;
 	private String content;
-	private String type;
 	private LocalDateTime createdAt;
 }

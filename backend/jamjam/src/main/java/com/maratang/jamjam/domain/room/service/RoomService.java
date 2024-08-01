@@ -24,7 +24,7 @@ import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.middle.GeometryUtils;
 import com.maratang.jamjam.global.middle.GrahamScan;
 import com.maratang.jamjam.global.middle.HaversineDistance;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.station.Point;
 import com.maratang.jamjam.global.station.SubwayDataLoader;
 import com.maratang.jamjam.global.station.SubwayInfo;
@@ -44,7 +44,7 @@ public class RoomService {
 	private final SubwayDataLoader subwayDataLoader;
 
 	@Transactional
-	public RoomJwtTokenCliams createRoom(RoomCreateReq roomCreateReq) {
+	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq) {
 		Room room = RoomMapper.INSTANCE.roomCreateReqToAttendee(roomCreateReq);
 
 		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(roomCreateReq);
@@ -58,12 +58,12 @@ public class RoomService {
 
 		UUID roomUUID = room.getRoomUUID();
 
-		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
+		RoomJwtTokenClaims roomJwtTokenClaims = RoomJwtTokenClaims.builder()
 			.roomUUID(roomUUID)
 			.attendeeUUID(attendee.getAttendeeUUID())
 			.build();
 
-		return roomJwtTokenCliams;
+		return roomJwtTokenClaims;
 	}
 
 	@Transactional

@@ -1,7 +1,6 @@
 package com.maratang.jamjam.domain.room.controller;
 
 import java.util.UUID;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,17 +46,17 @@ public class RoomController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@GetMapping("/{roomId}/middle")
+	@GetMapping("/{roomUUID}/middle")
 	@Operation(summary = "✨ 중심점 찾기", description = "그라함 알고리즘을 사용해서 방의 사용자의 좌표들을 읽어서 중심점을 찾는다")
-	public ResponseEntity<?> getMiddleStation(@PathVariable Long roomId){
-		List<SubwayInfo> startStation = roomService.getMiddleStation(roomId);
+	public ResponseEntity<?> getMiddleStation(@PathVariable UUID roomUUID){
+		SubwayInfo startStation = roomService.getMiddleStation(roomUUID);
 
 		return ResponseEntity.status(HttpStatus.OK).body(startStation);
 	}
 
-	@GetMapping("/{roomId}")
+	@GetMapping("/{roomUUID}")
 	@Operation(summary = "🚗 구현 중")
-	public ResponseEntity<?> getRoom(@PathVariable Long roomId){
+	public ResponseEntity<?> getRoom(@PathVariable UUID roomUUID){
 		// 링크를 클릭했을 때 연결된 활성화 상태의 방이 있는지 확인한다 (채팅방 유효성 검사)
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}

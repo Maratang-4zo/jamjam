@@ -7,6 +7,8 @@ import java.util.Stack;
 
 import org.springframework.stereotype.Component;
 
+import com.maratang.jamjam.global.error.ErrorCode;
+import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.station.Point;
 
 @Component
@@ -14,7 +16,12 @@ public class GrahamScan {
 	public List<Point> convexHull(List<Point> points) {
 		Collections.sort(points);
 
+		if (points.isEmpty()) {
+			throw new BusinessException(ErrorCode.MIDDLE_EVERY_EMPTY_LOCATION);
+		}
+
 		Point pivot = points.get(0);
+
 		points.sort((a, b) -> {
 			int order = Point.ccw(pivot, a, b);
 			if (order == 0) {

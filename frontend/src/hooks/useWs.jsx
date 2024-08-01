@@ -1,49 +1,56 @@
 import { useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { chatAtom, roomAtom } from "../recoil/atoms/roomState";
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = "http://i11a604.p.ssafy.io:8080/api/ws";
 
 const useWs = () => {
   const [connected, setConnected] = useState(false);
-  const [chat, setChat] = useState("");
-  const [chatLogs, setChatLogs] = useState([]);
+  const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const client = useRef({});
-  const [roomUUID, setRoomUUID] = useState(null);
-  const [attendeeUUID, setAttendeeUUID] = useState(null);
+  const roomInfo = useRecoilValue(roomAtom);
 
-  const connect = (roomUUID, attendeeUUID) => {
-    setRoomUUID(roomUUID);
-    setAttendeeUUID(attendeeUUID);
-    client.current = new Client({
-      webSocketFactory: () => new SockJS(API_BASE_URL + "/ws"),
-      debug: function (str) {
-        console.log(str);
-      },
-      reconnectDelay: 5000,
-      heartbeatIncoming: 20000,
-      heartbeatOutgoing: 20000,
-      onConnect: () => {
-        console.log("Connected");
-        subscribe();
-      },
-      onStompError: (frame) => {
-        console.error(frame);
-      },
+  const connect = () => {
+    return new Promise((resolve, reject) => {
+      client.current = new Client({
+        webSocketFactory: () => new SockJS(API_BASE_URL),
+        connectHeaders: {
+          roomUUID: roomInfo.roomUUID,
+          attendeeUUID: roomInfo.hostUUID,
+        },
+        debug: function (str) {
+          console.log(str);
+        },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 20000,
+        heartbeatOutgoing: 20000,
+        onConnect: () => {
+          console.log("Connected");
+          subscribe();
+          resolve();
+        },
+        onStompError: (frame) => {
+          console.error(frame);
+          reject(frame);
+        },
+      });
+      client.current.activate();
     });
-    client.current.activate();
   };
 
   const subscribe = () => {
     setConnected(true);
     client.current.subscribe(
-      `/topic/rooms/${roomUUID}`,
+      `/sub/rooms/${roomInfo.roomUUID}`,
       (message) => {
         handleMessage(JSON.parse(message.body));
       },
       {
         headers: {
-          attendeeUUID,
+          roomUUID: roomInfo.roomUUID,
+          attendeeUUID: roomInfo.hostUUID,
         },
       },
     );
@@ -60,7 +67,7 @@ const useWs = () => {
     console.log(message.type);
     switch (message.type) {
       case "CHAT_RECEIVED":
-        displayChatLogs(message);
+        handleChatLogs(message);
         break;
       case "ROOM_UPDATE":
         updateRoomStatus(message);
@@ -70,20 +77,30 @@ const useWs = () => {
     }
   };
 
-  const sendChat = () => {
+  const sendChat = (content) => {
     client.current.publish({
-      destination: `/app/${roomUUID}/chat/send`,
+      destination: `/pub/chat/send`,
       body: JSON.stringify({
-        nickname: "hi",
-        content: chat,
+        content,
       }),
+      headers: {
+        roomUUID: roomInfo.roomUUID,
+        attendeeUUID: roomInfo.hostUUID,
+      },
     });
-    setChat("");
   };
 
-  const displayChatLogs = (message) => {
-    console.log("hihi");
-    const n = message.nickname + ": " + message.content;
+  const handleChatLogs = (message) => {
+    const { senderUUID, content } = message;
+    const attendant = roomInfo.attendants.find(
+      (attendee) => attendee.attendeeUUID === senderUUID,
+    );
+    const nickname = attendant.nickname;
+    const n = {
+      senderUUID,
+      nickname,
+      content,
+    };
     setChatLogs((prevChatLogs) => [...prevChatLogs, n]);
     console.log(message);
   };
@@ -101,12 +118,11 @@ const useWs = () => {
 
   return {
     connected,
-    chat,
     chatLogs,
-    setChat,
     sendChat,
     connect,
     disconnect,
+    handleMessage,
   };
 };
 

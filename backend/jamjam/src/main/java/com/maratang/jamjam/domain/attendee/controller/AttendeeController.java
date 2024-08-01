@@ -21,14 +21,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/attendees")
+@RequestMapping("/attendees")
 @RequiredArgsConstructor
 public class AttendeeController {
 	private final AttendeeService attendeeService;
 	private final RoomTokenProvider roomTokenProvider;
 
 	@PostMapping
-	@Operation(summary = "참여자 추가하기", description = "해당 방에 참여자가 입장한다.")
+	@Operation(summary = "✨ 참여자 추가하기", description = "해당 방에 참여자가 입장한다.")
 	public ResponseEntity<?> createAttendee(@RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response) {
 		RoomJwtTokenCliams roomJwtTokenCliams = attendeeService.createAttendee(attendeeCreateReq);
 
@@ -44,7 +44,7 @@ public class AttendeeController {
 	}
 
 	@PatchMapping
-	@Operation(summary = "참여자 업데이트 하기", description = "해당 방에 참여자의 위치 정보를 업데이트 한다.")
+	@Operation(summary = "✨ 참여자 업데이트 하기", description = "해당 방에 참여자의 위치 정보를 업데이트 한다.")
 	public ResponseEntity<?> updateAttendee(@RequestBody AttendeeUpdateReq attendeeUpdateReq) {
 		attendeeService.updateAttendee(attendeeUpdateReq);
 

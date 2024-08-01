@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { roomAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
 import TutorialModal from "./Tutorial";
-import EditModal from "./EditModal"; // EditModal 임포트
+import { axiosGetMiddle } from "../../apis/mapApi";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -91,6 +91,7 @@ function Buttons({ onOpenEditModal }) {
   const [currentTutorialPage, setCurrentTutorialPage] = useState(1);
   const roomState = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
+  const setRoomState = useSetRecoilState(roomAtom);
 
   const openTutorialModal = () => {
     setIsTutorialModalOpen(true);
@@ -100,6 +101,19 @@ function Buttons({ onOpenEditModal }) {
   const closeTutorialModal = () => {
     setIsTutorialModalOpen(false);
     document.body.classList.remove("modal-open");
+  };
+
+  const handleFindCenter = async () => {
+    try {
+      const data = await axiosGetMiddle({ roomId: roomState.roomId });
+      setRoomState((prev) => ({
+        ...prev,
+        centerPlace: data,
+        isCenterExist: true,
+      }));
+    } catch (error) {
+      console.error("중심찾기 실패!!!", error);
+    }
   };
 
   return (
@@ -119,6 +133,7 @@ function Buttons({ onOpenEditModal }) {
           GAME
         </BigBtn>
         <BigBtn
+          onClick={handleFindCenter}
           disabled={
             !roomState.isAllHasDeparture ||
             !userInfo.isHost ||

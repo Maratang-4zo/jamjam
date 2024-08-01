@@ -44,7 +44,7 @@ function NavBarUp() {
     <>
       <Wrapper>
         <Left>
-          <Link to={`/room/:roomId/create`}>CREATE</Link>
+          <Link to={`/room/create`}>CREATE</Link>
         </Left>
         <Link to={`/`}>로고자리입니다</Link>
         <Right>

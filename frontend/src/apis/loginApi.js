@@ -26,7 +26,7 @@ export const getToken = async (code) => {
 export const sendTokenToBackend = async (token) => {
   try {
     const response = await axios.post(
-      "https://localhost:8080/api/oauth/login",
+      "http://70.12.114.94:8080/api/oauth/login",
       {},
       {
         headers: {

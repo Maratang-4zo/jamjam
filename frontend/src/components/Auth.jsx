@@ -41,7 +41,7 @@ const getToken = async (code) => {
 const sendTokenToBackend = async (token) => {
   try {
     const response = await axios.post(
-      "http://70.12.114.94:8080/api/login",
+      "https://jjam.shop/api/login",
       {},
       {
         headers: {

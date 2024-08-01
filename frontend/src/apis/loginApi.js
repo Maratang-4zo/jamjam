@@ -26,7 +26,7 @@ export const getToken = async (code) => {
 export const sendTokenToBackend = async (token) => {
   try {
     const response = await axios.post(
-      "http://70.12.114.94:8080/api/oauth/login",
+      "https://jjam.shop/api/login",
       {},
       {
         headers: {
@@ -42,7 +42,7 @@ export const sendTokenToBackend = async (token) => {
 
 export const getUserInfo = async () => {
   try {
-    const response = await axios.get("/api/member/info");
+    const response = await axios.get("/api/members/info");
     return response.data;
   } catch (error) {
     console.error("사용자 정보 가져오기 실패", error);
@@ -52,7 +52,7 @@ export const getUserInfo = async () => {
 
 export const updateUserNickname = async (nickname) => {
   try {
-    await axios.post("/api/member/info", { nickname });
+    await axios.post("/api/members/info", { nickname });
   } catch (error) {
     console.error("닉네임 수정 실패", error);
     throw error;

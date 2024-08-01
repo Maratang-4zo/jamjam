@@ -122,7 +122,7 @@ public class RoomService {
 
 		// 3. 기존 인원들에게 알림
 		AttendeeInfo attendeeInfo = AttendeeMapper.INSTANCE.attendeeToAttendeeInfo(attendee);
-		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST+roomUuid, attendeeInfo);
+		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST+roomUUID, attendeeInfo);
 	}
 
 

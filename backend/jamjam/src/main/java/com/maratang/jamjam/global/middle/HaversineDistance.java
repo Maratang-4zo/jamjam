@@ -1,10 +1,6 @@
 package com.maratang.jamjam.global.middle;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -29,18 +25,20 @@ public class HaversineDistance {
 
 
 	// 주어진 위치로부터 5km 이내의 지하철 역을 찾는 메서드
-	public static List<SubwayInfo> findNearbyStations(Map<String, SubwayInfo> subwayMap, double latitude,
+	public static SubwayInfo findNearbyStations(Map<String, SubwayInfo> subwayMap, double latitude,
 		double longitude, double radius, short stationCnt) {
-		List<SubwayInfo> nearbyStations = new ArrayList<>();
+
+		SubwayInfo nearestStation = null;
+		double closestDistance = radius; // 초기에는 주어진 반경 내의 최대 거리로 설정
+
 		for (SubwayInfo info : subwayMap.values()) {
 			double distance = calculateDistance(latitude, longitude, info.getLatitude(), info.getLongitude());
-			if (distance <= radius) {
-				nearbyStations.add(info);
+			if (distance <= radius && distance < closestDistance) {
+				nearestStation = info;
+				closestDistance = distance; // 업데이트된 가장 가까운 거리
 			}
 		}
-		nearbyStations.sort(
-			Comparator.comparingDouble(info -> calculateDistance(latitude, longitude, info.getLatitude(), info.getLongitude())));
 
-		return nearbyStations.stream().limit(stationCnt).collect(Collectors.toList());
+		return nearestStation;
 	}
 }

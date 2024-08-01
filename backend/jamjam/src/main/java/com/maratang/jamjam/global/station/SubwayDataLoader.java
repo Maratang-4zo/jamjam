@@ -1,7 +1,10 @@
 package com.maratang.jamjam.global.station;
 
+import java.io.InputStream;
 import java.util.Map;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -17,8 +20,11 @@ public class SubwayDataLoader {
 	}
 
 	@PostConstruct
-	private void loadSubwayData(){
-		this.subwayMap = stationCSVParsing.readSubwayInfoFromCSV("data/subwayinfo.csv");
+	private void loadSubwayData() throws Exception {
+		Resource resource = new ClassPathResource("data/subwayInfo.csv");
+		InputStream inputStream = resource.getInputStream();
+
+		this.subwayMap = stationCSVParsing.readSubwayInfoFromCSV(inputStream);
 	}
 
 	public Map<String, SubwayInfo> getSubwayInfoMap() {

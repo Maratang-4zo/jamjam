@@ -53,7 +53,8 @@ public enum ErrorCode {
 	ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "RM001", "미팅룸을 찾을 수 없습니다."),
 
 	// middle
-	MIDDLE_SOMEONE_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI001","위치를 선택안한 사람이 존재합니다.");
+	MIDDLE_SOMEONE_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI001","위치를 선택안한 사람이 존재합니다."),
+	MIDDLE_EVERY_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI002","아무도 위치를 선택하지 않았습니다.");
 
 	private final HttpStatus status;
 	private final String code;

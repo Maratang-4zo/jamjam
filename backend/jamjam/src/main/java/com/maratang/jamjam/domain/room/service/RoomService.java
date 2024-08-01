@@ -76,8 +76,8 @@ public class RoomService {
 		room.updateRoom(roomUpdateReq);
 	}
 
-	public List<SubwayInfo> getMiddleStation(Long roomId) {
-		Room room = roomRepository.findById(roomId)
+	public SubwayInfo getMiddleStation(UUID roomUUID) {
+		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		// Transforming attendees' coordinates into Point instances, skipping null values
@@ -86,14 +86,16 @@ public class RoomService {
 			.map(attendee -> new Point(attendee.getLat(), attendee.getLon()))
 			.collect(Collectors.toList());
 
-		Point centroid = geometryUtils.calculateCentroid(grahamScan.convexHull(points));
+		List<Point> grahamPoints = grahamScan.convexHull(points);
+
+		Point centroid = geometryUtils.calculateCentroid(grahamPoints);
 
 		Map<String, SubwayInfo> subwayMap = subwayDataLoader.getSubwayInfoMap();
 
 		double searchRadius = 5.0; // 5km
 		short stationCnt = 5;
 
-		List<SubwayInfo> nearbyStations = HaversineDistance.findNearbyStations(subwayMap, centroid.getX(),
+		SubwayInfo nearbyStations = HaversineDistance.findNearbyStations(subwayMap, centroid.getX(),
 			centroid.getY(), searchRadius,stationCnt);
 
 		return nearbyStations;

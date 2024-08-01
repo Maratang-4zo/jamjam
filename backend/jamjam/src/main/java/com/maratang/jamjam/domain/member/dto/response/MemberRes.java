@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MemberInfoResponseDto {
+public class MemberRes {
 	private String nickname;
 	private String email;
 	private String profile;

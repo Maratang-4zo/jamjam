@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.login.dto.response.LoginRes;
-import com.maratang.jamjam.domain.login.service.OauthLoginService;
+import com.maratang.jamjam.domain.login.service.LoginService;
 import com.maratang.jamjam.global.util.AuthorizationHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/login")
 public class LoginController {
 
-	private final OauthLoginService oauthLoginService;
+	private final LoginService loginService;
 
 	@PostMapping
 	@Operation(summary = "로그인", description = "token값을 확인하여 이미 존재하는 유저는 로그인을, 존재하지 않는 유저는 회원가입을 시킨다.")
@@ -36,7 +36,7 @@ public class LoginController {
 
 		log.info("kakao "+ accessToken);
 
-		LoginRes loginRes = oauthLoginService.oauthLogin(accessToken);
+		LoginRes loginRes = loginService.oauthLogin(accessToken);
 
 		Cookie cookie = new Cookie("refreshToken", loginRes.getRefreshToken());
 		cookie.setPath("/");

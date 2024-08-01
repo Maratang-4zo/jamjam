@@ -23,10 +23,13 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
       open-in-view: true
 
-  kakao:
-    client:
-      id: ${CLIENT_ID}
-      secret: ${CLIENT_SECRET}
+  logging:
+    level:
+      com.app: debug
+kakao:
+  client:
+    id: ${KAKAO_CLIENT_ID}
+    secret: ${KAKAO_CLIENT_SECRET}
 
 openvidu:
   openvidu-url: ${OPENVIDU_URL:http://localhost:4443/}
@@ -36,3 +39,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     display-request-duration: true
+token:
+  secret: ${TOKEN_CLIENT_SECRET}
+  access-token-expiration-time: ${ACCESS_TOKEN_EXPIRATION_TIME}
+  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}

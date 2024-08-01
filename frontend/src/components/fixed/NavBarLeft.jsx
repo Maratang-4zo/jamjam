@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import MicOn from "../../assets/icons/micon.png";
@@ -7,6 +7,8 @@ import MicOff from "../../assets/icons/micoff.png";
 import ChatOn from "../../assets/icons/chaton.png";
 import ChatOff from "../../assets/icons/chatoff.png";
 import ChattingModal from "./ChattingModal";
+import { useRecoilState } from "recoil";
+import { chatModalVisibleAtom } from "../../recoil/atoms/roomState";
 
 const Wrapper = styled.div`
   width: 50px;
@@ -75,9 +77,14 @@ const Home = styled.img`
 `;
 
 function NavBarLeft() {
-  const [isChatOn, setIsChatOn] = useState(false);
-  const handleChat = () => setIsChatOn(!isChatOn);
+  const [isChatOn, setIsChatOn] = useRecoilState(chatModalVisibleAtom);
   const [isMicOn, setIsMicOn] = useState(true);
+
+  useEffect(() => {
+    setIsChatOn(false); // 컴포넌트가 마운트될 때 채팅 모달 상태를 초기화
+  }, [setIsChatOn]);
+
+  const handleChat = () => setIsChatOn(!isChatOn);
   const handleMic = () => setIsMicOn(!isMicOn);
 
   return (

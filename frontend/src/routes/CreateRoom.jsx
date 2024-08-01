@@ -7,8 +7,10 @@ import "../index.css";
 import { useForm, Controller } from "react-hook-form";
 import { axiosCreateRoom } from "../apis/roomApi";
 import { useNavigate } from "react-router-dom";
-import { getCookie } from "../utils/Cookies";
 import useWs from "../hooks/useWs";
+import { useRecoilState } from "recoil";
+import { roomAtom } from "../recoil/atoms/roomState";
+import { useEffect, useState } from "react";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -94,29 +96,48 @@ const ErrorBox = styled.div`
 
 function CreateRoom() {
   const navigate = useNavigate();
+  const { connect } = useWs();
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
   } = useForm();
-  const { connect } = useWs();
 
   const createRoomFn = async (data) => {
-    let roomUUID, attendeeUUID;
-    axiosCreateRoom(data.purpose, data.meetingDate.toISOString(), data.nickname)
-      .then(() => {
-        roomUUID = getCookie("roomUUID");
-        attendeeUUID = getCookie("attendeeUUID");
-      })
-      .then(() => {
-        connect(roomUUID, attendeeUUID);
-      })
-      .then(() => {
-        // navigate(`/room/${roomUUID}`); 제가 진짜에요 주인님 밑에 녀석은 가짜입니다
-        navigate(`/room/:roomid`);
+    try {
+      const res = await axiosCreateRoom({
+        purpose: data.purpose,
+        meetingDate: data.meetingDate.toISOString(),
+        nickname: data.nickname,
       });
+
+      const roomUUID = res.roomUUID;
+      const attendeeUUID = res.attendeeUUID;
+
+      setRoomInfo((prev) => ({
+        ...prev,
+        roomUUID: roomUUID,
+        hostUUID: attendeeUUID,
+        attendants: [...prev.attendants, attendeeUUID],
+      }));
+    } catch (error) {
+      console.error("방 생성 중 오류 발생:", error);
+    }
   };
+
+  useEffect(() => {
+    if (roomInfo && roomInfo.roomUUID && roomInfo.hostUUID) {
+      connect()
+        .then(() => {
+          navigate(`/room/${roomInfo.roomUUID}`);
+        })
+        .catch((error) => {
+          console.error("WebSocket 연결 실패:", error);
+        });
+    }
+  }, [roomInfo, connect, navigate]);
 
   return (
     <Wrapper>

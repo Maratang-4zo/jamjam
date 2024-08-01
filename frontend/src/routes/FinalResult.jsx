@@ -7,6 +7,7 @@ const Wrapper = styled.div`
   height: ${(props) => props.theme.wrapperHeight};
   color: ${(props) => props.theme.textColor};
   border: 3px solid ${(props) => props.theme.accentColor};
+  border-left: none;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -1,5 +1,6 @@
 package com.maratang.jamjam.domain.chat.service;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.context.annotation.Lazy;
@@ -44,9 +45,9 @@ public class ChatService {
 		chatRepository.save(chat);
 
 		ChatRes res = ChatRes.builder()
-			.attendeeUUID(attendeeUUID).content(chatReq.getContent()).type("CHAT_RECEIVED").createdAt(chat.getCreatedAt())
+			.attendeeUUID(attendeeUUID).content(chatReq.getContent()).createdAt(chat.getCreatedAt())
 			.build();
 		// chat to chatReq
-		simpMessagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST + roomUUID, res);
+		simpMessagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST + roomUUID, res, Map.of("type", "CHAT_RECEIVED"));
 	}
 }

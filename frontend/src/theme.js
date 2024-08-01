@@ -7,5 +7,6 @@ export const defaultTheme = {
   subBgColor: "#FBFAF2", // 서브 배경색 (아이보리색)
   subaccentColor: "#FFFFFF", // 서브 강조색 (흰색)
   relaxColor: "#6C6C6C", // 존재감이 없어야하는 곳에 쓰는 색(진한 회색)
+  infoColor: "#D9D9D9", // 공유 버튼 등
   accentOpacity: "e9",
 };

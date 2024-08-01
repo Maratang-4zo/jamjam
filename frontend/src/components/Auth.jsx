@@ -8,6 +8,11 @@ const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
 // 카카오 인증 서버로부터 액세스 토큰 받아오기
 const getToken = async (code) => {
   try {
+    console.log("액세스 토큰 요청 시작");
+    console.log("APP_KEY:", APP_KEY);
+    console.log("REDIRECT_URI:", REDIRECT_URI);
+    console.log("code:", code);
+
     const res = await axios.post(
       "https://kauth.kakao.com/oauth/token",
       {
@@ -24,7 +29,10 @@ const getToken = async (code) => {
     );
     return res.data;
   } catch (error) {
-    console.error("액세스 토큰 받아오기 실패", error);
+    console.error(
+      "액세스 토큰 받아오기 실패",
+      error.response ? error.response.data : error.message,
+    );
     throw error;
   }
 };
@@ -33,7 +41,7 @@ const getToken = async (code) => {
 const sendTokenToBackend = async (token) => {
   try {
     const response = await axios.post(
-      "https://localhost:8080/api/oauth/login",
+      "http://70.12.114.94:8080/api/login",
       {},
       {
         headers: {
@@ -41,20 +49,30 @@ const sendTokenToBackend = async (token) => {
         },
       },
     );
+    const { accessToken, refreshToken } = response.data;
+
+    // 로컬 스토리지에 저장
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+
+    console.log("Access Token:", accessToken);
+    console.log("Refresh Token:", refreshToken);
+
     console.log(response.data);
   } catch (error) {
-    console.error("백엔드에게 토큰 보내기 실패", error);
+    console.error(
+      "백엔드에게 토큰 보내기 실패",
+      error.response ? error.response.data : error.message,
+    );
   }
 };
 
 // Auth 컴포넌트
 const Auth = () => {
-  // React 컴포넌트로 정의
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchToken = async () => {
-      // 현재 URL에서 인가 코드 추출
       const code = new URL(window.location.href).searchParams.get("code");
       if (!code) {
         console.error("인가 코드를 가져올 수 없습니다.");
@@ -62,24 +80,20 @@ const Auth = () => {
       }
 
       try {
-        // 인가 코드를 이용해 액세스 토큰을 받아옴
+        console.log("인가 코드:", code); // 인가 코드 출력
         const data = await getToken(code);
         const accessToken = data.access_token;
 
-        // 액세스 토큰을 로컬 스토리지에 저장 (필요 시)
-        // localStorage.setItem("token", JSON.stringify(accessToken));
+        console.log("액세스 토큰:", accessToken); // 액세스 토큰 출력
 
-        // 백엔드로 액세스 토큰을 보냄
         await sendTokenToBackend(accessToken);
 
-        // 홈 페이지로 리다이렉트
         navigate("/");
       } catch (err) {
         console.log(err);
       }
     };
 
-    // fetchToken 함수를 호출하여 인가 코드로부터 액세스 토큰을 받아옴
     fetchToken();
   }, [navigate]);
 

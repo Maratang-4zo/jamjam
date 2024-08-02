@@ -2,8 +2,6 @@ import styled from "styled-components";
 import DaumPostcodeEmbed from "react-daum-postcode";
 import { useNavermaps } from "react-naver-maps";
 import { useEffect, useState } from "react";
-import { useSetRecoilState } from "recoil";
-import { userInfoAtom } from "../../recoil/atoms/userState";
 
 const Wrapper = styled.div`
   position: fixed;
@@ -32,7 +30,7 @@ const ModalContent = styled.div`
 function FindDeparture({ onClose, onAddressSelect }) {
   const navermaps = useNavermaps();
   const [fullAddress, setFullAddress] = useState(null);
-  const setUserInfo = useSetRecoilState(userInfoAtom);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (fullAddress) {
@@ -49,14 +47,6 @@ function FindDeparture({ onClose, onAddressSelect }) {
           const longitude = items[0].point.x;
 
           // 데이터 전달 후 모달 닫기
-          setUserInfo((prevState) => ({
-            ...prevState,
-            departure: {
-              addressText: fullAddress,
-              latitude,
-              longitude,
-            },
-          }));
           onAddressSelect({ addressText: fullAddress, latitude, longitude });
           onClose();
         },
@@ -80,12 +70,13 @@ function FindDeparture({ onClose, onAddressSelect }) {
     }
 
     setFullAddress(address);
+    setIsLoading(true);
   };
 
   return (
     <Wrapper>
       <ModalContent>
-        <h1>출발지를 입력해주세요.</h1>
+        <h1> {isLoading ? "로딩 중" : "출발지를 입력해주세요."}</h1>
         <DaumPostcodeEmbed onComplete={handleComplete} />
       </ModalContent>
     </Wrapper>

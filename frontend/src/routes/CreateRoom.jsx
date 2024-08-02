@@ -118,6 +118,8 @@ function CreateRoom() {
 
       setRoomInfo((prev) => ({
         ...prev,
+        meetingDate: data.meetingDate.toISOString(),
+        purpose: data.purpose,
         roomUUID: roomUUID,
         hostUUID: attendeeUUID,
         attendants: [...prev.attendants, attendeeUUID],

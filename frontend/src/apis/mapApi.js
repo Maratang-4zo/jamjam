@@ -11,7 +11,6 @@ export function axiosGetMiddle({ roomUUID }) {
     .then((res) => {
       console.log("중심장소 가져오기 완료");
       console.log(res);
-      return res.data;
     })
     .catch((err) => {
       console.error("중심장소 가져오기 실패");
@@ -28,7 +27,6 @@ export function axiosUpdateUserInfo({ address, lat, lon }) {
     })
     .then((res) => {
       console.log("사용자 정보 업데이트 완료");
-      return res.data;
     })
     .catch((err) => {
       console.error("사용자 정보 업데이트 실패");

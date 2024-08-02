@@ -9,6 +9,10 @@ import ShareModal from "../components/mainroom/ShareModal";
 import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
+<<<<<<< HEAD
+=======
+import { axiosUpdateUserInfo } from "../apis/mapApi";
+>>>>>>> c57b6b4 (✨ Feat: webRTC 방생성 시 연결)
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -40,7 +44,11 @@ function Room() {
     setIsFindDepartureModalOpen(false);
   };
 
+<<<<<<< HEAD
   const handleAddressSelect = (data) => {
+=======
+  const handleAddressSelect = async (data) => {
+>>>>>>> c57b6b4 (✨ Feat: webRTC 방생성 시 연결)
     const { addressText, latitude, longitude, meetingDate } = data;
     if (
       userInfo.departure.addressText !== addressText ||
@@ -62,6 +70,19 @@ function Room() {
       ...prev,
       meetingDate,
     }));
+<<<<<<< HEAD
+=======
+
+    try {
+      await axiosUpdateUserInfo({
+        addressText,
+        latitude,
+        longitude,
+      });
+    } catch (err) {
+      console.error("사용자 정보 업데이트 실패");
+    }
+>>>>>>> c57b6b4 (✨ Feat: webRTC 방생성 시 연결)
   };
 
   const handleCloseEditModal = () => {

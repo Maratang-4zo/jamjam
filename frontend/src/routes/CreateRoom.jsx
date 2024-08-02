@@ -11,6 +11,7 @@ import useWs from "../hooks/useWs";
 <<<<<<< HEAD
 import { useRecoilState } from "recoil";
 import { roomAtom } from "../recoil/atoms/roomState";
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
 <<<<<<< HEAD
 =======
@@ -18,6 +19,11 @@ import { jwtDecode } from "jwt-decode";
 >>>>>>> c28fd28 (✨ Feat: room 생성 api 연결 구현)
 =======
 >>>>>>> 0febc84 (🔥 Hotfix: jwt decode -> reponse)
+=======
+import { getCookie } from "../utils/Cookies";
+import useOpenVidu from "../hooks/useOpenVidu";
+import { userInfoAtom } from "../recoil/atoms/userState";
+>>>>>>> c57b6b4 (✨ Feat: webRTC 방생성 시 연결)
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -40,8 +46,7 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding-top: 200px; /* 입력창들을 위로 옮기기 위한 패딩 */
+  justify-content: center;
 `;
 
 const FormWrapper = styled.form`
@@ -104,7 +109,9 @@ const ErrorBox = styled.div`
 function CreateRoom() {
   const navigate = useNavigate();
   const { connect } = useWs();
+  const { createSession } = useOpenVidu();
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const {
     register,
     handleSubmit,
@@ -145,7 +152,28 @@ function CreateRoom() {
         data.nickname,
       );
 
-      const roomUUID = response.roomUUID;
+      const roomToken = getCookie("roomToken");
+      const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
+
+      setRoomInfo((prev) => ({
+        ...prev,
+        meetingDate: data.meetingDate.toISOString(),
+        purpose: data.purpose,
+        roomUUID: roomUUID,
+        hostUUID: attendeeUUID,
+        attendants: [...prev.attendants, attendeeUUID],
+        isValid: true,
+      }));
+
+      const sessionToken = await createSession(roomUUID, attendeeUUID);
+      await connect(roomUUID, attendeeUUID);
+      setUserInfo((prev) => ({
+        ...prev,
+        sessionToken,
+        myUUID: attendeeUUID,
+        isHost: true,
+        nickname: data.nickname,
+      }));
 
       navigate(`/room/${roomUUID}`);
     } catch (error) {
@@ -153,18 +181,6 @@ function CreateRoom() {
 >>>>>>> c28fd28 (✨ Feat: room 생성 api 연결 구현)
     }
   };
-
-  useEffect(() => {
-    if (roomInfo && roomInfo.roomUUID && roomInfo.hostUUID) {
-      connect()
-        .then(() => {
-          navigate(`/room/${roomInfo.roomUUID}`);
-        })
-        .catch((error) => {
-          console.error("WebSocket 연결 실패:", error);
-        });
-    }
-  }, [roomInfo, connect, navigate]);
 
   return (
     <Wrapper>

@@ -3,11 +3,14 @@ import DaumPostcodeEmbed from "react-daum-postcode";
 import { useNavermaps } from "react-naver-maps";
 import { useEffect, useState } from "react";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import { axiosUpdateUserInfo } from "../../apis/mapApi";
 =======
 >>>>>>> c52f8e7 (✨ Feat: 출발지, 모임 날짜 수정 모달)
+=======
+>>>>>>> c57b6b4 (✨ Feat: webRTC 방생성 시 연결)
 
 const Wrapper = styled.div`
   position: fixed;
@@ -53,6 +56,7 @@ function FindDeparture({ onClose, onAddressSelect }) {
           const longitude = items[0].point.x;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
           // 데이터 전달 후 모달 닫기 -> axios 호출 해주세요 todo
           setUserInfo((prevState) => ({
             ...prevState,
@@ -73,6 +77,8 @@ function FindDeparture({ onClose, onAddressSelect }) {
             console.error("사용자 정보 업데이트 실패");
           }
 
+=======
+>>>>>>> c57b6b4 (✨ Feat: webRTC 방생성 시 연결)
           // 맨처음에 postcode를 설정할 때 사용한 코드 todo2
 =======
           // 데이터 전달 후 모달 닫기
@@ -82,7 +88,7 @@ function FindDeparture({ onClose, onAddressSelect }) {
         },
       );
     }
-  }, [fullAddress, navermaps, onAddressSelect, onClose, setUserInfo]);
+  }, [fullAddress, navermaps, onAddressSelect, onClose]);
 
   const handleComplete = (data) => {
     let address = data.address;

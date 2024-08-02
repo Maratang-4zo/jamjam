@@ -2,9 +2,12 @@ import styled from "styled-components";
 import DaumPostcodeEmbed from "react-daum-postcode";
 import { useNavermaps } from "react-naver-maps";
 import { useEffect, useState } from "react";
+<<<<<<< HEAD
 import { useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import { axiosUpdateUserInfo } from "../../apis/mapApi";
+=======
+>>>>>>> c52f8e7 (✨ Feat: 출발지, 모임 날짜 수정 모달)
 
 const Wrapper = styled.div`
   position: fixed;
@@ -33,7 +36,7 @@ const ModalContent = styled.div`
 function FindDeparture({ onClose, onAddressSelect }) {
   const navermaps = useNavermaps();
   const [fullAddress, setFullAddress] = useState(null);
-  const setUserInfo = useSetRecoilState(userInfoAtom);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (fullAddress) {
@@ -49,6 +52,7 @@ function FindDeparture({ onClose, onAddressSelect }) {
           const latitude = items[0].point.y;
           const longitude = items[0].point.x;
 
+<<<<<<< HEAD
           // 데이터 전달 후 모달 닫기 -> axios 호출 해주세요 todo
           setUserInfo((prevState) => ({
             ...prevState,
@@ -70,6 +74,9 @@ function FindDeparture({ onClose, onAddressSelect }) {
           }
 
           // 맨처음에 postcode를 설정할 때 사용한 코드 todo2
+=======
+          // 데이터 전달 후 모달 닫기
+>>>>>>> c52f8e7 (✨ Feat: 출발지, 모임 날짜 수정 모달)
           onAddressSelect({ addressText: fullAddress, latitude, longitude });
           onClose();
         },
@@ -93,12 +100,13 @@ function FindDeparture({ onClose, onAddressSelect }) {
     }
 
     setFullAddress(address);
+    setIsLoading(true);
   };
 
   return (
     <Wrapper>
       <ModalContent>
-        <h1>출발지를 입력해주세요.</h1>
+        <h1> {isLoading ? "로딩 중" : "출발지를 입력해주세요."}</h1>
         <DaumPostcodeEmbed onComplete={handleComplete} />
       </ModalContent>
     </Wrapper>

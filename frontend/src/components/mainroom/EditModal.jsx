@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { userInfoAtom } from "../../recoil/atoms/userState";
+import { roomAtom } from "../../recoil/atoms/roomState";
 import FindDeparture from "./Departure";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 
 const GlobalStyle = createGlobalStyle`
   body.modal-open {
@@ -38,11 +41,8 @@ const ModalContent = styled.div`
 `;
 
 const Calendar = styled.div`
-  width: 200px;
-  height: 200px;
-  background: #ba3939;
+  width: 250px;
   margin-bottom: 20px;
-  display: ${(props) => (props.isHost ? "block" : "none")};
 `;
 
 const Button = styled.button`
@@ -63,18 +63,8 @@ const Btns = styled.div`
   align-items: center;
 `;
 
-const AddressInfo = styled.div`
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-  width: 100%;
-  text-align: left;
-`;
-
 const FindBtn = styled.button`
-  width: 200px;
+  width: 250px;
   background-color: none;
   border-radius: 15px;
   border: 2px solid black;
@@ -89,8 +79,10 @@ const FindBtn = styled.button`
 function EditModal({ isOpen, onClose, onAddressSelect }) {
   const { isHost } = useRecoilValue(userInfoAtom);
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
+  const [roomInfo] = useRecoilState(roomAtom);
   const [address, setAddress] = useState(null);
   const [isFindDepartureOpen, setIsFindDepartureOpen] = useState(false);
+  const [meetingDate, setMeetingDate] = useState(new Date());
 
   const handleAddressSelect = (data) => {
     setAddress(data);
@@ -98,9 +90,24 @@ function EditModal({ isOpen, onClose, onAddressSelect }) {
   };
 
   const editInfoFn = () => {
-    if (address) {
-      onAddressSelect(address);
-    }
+    const updatedAddress = address || userInfo.departure;
+
+    setUserInfo((prevState) => ({
+      ...prevState,
+      departure: {
+        addressText: updatedAddress.addressText,
+        latitude: updatedAddress.latitude,
+        longitude: updatedAddress.longitude,
+      },
+    }));
+
+    onAddressSelect({
+      addressText: updatedAddress.addressText,
+      latitude: updatedAddress.latitude,
+      longitude: updatedAddress.longitude,
+      meetingDate: meetingDate.toISOString(),
+    });
+
     onClose();
   };
 
@@ -108,6 +115,12 @@ function EditModal({ isOpen, onClose, onAddressSelect }) {
     setAddress(null);
     setIsFindDepartureOpen(true);
   };
+
+  useEffect(() => {
+    if (roomInfo && roomInfo.meetingDate) {
+      setMeetingDate(new Date(roomInfo.meetingDate)); // roomInfo의 meetingDate로 설정
+    }
+  }, [roomInfo]);
 
   if (!isOpen) {
     return null;
@@ -127,7 +140,14 @@ function EditModal({ isOpen, onClose, onAddressSelect }) {
           hidden={isFindDepartureOpen}
           onClick={(e) => e.stopPropagation()}
         >
-          <Calendar isHost={isHost}>캘린더 자리입니다</Calendar>
+          <Calendar>
+            <DatePicker
+              selected={meetingDate}
+              onChange={(date) => setMeetingDate(date)}
+              dateFormat="yyyy/MM/dd"
+              inline
+            />
+          </Calendar>
           {!address && !isFindDepartureOpen && (
             <FindBtn onClick={() => setIsFindDepartureOpen(true)}>
               {userInfo.departure.addressText}

@@ -9,6 +9,7 @@ import ShareModal from "../components/mainroom/ShareModal";
 import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
+import { axiosUpdateUserInfo } from "../apis/mapApi";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -40,7 +41,7 @@ function Room() {
     setIsFindDepartureModalOpen(false);
   };
 
-  const handleAddressSelect = (data) => {
+  const handleAddressSelect = async (data) => {
     const { addressText, latitude, longitude, meetingDate } = data;
     if (
       userInfo.departure.addressText !== addressText ||
@@ -62,6 +63,16 @@ function Room() {
       ...prev,
       meetingDate,
     }));
+
+    try {
+      await axiosUpdateUserInfo({
+        addressText,
+        latitude,
+        longitude,
+      });
+    } catch (err) {
+      console.error("사용자 정보 업데이트 실패");
+    }
   };
 
   const handleCloseEditModal = () => {

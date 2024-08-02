@@ -13,6 +13,8 @@ const GlobalStyle = createGlobalStyle`
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
+  border: 3px solid ${(props) => props.theme.accentColor};
+  border-left: none;
   width: 100%;
   height: 100vh;
   color: ${(props) => props.theme.textColor};

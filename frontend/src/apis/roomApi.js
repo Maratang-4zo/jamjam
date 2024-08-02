@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = `http://jjam.shop`;
+const BASE_URL = `https://jjam.shop`;
 
 // 방 생성
 export function axiosCreateRoom({ purpose, meetingDate, nickname }) {

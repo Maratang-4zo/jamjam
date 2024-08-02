@@ -28,7 +28,8 @@ public class RoomTokenProvider {
 
 	public static final String AUTHORIZATION_HEADER = "Authorization";
 
-	@Value("${jwt.roomTokenExpiration:60}")
+	// 10시간 임의 설정
+	@Value("${jwt.roomTokenExpiration:36000000}")
 	private String roomTokenExpirationTime;
 
 	// openssl rand -hex 32
@@ -87,6 +88,9 @@ public class RoomTokenProvider {
 		try {
 			claims = Jwts.parser().setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
 				.parseClaimsJws(token).getBody();
+		} catch (ExpiredJwtException e){
+			log.info("만료된 토큰", e);
+			throw new BusinessException(ErrorCode.AU_TOKEN_EXPIRED);
 		} catch (Exception e) {
 			log.info("유효하지 않은 토큰", e);
 			throw new BusinessException(ErrorCode.AU_NOT_VALID_TOKEN);

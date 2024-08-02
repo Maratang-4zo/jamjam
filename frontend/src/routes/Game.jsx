@@ -7,6 +7,7 @@ const Wrapper = styled.div`
   height: ${(props) => props.theme.wrapperHeight};
   color: ${(props) => props.theme.bgColor};
   border: 3px solid ${(props) => props.theme.accentColor};
+  border-left: none;
   display: flex;
   /* align-items: center;
   justify-content: center; 중앙 정렬 추가 */

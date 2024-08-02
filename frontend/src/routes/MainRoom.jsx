@@ -5,7 +5,6 @@ import Map from "../components/mainroom/Map";
 import FindDeparture from "../components/mainroom/Departure";
 import EditModal from "../components/mainroom/EditModal";
 import Buttons from "../components/mainroom/Buttons";
-import { useParams } from "react-router-dom";
 import ShareModal from "../components/mainroom/ShareModal";
 
 const Wrapper = styled.div`
@@ -14,12 +13,12 @@ const Wrapper = styled.div`
   height: ${(props) => props.theme.wrapperHeight};
   color: ${(props) => props.theme.textColor};
   border: 3px solid ${(props) => props.theme.accentColor};
+  border-left: none;
   display: flex;
   align-items: center;
 `;
 
 function Room() {
-  const { roomId } = useParams();
   const [isFindDepartureModalOpen, setIsFindDepartureModalOpen] =
     useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -83,10 +82,7 @@ function Room() {
         />
       )}
       <Map selectedAddress={selectedAddress} />
-      <Buttons
-        onOpenEditModal={handleOpenEditModal}
-        onOpenShareModal={handleOpenShareModal}
-      />
+      <Buttons onOpenEditModal={handleOpenEditModal} />
     </Wrapper>
   );
 }

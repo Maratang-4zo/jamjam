@@ -7,9 +7,11 @@ import "../index.css";
 import { useForm, Controller } from "react-hook-form";
 import { axiosCreateRoom } from "../apis/roomApi";
 import { useNavigate } from "react-router-dom";
-import { getCookie } from "../utils/Cookies";
 import useWs from "../hooks/useWs";
 import { jwtDecode } from "jwt-decode";
+import { useRecoilState } from "recoil";
+import { roomAtom } from "../recoil/atoms/roomState";
+import { useEffect, useState } from "react"; 
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -95,13 +97,14 @@ const ErrorBox = styled.div`
 
 function CreateRoom() {
   const navigate = useNavigate();
+  const { connect } = useWs();
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
   } = useForm();
-  const { connect } = useWs();
 
   // const createRoomFn = async (data) => {
   //   let roomUUID, attendeeUUID;
@@ -139,6 +142,18 @@ function CreateRoom() {
       console.error("An error occurred:", error);
     }
   };
+
+  useEffect(() => {
+    if (roomInfo && roomInfo.roomUUID && roomInfo.hostUUID) {
+      connect()
+        .then(() => {
+          navigate(`/room/${roomInfo.roomUUID}`);
+        })
+        .catch((error) => {
+          console.error("WebSocket 연결 실패:", error);
+        });
+    }
+  }, [roomInfo, connect, navigate]);
 
   return (
     <Wrapper>

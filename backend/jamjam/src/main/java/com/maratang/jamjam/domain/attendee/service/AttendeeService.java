@@ -14,8 +14,10 @@ import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
+import com.maratang.jamjam.global.room.RoomTokenProvider;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class AttendeeService {
 	private final AttendeeRepository attendeeRepository;
 	private final RoomRepository roomRepository;
+	private final RoomTokenProvider roomTokenProvider;
 
 	@Transactional
 	public RoomJwtTokenCliams createAttendee(AttendeeCreateReq attendeeCreateReq) {
@@ -48,8 +51,14 @@ public class AttendeeService {
 	}
 
 	@Transactional
-	public void updateAttendee(AttendeeUpdateReq attendeeUpdateReq) {
-		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUpdateReq.getAttendeeUUID())
+	public void updateAttendee(AttendeeUpdateReq attendeeUpdateReq, String roomToken) {
+		Claims claims = roomTokenProvider.getTokenClaims(roomToken);
+
+		String attendeeUUIDString = (String) claims.get("attendeeUUID");
+
+		UUID attendeeUUID = UUID.fromString(attendeeUUIDString);
+
+ 		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUUID)
 			.orElseThrow(()->new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
 		attendee.updateAttendeeLocation(attendeeUpdateReq);

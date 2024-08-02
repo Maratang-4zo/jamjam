@@ -1,14 +1,19 @@
+server:
+  servlet:
+    context-path: /api
+
 spring:
   application:
     name: jamjam
   config:
     import: optional:file:.env[.properties]
   datasource:
-    dirver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${HOST}:${PORT}/${DATABASE_NAME}?${OPTIONS}
     username: ${USER_NAME}
     password: ${USER_PASSWORD}
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: update
     properties:
@@ -17,22 +22,24 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
       open-in-view: true
-      show-sql: true
-
-  springdoc:
-    swagger-ui:
-      path: /swagger-ui.html
-      display-request-duration: true
 
   logging:
     level:
       com.app: debug
-
-  kakao:
-    client:
-      id: ${CLIENT_ID}
-      secret: ${CLIENT_SECRET}
+kakao:
+  client:
+    id: ${KAKAO_CLIENT_ID}
+    secret: ${KAKAO_CLIENT_SECRET}
 
 openvidu:
   openvidu-url: ${OPENVIDU_URL:http://localhost:4443/}
   openvidu-secret: ${OPENVIDU_SECRET:MY_SECRET}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+token:
+  secret: ${TOKEN_CLIENT_SECRET}
+  access-token-expiration-time: ${ACCESS_TOKEN_EXPIRATION_TIME}
+  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}

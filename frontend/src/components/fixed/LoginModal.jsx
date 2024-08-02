@@ -16,13 +16,13 @@ const ModalBackground = styled.div`
 const SideModal = styled.div`
   position: fixed;
   top: 0;
-  right: ${({ isVisible }) => (isVisible ? "0" : "-300px")};
-  width: 300px;
+  right: ${({ isVisible }) => (isVisible ? "0" : "-600px")};
+  width: 400px;
   height: 100%;
   background-color: #ffe845;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   transition: right 0.3s ease-in-out;
-  z-index: 1001;
+  z-index: 9999;
   padding: 20px;
   display: flex;
   flex-direction: column;

@@ -2,6 +2,14 @@ import styled from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import wavebutton from "../assets/wavebutton.svg";
 
+const APP_KEY = process.env.REACT_APP_KAKAO_CLIENT_ID;
+const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
+const link = `https://kauth.kakao.com/oauth/authorize?client_id=${APP_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+
+const loginHandler = () => {
+  window.location.href = link;
+};
+
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: ${(props) => props.theme.wrapperWidth};
@@ -98,7 +106,7 @@ function JoinRoom() {
       <NavBarUp />
       {/* <Container> */}
       <KakaotalkButton>
-        <p>카카오톡으로 로그인</p>
+        <p onClick={loginHandler}>카카오톡으로 로그인</p>
       </KakaotalkButton>
       <OrText>or</OrText>
       <NicknameInput>

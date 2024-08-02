@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container as MapDiv,
   NaverMap,
@@ -6,40 +6,95 @@ import {
   useNavermaps,
 } from "react-naver-maps";
 import { useRecoilValue } from "recoil";
-import { userPlaceAtom } from "../../recoil/atoms/userState";
+import { userInfoAtom } from "../../recoil/atoms/userState";
+import { roomAtom } from "../../recoil/atoms/roomState";
 import Avatar1 from "../../assets/avatars/1.png";
 
-function MyMap() {
+function MyMap({ selectedAddress }) {
   const navermaps = useNavermaps();
-  const point = useRecoilValue(userPlaceAtom);
+  const userInfo = useRecoilValue(userInfoAtom);
+  const roomState = useRecoilValue(roomAtom);
   const [map, setMap] = useState(null);
+
   useEffect(() => {
-    if (map) {
-      map.panTo(new navermaps.LatLng(point.latitude, point.longitude));
+    if (selectedAddress && map) {
+      const { latitude, longitude } = selectedAddress;
+      map.panTo(new navermaps.LatLng(latitude, longitude));
     }
-  }, [point]);
+  }, [selectedAddress, map, navermaps]);
+
+  useEffect(() => {
+    if (map && userInfo.departure.latitude && userInfo.departure.longitude) {
+      map.panTo(
+        new navermaps.LatLng(
+          userInfo.departure.latitude,
+          userInfo.departure.longitude,
+        ),
+      );
+    }
+  }, [userInfo.departure, map, navermaps]);
+
+  useEffect(() => {
+    if (map && roomState.isCenterExist) {
+      map.panTo(
+        new navermaps.LatLng(
+          roomState.centerPlace.latitude,
+          roomState.centerPlace.longitude,
+        ),
+      );
+    }
+  }, [roomState.centerPlace, map, navermaps]);
+
   return (
     <NaverMap
       defaultCenter={new navermaps.LatLng(37.5012748, 127.039625)}
       defaultZoom={17}
       ref={setMap}
     >
-      {point.latitude && point.longitude && (
+      {userInfo.departure.latitude && userInfo.departure.longitude && (
         <Marker
-          position={new navermaps.LatLng(point.latitude, point.longitude)}
+          position={
+            new navermaps.LatLng(
+              userInfo.departure.latitude,
+              userInfo.departure.longitude,
+            )
+          }
           icon={{
             content: `<img src="${Avatar1}" style="width:40px;height:40px;" />`,
           }}
+        />
+      )}
+      {selectedAddress && (
+        <Marker
+          position={
+            new navermaps.LatLng(
+              selectedAddress.latitude,
+              selectedAddress.longitude,
+            )
+          }
+          icon={{
+            content: `<img src="${Avatar1}" style="width:40px;height:40px;" />`,
+          }}
+        />
+      )}
+      {roomState.isCenterExist && (
+        <Marker
+          position={
+            new navermaps.LatLng(
+              roomState.centerPlace.latitude,
+              roomState.centerPlace.longitude,
+            )
+          }
         />
       )}
     </NaverMap>
   );
 }
 
-function Map() {
+function Map({ selectedAddress }) {
   return (
     <MapDiv style={{ width: "100%", height: "100%" }}>
-      <MyMap />
+      <MyMap selectedAddress={selectedAddress} />
     </MapDiv>
   );
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
@@ -28,10 +29,21 @@ public class SwaggerConfig {
 			.bearerFormat("JWT")
 		);
 
+		// Server configurations
+		Server localServer = new Server();
+		localServer.setDescription("local");
+		localServer.setUrl("http://localhost:8080/api");
+
+		Server testServer = new Server();
+		testServer.setDescription("test");
+		testServer.setUrl("https://jjam.shop/api");
+
 		return new OpenAPI()
 			.info(info)
 			.addSecurityItem(securityRequirement)
-			.components(components);
+			.components(components)
+			.addServersItem(localServer)
+			.addServersItem(testServer);
 	}
 
 }

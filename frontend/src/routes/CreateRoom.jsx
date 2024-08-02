@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { OpenVidu } from "openvidu-browser";
-import axios from "axios";
-
 import styled from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import Background from "../assets/CreateRoomBg.png";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../index.css";
+import { useForm, Controller } from "react-hook-form";
+import { axiosCreateRoom } from "../apis/roomApi";
+import { useNavigate } from "react-router-dom";
+import useWs from "../hooks/useWs";
+import { jwtDecode } from "jwt-decode";
+import { useRecoilState } from "recoil";
+import { roomAtom } from "../recoil/atoms/roomState";
+import { useEffect, useState } from "react"; 
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -34,7 +38,7 @@ const Content = styled.div`
   padding-top: 200px; /* 입력창들을 위로 옮기기 위한 패딩 */
 `;
 
-const FormWrapper = styled.div`
+const FormWrapper = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -74,7 +78,7 @@ const Button = styled.button`
   border-radius: 15px;
   border: 3px solid var(--Color, #000);
   background: #fff;
-  margin-top: 100px; /* 버튼을 FormWrapper로부터 떨어뜨리기 위한 마진 */
+  margin-top: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,133 +88,106 @@ const ButtonText = styled.p`
   font-family: "pixel" !important;
 `;
 
+const ErrorBox = styled.div`
+  width: 200px;
+  height: 50px;
+  margin-top: 10px;
+  text-align: center;
+`;
+
 function CreateRoom() {
-  const sessionRef = useRef(null);
-  const ovRef = useRef(null);
-  const [sessionId, setSessionId] = useState("");
-  const [inputSessionId, setInputSessionId] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const navigate = useNavigate();
+  const { connect } = useWs();
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm();
 
-  const APPLICATION_SERVER_URL = "http://localhost:8080/";
+  // const createRoomFn = async (data) => {
+  //   let roomUUID, attendeeUUID;
+  //   axiosCreateRoom(data.purpose, data.meetingDate.toISOString(), data.nickname)
+  //     .then(() => {
+  //       roomUUID = getCookie("roomUUID");
+  //       attendeeUUID = getCookie("attendeeUUID");
+  //     })
+  //     .then(() => {
+  //       connect(roomUUID, attendeeUUID);
+  //     })
+  //     .then(() => {
+  //       // navigate(`/room/${roomUUID}`); 제가 진짜에요 주인님 밑에 녀석은 가짜입니다
+  //       navigate(`/room/:roomid`);
+  //     });
+  // };
 
-  const leaveSession = useCallback(() => {
-    if (sessionRef.current) {
-      sessionRef.current.disconnect();
+  const createRoomFn = async (data) => {
+    try {
+      await axiosCreateRoom(
+        data.purpose,
+        data.meetingDate.toISOString(),
+        data.nickname,
+      );
+
+      const roomToken = getCookie("roomToken");
+
+      console.log(roomToken);
+
+      const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
+
+      connect(roomUUID, attendeeUUID);
+      navigate(`/room/${roomUUID}`);
+    } catch (error) {
+      console.error("An error occurred:", error);
     }
-  }, []);
-
-  const handleInputChange = (event) => {
-    setInputSessionId(event.target.value);
-  };
-
-  const initSession = useCallback(() => {
-    const newOv = new OpenVidu();
-    const newSession = newOv.initSession();
-
-    ovRef.current = newOv;
-    sessionRef.current = newSession;
-
-    newSession.on("streamCreated", function (event) {
-      newSession.subscribe(event.stream, "subscriber");
-    });
-  }, []);
-
-  const createSession = async () => {
-    const res = await axios.post(APPLICATION_SERVER_URL + "api/sessions");
-    return res.data.sessionId;
-  };
-
-  const createToken = (sessionId) => {
-    return new Promise((resolve, reject) => {
-      axios
-        .post(
-          APPLICATION_SERVER_URL + "api/sessions/" + sessionId + "/connections",
-        )
-        .then((res) => {
-          resolve(res.data.token);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-  };
-
-  const getToken = async (existingSessionId = null) => {
-    const targetSessionId = existingSessionId || (await createSession());
-    setSessionId(targetSessionId);
-    return await createToken(targetSessionId);
   };
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      // 새로고침, 창 닫기 막기 추가 여부 논의
-
-      if (sessionRef.current) {
-        sessionRef.current.disconnect();
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      if (sessionRef.current) {
-        sessionRef.current.disconnect();
-      }
-    };
-  }, []);
-
-  const joinExistingSession = async (event) => {
-    event.preventDefault();
-    if (inputSessionId) {
-      await joinSession(inputSessionId);
-      setInputSessionId(""); // 입력 필드 초기화
+    if (roomInfo && roomInfo.roomUUID && roomInfo.hostUUID) {
+      connect()
+        .then(() => {
+          navigate(`/room/${roomInfo.roomUUID}`);
+        })
+        .catch((error) => {
+          console.error("WebSocket 연결 실패:", error);
+        });
     }
-  };
-
-  const joinSession = useCallback(async (existingSessionId = null) => {
-    initSession();
-
-    getToken(existingSessionId).then((token) => {
-      if (sessionRef.current && ovRef.current) {
-        sessionRef.current
-          .connect(token)
-          .then(() => {
-            const newPublisher = ovRef.current.initPublisher("publisher");
-            sessionRef.current.publish(newPublisher);
-          })
-          .catch((error) => {
-            console.log(
-              "There was an error connecting to the session:",
-              error.code,
-              error.message,
-            );
-          });
-      }
-    });
-  }, []);
+  }, [roomInfo, connect, navigate]);
 
   return (
     <Wrapper>
       <NavBarUp />
       <Content>
-        <h1>방 만들기</h1>
-        <FormWrapper>
+        <FormWrapper onSubmit={handleSubmit(createRoomFn)}>
+          <InputWrapper>
+            <Label>닉네임:</Label>
+            <input type="text" {...register("nickname")} />
+          </InputWrapper>
           <InputWrapper>
             <Label>모임 날짜:</Label>
-            <DatePickerStyled
-              selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
-              dateFormat="yyyy/MM/dd"
-              placeholderText="날짜를 선택하세요"
+            <Controller
+              name="meetingDate"
+              control={control}
+              defaultValue={null}
+              rules={{ required: "날짜를 선택하세요" }}
+              render={({ field }) => (
+                <DatePickerStyled
+                  selected={field.value}
+                  onChange={(date) => field.onChange(date)}
+                  dateFormat="yyyy/MM/dd"
+                  placeholderText="날짜를 선택하세요"
+                />
+              )}
             />
           </InputWrapper>
+
           <InputWrapper>
             <Label>모임 목적:</Label>
             <Select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              {...register("purpose", {
+                required: "카테고리를 입력해주세요.",
+              })}
             >
               <option value="" disabled hidden>
                 카테고리를 선택하세요
@@ -222,37 +199,16 @@ function CreateRoom() {
               <option value="food">음식</option>
             </Select>
           </InputWrapper>
+          <Button type="submit">
+            <ButtonText>생성</ButtonText>
+          </Button>
         </FormWrapper>
-        <Button>
-          <ButtonText>생성</ButtonText>
-        </Button>
+        <ErrorBox>
+          {errors.meetingDate && (
+            <p style={{ color: "red" }}>{errors.meetingDate.message}</p>
+          )}
+        </ErrorBox>
       </Content>
-      <div>
-        <h1>방 만들기</h1>
-        <button onClick={() => joinSession()}>켜져라얍</button>
-        <form onSubmit={joinExistingSession}>
-          <input
-            type="text"
-            value={inputSessionId}
-            onChange={handleInputChange}
-            placeholder="참여할 세션 ID 입력"
-          />
-          <button type="submit">기존 방 참여하기</button>
-        </form>
-        {sessionId && <p>현재 세션 ID: {sessionId}</p>}
-        <div id="session">
-          <h1>세션 헤더</h1>
-          <input type="button" onClick={leaveSession} value="LEAVE" />
-          <div>
-            <div id="publisher">
-              <h3>YOU</h3>
-            </div>
-            <div id="subscriber">
-              <h3>OTHERS</h3>
-            </div>
-          </div>
-        </div>
-      </div>
     </Wrapper>
   );
 }

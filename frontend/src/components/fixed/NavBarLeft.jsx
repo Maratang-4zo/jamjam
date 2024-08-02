@@ -1,11 +1,14 @@
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import MicOn from "../../assets/icons/micon.png";
 import HomeIcon from "../../assets/icons/homeIcon.png";
 import MicOff from "../../assets/icons/micoff.png";
 import ChatOn from "../../assets/icons/chaton.png";
 import ChatOff from "../../assets/icons/chatoff.png";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import ChattingModal from "./ChattingModal";
+import { useRecoilState } from "recoil";
+import { chatModalVisibleAtom } from "../../recoil/atoms/roomState";
 
 const Wrapper = styled.div`
   width: 50px;
@@ -17,6 +20,7 @@ const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
   padding: 10px 0 0 0;
   border-right: 3px solid ${(props) => props.theme.accentColor};
+  z-index: 10000;
 `;
 
 const Attendants = styled.div`
@@ -28,7 +32,6 @@ const Attendants = styled.div`
 `;
 
 const Avatar = styled.div`
-  // 원래 img임
   width: 35px;
   height: 35px;
   background-color: yellow;
@@ -74,29 +77,38 @@ const Home = styled.img`
 `;
 
 function NavBarLeft() {
+  const [isChatOn, setIsChatOn] = useRecoilState(chatModalVisibleAtom);
   const [isMicOn, setIsMicOn] = useState(true);
-  const handleMic = () => setIsMicOn((prev) => !prev);
-  const [isChatOn, setIsChatOn] = useState(false);
-  const handleChat = () => setIsChatOn((prev) => !prev);
+
+  useEffect(() => {
+    setIsChatOn(false); // 컴포넌트가 마운트될 때 채팅 모달 상태를 초기화
+  }, [setIsChatOn]);
+
+  const handleChat = () => setIsChatOn(!isChatOn);
+  const handleMic = () => setIsMicOn(!isMicOn);
+
   return (
-    <Wrapper>
-      <Attendants>
-        <Avatar />
-        <Avatar />
-        <Avatar />
-      </Attendants>
-      <Btns>
-        <Btn onClick={handleChat}>
-          <Icon src={isChatOn ? ChatOn : ChatOff} />
-        </Btn>
-        <Btn onClick={handleMic}>
-          <Icon src={isMicOn ? MicOn : MicOff} />
-        </Btn>
-        <Link to={`/`}>
-          <Home src={HomeIcon} />
-        </Link>
-      </Btns>
-    </Wrapper>
+    <>
+      <Wrapper>
+        <Attendants>
+          <Avatar />
+          <Avatar />
+          <Avatar />
+        </Attendants>
+        <Btns>
+          <Btn onClick={handleChat}>
+            <Icon src={isChatOn ? ChatOn : ChatOff} />
+          </Btn>
+          <Btn onClick={handleMic}>
+            <Icon src={isMicOn ? MicOn : MicOff} />
+          </Btn>
+          <Link to={`/`}>
+            <Home src={HomeIcon} />
+          </Link>
+        </Btns>
+      </Wrapper>
+      <ChattingModal isVisible={isChatOn} toggleModal={handleChat} />
+    </>
   );
 }
 

@@ -44,11 +44,11 @@ function NavBarUp() {
     <>
       <Wrapper>
         <Left>
-          <Link to={`/room/:roomId/create`}>CREATE</Link>
+          <Link to={`/room/create`}>CREATE</Link>
         </Left>
         <Link to={`/`}>로고자리입니다</Link>
         <Right>
-          <button onClick={toggleModal}>LOGIN</button>
+          <p onClick={toggleModal}>LOGIN</p>
         </Right>
       </Wrapper>
       <LoginModal isVisible={isModalVisible} toggleModal={toggleModal} />

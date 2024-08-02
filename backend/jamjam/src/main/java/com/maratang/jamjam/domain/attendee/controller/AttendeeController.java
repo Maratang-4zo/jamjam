@@ -35,7 +35,6 @@ public class AttendeeController {
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenCliams);
 
 		Cookie cookie = new Cookie("roomToken", roomJwtTokenDto.getRoomToken());
-		cookie.setHttpOnly(true);
 		cookie.setPath("/");
 
 		response.addCookie(cookie);

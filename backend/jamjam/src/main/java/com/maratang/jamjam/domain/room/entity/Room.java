@@ -94,5 +94,9 @@ public class Room extends BaseTimeEntity {
 	public void updateStation(String station){
 		this.startStation = station;
 	}
+
+	public boolean isRoomClosed(){
+		return this.roomStatus == RoomStatus.FINISHED || this.roomStatus == RoomStatus.ABORTED;
+	}
 }
 

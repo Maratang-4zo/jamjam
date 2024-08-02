@@ -24,15 +24,14 @@ public class VoiceChatController {
 	private final VoiceChatService voiceChatService;
 
 	@PostMapping
-	@Operation(summary = "🚗 구현 중")
+	@Operation(summary = "방장이 음성 채팅 방을 생성한다.")
 	public ResponseEntity<?> initializeSession(@RequestBody VoiceChatSessionReq params) {
-		// 일단 미팅룸과 음성채팅룸을 분리해서 작업
 		VoiceChatSessionRes voiceChatSessionRes = voiceChatService.initVoiceChatSession(params);
 		return ResponseEntity.status(HttpStatus.CREATED).body(voiceChatSessionRes);
 	}
 
 	@PostMapping("/token")
-	@Operation(summary = "🚗 구현 중")
+	@Operation(summary = "음성 채팅방에 들어가기 위한 토큰을 발급받는다.")
 	public ResponseEntity<?> createConnection(@RequestBody VoiceChatTokenReq params) {
 		VoiceChatTokenRes voiceChatTokenRes = voiceChatService.createConnection(params);
 		return ResponseEntity.status(HttpStatus.CREATED).body(voiceChatTokenRes);

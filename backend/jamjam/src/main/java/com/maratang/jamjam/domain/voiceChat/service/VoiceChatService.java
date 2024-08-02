@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.room.entity.Room;
-import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.domain.voiceChat.dto.request.VoiceChatSessionReq;
 import com.maratang.jamjam.domain.voiceChat.dto.request.VoiceChatTokenReq;
@@ -32,7 +31,7 @@ public class VoiceChatService {
 	public VoiceChatSessionRes initVoiceChatSession(VoiceChatSessionReq params) {
 		Room room = roomRepository.findByRoomUUID(params.getRoomUUID()).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
-		if(room.getRoomStatus() == RoomStatus.ABORTED || room.getRoomStatus() == RoomStatus.FINISHED) {
+		if(room.isRoomClosed()) {
 			throw new BusinessException(ErrorCode.ROOM_CANNOT_ENTER);
 		} else if(!room.getRoot().getAttendeeUUID().equals(params.getAttendeeUUID())){
 			throw new BusinessException(ErrorCode.FORBIDDEN);
@@ -52,7 +51,7 @@ public class VoiceChatService {
 	public VoiceChatTokenRes createConnection(VoiceChatTokenReq params) {
 		Attendee attendee = attendeeRepository.findByAttendeeUUID(params.getAttendeeUUID()).orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 		Room room = attendee.getRoom();
-		if(!room.getRoomUUID().equals(params.getRoomUUID()) || room.getRoomStatus() == RoomStatus.ABORTED || room.getRoomStatus() == RoomStatus.FINISHED){
+		if(!room.getRoomUUID().equals(params.getRoomUUID()) || room.isRoomClosed()){
 			throw new BusinessException(ErrorCode.ROOM_CANNOT_ENTER);
 		}
 

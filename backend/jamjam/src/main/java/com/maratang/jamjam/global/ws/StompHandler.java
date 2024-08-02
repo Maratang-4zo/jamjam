@@ -26,8 +26,9 @@ public class StompHandler implements ChannelInterceptor {
 
 		switch (accessor.getCommand()) {
 			case CONNECT -> handleConnectCommand(accessor);
-			case DISCONNECT -> handleDisconnectCommand(accessor);
 			case SUBSCRIBE -> handleSubscribeCommand(accessor);
+			case UNSUBSCRIBE -> handleDisconnectCommand(accessor);
+			case DISCONNECT -> handleDisconnectCommand(accessor);
 			case null, default -> {
 			}
 		}
@@ -59,15 +60,26 @@ public class StompHandler implements ChannelInterceptor {
 		// 2. 유효한 방이면 입장 요청
 		// 3. 구독자들에게 새로운 참여자 브로드캐스팅
 		roomService.enterRoom(roomUUID, attendeeUUID);
+
+		Map<String ,Object> attributes =  accessor.getSessionAttributes();
+		attributes.put("status", "entered");
+		accessor.setSessionAttributes(attributes);
 	}
 
 	public void handleDisconnectCommand(StompHeaderAccessor accessor){
-		// 사용자가 떠난다. => 중간 탈주 / 최종 모임 장소 결정
-		UUID attendeeUUID = UUID.fromString((String)accessor.getSessionAttributes().get("attendeeUUID"));
-		UUID roomUUID = UUID.fromString((String)accessor.getSessionAttributes().get("roomUUID"));
+		if("leaved".equals(accessor.getSessionAttributes().get("status"))){
+			// 사용자가 떠난다. => 중간 탈주 / 최종 모임 장소 결정
+			UUID attendeeUUID = UUID.fromString((String)accessor.getSessionAttributes().get("attendeeUUID"));
+			UUID roomUUID = UUID.fromString((String)accessor.getSessionAttributes().get("roomUUID"));
 
-		// 사용자 나감 처리
-		roomService.leaveRoom(roomUUID, attendeeUUID);
+			// 사용자 나감 처리
+			roomService.leaveRoom(roomUUID, attendeeUUID);
+
+			Map<String ,Object> attributes =  accessor.getSessionAttributes();
+			attributes.put("status", "leaved");
+			accessor.setSessionAttributes(attributes);
+		}
+
 	}
 
 

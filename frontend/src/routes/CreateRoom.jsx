@@ -132,9 +132,17 @@ function CreateRoom() {
 
       const roomToken = getCookie("roomToken");
 
-      console.log(roomToken);
-
       const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
+
+      setRoomInfo((prev) => ({
+        ...prev,
+        meetingDate: data.meetingDate.toISOString(),
+        purpose: data.purpose,
+        roomUUID: roomUUID,
+        hostUUID: attendeeUUID,
+        attendants: [...prev.attendants, attendeeUUID],
+      }));
+      console.log(roomToken);
 
       connect(roomUUID, attendeeUUID);
       navigate(`/room/${roomUUID}`);

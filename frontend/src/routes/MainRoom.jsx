@@ -6,6 +6,9 @@ import FindDeparture from "../components/mainroom/Departure";
 import EditModal from "../components/mainroom/EditModal";
 import Buttons from "../components/mainroom/Buttons";
 import ShareModal from "../components/mainroom/ShareModal";
+import { useRecoilState } from "recoil";
+import { userInfoAtom } from "../recoil/atoms/userState";
+import { roomAtom } from "../recoil/atoms/roomState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -26,6 +29,8 @@ function Room() {
   const [modalTitle, setModalTitle] = useState("");
   const [modalTop, setModalTop] = useState("50px");
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
 
   useEffect(() => {
     setIsFindDepartureModalOpen(true);
@@ -36,8 +41,27 @@ function Room() {
   };
 
   const handleAddressSelect = (data) => {
-    setSelectedAddress(data);
-    console.log("Selected Address Data:", data);
+    const { addressText, latitude, longitude, meetingDate } = data;
+    if (
+      userInfo.departure.addressText !== addressText ||
+      userInfo.departure.latitude !== latitude ||
+      userInfo.departure.longitude !== longitude
+    ) {
+      setSelectedAddress({ addressText, latitude, longitude });
+      setUserInfo((prev) => ({
+        ...prev,
+        departure: {
+          addressText,
+          latitude,
+          longitude,
+        },
+      }));
+    }
+
+    setRoomInfo((prev) => ({
+      ...prev,
+      meetingDate,
+    }));
   };
 
   const handleCloseEditModal = () => {
@@ -81,8 +105,11 @@ function Room() {
           onClose={handleCloseShareModal}
         />
       )}
-      <Map selectedAddress={selectedAddress} />
-      <Buttons onOpenEditModal={handleOpenEditModal} />
+      <Map selectedAddress={userInfo.departure} />
+      <Buttons
+        onOpenEditModal={handleOpenEditModal}
+        onOpenShareModal={handleOpenShareModal}
+      />
     </Wrapper>
   );
 }

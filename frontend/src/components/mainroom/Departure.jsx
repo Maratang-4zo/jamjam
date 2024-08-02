@@ -33,7 +33,7 @@ const ModalContent = styled.div`
 function FindDeparture({ onClose, onAddressSelect }) {
   const navermaps = useNavermaps();
   const [fullAddress, setFullAddress] = useState(null);
-  const setUserInfo = useSetRecoilState(userInfoAtom);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (fullAddress) {
@@ -93,12 +93,13 @@ function FindDeparture({ onClose, onAddressSelect }) {
     }
 
     setFullAddress(address);
+    setIsLoading(true);
   };
 
   return (
     <Wrapper>
       <ModalContent>
-        <h1>출발지를 입력해주세요.</h1>
+        <h1> {isLoading ? "로딩 중" : "출발지를 입력해주세요."}</h1>
         <DaumPostcodeEmbed onComplete={handleComplete} />
       </ModalContent>
     </Wrapper>

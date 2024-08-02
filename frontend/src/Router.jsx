@@ -17,7 +17,7 @@ function Router() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/:userId" element={<Mypage />} />
+        <Route path="/:userUUID" element={<Mypage />} />
         <Route path="/room/create" element={<CreateRoom />} />
         <Route path="/room/:roomId" element={<Room />} />
         <Route path="/room/:roomId/join" element={<JoinRoom />} />

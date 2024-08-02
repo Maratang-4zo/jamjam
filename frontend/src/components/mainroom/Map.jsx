@@ -10,18 +10,11 @@ import { userInfoAtom } from "../../recoil/atoms/userState";
 import { roomAtom } from "../../recoil/atoms/roomState";
 import Avatar1 from "../../assets/avatars/1.png";
 
-function MyMap({ selectedAddress }) {
+function MyMap() {
   const navermaps = useNavermaps();
   const userInfo = useRecoilValue(userInfoAtom);
   const roomState = useRecoilValue(roomAtom);
   const [map, setMap] = useState(null);
-
-  useEffect(() => {
-    if (selectedAddress && map) {
-      const { latitude, longitude } = selectedAddress;
-      map.panTo(new navermaps.LatLng(latitude, longitude));
-    }
-  }, [selectedAddress, map, navermaps]);
 
   useEffect(() => {
     if (map && userInfo.departure.latitude && userInfo.departure.longitude) {
@@ -32,7 +25,7 @@ function MyMap({ selectedAddress }) {
         ),
       );
     }
-  }, [userInfo.departure, map, navermaps]);
+  }, [userInfo.departure]);
 
   useEffect(() => {
     if (map && roomState.isCenterExist) {
@@ -64,19 +57,6 @@ function MyMap({ selectedAddress }) {
           }}
         />
       )}
-      {selectedAddress && (
-        <Marker
-          position={
-            new navermaps.LatLng(
-              selectedAddress.latitude,
-              selectedAddress.longitude,
-            )
-          }
-          icon={{
-            content: `<img src="${Avatar1}" style="width:40px;height:40px;" />`,
-          }}
-        />
-      )}
       {roomState.isCenterExist && (
         <Marker
           position={
@@ -91,10 +71,10 @@ function MyMap({ selectedAddress }) {
   );
 }
 
-function Map({ selectedAddress }) {
+function Map() {
   return (
     <MapDiv style={{ width: "100%", height: "100%" }}>
-      <MyMap selectedAddress={selectedAddress} />
+      <MyMap />
     </MapDiv>
   );
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomJwtTokenCliams {
+public class RoomJwtTokenClaims {
 	private UUID roomUUID;
 	private UUID attendeeUUID;
 }

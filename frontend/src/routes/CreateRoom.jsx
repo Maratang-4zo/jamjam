@@ -9,6 +9,7 @@ import { axiosCreateRoom } from "../apis/roomApi";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../utils/Cookies";
 import useWs from "../hooks/useWs";
+import { jwtDecode } from "jwt-decode";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -102,20 +103,41 @@ function CreateRoom() {
   } = useForm();
   const { connect } = useWs();
 
+  // const createRoomFn = async (data) => {
+  //   let roomUUID, attendeeUUID;
+  //   axiosCreateRoom(data.purpose, data.meetingDate.toISOString(), data.nickname)
+  //     .then(() => {
+  //       roomUUID = getCookie("roomUUID");
+  //       attendeeUUID = getCookie("attendeeUUID");
+  //     })
+  //     .then(() => {
+  //       connect(roomUUID, attendeeUUID);
+  //     })
+  //     .then(() => {
+  //       // navigate(`/room/${roomUUID}`); 제가 진짜에요 주인님 밑에 녀석은 가짜입니다
+  //       navigate(`/room/:roomid`);
+  //     });
+  // };
+
   const createRoomFn = async (data) => {
-    let roomUUID, attendeeUUID;
-    axiosCreateRoom(data.purpose, data.meetingDate.toISOString(), data.nickname)
-      .then(() => {
-        roomUUID = getCookie("roomUUID");
-        attendeeUUID = getCookie("attendeeUUID");
-      })
-      .then(() => {
-        connect(roomUUID, attendeeUUID);
-      })
-      .then(() => {
-        // navigate(`/room/${roomUUID}`); 제가 진짜에요 주인님 밑에 녀석은 가짜입니다
-        navigate(`/room/:roomid`);
-      });
+    try {
+      await axiosCreateRoom(
+        data.purpose,
+        data.meetingDate.toISOString(),
+        data.nickname,
+      );
+
+      const roomToken = getCookie("roomToken");
+
+      console.log(roomToken);
+
+      const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
+
+      connect(roomUUID, attendeeUUID);
+      navigate(`/room/${roomUUID}`);
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
   return (

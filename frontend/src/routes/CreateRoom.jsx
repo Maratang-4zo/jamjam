@@ -11,7 +11,9 @@ import useWs from "../hooks/useWs";
 import { jwtDecode } from "jwt-decode";
 import { useRecoilState } from "recoil";
 import { roomAtom } from "../recoil/atoms/roomState";
-import { useEffect, useState } from "react";
+import { getCookie } from "../utils/Cookies";
+import useOpenVidu from "../hooks/useOpenVidu";
+import { userInfoAtom } from "../recoil/atoms/userState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -34,8 +36,7 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding-top: 200px; /* 입력창들을 위로 옮기기 위한 패딩 */
+  justify-content: center;
 `;
 
 const FormWrapper = styled.form`
@@ -98,7 +99,9 @@ const ErrorBox = styled.div`
 function CreateRoom() {
   const navigate = useNavigate();
   const { connect } = useWs();
+  const { createSession } = useOpenVidu();
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const {
     register,
     handleSubmit,
@@ -114,25 +117,34 @@ function CreateRoom() {
         data.nickname,
       );
 
-      const roomUUID = response.roomUUID;
+      const roomToken = getCookie("roomToken");
+      const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
+
+      setRoomInfo((prev) => ({
+        ...prev,
+        meetingDate: data.meetingDate.toISOString(),
+        purpose: data.purpose,
+        roomUUID: roomUUID,
+        hostUUID: attendeeUUID,
+        attendants: [...prev.attendants, attendeeUUID],
+        isValid: true,
+      }));
+
+      const sessionToken = await createSession(roomUUID, attendeeUUID);
+      await connect(roomUUID, attendeeUUID);
+      setUserInfo((prev) => ({
+        ...prev,
+        sessionToken,
+        myUUID: attendeeUUID,
+        isHost: true,
+        nickname: data.nickname,
+      }));
 
       navigate(`/room/${roomUUID}`);
     } catch (error) {
       console.error("An error occurred:", error);
     }
   };
-
-  useEffect(() => {
-    if (roomInfo && roomInfo.roomUUID && roomInfo.hostUUID) {
-      connect()
-        .then(() => {
-          navigate(`/room/${roomInfo.roomUUID}`);
-        })
-        .catch((error) => {
-          console.error("WebSocket 연결 실패:", error);
-        });
-    }
-  }, [roomInfo, connect, navigate]);
 
   return (
     <Wrapper>

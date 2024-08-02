@@ -1,12 +1,8 @@
 import React, { useEffect } from "react";
-import DaumPostcodeEmbed from "react-daum-postcode";
 import { useNavermaps } from "react-naver-maps";
-import { useSetRecoilState } from "recoil";
-import { userPlaceAtom } from "../../recoil/atoms/userState";
 
 function PostCodeAPI({ onComplete }) {
   const navermaps = useNavermaps();
-  const setUserPlace = useSetRecoilState(userPlaceAtom);
 
   useEffect(() => {
     new window.daum.Postcode({
@@ -40,13 +36,12 @@ function PostCodeAPI({ onComplete }) {
             const longitude = items[0].point.x;
 
             const selectedAddress = { address, latitude, longitude };
-            setUserPlace(selectedAddress);
             onComplete(selectedAddress);
           },
         );
       },
     }).embed(document.getElementById("postcode-container"));
-  }, [navermaps, onComplete, setUserPlace]);
+  }, [navermaps, onComplete]);
 
   return <div id="postcode-container" />;
 }

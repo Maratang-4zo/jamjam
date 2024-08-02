@@ -6,13 +6,14 @@ export const userInfoAtom = atom({
     myUUID: "abcd1234",
     isHost: false,
     isLogin: false,
+    sessionToken: null,
     departure: {
       addressText: "",
       latitude: null,
       longitude: null,
     },
-    time: null,
-    route: null,
+    time: null, //소요시간
+    route: null, //중심지까지 경로
     profile: null, // 이미지
     nickname: "김민경",
     email: "",

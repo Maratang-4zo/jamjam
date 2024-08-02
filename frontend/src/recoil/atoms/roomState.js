@@ -6,6 +6,8 @@ export const roomAtom = atom({
     roomUUID: null,
     sessionId: null,
     roomName: "방 이름 예시",
+    meetingDate: "2024-08-15T02:00:32.000Z",
+    purpose: "",
     attendants: [
       {
         nickname: "김민경",
@@ -18,7 +20,7 @@ export const roomAtom = atom({
     isCenterExist: false,
     isAllReadyToGame: false,
     centerPlace: { address: "", latitude: 0, longitude: 0 },
-    isValid: false,
+    isValid: false, // 실시간 연결을 위한
   },
 });
 

@@ -6,7 +6,7 @@ from app import app
 from flask import jsonify
 
 # 지도 데이터 크롤링 후 db 저장
-@app.route('/crawling', methods=["POST"])
+@app.route('/flask/crawling', methods=["POST"])
 def addData():
 
     start_time = time.time()  # 시작 시간 측정
@@ -33,8 +33,9 @@ def addData():
     all_places = Place.get_all_places()
 
     if len(all_places) == 0: # DB에 아무 데이터가 없다면 새로운 데이터 삽입
-        for _, row in new_data_df.iterrows():
-            Place.insert_place(row.to_dict())
+        Place.bulk_insert(new_data_df.to_dict(orient='records'))
+        # for _, row in new_data_df.iterrows():
+        #     Place.insert_place(row.to_dict())
     else:
         all_places_df = pd.DataFrame(all_places)
         all_places_df['id'] = all_places_df['id'].astype(str) # id 열의 데이터 타입을 동일하게 맞추기
@@ -46,12 +47,14 @@ def addData():
         to_update = new_data_df[new_data_df['id'].isin(all_places_df['id'])] # 교집합
 
         # 삭제 필드 업데이트
-        for place_id in to_delete['id'].tolist():
-            Place.delete_place(place_id)
+        Place.bulk_delete(to_delete['id'].tolist())
+        # for place_id in to_delete['id'].tolist():
+        #     Place.delete_place(place_id)
 
         # 새로운 데이터 삽입
-        for _, row in to_insert.iterrows():
-            Place.insert_place(row.to_dict())
+        Place.bulk_insert(to_insert.to_dict(orient='records'))
+        # for _, row in to_insert.iterrows():
+        #     Place.insert_place(row.to_dict())
 
         # 교집합 부분 업데이트
         for _, row in to_update.iterrows():
@@ -65,3 +68,12 @@ def addData():
 
     return jsonify({"response": "complete"}), 201
 
+
+@app.route('/flask/check', methods=["GET"])
+def healthCheck():
+    return jsonify({"response": "ok"}), 200
+
+@app.route('/flask/db/check', methods=["POST"])
+def connectionCheck():
+    Place.insert_test()
+    return jsonify({"response": "complete"}), 201

@@ -18,7 +18,6 @@ export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
     .then((res) => {
       console.log("방 생성 완료");
       console.log(res);
-      return res.data;
     })
     .catch((err) => {
       console.error("방 생성 실패");
@@ -40,7 +39,6 @@ export function axiosJoinRoom({ purpose, meetingDate, nickname }) {
     .then((res) => {
       console.log("방 생성 완료");
       console.log(res);
-      return res.data;
     })
     .catch((err) => {
       console.error("방 생성 실패");

@@ -14,7 +14,7 @@ import com.maratang.jamjam.domain.attendee.service.AttendeeService;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenDto;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,16 +33,16 @@ public class AttendeeController {
 	@PostMapping
 	@Operation(summary = "✨ 참여자 추가하기", description = "해당 방에 참여자가 입장한다.")
 	public ResponseEntity<?> createAttendee(@RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response) {
-		RoomJwtTokenCliams roomJwtTokenCliams = attendeeService.createAttendee(attendeeCreateReq);
+		RoomJwtTokenClaims roomJwtTokenClaims = attendeeService.createAttendee(attendeeCreateReq);
 
-		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenCliams);
+		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims);
 
 		Cookie cookie = new Cookie("roomToken", roomJwtTokenDto.getRoomToken());
 		cookie.setPath("/");
 
 		response.addCookie(cookie);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.CREATED).body(roomJwtTokenClaims);
 	}
 
 	@PatchMapping

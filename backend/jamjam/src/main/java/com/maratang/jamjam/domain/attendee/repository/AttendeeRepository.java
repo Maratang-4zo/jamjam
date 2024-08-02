@@ -13,5 +13,5 @@ public interface AttendeeRepository extends JpaRepository<Attendee, Long> {
 	Optional<Attendee> findByAttendeeUUIDAndRoom(UUID attendeeId, Room room);
 	Optional<Attendee> findByAttendeeUUID(UUID attendeeUUID);
 
-	List<Attendee> findByRoom_RoomUUID(UUID roomUuid);
+	List<Attendee> findByRoom_RoomUUID(UUID roomUUID);
 }

@@ -8,9 +8,10 @@ import { useForm, Controller } from "react-hook-form";
 import { axiosCreateRoom } from "../apis/roomApi";
 import { useNavigate } from "react-router-dom";
 import useWs from "../hooks/useWs";
+import { jwtDecode } from "jwt-decode";
 import { useRecoilState } from "recoil";
 import { roomAtom } from "../recoil/atoms/roomState";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; 
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -105,16 +106,33 @@ function CreateRoom() {
     control,
   } = useForm();
 
+  // const createRoomFn = async (data) => {
+  //   let roomUUID, attendeeUUID;
+  //   axiosCreateRoom(data.purpose, data.meetingDate.toISOString(), data.nickname)
+  //     .then(() => {
+  //       roomUUID = getCookie("roomUUID");
+  //       attendeeUUID = getCookie("attendeeUUID");
+  //     })
+  //     .then(() => {
+  //       connect(roomUUID, attendeeUUID);
+  //     })
+  //     .then(() => {
+  //       // navigate(`/room/${roomUUID}`); 제가 진짜에요 주인님 밑에 녀석은 가짜입니다
+  //       navigate(`/room/:roomid`);
+  //     });
+  // };
+
   const createRoomFn = async (data) => {
     try {
-      const res = await axiosCreateRoom({
-        purpose: data.purpose,
-        meetingDate: data.meetingDate.toISOString(),
-        nickname: data.nickname,
-      });
+      await axiosCreateRoom(
+        data.purpose,
+        data.meetingDate.toISOString(),
+        data.nickname,
+      );
 
-      const roomUUID = res.roomUUID;
-      const attendeeUUID = res.attendeeUUID;
+      const roomToken = getCookie("roomToken");
+
+      const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
 
       setRoomInfo((prev) => ({
         ...prev,
@@ -124,8 +142,12 @@ function CreateRoom() {
         hostUUID: attendeeUUID,
         attendants: [...prev.attendants, attendeeUUID],
       }));
+      console.log(roomToken);
+
+      connect(roomUUID, attendeeUUID);
+      navigate(`/room/${roomUUID}`);
     } catch (error) {
-      console.error("방 생성 중 오류 발생:", error);
+      console.error("An error occurred:", error);
     }
   };
 

@@ -10,7 +10,7 @@ import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.room.constant.GrantType;
 import com.maratang.jamjam.global.room.constant.TokenType;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenDto;
 
 import io.jsonwebtoken.Claims;
@@ -28,18 +28,19 @@ public class RoomTokenProvider {
 
 	public static final String AUTHORIZATION_HEADER = "Authorization";
 
-	@Value("${jwt.roomTokenExpiration:60}")
+	// 10시간 임의 설정
+	@Value("${jwt.roomTokenExpiration:36000000}")
 	private String roomTokenExpirationTime;
 
 	// openssl rand -hex 32
 	@Value("${jwt.secretKey:anEWd0LXRvaFGFasdQF1432ghSDASGLXNlYd12AesEgeasdfqSDGDGwe3JAEldA==}")
 	private String tokenSecret;
 
-	public RoomJwtTokenDto createRoomJwtToken(RoomJwtTokenCliams roomJwtTokenCliams) {
+	public RoomJwtTokenDto createRoomJwtToken(RoomJwtTokenClaims roomJwtTokenClaims) {
 
 		Date roomTokenExpireTime = createRoomTokenExpireTime();
 
-		String roomToken = createRoomToken(roomJwtTokenCliams, roomTokenExpireTime);
+		String roomToken = createRoomToken(roomJwtTokenClaims, roomTokenExpireTime);
 
 		log.info(roomToken);
 
@@ -55,13 +56,13 @@ public class RoomTokenProvider {
 	}
 
 
-	public String createRoomToken(RoomJwtTokenCliams roomJwtTokenCliams, Date expireTime) {
+	public String createRoomToken(RoomJwtTokenClaims roomJwtTokenClaims, Date expireTime) {
 		String roomToken = Jwts.builder()
 			.setSubject(TokenType.ROOM.name())
 			.setIssuedAt(new Date())
 			.setExpiration(expireTime)
-			.claim("roomUUID", roomJwtTokenCliams.getRoomUUID())
-			.claim("attendeeUUID", roomJwtTokenCliams.getAttendeeUUID())
+			.claim("roomUUID", roomJwtTokenClaims.getRoomUUID())
+			.claim("attendeeUUID", roomJwtTokenClaims.getAttendeeUUID())
 			.signWith(SignatureAlgorithm.HS512, tokenSecret.getBytes(StandardCharsets.UTF_8))
 			.setHeaderParam("typ", "JWT")
 			.compact();
@@ -87,6 +88,9 @@ public class RoomTokenProvider {
 		try {
 			claims = Jwts.parser().setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
 				.parseClaimsJws(token).getBody();
+		} catch (ExpiredJwtException e){
+			log.info("만료된 토큰", e);
+			throw new BusinessException(ErrorCode.AU_TOKEN_EXPIRED);
 		} catch (Exception e) {
 			log.info("유효하지 않은 토큰", e);
 			throw new BusinessException(ErrorCode.AU_NOT_VALID_TOKEN);

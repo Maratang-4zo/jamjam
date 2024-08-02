@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenDto;
 import com.maratang.jamjam.global.station.SubwayInfo;
 
@@ -33,16 +33,16 @@ public class RoomController {
 	@PostMapping
 	@Operation(summary = "✨ 방 만들기", description = "방을 만들며, 방장을 설정하고, 사용자도 만든다.")
 	public ResponseEntity<?> createRoom(@RequestBody RoomCreateReq roomCreateReq, HttpServletResponse response) {
-		RoomJwtTokenCliams roomJwtTokenCliams = roomService.createRoom(roomCreateReq);
+		RoomJwtTokenClaims roomJwtTokenClaims = roomService.createRoom(roomCreateReq);
 
-		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenCliams);
+		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims);
 
 		Cookie cookie = new Cookie("roomToken", roomJwtTokenDto.getRoomToken());
 		cookie.setPath("/");
 
 		response.addCookie(cookie);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.CREATED).body(roomJwtTokenClaims);
 	}
 
 	@GetMapping("/{roomUUID}/middle")

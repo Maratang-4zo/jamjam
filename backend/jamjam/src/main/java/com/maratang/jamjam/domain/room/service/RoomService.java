@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -169,4 +170,16 @@ public class RoomService {
 		// 2. 참여자들에게 알리기
 		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST, "", Map.of("type", "ATTENDEE_UPDATE"));
 	}
+
+	public RoomGetRes findRoom(UUID roomUUID) {
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+				.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		if (room.getRoomStatus() == RoomStatus.FINISHED || room.getRoomStatus() == RoomStatus.ABORTED){
+            throw new BusinessException(ErrorCode.ROOM_NOT_OPEN_FOUND);
+		}
+
+		return RoomGetRes.builder().isRoom(true).build();
+	}
+
 }

@@ -2,6 +2,7 @@ package com.maratang.jamjam.domain.room.controller;
 
 import java.util.UUID;
 
+import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,8 +57,9 @@ public class RoomController {
 	@GetMapping("/{roomUUID}")
 	@Operation(summary = "🚗 구현 중")
 	public ResponseEntity<?> getRoom(@PathVariable UUID roomUUID){
-		// 링크를 클릭했을 때 연결된 활성화 상태의 방이 있는지 확인한다 (채팅방 유효성 검사)
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		RoomGetRes roomGetRes = roomService.findRoom(roomUUID);
+
+		return ResponseEntity.status(HttpStatus.OK).body(roomGetRes);
 	}
 
 	@PostMapping("/{roomUUID}/join")

@@ -27,7 +27,7 @@ function Router() {
         <Route path="/room/:roomUUID/reconnect" element={<Reconnect />} />
         <Route path="/room/:roomUUID/ws" element={<Ws />} />
         <Route path="/room/:roomUUID/openvidu" element={<ConnectOpenVidu />} />
-        <Route path="/oauth/kakao/callback" element={<Auth />} />
+        {/* <Route path="/oauth/kakao/callback" element={<Auth />} /> */}
       </Routes>
     </BrowserRouter>
   );

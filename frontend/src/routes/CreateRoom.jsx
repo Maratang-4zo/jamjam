@@ -11,7 +11,7 @@ import useWs from "../hooks/useWs";
 import { jwtDecode } from "jwt-decode";
 import { useRecoilState } from "recoil";
 import { roomAtom } from "../recoil/atoms/roomState";
-import { getCookie } from "../utils/Cookies";
+import { getCookie, setCookie } from "../utils/Cookies";
 import useOpenVidu from "../hooks/useOpenVidu";
 import { userInfoAtom } from "../recoil/atoms/userState";
 
@@ -23,16 +23,16 @@ const Wrapper = styled.div`
   border: 3px solid ${(props) => props.theme.accentColor};
   display: flex;
   flex-direction: column;
-  align-items: center;
+  overflow: hidden;
 `;
 
 const Content = styled.div`
   background-image: url(${Background});
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
-  width: 90%;
+  width: ${(props) => props.theme.wrapperWidth};
   flex: 1;
-  margin-top: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -99,7 +99,7 @@ const ErrorBox = styled.div`
 function CreateRoom() {
   const navigate = useNavigate();
   const { connect } = useWs();
-  const { createSession } = useOpenVidu();
+  const { createSession, joinSession } = useOpenVidu();
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const {
@@ -130,15 +130,16 @@ function CreateRoom() {
         isValid: true,
       }));
 
-      const sessionToken = await createSession(roomUUID, attendeeUUID);
+      await createSession(roomUUID, attendeeUUID);
       await connect(roomUUID, attendeeUUID);
+
       setUserInfo((prev) => ({
         ...prev,
-        sessionToken,
         myUUID: attendeeUUID,
         isHost: true,
         nickname: data.nickname,
       }));
+      await joinSession(roomUUID, attendeeUUID); // OpenVidu 세션에 참가
 
       navigate(`/room/${roomUUID}`);
     } catch (error) {

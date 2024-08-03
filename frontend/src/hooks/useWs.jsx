@@ -4,7 +4,7 @@ import { Client } from "@stomp/stompjs";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { chatAtom, roomAtom } from "../recoil/atoms/roomState";
 
-const API_BASE_URL = "http://i11a604.p.ssafy.io:8080/api/ws";
+const API_BASE_URL = "https://jjam.shop/api/ws";
 
 const useWs = () => {
   const [connected, setConnected] = useState(false);
@@ -12,13 +12,13 @@ const useWs = () => {
   const client = useRef({});
   const roomInfo = useRecoilValue(roomAtom);
 
-  const connect = () => {
+  const connect = (roomUUID, attendeeUUID) => {
     return new Promise((resolve, reject) => {
       client.current = new Client({
         webSocketFactory: () => new SockJS(API_BASE_URL),
         connectHeaders: {
-          roomUUID: roomInfo.roomUUID,
-          attendeeUUID: roomInfo.hostUUID,
+          roomUUID,
+          attendeeUUID,
         },
         debug: function (str) {
           console.log(str);
@@ -28,7 +28,7 @@ const useWs = () => {
         heartbeatOutgoing: 20000,
         onConnect: () => {
           console.log("Connected");
-          subscribe();
+          subscribe(roomUUID, attendeeUUID);
           resolve();
         },
         onStompError: (frame) => {
@@ -40,17 +40,17 @@ const useWs = () => {
     });
   };
 
-  const subscribe = () => {
+  const subscribe = (roomUUID, attendeeUUID) => {
     setConnected(true);
     client.current.subscribe(
-      `/sub/rooms/${roomInfo.roomUUID}`,
+      `/sub/rooms/${roomUUID}`,
       (message) => {
         handleMessage(JSON.parse(message.body));
       },
       {
         headers: {
-          roomUUID: roomInfo.roomUUID,
-          attendeeUUID: roomInfo.hostUUID,
+          roomUUID,
+          attendeeUUID,
         },
       },
     );
@@ -77,15 +77,15 @@ const useWs = () => {
     }
   };
 
-  const sendChat = (content) => {
+  const sendChat = ({ content, roomUUID, attendeeUUID }) => {
     client.current.publish({
       destination: `/pub/chat/send`,
       body: JSON.stringify({
         content,
       }),
       headers: {
-        roomUUID: roomInfo.roomUUID,
-        attendeeUUID: roomInfo.hostUUID,
+        roomUUID,
+        attendeeUUID,
       },
     });
   };
@@ -121,6 +121,7 @@ const useWs = () => {
     chatLogs,
     sendChat,
     connect,
+    subscribe,
     disconnect,
     handleMessage,
   };

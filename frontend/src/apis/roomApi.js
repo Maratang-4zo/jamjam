@@ -25,23 +25,17 @@ export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
     });
 }
 
-// 방 참여 todo3
-export function axiosJoinRoom({ purpose, meetingDate, nickname }) {
+// 방 유효성 검사
+export function axiosIsRoomValid({ roomUUID }) {
+  return axios.get(BASE_URL + `/api/rooms/${roomUUID}`);
+}
+
+// 방 참여 요청
+export function axiosAttendRoom({ roomUUID, nickname }) {
   const params = {
-    name: "",
-    purpose,
-    meetingDate,
+    roomUUID,
     nickname,
   };
 
-  return axios
-    .post(BASE_URL + "/api/rooms", params)
-    .then((res) => {
-      console.log("방 생성 완료");
-      console.log(res);
-    })
-    .catch((err) => {
-      console.error("방 생성 실패");
-      console.log(err);
-    });
+  return axios.post(BASE_URL + `/api/rooms/${roomUUID}/join`, params);
 }

@@ -10,6 +10,8 @@ import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
 import { axiosUpdateUserInfo } from "../apis/mapApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { axiosIsRoomValid } from "../apis/roomApi";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -23,6 +25,8 @@ const Wrapper = styled.div`
 `;
 
 function Room() {
+  const { roomUUID } = useParams();
+  const navigate = useNavigate();
   const [isFindDepartureModalOpen, setIsFindDepartureModalOpen] =
     useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -34,8 +38,35 @@ function Room() {
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
 
   useEffect(() => {
-    setIsFindDepartureModalOpen(true);
-  }, []);
+    const checkRoomValidity = async () => {
+      try {
+        const response = await axiosIsRoomValid({ roomUUID });
+        const isValid = response.data.room === true;
+
+        setRoomInfo((prev) => ({
+          ...prev,
+          isValid: isValid,
+        }));
+
+        if (isValid) {
+          navigate(`/room/${roomUUID}/join`);
+        } else {
+          navigate("/invalid-room");
+        }
+      } catch (error) {
+        console.error("방 유효성 검사 실패:", error);
+        setRoomInfo((prev) => ({
+          ...prev,
+          isValid: false,
+        }));
+        navigate("/invalid-room");
+      }
+    };
+
+    if (!userInfo.isHost) {
+      checkRoomValidity();
+    }
+  }, [roomUUID, navigate, userInfo.isHost, setRoomInfo]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);
@@ -92,7 +123,6 @@ function Room() {
   const handleCloseShareModal = () => {
     setIsShareModalOpen(false);
   };
-
   return (
     <Wrapper>
       <NavBarLeft />

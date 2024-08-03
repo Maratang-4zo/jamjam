@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { OpenVidu } from "openvidu-browser";
 import axios from "axios";
+import { getCookie, setCookie } from "../utils/Cookies";
 
-const APPLICATION_SERVER_URL = "http://localhost:8080/";
+const APPLICATION_SERVER_URL = "https://jjam.shop/";
 
 const useOpenVidu = () => {
   const sessionRef = useRef(null);
   const ovRef = useRef(null);
-  const [sessionId, setSessionId] = useState("");
-  const [inputSessionId, setInputSessionId] = useState("");
   const [connected, setConnected] = useState(false);
 
   const leaveSession = useCallback(() => {
@@ -17,10 +16,6 @@ const useOpenVidu = () => {
     }
     setConnected(false);
   }, []);
-
-  const handleInputChange = (event) => {
-    setInputSessionId(event.target.value);
-  };
 
   const initSession = useCallback(() => {
     const newOv = new OpenVidu();
@@ -50,18 +45,14 @@ const useOpenVidu = () => {
           attendeeUUID,
         })
         .then((res) => {
-          resolve(res.data.token);
+          const token = res.data.token;
+          setCookie("OpenviduToken", token);
+          resolve(token);
         })
         .catch((err) => {
           reject(err);
         });
     });
-  };
-
-  const getToken = async (existingSessionId = null) => {
-    const targetSessionId = existingSessionId || (await createSession());
-    setSessionId(targetSessionId);
-    return await createToken(targetSessionId);
   };
 
   useEffect(() => {
@@ -81,49 +72,48 @@ const useOpenVidu = () => {
     };
   }, []);
 
-  const joinExistingSession = async (event) => {
-    event.preventDefault();
-    if (inputSessionId) {
-      await joinSession(inputSessionId);
-      setInputSessionId(""); // 입력 필드 초기화
-    }
-  };
-
   const joinSession = useCallback(
-    async (existingSessionId = null) => {
+    async (roomUUID, attendeeUUID) => {
+      if (!roomUUID || !attendeeUUID) {
+        console.error("roomUUID and attendeeUUID are required");
+        return;
+      }
+
       initSession();
 
-      getToken(existingSessionId).then((token) => {
-        if (sessionRef.current && ovRef.current) {
-          sessionRef.current
-            .connect(token)
-            .then(() => {
-              const newPublisher = ovRef.current.initPublisher("publisher");
-              sessionRef.current.publish(newPublisher);
-              setConnected(true);
-            })
-            .catch((error) => {
-              console.log(
-                "There was an error connecting to the session:",
-                error.code,
-                error.message,
-              );
-            });
-        }
-      });
+      let token = getCookie("OpenviduToken");
+
+      if (!token) {
+        // 쿠키에 토큰이 없을 경우 토큰을 생성하여 쿠키에 저장
+        token = await createToken(roomUUID, attendeeUUID);
+      }
+
+      if (sessionRef.current && ovRef.current) {
+        sessionRef.current
+          .connect(token)
+          .then(() => {
+            const newPublisher = ovRef.current.initPublisher("publisher");
+            sessionRef.current.publish(newPublisher);
+            setConnected(true);
+          })
+          .catch((error) => {
+            console.log(
+              "There was an error connecting to the session:",
+              error.code,
+              error.message,
+            );
+          });
+      }
     },
     [initSession],
   );
 
   return {
-    sessionId,
-    inputSessionId,
     connected,
-    handleInputChange,
-    joinExistingSession,
     joinSession,
     leaveSession,
     createSession,
+    createToken,
   };
 };
 

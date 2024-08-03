@@ -13,8 +13,6 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   border-bottom: 3px solid ${(props) => props.theme.accentColor};
-  border-left: 3px solid ${(props) => props.theme.accentColor};
-  border-right: 3px solid ${(props) => props.theme.accentColor};
   position: relative;
 `;
 

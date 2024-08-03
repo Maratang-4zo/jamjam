@@ -4,9 +4,8 @@ export const userInfoAtom = atom({
   key: "userInfo",
   default: {
     myUUID: "abcd1234",
-    isHost: false,
+    isHost: true,
     isLogin: false,
-    sessionToken: null,
     departure: {
       addressText: "",
       latitude: null,

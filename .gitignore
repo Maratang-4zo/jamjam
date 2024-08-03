@@ -231,8 +231,6 @@ node_modules
 psd
 thumb
 sketch
-<<<<<<< HEAD
-=======
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java,node,react
 
@@ -384,6 +382,5 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/node
 
 # custom
-backend/.env
+.env
 .idea/
->>>>>>> aeee9f5 (✨ Feat: 역 주변 상권 정보 조회 api 추가)

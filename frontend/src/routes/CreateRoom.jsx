@@ -8,22 +8,12 @@ import { useForm, Controller } from "react-hook-form";
 import { axiosCreateRoom } from "../apis/roomApi";
 import { useNavigate } from "react-router-dom";
 import useWs from "../hooks/useWs";
-<<<<<<< HEAD
+import { jwtDecode } from "jwt-decode";
 import { useRecoilState } from "recoil";
 import { roomAtom } from "../recoil/atoms/roomState";
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-<<<<<<< HEAD
-=======
-import { jwtDecode } from "jwt-decode";
->>>>>>> c28fd28 (✨ Feat: room 생성 api 연결 구현)
-=======
->>>>>>> 0febc84 (🔥 Hotfix: jwt decode -> reponse)
-=======
 import { getCookie } from "../utils/Cookies";
 import useOpenVidu from "../hooks/useOpenVidu";
 import { userInfoAtom } from "../recoil/atoms/userState";
->>>>>>> c57b6b4 (✨ Feat: webRTC 방생성 시 연결)
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -121,32 +111,7 @@ function CreateRoom() {
 
   const createRoomFn = async (data) => {
     try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-      const res = await axiosCreateRoom({
-        purpose: data.purpose,
-        meetingDate: data.meetingDate.toISOString(),
-        nickname: data.nickname,
-      });
-
-      const roomUUID = res.roomUUID;
-      const attendeeUUID = res.attendeeUUID;
-
-      setRoomInfo((prev) => ({
-        ...prev,
-        meetingDate: data.meetingDate.toISOString(),
-        purpose: data.purpose,
-        roomUUID: roomUUID,
-        hostUUID: attendeeUUID,
-        attendants: [...prev.attendants, attendeeUUID],
-      }));
-    } catch (error) {
-      console.error("방 생성 중 오류 발생:", error);
-=======
-      await axiosCreateRoom(
-=======
       const response = await axiosCreateRoom(
->>>>>>> 0febc84 (🔥 Hotfix: jwt decode -> reponse)
         data.purpose,
         data.meetingDate.toISOString(),
         data.nickname,
@@ -178,7 +143,6 @@ function CreateRoom() {
       navigate(`/room/${roomUUID}`);
     } catch (error) {
       console.error("An error occurred:", error);
->>>>>>> c28fd28 (✨ Feat: room 생성 api 연결 구현)
     }
   };
 

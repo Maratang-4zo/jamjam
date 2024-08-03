@@ -2,7 +2,6 @@ import styled from "styled-components";
 import DaumPostcodeEmbed from "react-daum-postcode";
 import { useNavermaps } from "react-naver-maps";
 import { useEffect, useState } from "react";
-import { axiosUpdateUserInfo } from "../../apis/mapApi";
 
 const Wrapper = styled.div`
   position: fixed;

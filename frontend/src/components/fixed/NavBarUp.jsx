@@ -33,6 +33,10 @@ const Right = styled.div`
   flex: 1 0 0;
 `;
 
+const LoginP = styled.p`
+  cursor: pointer;
+`;
+
 function NavBarUp() {
   const [isModalVisible, setModalVisible] = useState(false);
 
@@ -48,7 +52,7 @@ function NavBarUp() {
         </Left>
         <Link to={`/`}>로고자리입니다</Link>
         <Right>
-          <p onClick={toggleModal}>LOGIN</p>
+          <LoginP onClick={toggleModal}>LOGIN</LoginP>
         </Right>
       </Wrapper>
       <LoginModal isVisible={isModalVisible} toggleModal={toggleModal} />

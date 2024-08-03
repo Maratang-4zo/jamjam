@@ -29,7 +29,7 @@ public class AttendeeService {
 	private final RoomTokenProvider roomTokenProvider;
 
 	@Transactional
-	public RoomJwtTokenCliams createAttendee(AttendeeCreateReq attendeeCreateReq) {
+	public RoomJwtTokenClaims createAttendee(AttendeeCreateReq attendeeCreateReq) {
 		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(attendeeCreateReq);
 
 		attendeeRepository.save(attendee);
@@ -42,12 +42,12 @@ public class AttendeeService {
 
 		attendee.updateRoom(room);
 
-		RoomJwtTokenCliams roomJwtTokenCliams = RoomJwtTokenCliams.builder()
+		RoomJwtTokenClaims roomJwtTokenClaims = RoomJwtTokenClaims.builder()
 			.roomUUID(roomUUID)
 			.attendeeUUID(attendeeUUID)
 			.build();
 
-		return roomJwtTokenCliams;
+		return roomJwtTokenClaims;
 	}
 
 	@Transactional

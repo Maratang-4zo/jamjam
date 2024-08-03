@@ -41,8 +41,7 @@ public class LoginController {
 		Cookie cookie = new Cookie("refreshToken", loginRes.getRefreshToken());
 		cookie.setPath("/");
 		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setMaxAge(1800);
+		// cookie.setSecure(true);
 
 		httpServletResponse.addCookie(cookie);
 		httpServletResponse.addHeader("accessToken", loginRes.getAccessToken());

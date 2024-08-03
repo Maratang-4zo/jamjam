@@ -1,12 +1,15 @@
 package com.maratang.jamjam.domain.chat.dto.response;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
 public class ChatRes {
-	private String nickname;
+	private UUID attendeeUUID;
 	private String content;
-	private String type;
+	private LocalDateTime createdAt;
 }

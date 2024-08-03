@@ -15,7 +15,7 @@ import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;

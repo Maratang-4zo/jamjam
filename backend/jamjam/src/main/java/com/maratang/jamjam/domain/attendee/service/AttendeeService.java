@@ -14,12 +14,8 @@ import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
-<<<<<<< HEAD
 import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenCliams;
-=======
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
->>>>>>> 6d2469d (🔨 Fix: 오탈자 수정)
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;

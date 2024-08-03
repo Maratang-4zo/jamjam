@@ -19,7 +19,6 @@ function Router() {
         <Route path="/" element={<Home />} />
         <Route path="/:userUUID" element={<Mypage />} />
         <Route path="/room/create" element={<CreateRoom />} />
-<<<<<<< HEAD
         <Route path="/room/:roomUUID" element={<Room />} />
         <Route path="/room/:roomUUID/join" element={<JoinRoom />} />
         <Route path="/room/:roomUUID/gamechoice" element={<GameChoice />} />
@@ -29,17 +28,6 @@ function Router() {
         <Route path="/room/:roomUUID/ws" element={<Ws />} />
         <Route path="/room/:roomUUID/openvidu" element={<ConnectOpenVidu />} />
         <Route path="/oauth/kakao/callback" element={<Auth />} />
-=======
-        <Route path="/room/:roomId" element={<Room />} />
-        <Route path="/room/:roomId/join" element={<JoinRoom />} />
-        <Route path="/room/:roomId/gamechoice" element={<GameChoice />} />
-        <Route path="/room/:roomId/game" element={<Game />} />
-        <Route path="/room/:roomId/result" element={<FinalResult />} />
-        <Route path="/room/:roomId/reconnect" element={<Reconnect />} />
-        <Route path="/room/:roomId/ws" element={<Ws />} />
-        <Route path="/room/:roomId/openvidu" element={<ConnectOpenVidu />} />
-        {/* <Route path="/oauth/kakao/callback" element={<Auth />} /> */}
->>>>>>> c3b8021 (🔨 Fix: 기존 프론트 코드 삭제)
       </Routes>
     </BrowserRouter>
   );

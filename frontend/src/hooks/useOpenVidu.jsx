@@ -34,17 +34,21 @@ const useOpenVidu = () => {
     });
   }, []);
 
-  const createSession = async () => {
-    const res = await axios.post(APPLICATION_SERVER_URL + "api/sessions");
-    return res.data.sessionId;
+  const createSession = async (roomUUID, attendeeUUID) => {
+    await axios.post(APPLICATION_SERVER_URL + "api/wr/rooms", {
+      roomUUID,
+      attendeeUUID,
+    });
+    return createToken(roomUUID, attendeeUUID);
   };
 
-  const createToken = (sessionId) => {
+  const createToken = (roomUUID, attendeeUUID) => {
     return new Promise((resolve, reject) => {
       axios
-        .post(
-          APPLICATION_SERVER_URL + "api/sessions/" + sessionId + "/connections",
-        )
+        .post(APPLICATION_SERVER_URL + "api/wr/rooms/token", {
+          roomUUID,
+          attendeeUUID,
+        })
         .then((res) => {
           resolve(res.data.token);
         })
@@ -119,6 +123,7 @@ const useOpenVidu = () => {
     joinExistingSession,
     joinSession,
     leaveSession,
+    createSession,
   };
 };
 

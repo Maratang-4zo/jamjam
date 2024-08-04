@@ -26,7 +26,8 @@ public enum ErrorCode {
 	REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT005", "해당 refresh token은 존재하지 않습니다."),
 	REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AT006", "해당 refresh token은 만료되었습니다."),
 	NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "AT007", "해당 토큰은 access token이 아닙니다."),
-	FORBIDDEN_ADMIN(HttpStatus.FORBIDDEN, "AT008", "관리자 ROLE이 아닙니다."),
+	ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT008", "access token이 존재하지 않습니다."),
+	// FORBIDDEN_ADMIN(HttpStatus.FORBIDDEN, "AT009", "관리자 ROLE이 아닙니다."),
 
 	// member
 	INVALID_MEMBER_TYPE(HttpStatus.BAD_REQUEST, "MB001", "잘못된 회원 타입입니다.(memberType : KAKAO"),

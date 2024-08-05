@@ -176,7 +176,9 @@ function JoinRoom() {
       <NavBarUp />
       <Container>
         <KakaotalkButton>
-          <p onClick={fetchToken}>카카오톡으로 로그인</p>
+          <a href="https://jjam.shop/api/login/authorize">
+            카카오톡으로 로그인
+          </a>
         </KakaotalkButton>
         <OrText>or</OrText>
         <Form onSubmit={handleSubmit(attendRoomFn)}>

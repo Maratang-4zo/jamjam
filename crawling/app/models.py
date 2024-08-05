@@ -59,12 +59,12 @@ class Place:
         finally:
             session.close()
 
-    @staticmethod
-    def insert_test():
-        query = text("INSERT INTO local_info (station_name) VALUES (:station_name)")
-        session = Session()
-        try:
-            session.execute(query, {'station_name': '테스트입니다'})
-            session.commit()
-        finally:
-            session.close()
+    # @staticmethod
+    # def insert_test():
+    #     query = text("INSERT INTO local_info (station_name) VALUES (:station_name)")
+    #     session = Session()
+    #     try:
+    #         session.execute(query, {'station_name': '테스트입니다'})
+    #         session.commit()
+    #     finally:
+    #         session.close()

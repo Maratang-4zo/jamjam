@@ -67,7 +67,7 @@ def addData():
 def healthCheck():
     return jsonify({"response": "ok"}), 200
 
-@app.route('/flask/db/check', methods=["POST"])
-def connectionCheck():
-    Place.insert_test()
-    return jsonify({"response": "complete"}), 201
+# @app.route('/flask/db/check', methods=["POST"])
+# def connectionCheck():
+#     Place.insert_test()
+#     return jsonify({"response": "complete"}), 201

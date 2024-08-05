@@ -2,9 +2,11 @@ package com.maratang.jamjam.global.room;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -17,6 +19,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,14 +30,23 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class RoomTokenProvider {
 
-	public static final String AUTHORIZATION_HEADER = "Authorization";
+	public static final String tokenName = "roomToken";
+	//public static final String AUTHORIZATION_HEADER = "Authorization";
 
-	@Value("${jwt.roomTokenExpiration:60}")
+	@Value("${jwt.roomTokenExpiration:60000000000000}")
 	private String roomTokenExpirationTime;
 
 	// openssl rand -hex 32
 	@Value("${jwt.secretKey:anEWd0LXRvaFGFasdQF1432ghSDASGLXNlYd12AesEgeasdfqSDGDGwe3JAEldA==}")
 	private String tokenSecret;
+
+	public String resolveToken(HttpServletRequest request){
+		Cookie cookie = WebUtils.getCookie(request, tokenName);
+		if(cookie != null){
+			return cookie.getValue();
+		}
+		return null;
+	}
 
 	public RoomJwtTokenDto createRoomJwtToken(RoomJwtTokenClaims roomJwtTokenClaims) {
 
@@ -92,6 +105,14 @@ public class RoomTokenProvider {
 			throw new BusinessException(ErrorCode.AU_NOT_VALID_TOKEN);
 		}
 		return claims;
+	}
+
+	public RoomJwtTokenClaims getUUIDs(String token){
+		Claims claims = getTokenClaims(token);
+		return RoomJwtTokenClaims.builder()
+			.roomUUID(UUID.fromString((String)claims.get("roomUUID")))
+			.attendeeUUID(UUID.fromString((String)claims.get("attendeeUUID")))
+			.build();
 	}
 
 }

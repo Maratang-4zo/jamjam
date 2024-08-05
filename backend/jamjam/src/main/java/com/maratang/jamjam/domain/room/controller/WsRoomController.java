@@ -2,12 +2,13 @@ package com.maratang.jamjam.domain.room.controller;
 
 import java.util.UUID;
 
-import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
 import com.maratang.jamjam.domain.board.dto.request.AttendeeUpdateReq;
+import com.maratang.jamjam.domain.room.dto.request.RoomCloseReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomEnterReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.service.RoomService;
@@ -22,37 +23,38 @@ public class WsRoomController {
 	private final RoomService roomService;
 
 	// 참여자 방 입장
-	@MessageMapping("/{roomId}/enter")
+	@MessageMapping("/enter")
 	@Operation(summary = "🚗 구현 중")
-	public void enterRoom(@DestinationVariable UUID roomUUID, @Payload RoomEnterReq roomEnterReq){
-		roomService.enterRoom(roomUUID, roomEnterReq);
+	public void enterRoom(@Header("roomUUID") UUID roomUUID, @Header("attendeeUUID") UUID attendeeUUID, @Payload RoomEnterReq roomEnterReq){
+		// roomService.enterRoom(roomId, roomEnterReq);
 
 	}
 
 	// 참여자가 떠남
-	@MessageMapping("/{roomId}/leave")
+	@MessageMapping("/leave")
 	@Operation(summary = "🚗 구현 중")
-	public void leaveRoom(@DestinationVariable UUID roomUUID){
-		roomService.leaveRoom(roomUUID);
+	public void leaveRoom(@Header("roomUUID") UUID roomUUID, @Header("attendeeUUID") UUID attendeeUUID){
+		roomService.leaveRoom(roomUUID, attendeeUUID);
 	}
 
 	// 방 아예 종료
-	@MessageMapping("/{roomId}/close")
+	@MessageMapping("/close")
 	@Operation(summary = "🚗 구현 중")
-	public void closeRoom(@DestinationVariable UUID roomUUID){
-		roomService.closeRoom(roomUUID);
+	public void closeRoom(@Header("roomUUID") UUID roomUUID, @Header("attendeeUUID") UUID attendeeUUID, @Payload RoomCloseReq roomCloseReq){
+		roomService.closeRoom(roomUUID, attendeeUUID, roomCloseReq);
 	}
 
 	// 방 정보 수정
-	@MessageMapping("/{roomId}/info")
+	@MessageMapping("/info")
 	@Operation(summary = "🚗 구현 중")
-	public void updateRoom(@DestinationVariable UUID roomUUID, @Payload RoomUpdateReq roomUpdateReq){
+	public void updateRoom(@Header("roomUUID") UUID roomUUID, @Header("attendeeUUID") UUID attendeeUUID, @Payload RoomUpdateReq roomUpdateReq){
 		roomService.updateRoom(roomUUID, roomUpdateReq);
     }
 
 	// 사용자 정보 수정
-	@MessageMapping("/{roomId}/my")
-	public void updateAttendeeInfo(@DestinationVariable UUID roomUUID, @Payload AttendeeUpdateReq attendeeUpdateReq){
+	@MessageMapping("/my")
+	@Operation(summary = "🚗 구현 중")
+	public void updateAttendeeInfo(@Header("roomUUID") UUID roomUUID, @Header("attendeeUUID") UUID attendeeUUID, @Payload AttendeeUpdateReq attendeeUpdateReq){
 		roomService.updateAttendeeInfo(roomUUID, attendeeUpdateReq);
 	}
 }

@@ -1,32 +1,23 @@
 package com.maratang.jamjam.domain.attendee.entity;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.memberRoundRecord.entity.MemberRoundRecord;
 import com.maratang.jamjam.domain.room.entity.Room;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import com.maratang.jamjam.global.auditing.BaseTimeEntity;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Entity
 @Getter
 @Table(name = "attendee")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Attendee {
+public class Attendee extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(columnDefinition = "INT UNSIGNED")
@@ -39,10 +30,15 @@ public class Attendee {
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "room_id") // DB의 room_id 컬럼과 매핑
+	@JoinColumn(name = "room_id")
 	private Room room;
 
-	private LocalDateTime created_at;
+	@Column(nullable = false, unique = true, updatable = false)
+	private UUID attendeeUUID;
+
+	@Enumerated(EnumType.STRING)
+	private AttendeeStatus attendeeStatus;
+
 	private Double lat;
 	private Double lon;
 	private String address;
@@ -51,21 +47,25 @@ public class Attendee {
 	@JoinColumn(name = "member_round_record_id")
 	private MemberRoundRecord memberRoundRecord;
 
-	@Column(nullable = false, unique = true, updatable = false)
-	private UUID attendeeUUID;
+	private Long duration; // 소요시간 (단위: 초)
+	private String route; // 경로
 
-	public Attendee(Long attendeeId, String nickname, Member member, Room room, LocalDateTime created_at, Double lat,
-		Double lon, String address, MemberRoundRecord memberRoundRecord, UUID attendeeUUID) {
+	@Builder
+	public Attendee(Long attendeeId, String nickname, Member member, Room room, UUID attendeeUUID,
+					AttendeeStatus attendeeStatus, Double lat, Double lon, String address,
+					MemberRoundRecord memberRoundRecord, Long duration, String route) {
 		this.attendeeId = attendeeId;
 		this.nickname = nickname;
 		this.member = member;
 		this.room = room;
-		this.created_at = created_at;
+		this.attendeeUUID = attendeeUUID;
+		this.attendeeStatus = attendeeStatus;
 		this.lat = lat;
 		this.lon = lon;
 		this.address = address;
 		this.memberRoundRecord = memberRoundRecord;
-		this.attendeeUUID = attendeeUUID;
+		this.duration = duration;
+		this.route = route;
 	}
 
 	@PrePersist
@@ -82,5 +82,16 @@ public class Attendee {
 	public void updateRoom(Room room) {
 		this.room = room;
 	}
-}
 
+	public void updateStatus(AttendeeStatus attendeeStatus) {
+		this.attendeeStatus = attendeeStatus;
+	}
+
+	public void updateDuration(Long duration) {
+		this.duration = duration;
+	}
+
+	public void updateRoute(String route) {
+		this.route = route;
+	}
+}

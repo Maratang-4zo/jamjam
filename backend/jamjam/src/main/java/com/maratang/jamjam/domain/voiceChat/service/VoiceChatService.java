@@ -2,6 +2,11 @@ package com.maratang.jamjam.domain.voiceChat.service;
 
 import org.springframework.stereotype.Service;
 
+import com.maratang.jamjam.domain.attendee.entity.Attendee;
+import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
+import com.maratang.jamjam.domain.room.entity.Room;
+import com.maratang.jamjam.domain.room.entity.RoomStatus;
+import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.domain.voiceChat.dto.request.VoiceChatSessionReq;
 import com.maratang.jamjam.domain.voiceChat.dto.request.VoiceChatTokenReq;
 import com.maratang.jamjam.domain.voiceChat.dto.response.VoiceChatSessionRes;
@@ -21,11 +26,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class VoiceChatService {
 	private final OpenVidu openviduClient;
+	private final RoomRepository roomRepository;
+	private final AttendeeRepository attendeeRepository;
 
 	public VoiceChatSessionRes initVoiceChatSession(VoiceChatSessionReq params) {
-		// SessionProperties properties = SessionProperties.fromJson(params).build();
-		// params: customSessionId, title(?)
-		SessionProperties properties = new SessionProperties.Builder().build();
+		Room room = roomRepository.findByRoomUUID(params.getRoomUUID()).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		if(room.getRoomStatus() == RoomStatus.ABORTED || room.getRoomStatus() == RoomStatus.FINISHED) {
+			throw new BusinessException(ErrorCode.ROOM_CANNOT_ENTER);
+		} else if(!room.getRoot().getAttendeeUUID().equals(params.getAttendeeUUID())){
+			throw new BusinessException(ErrorCode.FORBIDDEN);
+		}
+
+		SessionProperties properties = new SessionProperties.Builder().customSessionId(params.getRoomUUID().toString()).build();
 		Session session;
 		try {
 			session = openviduClient.createSession(properties);
@@ -36,16 +49,20 @@ public class VoiceChatService {
 		return VoiceChatSessionRes.builder().sessionId(session.getSessionId()).build();
 	}
 
-	public VoiceChatTokenRes createConnection(String sessionId, VoiceChatTokenReq params) {
-		Session session = openviduClient.getActiveSession(sessionId);
+	public VoiceChatTokenRes createConnection(VoiceChatTokenReq params) {
+		Attendee attendee = attendeeRepository.findByAttendeeUUID(params.getAttendeeUUID()).orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
+		Room room = attendee.getRoom();
+		if(!room.getRoomUUID().equals(params.getRoomUUID()) || room.getRoomStatus() == RoomStatus.ABORTED || room.getRoomStatus() == RoomStatus.FINISHED){
+			throw new BusinessException(ErrorCode.ROOM_CANNOT_ENTER);
+		}
+
+		Session session = openviduClient.getActiveSession(params.getRoomUUID().toString());
 
 		if (session == null) {
 			throw new BusinessException(ErrorCode.OV_SESSION_NOT_FOUND);
 		}
 
-		// ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
-		// params: nickname, station(?)
-		ConnectionProperties properties = new ConnectionProperties.Builder().build();
+		ConnectionProperties properties = new ConnectionProperties.Builder().data(params.getAttendeeUUID().toString()).build();
 
 		Connection connection;
 		try {

@@ -30,11 +30,13 @@ import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.middle.GeometryUtils;
 import com.maratang.jamjam.global.middle.GrahamScan;
 import com.maratang.jamjam.global.middle.HaversineDistance;
+import com.maratang.jamjam.global.room.RoomTokenProvider;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.station.Point;
 import com.maratang.jamjam.global.station.SubwayDataLoader;
 import com.maratang.jamjam.global.station.SubwayInfo;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -48,6 +50,7 @@ public class RoomService {
 	private final GrahamScan grahamScan;
 	private final GeometryUtils geometryUtils;
 	private final SubwayDataLoader subwayDataLoader;
+	private final RoomTokenProvider roomTokenProvider;
 
 	@Transactional
 	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq) {
@@ -172,12 +175,32 @@ public class RoomService {
 		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST, "", Map.of("type", "ATTENDEE_UPDATE"));
 	}
 
-	public RoomGetRes findRoom(UUID roomUUID) {
+	public RoomGetRes findRoom(UUID roomUUID, String roomToken) {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 				.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		if (room.getRoomStatus() == RoomStatus.FINISHED || room.getRoomStatus() == RoomStatus.ABORTED){
-            throw new BusinessException(ErrorCode.ROOM_NOT_OPEN_FOUND);
+			throw new BusinessException(ErrorCode.ROOM_NOT_OPEN_FOUND);
+		}
+
+		// roomToken
+		Claims claims = roomTokenProvider.getTokenClaims(roomToken);
+
+		String attendeeUUIDString = (String) claims.get("attendeeUUID");
+
+		UUID attendeeUUID = UUID.fromString(attendeeUUIDString);
+
+		room.getAttendees().stream()
+			.filter(a -> a.getAttendeeUUID().equals(attendeeUUID))
+			.findFirst()
+			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
+
+		//roomToken end
+
+		Boolean isHost = false;
+
+		if (room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
+			isHost = true;
 		}
 
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
@@ -188,6 +211,7 @@ public class RoomService {
 		SubwayInfo roomCenterStart = subwayDataLoader.getSubwayInfo(startStation);
 
 		return RoomGetRes.builder()
+			.isHost(isHost)
 			.RoomUUID(roomUUID)
 			.roomName(room.getName())
 			.roomCenterStart(roomCenterStart)

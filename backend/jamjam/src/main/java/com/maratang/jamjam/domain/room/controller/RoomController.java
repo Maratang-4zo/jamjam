@@ -1,24 +1,34 @@
 package com.maratang.jamjam.domain.room.controller;
 
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.service.AttendeeService;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.service.RoomService;
+import com.maratang.jamjam.global.error.ErrorCode;
+import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.room.RoomTokenProvider;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenDto;
 import com.maratang.jamjam.global.station.SubwayInfo;
+
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/rooms")
@@ -53,8 +63,24 @@ public class RoomController {
 
 	@GetMapping("/{roomUUID}")
 	@Operation(summary = "✨ 방 존재 유무 확인", description = "방이 존재하지 않거나, 중단, 종료 된 방은 404 에러 처리한다.")
-	public ResponseEntity<?> getRoom(@PathVariable UUID roomUUID){
-		RoomGetRes roomGetRes = roomService.findRoom(roomUUID);
+	public ResponseEntity<?> getRoom(@PathVariable UUID roomUUID, HttpServletRequest request){
+		Cookie[] cookies = request.getCookies();
+		String roomToken = null;
+
+		if (cookies != null) {
+			for(Cookie cookie : cookies) {
+				if(cookie.getName().equals("roomToken")) {
+					roomToken = cookie.getValue();
+					break;
+				}
+			}
+		}
+
+		if (roomToken == null) {
+			throw new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND);
+		}
+
+		RoomGetRes roomGetRes = roomService.findRoom(roomUUID, roomToken);
 
 		return ResponseEntity.status(HttpStatus.OK).body(roomGetRes);
 	}

@@ -5,12 +5,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
@@ -20,6 +20,7 @@ import com.maratang.jamjam.domain.board.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCloseReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
+import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.mapper.RoomMapper;
@@ -179,7 +180,21 @@ public class RoomService {
             throw new BusinessException(ErrorCode.ROOM_NOT_OPEN_FOUND);
 		}
 
-		return RoomGetRes.builder().isRoom(true).build();
-	}
+		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
+		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
 
+		String startStation = room.getStartStation();
+
+		SubwayInfo roomCenterStart = subwayDataLoader.getSubwayInfo(startStation);
+
+		return RoomGetRes.builder()
+			.RoomUUID(roomUUID)
+			.roomName(room.getName())
+			.roomCenterStart(roomCenterStart)
+			.roomTime(room.getMeetingDate())
+			.roomPurpose(room.getPurpose())
+			.hostUUID(room.getRoomUUID())
+			.attendees(attendeeList)
+			.build();
+	}
 }

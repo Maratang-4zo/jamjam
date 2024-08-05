@@ -13,6 +13,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class RoomGetRes {
+    Boolean isHost;
     UUID RoomUUID;
     String roomName;
     SubwayInfo roomCenterStart;

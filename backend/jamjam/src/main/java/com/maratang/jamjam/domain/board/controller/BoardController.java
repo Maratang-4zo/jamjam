@@ -61,5 +61,4 @@ public class BoardController {
 		boardService.deleteBoard(boardId);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
-
 }

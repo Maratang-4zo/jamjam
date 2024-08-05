@@ -213,6 +213,7 @@ public class RoomService {
 		return RoomGetRes.builder()
 			.isHost(isHost)
 			.RoomUUID(roomUUID)
+			.attendeeUUID(attendeeUUID)
 			.roomName(room.getName())
 			.roomCenterStart(roomCenterStart)
 			.roomTime(room.getMeetingDate())

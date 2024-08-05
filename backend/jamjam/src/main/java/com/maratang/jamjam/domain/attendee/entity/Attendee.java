@@ -1,17 +1,31 @@
 package com.maratang.jamjam.domain.attendee.entity;
 
+import java.util.Random;
+import java.util.UUID;
+
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.memberRoundRecord.entity.MemberRoundRecord;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
-import jakarta.persistence.*;
+import com.maratang.jamjam.global.room.constant.ProfileType;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -50,10 +64,13 @@ public class Attendee extends BaseTimeEntity {
 	private Long duration; // 소요시간 (단위: 초)
 	private String route; // 경로
 
+	@Enumerated(EnumType.STRING)
+	private ProfileType profileImageUrl;
+
 	@Builder
 	public Attendee(Long attendeeId, String nickname, Member member, Room room, UUID attendeeUUID,
-					AttendeeStatus attendeeStatus, Double lat, Double lon, String address,
-					MemberRoundRecord memberRoundRecord, Long duration, String route) {
+		AttendeeStatus attendeeStatus, Double lat, Double lon, String address,
+		MemberRoundRecord memberRoundRecord, Long duration, String route, ProfileType profileImageUrl) {
 		this.attendeeId = attendeeId;
 		this.nickname = nickname;
 		this.member = member;
@@ -66,11 +83,13 @@ public class Attendee extends BaseTimeEntity {
 		this.memberRoundRecord = memberRoundRecord;
 		this.duration = duration;
 		this.route = route;
+		this.profileImageUrl = profileImageUrl;
 	}
 
 	@PrePersist
 	protected void onCreate() {
 		this.attendeeUUID = UUID.randomUUID();
+		this.profileImageUrl = ProfileType.values()[new Random().nextInt(ProfileType.values().length)];
 	}
 
 	public void updateAttendeeLocation(AttendeeUpdateReq attendeeUpdateReq) {
@@ -93,5 +112,9 @@ public class Attendee extends BaseTimeEntity {
 
 	public void updateRoute(String route) {
 		this.route = route;
+	}
+
+	public void updateProfileImageUrl(ProfileType profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
 	}
 }

@@ -15,6 +15,7 @@ import lombok.Getter;
 public class RoomGetRes {
     Boolean isHost;
     UUID RoomUUID;
+    UUID attendeeUUID;
     String roomName;
     SubwayInfo roomCenterStart;
     LocalDateTime roomTime;

@@ -69,8 +69,8 @@ public class StompHandler implements ChannelInterceptor {
 	public void handleDisconnectCommand(StompHeaderAccessor accessor){
 		if(!"leaved".equals(accessor.getSessionAttributes().get("status"))){
 			// 사용자가 떠난다. => 중간 탈주 / 최종 모임 장소 결정
-			UUID attendeeUUID = UUID.fromString((String)accessor.getSessionAttributes().get("attendeeUUID"));
-			UUID roomUUID = UUID.fromString((String)accessor.getSessionAttributes().get("roomUUID"));
+			UUID attendeeUUID = (UUID)accessor.getSessionAttributes().get("attendeeUUID");
+			UUID roomUUID = (UUID)accessor.getSessionAttributes().get("roomUUID");
 
 			// 사용자 나감 처리
 			roomService.leaveRoom(roomUUID, attendeeUUID);

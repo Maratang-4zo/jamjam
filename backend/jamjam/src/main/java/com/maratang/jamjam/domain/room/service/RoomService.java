@@ -124,7 +124,7 @@ public class RoomService {
 		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ENTER);
 	}
 
-
+	@Transactional
 	public void leaveRoom(UUID roomUUID, UUID attendeeUUID) {
 		// 1. 현재 접속중인 사람 목록에서 제거한다.
 		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUUID).orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));

@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const getUserInfo = async () => {
   try {
     const response = await axios.get("/api/members/info");

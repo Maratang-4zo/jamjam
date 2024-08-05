@@ -4,7 +4,8 @@ import wavebutton from "../assets/wavebutton.svg";
 
 const APP_KEY = process.env.REACT_APP_KAKAO_CLIENT_ID;
 const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
-const link = `https://kauth.kakao.com/oauth/authorize?client_id=${APP_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+// const link = `https://jjam.shop/api/login/authorize`;
+const link = `http://70.12.114.94:8080/api/login/authorize`;
 
 const loginHandler = () => {
   window.location.href = link;

@@ -44,7 +44,7 @@ public class LoginController {
 	private String redirectUri;
 
 	@GetMapping("/authorize")
-	@Operation(summary = "카카오 로그인 요청", description = "카카오 로그인 페이지로 리다이렉트합니다.")
+	@Operation(summary = "카카오 로그인 요청", description = "redirect uri로 리다이렉트합니다.")
 	public void redirectToKakao(HttpServletResponse httpServletResponse) throws IOException {
 		String authorizeUrl = "https://kauth.kakao.com/oauth/authorize"
 			+ "?response_type=code"
@@ -73,6 +73,7 @@ public class LoginController {
 		httpServletResponse.addHeader("accessToken", loginRes.getAccessToken());
 
 		httpServletResponse.sendRedirect("https://jjam.shop/");
+		// httpServletResponse.sendRedirect("http://70.12.114.94:3000/");
 	}
 
 	private String getAccessToken(String code) {

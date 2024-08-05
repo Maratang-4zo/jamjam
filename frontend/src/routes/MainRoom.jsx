@@ -65,8 +65,16 @@ function Room() {
 
     if (!userInfo.isHost) {
       checkRoomValidity();
+    } else {
+      if (
+        !userInfo.departure.addressText &&
+        !userInfo.departure.latitude &&
+        !userInfo.departure.longitude
+      ) {
+        setIsFindDepartureModalOpen(true);
+      }
     }
-  }, [roomUUID, navigate, userInfo.isHost, setRoomInfo]);
+  }, [roomUUID, navigate, userInfo.isHost, setRoomInfo, userInfo.departure]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);
@@ -90,19 +98,20 @@ function Room() {
       }));
     }
 
-    setRoomInfo((prev) => ({
-      ...prev,
-      meetingDate,
-    }));
-
-    try {
-      await axiosUpdateUserInfo({
-        addressText,
-        latitude,
-        longitude,
-      });
-    } catch (err) {
-      console.error("사용자 정보 업데이트 실패");
+    if (roomInfo.meetingDate !== meetingDate) {
+      setRoomInfo((prev) => ({
+        ...prev,
+        meetingDate,
+      }));
+      try {
+        await axiosUpdateUserInfo({
+          addressText,
+          latitude,
+          longitude,
+        });
+      } catch (err) {
+        console.error("사용자 정보 업데이트 실패");
+      }
     }
   };
 
@@ -123,6 +132,7 @@ function Room() {
   const handleCloseShareModal = () => {
     setIsShareModalOpen(false);
   };
+
   return (
     <Wrapper>
       <NavBarLeft />

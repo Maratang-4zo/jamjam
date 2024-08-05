@@ -1,5 +1,6 @@
 import styled, { keyframes } from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
+import { Link } from "react-router-dom";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -62,7 +63,9 @@ function Home() {
           <Section>페이지 투!!</Section>
           <Section>
             <ButtonContainer>
-              <AnimatedButton>YES</AnimatedButton>
+              <AnimatedButton>
+                <Link to={"/room/create"}>YES</Link>
+              </AnimatedButton>
               <AnimatedButton>LOGIN</AnimatedButton>
             </ButtonContainer>
           </Section>

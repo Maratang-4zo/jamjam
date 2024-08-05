@@ -19,17 +19,9 @@ export function axiosGetMiddle({ roomUUID }) {
 }
 
 export function axiosUpdateUserInfo({ address, lat, lon }) {
-  return axios
-    .patch(BASE_URL + `/api/attendees`, {
-      address,
-      lat,
-      lon,
-    })
-    .then((res) => {
-      console.log("사용자 정보 업데이트 완료");
-    })
-    .catch((err) => {
-      console.error("사용자 정보 업데이트 실패");
-      console.log(err);
-    });
+  return axios.patch(BASE_URL + `/api/attendees`, {
+    address,
+    lat,
+    lon,
+  });
 }

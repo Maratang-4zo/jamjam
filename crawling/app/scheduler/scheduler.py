@@ -70,7 +70,7 @@ def update_database(new_data_df, existing_data_df):
 
 # 스케줄러 시작 함수
 def start_scheduler():
-    # timezone을 설정해두지 않으면 경고문구가 뜰 수 있다!
+    # timezone을 설정해두지 않으면 경고 문구가 뜰 수 있다.
     # BackgroundScheduler을 통해 schedule 인스턴스를 생성한다.
     schedule = BackgroundScheduler(daemon=True, timezone='Asia/Seoul')
 

@@ -1,0 +1,6 @@
+id,station_name,name,category,road_address,address,phone,latitude,longitude
+1,Test Station,New Test Place 1,New Test Category,New Test Road Address 1,New Test Address 1,123-456-7890,37.1234,127.1234
+3,Test Station,New Test Place 3,New Test Category,New Test Road Address 3,New Test Address 3,123-456-7890,37.9101,127.9101
+4,Test Station,New Test Place 4,New Test Category,New Test Road Address 4,New Test Address 4,123-456-7890,37.9101,127.9101
+5,Test Station,New Test Place 5,New Test Category,New Test Road Address 5,New Test Address 5,123-456-7890,37.9101,127.9101
+6,Test Station,New Test Place 6,New Test Category,New Test Road Address 6,New Test Address 6,123-456-7890,37.9101,127.9101

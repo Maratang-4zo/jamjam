@@ -73,7 +73,7 @@ const useOpenVidu = () => {
 
     if (!token) {
       // 쿠키에 토큰이 없을 경우 토큰을 생성하여 쿠키에 저장
-      token = await createToken(roomUUID, attendeeUUID);
+      token = await createToken();
     }
 
     if (sessionRef.current && ovRef.current) {

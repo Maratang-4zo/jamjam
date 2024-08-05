@@ -91,15 +91,16 @@ const useWs = () => {
   };
 
   const handleChatLogs = (message) => {
-    const { senderUUID, content } = message;
+    const { attendeeUUID, content, createdAt } = message;
     const attendant = roomInfo.attendants.find(
-      (attendee) => attendee.attendeeUUID === senderUUID,
+      (attendee) => attendee.attendeeUUID === attendeeUUID,
     );
     const nickname = attendant.nickname;
     const n = {
-      senderUUID,
+      attendeeUUID,
       nickname,
       content,
+      createdAt,
     };
     setChatLogs((prevChatLogs) => [...prevChatLogs, n]);
     console.log(message);

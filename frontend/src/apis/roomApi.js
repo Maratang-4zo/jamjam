@@ -25,7 +25,7 @@ export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
     });
 }
 
-// 방 유효성 검사
+// 방 유효성 검사 + 방 정보 받기
 export function axiosIsRoomValid({ roomUUID }) {
   return axios.get(BASE_URL + `/api/rooms/${roomUUID}`);
 }

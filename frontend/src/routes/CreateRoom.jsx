@@ -11,7 +11,7 @@ import useWs from "../hooks/useWs";
 import { jwtDecode } from "jwt-decode";
 import { useRecoilState } from "recoil";
 import { roomAtom } from "../recoil/atoms/roomState";
-import { getCookie, setCookie } from "../utils/Cookies";
+import { getCookie } from "../utils/Cookies";
 import useOpenVidu from "../hooks/useOpenVidu";
 import { userInfoAtom } from "../recoil/atoms/userState";
 

@@ -8,6 +8,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import com.maratang.jamjam.global.ws.StompHandler;
+import com.maratang.jamjam.global.ws.WsHandshakeInterceptor;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	private final StompHandler stompHandler;
+	private final WsHandshakeInterceptor wsHandshakeInterceptor;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -25,8 +27,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
-		registry.addEndpoint("/ws").setAllowedOriginPatterns("*");
+		registry
+			.addEndpoint("/ws")
+			.setAllowedOriginPatterns("*")
+			.withSockJS()
+			.setInterceptors(wsHandshakeInterceptor);
 	}
 
 	@Override

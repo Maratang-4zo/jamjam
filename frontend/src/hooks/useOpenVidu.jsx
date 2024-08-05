@@ -29,21 +29,15 @@ const useOpenVidu = () => {
     });
   }, []);
 
-  const createSession = async (roomUUID, attendeeUUID) => {
-    await axios.post(APPLICATION_SERVER_URL + "api/wr/rooms", {
-      roomUUID,
-      attendeeUUID,
-    });
-    return createToken(roomUUID, attendeeUUID);
+  const createSession = async () => {
+    await axios.post(APPLICATION_SERVER_URL + "api/wr/rooms");
+    return createToken();
   };
 
-  const createToken = (roomUUID, attendeeUUID) => {
+  const createToken = () => {
     return new Promise((resolve, reject) => {
       axios
-        .post(APPLICATION_SERVER_URL + "api/wr/rooms/token", {
-          roomUUID,
-          attendeeUUID,
-        })
+        .post(APPLICATION_SERVER_URL + "api/wr/rooms/token")
         .then((res) => {
           const token = res.data.token;
           setCookie("OpenviduToken", token);
@@ -72,41 +66,33 @@ const useOpenVidu = () => {
     };
   }, []);
 
-  const joinSession = useCallback(
-    async (roomUUID, attendeeUUID) => {
-      if (!roomUUID || !attendeeUUID) {
-        console.error("roomUUID and attendeeUUID are required");
-        return;
-      }
+  const joinSession = useCallback(async () => {
+    initSession();
 
-      initSession();
+    let token = getCookie("OpenviduToken");
 
-      let token = getCookie("OpenviduToken");
+    if (!token) {
+      // 쿠키에 토큰이 없을 경우 토큰을 생성하여 쿠키에 저장
+      token = await createToken(roomUUID, attendeeUUID);
+    }
 
-      if (!token) {
-        // 쿠키에 토큰이 없을 경우 토큰을 생성하여 쿠키에 저장
-        token = await createToken(roomUUID, attendeeUUID);
-      }
-
-      if (sessionRef.current && ovRef.current) {
-        sessionRef.current
-          .connect(token)
-          .then(() => {
-            const newPublisher = ovRef.current.initPublisher("publisher");
-            sessionRef.current.publish(newPublisher);
-            setConnected(true);
-          })
-          .catch((error) => {
-            console.log(
-              "There was an error connecting to the session:",
-              error.code,
-              error.message,
-            );
-          });
-      }
-    },
-    [initSession],
-  );
+    if (sessionRef.current && ovRef.current) {
+      sessionRef.current
+        .connect(token)
+        .then(() => {
+          const newPublisher = ovRef.current.initPublisher("publisher");
+          sessionRef.current.publish(newPublisher);
+          setConnected(true);
+        })
+        .catch((error) => {
+          console.log(
+            "There was an error connecting to the session:",
+            error.code,
+            error.message,
+          );
+        });
+    }
+  }, [initSession]);
 
   return {
     connected,

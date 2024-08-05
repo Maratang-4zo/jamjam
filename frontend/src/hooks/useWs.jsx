@@ -4,7 +4,7 @@ import { Client } from "@stomp/stompjs";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { chatAtom, roomAtom } from "../recoil/atoms/roomState";
 
-const API_BASE_URL = "https://jjam.shop/api/ws";
+const API_BASE_URL = "https://jjam.shop";
 
 const useWs = () => {
   const [connected, setConnected] = useState(false);
@@ -12,14 +12,10 @@ const useWs = () => {
   const client = useRef({});
   const roomInfo = useRecoilValue(roomAtom);
 
-  const connect = (roomUUID, attendeeUUID) => {
+  const connect = () => {
     return new Promise((resolve, reject) => {
       client.current = new Client({
-        webSocketFactory: () => new SockJS(API_BASE_URL),
-        connectHeaders: {
-          roomUUID,
-          attendeeUUID,
-        },
+        webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
         debug: function (str) {
           console.log(str);
         },
@@ -28,7 +24,7 @@ const useWs = () => {
         heartbeatOutgoing: 20000,
         onConnect: () => {
           console.log("Connected");
-          subscribe(roomUUID, attendeeUUID);
+          subscribe();
           resolve();
         },
         onStompError: (frame) => {
@@ -40,20 +36,11 @@ const useWs = () => {
     });
   };
 
-  const subscribe = (roomUUID, attendeeUUID) => {
+  const subscribe = () => {
     setConnected(true);
-    client.current.subscribe(
-      `/sub/rooms/${roomUUID}`,
-      (message) => {
-        handleMessage(JSON.parse(message.body));
-      },
-      {
-        headers: {
-          roomUUID,
-          attendeeUUID,
-        },
-      },
-    );
+    client.current.subscribe(`/sub/rooms/${roomInfo.roomUUID}`, (message) => {
+      handleMessage(JSON.parse(message.body));
+    });
   };
 
   const disconnect = () => {
@@ -77,16 +64,12 @@ const useWs = () => {
     }
   };
 
-  const sendChat = ({ content, roomUUID, attendeeUUID }) => {
+  const sendChat = ({ content }) => {
     client.current.publish({
       destination: `/pub/chat/send`,
       body: JSON.stringify({
         content,
       }),
-      headers: {
-        roomUUID,
-        attendeeUUID,
-      },
     });
   };
 

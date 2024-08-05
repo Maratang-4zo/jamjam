@@ -29,6 +29,15 @@ services: # container setting info
     ports:
       - "3306:3306"
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin-container
+    restart: unless-stopped
+    ports:
+      - "27017:80"
+    environment:
+      PMA_ARBITRARY: 1
+
   redis-docker:
     container_name: redis-container
     image: redis:7.0

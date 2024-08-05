@@ -55,6 +55,8 @@ public enum ErrorCode {
 
 	// room
 	ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "RM001", "미팅룸을 찾을 수 없습니다."),
+	ROOM_CANNOT_ENTER(HttpStatus.BAD_REQUEST, "RM002", "미팅룸에 참여할 수 없습니다."),
+	ROOM_NOT_OPEN_FOUND(HttpStatus.NOT_FOUND, "RM003", "미팅룸이 종료되었습니다."),
 
 	// middle
 	MIDDLE_SOMEONE_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI001","위치를 선택안한 사람이 존재합니다."),

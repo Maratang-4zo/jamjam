@@ -6,7 +6,6 @@ import lombok.Getter;
 
 @Getter
 public class RoomUpdateReq {
-	private Long roomId;
 	private LocalDateTime meetingDay;
 	private String name;
 	private String purpose;

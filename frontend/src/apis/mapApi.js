@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = `http://jjam.shop`;
+const BASE_URL = `https://jjam.shop`;
 
 // 중심 장소 정보 가져오기
 export function axiosGetMiddle({ roomUUID }) {

@@ -6,7 +6,6 @@ export const userInfoAtom = atom({
     myUUID: "abcd1234",
     isHost: true,
     isLogin: false,
-    sessionToken: null,
     departure: {
       addressText: "",
       latitude: null,

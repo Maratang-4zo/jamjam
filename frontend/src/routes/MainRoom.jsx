@@ -10,6 +10,10 @@ import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
 import { axiosUpdateUserInfo } from "../apis/mapApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { axiosIsRoomValid } from "../apis/roomApi";
+import { getCookie } from "../utils/Cookies";
+import { jwtDecode } from "jwt-decode";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -23,6 +27,8 @@ const Wrapper = styled.div`
 `;
 
 function Room() {
+  const { roomUUID } = useParams();
+  const navigate = useNavigate();
   const [isFindDepartureModalOpen, setIsFindDepartureModalOpen] =
     useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -33,9 +39,66 @@ function Room() {
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
 
-  useEffect(() => {
-    setIsFindDepartureModalOpen(true);
-  }, []);
+  // 유효성 검사 및 이것저것 검사하는데 이거 주석 풀면 mainRoom에 영원히 못들어가니까 주석처리해놓을게요 일단..
+  // useEffect(() => {
+  //   const checkRoomValidity = async () => {
+  //     try {
+  //       const response = await axiosIsRoomValid({ roomUUID });
+  //       const isValid = response.data.room === true;
+
+  //       if (isValid) {
+  //         const roomToken = getCookie("roomToken");
+  //         if (roomToken) {
+  //           const myUUID = jwtDecode(roomToken).attendeeUUID;
+  //           const isMyUUIDPresent = response.data.attendees.some(
+  //             (attendee) => attendee.uuid === myUUID,
+  //           );
+  //           if (isMyUUIDPresent) {
+  //             if (
+  //               !userInfo.departure.addressText &&
+  //               !userInfo.departure.latitude &&
+  //               !userInfo.departure.longitude
+  //             ) {
+  //               setIsFindDepartureModalOpen(true);
+  //             }
+  //             setRoomInfo((prev) => ({
+  //               ...prev,
+  //               roomUUID,
+  //               isValid: true,
+  //               roomName: response.data.roomName,
+  //               meetingDate: response.data.roomTime,
+  //               centerPlace: response.data.roomStartCenter,
+  //               attendees: response.data.attendees,
+  //               roomPurpose: response.data.roomPurpose,
+  //               hostUUID: response.data.hostUUID,
+  //             }));
+  //             if (response.data.hostUUID === myUUID) {
+  //               setUserInfo((prev) => ({
+  //                 ...prev,
+  //                 isHost: true,
+  //               }));
+  //             }
+  //           } else {
+  //             navigate("/invalid-room");
+  //           }
+  //         } else {
+  //           navigate(`/room/${roomUUID}/join`);
+  //         }
+  //       } else {
+  //         navigate("/invalid-room");
+  //       }
+  //     } catch (error) {
+  //       console.error("방 유효성 검사 실패:", error);
+  //       setRoomInfo((prev) => ({
+  //         ...prev,
+  //         isValid: false,
+  //       }));
+  //       navigate("/invalid-room");
+  //     }
+  //   };
+
+  //   checkRoomValidity();
+  // }, [roomUUID, navigate, setRoomInfo, userInfo.departure]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);
@@ -59,19 +122,20 @@ function Room() {
       }));
     }
 
-    setRoomInfo((prev) => ({
-      ...prev,
-      meetingDate,
-    }));
-
-    try {
-      await axiosUpdateUserInfo({
-        addressText,
-        latitude,
-        longitude,
-      });
-    } catch (err) {
-      console.error("사용자 정보 업데이트 실패");
+    if (roomInfo.meetingDate !== meetingDate) {
+      setRoomInfo((prev) => ({
+        ...prev,
+        meetingDate,
+      }));
+      try {
+        await axiosUpdateUserInfo({
+          addressText,
+          latitude,
+          longitude,
+        });
+      } catch (err) {
+        console.error("사용자 정보 업데이트 실패");
+      }
     }
   };
 

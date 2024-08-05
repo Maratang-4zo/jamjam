@@ -137,8 +137,12 @@ function ChattingModal({ isVisible, toggleModal }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    sendChat(chatContent);
     setChatContent(""); // Clear input after sending
+    sendChat({
+      content: chatContent,
+      roomUUID: roomInfo.roomUUID,
+      attendeeUUID: userInfo.myUUID,
+    });
   };
 
   const groupMessages = () => {

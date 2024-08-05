@@ -1,6 +1,14 @@
 import styled from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import wavebutton from "../assets/wavebutton.svg";
+import { useForm } from "react-hook-form";
+import { useParams, useNavigate } from "react-router-dom";
+import { axiosAttendRoom } from "../apis/roomApi";
+import { useRecoilState } from "recoil";
+import { userInfoAtom } from "../recoil/atoms/userState";
+import { roomAtom } from "../recoil/atoms/roomState";
+import useWs from "../hooks/useWs";
+import useOpenVidu from "../hooks/useOpenVidu";
 
 const APP_KEY = process.env.REACT_APP_KAKAO_CLIENT_ID;
 const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
@@ -18,13 +26,23 @@ const Wrapper = styled.div`
   border: 3px solid ${(props) => props.theme.accentColor};
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+`;
+
+const Container = styled.div`
+  width: ${(props) => props.theme.wrapperWidth};
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
 `;
 
 const KakaotalkButton = styled.button`
-  margin-top: 150px;
-  height: 123px;
-  width: 381px;
+  height: 100px;
+  width: 350px;
+  background: none;
   background-image: url(${wavebutton});
   background-size: 100% 100%;
   border: none;
@@ -33,10 +51,10 @@ const KakaotalkButton = styled.button`
   align-items: center;
   position: relative;
   font-family: "pixel", Helvetica;
-  font-size: 30px;
+  font-size: 25px;
   color: #ffe845;
 
-  & p {
+  p {
     margin: 0;
   }
 `;
@@ -44,10 +62,10 @@ const KakaotalkButton = styled.button`
 const OrText = styled.h3`
   color: #000;
   font-family: "pixel", Helvetica;
-  font-size: 40px;
+  font-size: 30px;
   font-weight: 500;
   text-align: center;
-  margin: 70px 0;
+  margin: 35px 0;
 `;
 
 const NicknameInput = styled.div`
@@ -57,25 +75,25 @@ const NicknameInput = styled.div`
   position: relative;
   margin-bottom: 70px;
 
-  & label {
+  label {
     font-family: "NewGalmuriRegular", Helvetica;
-    font-size: 30px;
+    font-size: 25px;
     color: #000;
   }
 
-  & input {
+  input {
     border: 3px solid #000;
-    height: 85px;
-    width: 513px;
-    padding-left: 22px;
-    font-size: 40px;
+    height: 60px;
+    width: 350px;
+    padding: 0 10px;
+    font-size: 30px;
   }
 `;
 
 const EnterButton = styled.button`
-  height: 54px;
-  width: 350px;
-  background-color: #d9d9d9;
+  height: 45px;
+  width: 300px;
+  background-color: ${(props) => props.theme.infoColor};
   border-radius: 15px;
   box-shadow: 0px 4px 4px #00000040;
   border: none;
@@ -83,40 +101,78 @@ const EnterButton = styled.button`
   justify-content: center;
   align-items: center;
   font-family: "DungGeunMo", Helvetica;
-  font-size: 30px;
+  font-size: 25px;
   color: #000;
 
-  & p {
+  p {
     margin: 0;
+  }
+  &:hover {
+    background-color: ${(props) => props.theme.infoColorHover};
   }
 `;
 
-// const Container = styled.div`
-//   display: flex;
-//   height: ${(props) => props.theme.wrapperHeight};
-//   padding: 209px 703px;
-//   flex-direction: column;
-//   justify-content: center;
-//   align-items: center;
-//   gap: 70px;
-// `;
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 function JoinRoom() {
+  const { roomUUID } = useParams();
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm();
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const { subscribe } = useWs();
+  const { joinSession } = useOpenVidu();
+
+  const attendRoomFn = async (data) => {
+    try {
+      const response = await axiosAttendRoom(roomUUID, data.nickname);
+
+      // ws, wRTC 연결 요청
+      subscribe(roomUUID, response.data.attendeeUUID);
+      await joinSession(roomUUID, response.data.attendeeUUID);
+
+      // 참가자 정보 저장
+      setUserInfo((prev) => ({
+        ...prev,
+        myUUID: response.data.attendeeUUID,
+        nickname: data.nickname,
+      }));
+
+      // 방 정보 저장
+      setRoomInfo((prev) => ({
+        ...prev,
+        roomUUID,
+        isValid: true,
+      }));
+
+      navigate(`/room/${roomUUID}`);
+    } catch (error) {
+      console.log("방 참여 실패", error);
+    }
+  };
+
   return (
     <Wrapper>
       <NavBarUp />
-      {/* <Container> */}
-      <KakaotalkButton>
-        <p onClick={loginHandler}>카카오톡으로 로그인</p>
-      </KakaotalkButton>
-      <OrText>or</OrText>
-      <NicknameInput>
-        <label> 닉네임: </label>
-        <input type="text" />
-      </NicknameInput>
-      <EnterButton>
-        <p>비회원으로 접속</p>
-      </EnterButton>
-      {/* </Container> */}
+      <Container>
+        <KakaotalkButton>
+          <p onClick={loginHandler}>카카오톡으로 로그인</p>
+        </KakaotalkButton>
+        <OrText>or</OrText>
+        <Form onSubmit={handleSubmit(attendRoomFn)}>
+          <NicknameInput>
+            <label> 닉네임: </label>
+            <input {...register("nickname")} type="text" />
+          </NicknameInput>
+          <EnterButton>
+            <p>비회원으로 접속</p>
+          </EnterButton>
+        </Form>
+      </Container>
     </Wrapper>
   );
 }

@@ -33,6 +33,7 @@ const SideModal = styled.div`
 const KakaotalkButton = styled.button`
   height: 80px;
   width: 150px;
+  background: none;
   background-image: url(${wavebutton});
   background-size: 100% 100%;
   border: none;

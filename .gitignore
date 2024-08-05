@@ -382,5 +382,5 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/node
 
 # custom
-backend/.env
+.env
 .idea/

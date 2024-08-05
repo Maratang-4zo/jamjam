@@ -4,11 +4,10 @@ export const roomAtom = atom({
   key: "roomState",
   default: {
     roomUUID: null,
-    sessionId: null,
     roomName: "방 이름 예시",
     meetingDate: "2024-08-15T02:00:32.000Z",
-    purpose: "",
-    attendants: [
+    roomPurpose: "",
+    attendees: [
       {
         nickname: "김민경",
         attendeeUUID: "abcd1234",
@@ -20,7 +19,7 @@ export const roomAtom = atom({
     isCenterExist: false,
     isAllReadyToGame: false,
     centerPlace: { address: "", latitude: 0, longitude: 0 },
-    isValid: false, // 실시간 연결을 위한
+    isValid: false,
   },
 });
 
@@ -31,46 +30,58 @@ export const chatAtom = atom({
       nickname: "김민경",
       content: "이건 김민경 메시지야",
       senderUUID: "1234abcd",
-      timestamp: "",
+      createdAt: "",
     },
     {
       nickname: "김민경",
       content: "이건 김민경 메시지야",
       senderUUID: "1234abcd",
-      timestamp: "",
+      createdAt: "",
     },
     {
       nickname: "김민경",
       content: "이건 김민경 메시지야",
       senderUUID: "1234abcd",
-      timestamp: "",
+      createdAt: "",
     },
     {
       nickname: "김민경",
       content: "이건 김민경 메시지야",
       senderUUID: "1234abcd",
-      timestamp: "",
+      createdAt: "",
     },
-    { nickname: "김민", content: "야", senderUUID: "1234acd", timestamp: "" },
+    { nickname: "김민", content: "야", senderUUID: "1234acd", createdAt: "" },
     {
       nickname: "김민경",
       content: "이건 김민경 메시지야",
       senderUUID: "1234abcd",
-      timestamp: "",
+      createdAt: "",
     },
-    { nickname: "김민", content: "야", senderUUID: "1234acd", timestamp: "" },
-    { nickname: "김민", content: "야", senderUUID: "1234acd", timestamp: "" },
+    { nickname: "김민", content: "야", senderUUID: "1234acd", createdAt: "" },
+    { nickname: "김민", content: "야", senderUUID: "1234acd", createdAt: "" },
     {
       nickname: "김민경",
       content: "이건 김민경 메시지야",
       senderUUID: "1234abcd",
-      timestamp: "",
+      createdAt: "",
     },
     {
       nickname: "김민경",
       content: "이건 김민경 메시지야",
       senderUUID: "1234abcd",
-      timestamp: "",
+      createdAt: "",
+    },
+    {
+      nickname: "김수현",
+      content: "이건 김민경 메시지야",
+      senderUUID: "1234ㅇㅇabcd",
+      createdAt: "",
+    },
+    {
+      nickname: "김수현",
+      content: "이건 김민경 메시지야",
+      senderUUID: "1234ㅇㅇabcd",
+      createdAt: "",
     },
   ],
 });

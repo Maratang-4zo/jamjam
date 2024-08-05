@@ -43,7 +43,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @Transactional(readOnly = true)
 public class RoomService {
-	@Lazy private final SimpMessagingTemplate messagingTemplate;
+	@Lazy
+	private final SimpMessagingTemplate messagingTemplate;
 	private final String ROOM_SUBSCRIBE_DEST = "/sub/rooms/";
 	private final RoomRepository roomRepository;
 	private final AttendeeRepository attendeeRepository;
@@ -51,6 +52,7 @@ public class RoomService {
 	private final GeometryUtils geometryUtils;
 	private final SubwayDataLoader subwayDataLoader;
 	private final RoomTokenProvider roomTokenProvider;
+	private final HaversineDistance haversineDistance;
 
 	@Transactional
 	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq) {
@@ -102,12 +104,9 @@ public class RoomService {
 		Map<String, SubwayInfo> subwayMap = subwayDataLoader.getSubwayInfoMap();
 
 		double searchRadius = 5.0; // 5km
-		short stationCnt = 5;
 
-		SubwayInfo nearbyStations = HaversineDistance.findNearbyStations(subwayMap, centroid.getX(),
-			centroid.getY(), searchRadius,stationCnt);
-
-		return nearbyStations;
+		return haversineDistance.selectStation(subwayMap, centroid.getX(),
+			centroid.getY(), searchRadius, room.getPurpose());
 	}
 
 	@Transactional
@@ -115,25 +114,27 @@ public class RoomService {
 		// 정원 초과는 아직 고려 안 함
 
 		// 1. 활성화된 방인지, 유효한 유저인지, 방-유저 매칭이 되는지
-		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 		if (room.getRoomStatus() == RoomStatus.ABORTED || room.getRoomStatus() == RoomStatus.FINISHED) {
 			throw new BusinessException(ErrorCode.ROOM_CANNOT_ENTER);
 		}
 
 		// 2. 참여자 유효성 검사
-		Attendee attendee = attendeeRepository.findByAttendeeUUIDAndRoom(attendeeUUID, room).orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
+		Attendee attendee = attendeeRepository.findByAttendeeUUIDAndRoom(attendeeUUID, room)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 		attendee.updateStatus(AttendeeStatus.ENTERED);
 		attendeeRepository.save(attendee);
 
 		// 3. 기존 인원들에게 알림
 		AttendeeInfo attendeeInfo = AttendeeMapper.INSTANCE.attendeeToAttendeeInfo(attendee);
-		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST+roomUUID, attendeeInfo, Map.of("type", "ROOM_ENTER"));
+		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST + roomUUID, attendeeInfo, Map.of("type", "ROOM_ENTER"));
 	}
-
 
 	public void leaveRoom(UUID roomUUID, UUID attendeeUUID) {
 		// 1. 현재 접속중인 사람 목록에서 제거한다.
-		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUUID).orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
+		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUUID)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 		attendee.updateStatus(AttendeeStatus.EXITED);
 		attendeeRepository.save(attendee);
 
@@ -144,23 +145,25 @@ public class RoomService {
 		// 3. 방장
 		// 3-1. 모임 결정 완료) 다른 사람들도 DONE 표시하고 로비로 모셔다드리기
 		// 3-2. 모임 결정 미완료) 다른 사람들을 내쫓기
-		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		if(room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		if (room.getRoot().getAttendeeUUID().equals(attendeeUUID)) {
 			closeRoom(roomUUID, attendeeUUID, null);
 		}
 	}
 
 	public void closeRoom(UUID roomUUID, UUID attendeeUUID, RoomCloseReq roomCloseReq) {
 		// 1. DB 상태 변경
-		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
-		if(!room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
+		if (!room.getRoot().getAttendeeUUID().equals(attendeeUUID)) {
 			throw new BusinessException(ErrorCode.FORBIDDEN);
 		}
 
 		// 2. 남은 참여자 쫓아내기
 		room.updateStatus(RoomStatus.FINISHED);
-		if(roomCloseReq != null){
+		if (roomCloseReq != null) {
 			room.updateStation(roomCloseReq.getStation());
 		}
 		roomRepository.save(room);
@@ -177,16 +180,16 @@ public class RoomService {
 
 	public RoomGetRes findRoom(UUID roomUUID, String roomToken) {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
-				.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
-		if (room.getRoomStatus() == RoomStatus.FINISHED || room.getRoomStatus() == RoomStatus.ABORTED){
+		if (room.getRoomStatus() == RoomStatus.FINISHED || room.getRoomStatus() == RoomStatus.ABORTED) {
 			throw new BusinessException(ErrorCode.ROOM_NOT_OPEN_FOUND);
 		}
 
 		// roomToken
 		Claims claims = roomTokenProvider.getTokenClaims(roomToken);
 
-		String attendeeUUIDString = (String) claims.get("attendeeUUID");
+		String attendeeUUIDString = (String)claims.get("attendeeUUID");
 
 		UUID attendeeUUID = UUID.fromString(attendeeUUIDString);
 
@@ -199,7 +202,7 @@ public class RoomService {
 
 		Boolean isHost = false;
 
-		if (room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
+		if (room.getRoot().getAttendeeUUID().equals(attendeeUUID)) {
 			isHost = true;
 		}
 

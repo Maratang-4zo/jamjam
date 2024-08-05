@@ -132,10 +132,7 @@ const ErrorBox = styled.div`
 
 function CreateRoom() {
   const navigate = useNavigate();
-  const { connect } = useWs();
-  const { createSession, joinSession } = useOpenVidu();
-  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
-  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
+  const { createSession } = useOpenVidu();
   const {
     register,
     handleSubmit,
@@ -154,26 +151,7 @@ function CreateRoom() {
       const roomToken = getCookie("roomToken");
       const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
 
-      setRoomInfo((prev) => ({
-        ...prev,
-        meetingDate: data.meetingDate.toISOString(),
-        purpose: data.purpose,
-        roomUUID: roomUUID,
-        hostUUID: attendeeUUID,
-        attendants: [...prev.attendants, attendeeUUID],
-        isValid: true,
-      }));
-
-      await createSession(roomUUID, attendeeUUID);
-      await connect(roomUUID, attendeeUUID);
-
-      setUserInfo((prev) => ({
-        ...prev,
-        myUUID: attendeeUUID,
-        isHost: true,
-        nickname: data.nickname,
-      }));
-      await joinSession(roomUUID, attendeeUUID); // OpenVidu 세션에 참가
+      await createSession();
 
       navigate(`/room/${roomUUID}`);
     } catch (error) {

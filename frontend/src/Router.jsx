@@ -10,7 +10,7 @@ import JoinRoom from "./routes/JoinRoom";
 import Reconnect from "./routes/Reconnect";
 import Ws from "./routes/ws";
 import ConnectOpenVidu from "./routes/OpenVidu";
-import Auth from "./components/Auth";
+// import Auth from "./components/Auth";
 import InvalidRoom from "./routes/InvalidRoom";
 
 function Router() {
@@ -28,7 +28,7 @@ function Router() {
         <Route path="/room/:roomUUID/reconnect" element={<Reconnect />} />
         <Route path="/room/:roomUUID/ws" element={<Ws />} />
         <Route path="/room/:roomUUID/openvidu" element={<ConnectOpenVidu />} />
-        <Route path="/oauth/kakao/callback" element={<Auth />} />
+        {/* <Route path="/oauth/kakao/callback" element={<Auth />} /> */}
         <Route path="/invalid-room" element={<InvalidRoom />} />
       </Routes>
     </BrowserRouter>

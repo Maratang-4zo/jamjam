@@ -14,6 +14,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { axiosIsRoomValid } from "../apis/roomApi";
 import { getCookie } from "../utils/Cookies";
 import { jwtDecode } from "jwt-decode";
+import useWs from "../hooks/useWs";
+import useOpenVidu from "../hooks/useOpenVidu";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -38,67 +40,65 @@ function Room() {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const { connect } = useWs();
+  const { joinSession } = useOpenVidu();
 
-  // 유효성 검사 및 이것저것 검사하는데 이거 주석 풀면 mainRoom에 영원히 못들어가니까 주석처리해놓을게요 일단..
-  // useEffect(() => {
-  //   const checkRoomValidity = async () => {
-  //     try {
-  //       const response = await axiosIsRoomValid({ roomUUID });
-  //       const isValid = response.data.room === true;
+  useEffect(() => {
+    const checkRoomValidity = async () => {
+      try {
+        const response = await axiosIsRoomValid({ roomUUID });
+        const roomToken = getCookie("roomToken");
+        if (roomToken) {
+          const myUUID = jwtDecode(roomToken).attendeeUUID;
+          const myAttendeeInfo = response.data.attendees.find(
+            (attendee) => attendee.attendeeUUID === myUUID,
+          );
 
-  //       if (isValid) {
-  //         const roomToken = getCookie("roomToken");
-  //         if (roomToken) {
-  //           const myUUID = jwtDecode(roomToken).attendeeUUID;
-  //           const isMyUUIDPresent = response.data.attendees.some(
-  //             (attendee) => attendee.uuid === myUUID,
-  //           );
-  //           if (isMyUUIDPresent) {
-  //             if (
-  //               !userInfo.departure.addressText &&
-  //               !userInfo.departure.latitude &&
-  //               !userInfo.departure.longitude
-  //             ) {
-  //               setIsFindDepartureModalOpen(true);
-  //             }
-  //             setRoomInfo((prev) => ({
-  //               ...prev,
-  //               roomUUID,
-  //               isValid: true,
-  //               roomName: response.data.roomName,
-  //               meetingDate: response.data.roomTime,
-  //               centerPlace: response.data.roomStartCenter,
-  //               attendees: response.data.attendees,
-  //               roomPurpose: response.data.roomPurpose,
-  //               hostUUID: response.data.hostUUID,
-  //             }));
-  //             if (response.data.hostUUID === myUUID) {
-  //               setUserInfo((prev) => ({
-  //                 ...prev,
-  //                 isHost: true,
-  //               }));
-  //             }
-  //           } else {
-  //             navigate("/invalid-room");
-  //           }
-  //         } else {
-  //           navigate(`/room/${roomUUID}/join`);
-  //         }
-  //       } else {
-  //         navigate("/invalid-room");
-  //       }
-  //     } catch (error) {
-  //       console.error("방 유효성 검사 실패:", error);
-  //       setRoomInfo((prev) => ({
-  //         ...prev,
-  //         isValid: false,
-  //       }));
-  //       navigate("/invalid-room");
-  //     }
-  //   };
+          if (
+            myAttendeeInfo &&
+            (!myAttendeeInfo.address ||
+              !myAttendeeInfo.lat ||
+              !myAttendeeInfo.lon)
+          ) {
+            setIsFindDepartureModalOpen(true);
+          }
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID,
+            isValid: true,
+            roomName: response.data.roomName,
+            meetingDate: response.data.roomTime,
+            centerPlace: response.data.roomStartCenter,
+            attendees: response.data.attendees,
+            roomPurpose: response.data.roomPurpose,
+            hostUUID: response.data.hostUUID,
+          }));
+          setUserInfo((prev) => ({
+            ...prev,
+            isHost: response.data.isHost,
+            departure: {
+              addressText: myAttendeeInfo.address,
+              latitude: myAttendeeInfo.lat,
+              longitude: myAttendeeInfo.lon,
+            },
+            nickname: myAttendeeInfo.nickname,
+            duration: myAttendeeInfo.duration,
+            route: myAttendeeInfo.route,
+            myUUID,
+          }));
+          await connect();
+          await joinSession();
+        } else {
+          navigate(`/room/${roomUUID}/join`);
+        }
+      } catch (error) {
+        console.error("방 유효성 검사 실패:", error);
+        navigate("/invalid-room");
+      }
+    };
 
-  //   checkRoomValidity();
-  // }, [roomUUID, navigate, setRoomInfo, userInfo.departure]);
+    checkRoomValidity();
+  }, [roomUUID, navigate, setRoomInfo, setUserInfo, connect, joinSession]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);

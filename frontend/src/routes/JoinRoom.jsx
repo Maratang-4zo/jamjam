@@ -124,29 +124,16 @@ function JoinRoom() {
   const { register, handleSubmit } = useForm();
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
-  const { subscribe } = useWs();
-  const { joinSession } = useOpenVidu();
 
   const attendRoomFn = async (data) => {
     try {
       const response = await axiosAttendRoom(roomUUID, data.nickname);
-
-      // ws, wRTC 연결 요청
-      subscribe(roomUUID, response.data.attendeeUUID);
-      await joinSession(roomUUID, response.data.attendeeUUID);
 
       // 참가자 정보 저장
       setUserInfo((prev) => ({
         ...prev,
         myUUID: response.data.attendeeUUID,
         nickname: data.nickname,
-      }));
-
-      // 방 정보 저장
-      setRoomInfo((prev) => ({
-        ...prev,
-        roomUUID,
-        isValid: true,
       }));
 
       navigate(`/room/${roomUUID}`);

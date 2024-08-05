@@ -11,6 +11,8 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 
 import com.maratang.jamjam.domain.room.service.RoomService;
+import com.maratang.jamjam.global.room.RoomTokenProvider;
+import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 
 import lombok.RequiredArgsConstructor;
 

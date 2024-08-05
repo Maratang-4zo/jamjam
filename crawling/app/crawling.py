@@ -26,7 +26,6 @@ def get_places(keyword):
     places = []
 
     for station_name in df['C1']:
-    # station_name = '범계역'
 
         # 요청 파라미터
         center_lon, center_lat = get_station_info(station_name)

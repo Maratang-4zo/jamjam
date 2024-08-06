@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.service.AttendeeService;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
+import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
@@ -61,6 +62,14 @@ public class RoomController {
 	@Operation(summary = "✨ 방 정보 변경하기", description = "방에 대한 정보를 변경한다.")
 	public ResponseEntity<?> updateRoom(@PathVariable UUID roomUUID, @RequestBody RoomUpdateReq roomUpdateReq) {
 		roomService.updateRoom(roomUUID, roomUpdateReq);
+
+		return ResponseEntity.status(HttpStatus.OK).body(null);
+	}
+
+	@PatchMapping("/{roomUUID}/move")
+	@Operation(summary = "✨ 방 중심 위치 수정", description = "방 중심 위치 수정이 게임끝나고 모임위치 결정하고 나면 보낸다.")
+	public ResponseEntity<?> moveRoom(@PathVariable UUID roomUUID, @RequestBody RoomMoveReq roomMoveReq) {
+		roomService.moveRoom(roomUUID, roomMoveReq);
 
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}

@@ -25,6 +25,7 @@ import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,20 +46,24 @@ public class LoginController {
 
 	@GetMapping("/authorize")
 	@Operation(summary = "카카오 로그인 요청", description = "redirect uri로 리다이렉트합니다.")
-	public void redirectToKakao(HttpServletResponse httpServletResponse) throws IOException {
+	public void redirectToKakao(@RequestParam("redirectUri") String clientRedirectUri, HttpServletRequest request, HttpServletResponse httpServletResponse) throws IOException {
 		String authorizeUrl = "https://kauth.kakao.com/oauth/authorize"
 			+ "?response_type=code"
 			+ "&client_id=" + clientId
 			+ "&redirect_uri=" + redirectUri;
+
+		HttpSession session = request.getSession();
+		session.setAttribute("clientRedirectUri", clientRedirectUri);
+
 		httpServletResponse.sendRedirect(authorizeUrl);
 	}
 
 	@GetMapping("/oauth/kakao/callback")
 	@Operation(summary = "로그인", description = "인가 코드를 사용하여 액세스 토큰을 받아와서 로그인 처리합니다.")
-	public void oauthLogin(@RequestParam("code") String code,
-		HttpServletResponse httpServletResponse) throws IOException {
+	public void oauthLogin(@RequestParam("code") String code, HttpServletRequest request,
+		HttpServletResponse response) throws IOException {
 
-		// 인가 코드로 액세스 토큰 요청
+		// 인가 코드로 kakao 액세스 토큰 요청
 		String accessToken = getAccessToken(code);
 
 		// 액세스 토큰을 이용해 로그인 처리
@@ -67,12 +72,23 @@ public class LoginController {
 		Cookie cookie = new Cookie("refreshToken", loginRes.getRefreshToken());
 		cookie.setPath("/");
 		cookie.setHttpOnly(true);
-		// cookie.setSecure(true);
+		cookie.setSecure(true);
 
-		httpServletResponse.addCookie(cookie);
-		httpServletResponse.addHeader("accessToken", loginRes.getAccessToken());
+		Cookie aceessTokencookie = new Cookie("accessToken", loginRes.getAccessToken());
+		cookie.setPath("/");
 
-		httpServletResponse.sendRedirect("https://jjam.shop/");
+		response.addCookie(cookie);
+		response.addCookie(aceessTokencookie);
+
+		HttpSession session = request.getSession();
+		String clientRedirectUri = (String) session.getAttribute("clientRedirectUri");
+
+		log.info(clientRedirectUri);
+		if (clientRedirectUri.isEmpty()) {
+			// clientRedirectUri = "http://localhost:3000/"; // 기본 리디렉션 URL
+			clientRedirectUri = "https://jjam.shop/";
+		}
+		response.sendRedirect(clientRedirectUri);
 		// httpServletResponse.sendRedirect("http://70.12.114.94:3000/");
 	}
 

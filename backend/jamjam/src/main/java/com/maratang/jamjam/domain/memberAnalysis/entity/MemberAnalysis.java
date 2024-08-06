@@ -23,8 +23,6 @@ public class MemberAnalysis {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long memberAnalysisId;
 
-	private String rate;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
@@ -33,12 +31,17 @@ public class MemberAnalysis {
 	@JoinColumn(name = "game_id")
 	private Game game;
 
+	private int gameCount;
+
+	private int gameWinCount;
+
 	@Builder
-	public MemberAnalysis(Long memberAnalysisId, String rate, Member member, Game game) {
+	public MemberAnalysis(Long memberAnalysisId, String rate, Member member, Game game, int gameCount, int gameWinCount) {
 		this.memberAnalysisId = memberAnalysisId;
-		this.rate = rate;
 		this.member = member;
 		this.game = game;
+		this.gameCount = gameCount;
+		this.gameWinCount = gameWinCount;
 	}
 }
 

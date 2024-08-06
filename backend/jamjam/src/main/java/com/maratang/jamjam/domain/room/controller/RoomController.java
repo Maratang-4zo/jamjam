@@ -19,6 +19,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -67,9 +68,9 @@ public class RoomController {
 	@GetMapping("/{roomUUID}/middle")
 	@Operation(summary = "✨ 중심점 찾기", description = "그라함 알고리즘을 사용해서 방의 사용자의 좌표들을 읽어서 중심점을 찾는다")
 	public ResponseEntity<?> getMiddleStation(@PathVariable UUID roomUUID){
-		SubwayInfo startStation = roomService.getMiddleStation(roomUUID);
+		RoomMiddleRes roomMiddleRes = roomService.getMiddleStation(roomUUID);
 
-		return ResponseEntity.status(HttpStatus.OK).body(startStation);
+		return ResponseEntity.status(HttpStatus.OK).body(roomMiddleRes);
 	}
 
 	@GetMapping("/{roomUUID}/around")

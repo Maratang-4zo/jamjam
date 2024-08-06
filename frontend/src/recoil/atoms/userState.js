@@ -11,8 +11,9 @@ export const userInfoAtom = atom({
       latitude: null,
       longitude: null,
     },
-    time: null,
-    route: null,
+    duration: null, //소요시간
+    route:
+      "ydrdFc{aeW@??@@r@DfBDv@I@Bh@J|@Px@^j@n@As@AHLmA`BW\\g@p@aChDoAbBy@hA", //중심지까지 경로
     profile: null, // 이미지
     nickname: "김민경",
     email: "",

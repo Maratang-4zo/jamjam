@@ -3,23 +3,21 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { chatAtom, roomAtom } from "../recoil/atoms/roomState";
+import { playerState } from "../recoil/atoms/playerState";
 
-const API_BASE_URL = "http://i11a604.p.ssafy.io:8080/api/ws";
+const API_BASE_URL = "https://jjam.shop";
 
 const useWs = () => {
   const [connected, setConnected] = useState(false);
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const client = useRef({});
   const roomInfo = useRecoilValue(roomAtom);
+  const [players, setPlayers] = useRecoilState(playerState);
 
   const connect = () => {
     return new Promise((resolve, reject) => {
       client.current = new Client({
-        webSocketFactory: () => new SockJS(API_BASE_URL),
-        connectHeaders: {
-          roomUUID: roomInfo.roomUUID,
-          attendeeUUID: roomInfo.hostUUID,
-        },
+        webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
         debug: function (str) {
           console.log(str);
         },
@@ -42,18 +40,9 @@ const useWs = () => {
 
   const subscribe = () => {
     setConnected(true);
-    client.current.subscribe(
-      `/sub/rooms/${roomInfo.roomUUID}`,
-      (message) => {
-        handleMessage(JSON.parse(message.body));
-      },
-      {
-        headers: {
-          roomUUID: roomInfo.roomUUID,
-          attendeeUUID: roomInfo.hostUUID,
-        },
-      },
-    );
+    client.current.subscribe(`/sub/rooms/${roomInfo.roomUUID}`, (message) => {
+      handleMessage(JSON.parse(message.body));
+    });
   };
 
   const disconnect = () => {
@@ -72,34 +61,33 @@ const useWs = () => {
       case "ROOM_UPDATE":
         updateRoomStatus(message);
         break;
+      case "AVATAR_POSITION": // 게임관련 메시지
+        handleAvatarPosition(message);
       default:
         console.error("Unknown message type:", message.type);
     }
   };
 
-  const sendChat = (content) => {
+  const sendChat = ({ content }) => {
     client.current.publish({
       destination: `/pub/chat/send`,
       body: JSON.stringify({
         content,
       }),
-      headers: {
-        roomUUID: roomInfo.roomUUID,
-        attendeeUUID: roomInfo.hostUUID,
-      },
     });
   };
 
   const handleChatLogs = (message) => {
-    const { senderUUID, content } = message;
+    const { attendeeUUID, content, createdAt } = message;
     const attendant = roomInfo.attendants.find(
-      (attendee) => attendee.attendeeUUID === senderUUID,
+      (attendee) => attendee.attendeeUUID === attendeeUUID,
     );
     const nickname = attendant.nickname;
     const n = {
-      senderUUID,
+      attendeeUUID,
       nickname,
       content,
+      createdAt,
     };
     setChatLogs((prevChatLogs) => [...prevChatLogs, n]);
     console.log(message);
@@ -107,6 +95,26 @@ const useWs = () => {
 
   const updateRoomStatus = (message) => {
     console.log("Room status updated:", message);
+  };
+
+  const handleAvatarPosition = (message) => {
+    setPlayers((prevPlayers) => {
+      const updatedPlayers = prevPlayers.map((player) =>
+        player.attendeeUUID === message.attendeeUUID
+          ? { ...player, bottom: message.bottom }
+          : player,
+      );
+      return updatedPlayers;
+    });
+  };
+
+  const sendGame = ({ newBottom }) => {
+    if (client.current) {
+      client.current.publish({
+        destination: `/pub/game/updatePosition`,
+        body: JSON.stringify({ bottom: newBottom }),
+      });
+    }
   };
 
   useEffect(() => {
@@ -121,8 +129,10 @@ const useWs = () => {
     chatLogs,
     sendChat,
     connect,
+    subscribe,
     disconnect,
     handleMessage,
+    sendGame,
   };
 };
 

@@ -26,8 +26,8 @@ public enum ErrorCode {
 	REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT005", "해당 refresh token은 존재하지 않습니다."),
 	REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AT006", "해당 refresh token은 만료되었습니다."),
 	NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "AT007", "해당 토큰은 access token이 아닙니다."),
-	FORBIDDEN_ADMIN(HttpStatus.FORBIDDEN, "AT008", "관리자 ROLE이 아닙니다."),
-	ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT009", "kakao access token이 발급되지 않았습니다."),
+	ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT008", "access token이 존재하지 않습니다."),
+	// FORBIDDEN_ADMIN(HttpStatus.FORBIDDEN, "AT009", "관리자 ROLE이 아닙니다."),
 
 	// member
 	INVALID_MEMBER_TYPE(HttpStatus.BAD_REQUEST, "MB001", "잘못된 회원 타입입니다.(memberType : KAKAO"),
@@ -57,10 +57,14 @@ public enum ErrorCode {
 	// room
 	ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "RM001", "미팅룸을 찾을 수 없습니다."),
 	ROOM_CANNOT_ENTER(HttpStatus.BAD_REQUEST, "RM002", "미팅룸에 참여할 수 없습니다."),
+	ROOM_NOT_OPEN_FOUND(HttpStatus.NOT_FOUND, "RM003", "미팅룸이 종료되었습니다."),
 
 	// middle
 	MIDDLE_SOMEONE_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI001","위치를 선택안한 사람이 존재합니다."),
-	MIDDLE_EVERY_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI002","아무도 위치를 선택하지 않았습니다.");
+	MIDDLE_EVERY_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI002","아무도 위치를 선택하지 않았습니다."),
+	MIDDLE_NOT_FOUND_STATION_LOCATION(HttpStatus.NOT_FOUND, "MI003","중간 지점 주변 역이 존재하지 않습니다."),
+	MIDDLE_NOT_FOUND_PURPOSE_LOCATION(HttpStatus.NOT_FOUND, "MI004","해당하는 방 목적지는 없습니다. 유효 목적지 (스터디룸, 식당, 카페)"),
+	MIDDLE_NOT_SET_START_LOCATION(HttpStatus.NOT_FOUND, "MI005","먼저 방의 중심점을 먼저 설정해주세요");
 
 	private final HttpStatus status;
 	private final String code;

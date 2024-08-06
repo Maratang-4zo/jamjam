@@ -15,6 +15,6 @@ public class LocalInfoService {
 	private final LocalInfoRepository localInfoRepository;
 
 	public List<LocalInfoRes> getLocalInfoList(String stationName, String category) {
-		return localInfoRepository.findAll(stationName, category);
+		return localInfoRepository.selectAllByStationNameAndCategory(stationName, category);
 	}
 }

@@ -10,6 +10,12 @@ import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
 import { axiosUpdateUserInfo } from "../apis/mapApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { axiosIsRoomValid } from "../apis/roomApi";
+import { getCookie } from "../utils/Cookies";
+import { jwtDecode } from "jwt-decode";
+import useWs from "../hooks/useWs";
+import useOpenVidu from "../hooks/useOpenVidu";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -23,6 +29,8 @@ const Wrapper = styled.div`
 `;
 
 function Room() {
+  const { roomUUID } = useParams();
+  const navigate = useNavigate();
   const [isFindDepartureModalOpen, setIsFindDepartureModalOpen] =
     useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -32,10 +40,72 @@ function Room() {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const { connect } = useWs();
+  const { joinSession } = useOpenVidu();
 
   useEffect(() => {
-    setIsFindDepartureModalOpen(true);
-  }, []);
+    const checkRoomValidity = async () => {
+      try {
+        const response = await axiosIsRoomValid({ roomUUID });
+        const roomToken = getCookie("roomToken");
+        if (roomToken) {
+          const myUUID = jwtDecode(roomToken).attendeeUUID;
+          const myAttendeeInfo = response.data.attendees.find(
+            (attendee) => attendee.attendeeUUID === myUUID,
+          );
+
+          if (
+            myAttendeeInfo &&
+            (!myAttendeeInfo.address ||
+              !myAttendeeInfo.lat ||
+              !myAttendeeInfo.lon)
+          ) {
+            setIsFindDepartureModalOpen(true);
+          }
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID,
+            isValid: true,
+            roomName: response.data.roomName,
+            meetingDate: response.data.roomTime,
+            centerPlace: response.data.roomStartCenter,
+            attendees: {
+              departure: {
+                address: response.data.attendees.address,
+                lat: response.data.attendees.lat,
+                lon: response.data.attendees.lon,
+              },
+              ...response.data.attendees,
+            },
+            roomPurpose: response.data.roomPurpose,
+            hostUUID: response.data.hostUUID,
+          }));
+          setUserInfo((prev) => ({
+            ...prev,
+            isHost: response.data.isHost,
+            departure: {
+              addressText: myAttendeeInfo.address,
+              latitude: myAttendeeInfo.lat,
+              longitude: myAttendeeInfo.lon,
+            },
+            nickname: myAttendeeInfo.nickname,
+            duration: myAttendeeInfo.duration,
+            route: myAttendeeInfo.route,
+            myUUID,
+          }));
+          await connect();
+          await joinSession();
+        } else {
+          navigate(`/room/${roomUUID}/join`);
+        }
+      } catch (error) {
+        console.error("방 유효성 검사 실패:", error);
+        navigate("/invalid-room");
+      }
+    };
+
+    checkRoomValidity();
+  }, [roomUUID, navigate, setRoomInfo, setUserInfo, connect, joinSession]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);
@@ -59,19 +129,20 @@ function Room() {
       }));
     }
 
-    setRoomInfo((prev) => ({
-      ...prev,
-      meetingDate,
-    }));
-
-    try {
-      await axiosUpdateUserInfo({
-        addressText,
-        latitude,
-        longitude,
-      });
-    } catch (err) {
-      console.error("사용자 정보 업데이트 실패");
+    if (roomInfo.meetingDate !== meetingDate) {
+      setRoomInfo((prev) => ({
+        ...prev,
+        meetingDate,
+      }));
+      try {
+        await axiosUpdateUserInfo({
+          addressText,
+          latitude,
+          longitude,
+        });
+      } catch (err) {
+        console.error("사용자 정보 업데이트 실패");
+      }
     }
   };
 

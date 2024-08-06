@@ -45,3 +45,7 @@ token:
   secret: ${TOKEN_CLIENT_SECRET}
   access-token-expiration-time: ${ACCESS_TOKEN_EXPIRATION_TIME}
   refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
+otp:
+  user:
+    client:
+      url: ${OTP_USER_CLIENT_URL}

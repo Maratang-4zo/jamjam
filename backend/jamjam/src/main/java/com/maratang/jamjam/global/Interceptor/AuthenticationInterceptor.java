@@ -29,8 +29,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		Exception {
 
 		// 1. Authorization Header 검증
-
-		String authorizationHeader = request.getHeader("Authorization");
+		String authorizationHeader;
+		try {
+			authorizationHeader = request.getHeader("Authorization");
+		}catch (Exception e) {
+			throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
+		}
 		AuthorizationHeaderUtils.validateAuthorization(authorizationHeader);
 
 		// 2. 토큰 검증

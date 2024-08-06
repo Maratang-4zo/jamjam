@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = `http://jjam.shop`;
+const BASE_URL = `https://jjam.shop`;
 
 // 중심 장소 정보 가져오기
 export function axiosGetMiddle({ roomUUID }) {
@@ -11,7 +11,6 @@ export function axiosGetMiddle({ roomUUID }) {
     .then((res) => {
       console.log("중심장소 가져오기 완료");
       console.log(res);
-      return res.data;
     })
     .catch((err) => {
       console.error("중심장소 가져오기 실패");
@@ -20,18 +19,24 @@ export function axiosGetMiddle({ roomUUID }) {
 }
 
 export function axiosUpdateUserInfo({ address, lat, lon }) {
-  return axios
-    .patch(BASE_URL + `/api/attendees`, {
-      address,
-      lat,
-      lon,
-    })
-    .then((res) => {
-      console.log("사용자 정보 업데이트 완료");
-      return res.data;
-    })
-    .catch((err) => {
-      console.error("사용자 정보 업데이트 실패");
-      console.log(err);
-    });
+  return axios.patch(BASE_URL + `/api/attendees`, {
+    address,
+    lat,
+    lon,
+  });
+}
+
+export function axiosGetThreeStations({ roomUUID }) {
+  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/around`);
+}
+
+export function axiosGetAroundStores({ stationName, category }) {
+  return axios.get(
+    BASE_URL +
+      `/api/local-info?stationName=${stationName}&category=${category}`,
+  );
+}
+
+export function axiosPatchNextMiddle({ roomUUID }) {
+  return axios.patch(BASE_URL + `/api/rooms/${roomUUID}/move`);
 }

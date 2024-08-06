@@ -15,7 +15,7 @@ public class LocalInfoRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	public List<LocalInfoRes> findAll(String stationName, String category) {
+	public List<LocalInfoRes> selectAllByStationNameAndCategory(String stationName, String category) {
 
 		String sql = "SELECT * FROM local_info WHERE is_deleted = 0 AND station_name = ? AND category = ?";
 
@@ -25,5 +25,10 @@ public class LocalInfoRepository {
 			stationName,
 			category
 		);
+	}
+
+	public int countAllByStationNameAndCategory(String stationName, String category) {
+		String sql = "SELECT COUNT(*) FROM local_info WHERE is_deleted = 0 AND station_name = ? AND category = ?";
+		return jdbcTemplate.queryForObject(sql, new Object[] {stationName, category}, Integer.class);
 	}
 }

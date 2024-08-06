@@ -13,8 +13,6 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   border-bottom: 3px solid ${(props) => props.theme.accentColor};
-  border-left: 3px solid ${(props) => props.theme.accentColor};
-  border-right: 3px solid ${(props) => props.theme.accentColor};
   position: relative;
 `;
 
@@ -33,6 +31,10 @@ const Right = styled.div`
   flex: 1 0 0;
 `;
 
+const LoginP = styled.p`
+  cursor: pointer;
+`;
+
 function NavBarUp() {
   const [isModalVisible, setModalVisible] = useState(false);
 
@@ -48,7 +50,7 @@ function NavBarUp() {
         </Left>
         <Link to={`/`}>로고자리입니다</Link>
         <Right>
-          <p onClick={toggleModal}>LOGIN</p>
+          <LoginP onClick={toggleModal}>LOGIN</LoginP>
         </Right>
       </Wrapper>
       <LoginModal isVisible={isModalVisible} toggleModal={toggleModal} />

@@ -315,15 +315,19 @@ public class RoomService {
 			.map(attendee -> new Point(attendee.getLat(), attendee.getLon()))
 			.collect(Collectors.toList());
 
-		List<Point> grahamPoints = grahamScan.convexHull(points);
+		String startStation = room.getStartStation();
 
-		Point centroid = geometryUtils.calculateCentroid(grahamPoints);
+		if (startStation == null){
+			throw new BusinessException(ErrorCode.MIDDLE_NOT_SET_START_LOCATION);
+		}
 
 		Map<String, SubwayInfo> subwayMap = subwayDataLoader.getSubwayInfoMap();
 
 		double searchRadius = 5.0; // 5km
 
-		List<SubwayInfo> aroundStations = haversineDistance.aroundStation(subwayMap, centroid.getX(), centroid.getY(), searchRadius, room.getPurpose());
+		SubwayInfo point = subwayMap.get(startStation);
+
+		List<SubwayInfo> aroundStations = haversineDistance.aroundStation(subwayMap, point.getLatitude(), point.getLongitude(), searchRadius, room.getPurpose());
 
 		if (aroundStations == null || aroundStations.isEmpty()) {
 			throw new BusinessException(ErrorCode.MIDDLE_NOT_FOUND_STATION_LOCATION);

@@ -7,13 +7,21 @@ import {
   useNavermaps,
 } from "react-naver-maps";
 import { useRecoilValue } from "recoil";
-import { roomAtom } from "../../recoil/atoms/roomState";
+import {
+  isGameFinishAtom,
+  isNextMiddleExistAtom,
+  roomAtom,
+  selectedStationAtom,
+} from "../../recoil/atoms/roomState";
 import useDecoding from "../../hooks/useDecoding";
 import ColorThief from "colorthief";
 
 function MyMap() {
   const navermaps = useNavermaps();
   const roomInfo = useRecoilValue(roomAtom);
+  const selectedStation = useRecoilValue(selectedStationAtom);
+  const isGameFinish = useRecoilValue(isGameFinishAtom);
+  const isNextMiddleExist = useRecoilValue(isNextMiddleExistAtom);
   const [map, setMap] = useState(null);
   const [attendeeDepartures, setAttendeeDepartures] = useState([]);
   const [visibleDurationIndex, setVisibleDurationIndex] = useState(null);
@@ -77,7 +85,8 @@ function MyMap() {
           }
 
           return {
-            ...attendee.departure,
+            lat: attendee.lat,
+            lon: attendee.lon,
             nickname: attendee.nickname,
             profileImageUrl: attendee.profileImageUrl,
             route,
@@ -124,26 +133,43 @@ function MyMap() {
   useEffect(() => {
     if (map) {
       const bounds = new navermaps.LatLngBounds();
-      attendeeDepartures.forEach((departure) => {
-        bounds.extend(new navermaps.LatLng(departure.lat, departure.lon));
-      });
 
-      if (roomInfo.isCenterExist) {
+      if (selectedStation && isGameFinish && !isNextMiddleExist) {
         bounds.extend(
           new navermaps.LatLng(
-            roomInfo.centerPlace.latitude,
-            roomInfo.centerPlace.longitude,
+            selectedStation.latitude,
+            selectedStation.longitude,
           ),
         );
-      }
+        selectedStation.stores.forEach((store) => {
+          bounds.extend(new navermaps.LatLng(store.latitude, store.longitude));
+        });
+        map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
+      } else {
+        attendeeDepartures.forEach((departure) => {
+          bounds.extend(new navermaps.LatLng(departure.lat, departure.lon));
+        });
 
-      map.fitBounds(bounds);
+        if (roomInfo.isCenterExist) {
+          bounds.extend(
+            new navermaps.LatLng(
+              roomInfo.centerPlace.latitude,
+              roomInfo.centerPlace.longitude,
+            ),
+          );
+        }
+
+        map.fitBounds(bounds);
+      }
     }
   }, [
     map,
     attendeeDepartures,
     roomInfo.isCenterExist,
     roomInfo.centerPlace,
+    selectedStation,
+    isGameFinish,
+    isNextMiddleExist,
     navermaps,
   ]);
 
@@ -177,19 +203,22 @@ function MyMap() {
               `,
             }}
           />
-          <Polyline
-            path={departure.route.map(
-              (point) => new navermaps.LatLng(point[0], point[1]),
-            )}
-            clickable={true}
-            strokeColor={departure.color}
-            strokeStyle={"solid"}
-            strokeWeight={5}
-            strokeOpacity={1}
-            strokeLineJoin={"miter"}
-            strokeLineCap={"round"}
-            onClick={() => handlePolylineClick(index)}
-          />
+          {isGameFinish ? null : (
+            <Polyline
+              path={departure.route.map(
+                (point) => new navermaps.LatLng(point[0], point[1]),
+              )}
+              clickable={true}
+              strokeColor={departure.color}
+              strokeStyle={"solid"}
+              strokeWeight={5}
+              strokeOpacity={1}
+              strokeLineJoin={"miter"}
+              strokeLineCap={"round"}
+              onClick={() => handlePolylineClick(index)}
+            />
+          )}
+
           {visibleDurationIndex === index && (
             <Marker
               position={
@@ -209,7 +238,7 @@ function MyMap() {
           )}
         </React.Fragment>
       ))}
-      {roomInfo.isCenterExist && (
+      {roomInfo.isCenterExist && !isGameFinish ? (
         <Marker
           position={
             new navermaps.LatLng(
@@ -218,7 +247,23 @@ function MyMap() {
             )
           }
         />
-      )}
+      ) : null}
+      {selectedStation &&
+        isGameFinish &&
+        !isNextMiddleExist &&
+        selectedStation.stores.map((store, index) => (
+          <Marker
+            key={index}
+            position={new navermaps.LatLng(store.latitude, store.longitude)}
+            title={store.name}
+            onClick={() =>
+              window.open(
+                `https://map.naver.com/v5/search/${store.name}`,
+                "_blank",
+              )
+            }
+          />
+        ))}
     </NaverMap>
   );
 }

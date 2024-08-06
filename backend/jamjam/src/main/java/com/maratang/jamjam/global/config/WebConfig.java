@@ -1,11 +1,17 @@
 package com.maratang.jamjam.global.config;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.maratang.jamjam.global.Interceptor.AuthenticationInterceptor;
+import com.maratang.jamjam.global.Interceptor.RoomAuthenticationInterceptor;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,16 +20,22 @@ import lombok.RequiredArgsConstructor;
 public class WebConfig implements WebMvcConfigurer {
 
 	private final AuthenticationInterceptor authenticationInterceptor;
+	private final RoomAuthenticationInterceptor roomAuthenticationInterceptor;
 
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**")
-			.allowedOriginPatterns("*")
-			.allowCredentials(true)
-			.maxAge(3600)
-			.allowedHeaders("*")
-			.allowedMethods("*");
+	@Bean
+	public FilterRegistrationBean<CorsFilter> corsFilter() {
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowCredentials(true);
+		config.addAllowedOriginPattern("*");
+		config.addAllowedHeader("*");
+		config.addAllowedMethod("*");
+		config.setMaxAge(3600L);
+		source.registerCorsConfiguration("/**", config);
 
+		FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+		bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		return bean;
 	}
 
 	@Override
@@ -33,5 +45,8 @@ public class WebConfig implements WebMvcConfigurer {
 			.addPathPatterns("/members/**");
 			// .excludePathPatterns("/login", "/logout");
 
+		registry.addInterceptor(roomAuthenticationInterceptor)
+			.addPathPatterns("/wr/**");
 	}
+
 }

@@ -98,5 +98,8 @@ public class Room extends BaseTimeEntity {
 		this.startStation = startStation;
 	}
 
+	public boolean isRoomClosed(){
+		return this.roomStatus == RoomStatus.FINISHED || this.roomStatus == RoomStatus.ABORTED;
+	}
 }
 

@@ -100,6 +100,9 @@ public class RoomTokenProvider {
 		try {
 			claims = Jwts.parser().setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
 				.parseClaimsJws(token).getBody();
+		} catch (ExpiredJwtException e){
+			log.info("만료된 토큰", e);
+			throw new BusinessException(ErrorCode.AU_TOKEN_EXPIRED);
 		} catch (Exception e) {
 			log.info("유효하지 않은 토큰", e);
 			throw new BusinessException(ErrorCode.AU_NOT_VALID_TOKEN);

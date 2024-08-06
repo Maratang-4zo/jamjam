@@ -1,13 +1,12 @@
 package com.maratang.jamjam.global.station;
 
-import java.io.InputStream;
-import java.util.Map;
-
+import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
+import java.io.InputStream;
+import java.util.Map;
 
 @Component
 public class SubwayDataLoader {
@@ -29,5 +28,9 @@ public class SubwayDataLoader {
 
 	public Map<String, SubwayInfo> getSubwayInfoMap() {
 		return subwayMap;
+	}
+
+	public SubwayInfo getSubwayInfo(String subwayName) {
+		return subwayMap.get(subwayName);
 	}
 }

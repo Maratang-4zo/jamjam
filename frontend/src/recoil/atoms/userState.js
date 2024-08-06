@@ -3,17 +3,19 @@ import { atom } from "recoil";
 export const userInfoAtom = atom({
   key: "userInfo",
   default: {
-    isHost: false,
+    myUUID: "abcd1234",
+    isHost: true,
     isLogin: false,
     departure: {
       addressText: "",
       latitude: null,
       longitude: null,
     },
-    time: null,
-    route: null,
+    duration: null, //소요시간
+    route:
+      "ydrdFc{aeW@??@@r@DfBDv@I@Bh@J|@Px@^j@n@As@AHLmA`BW\\g@p@aChDoAbBy@hA", //중심지까지 경로
     profile: null, // 이미지
-    nickname: "",
+    nickname: "김민경",
     email: "",
     winningRate: {},
     meetingHistory: [],

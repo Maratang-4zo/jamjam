@@ -1,6 +1,7 @@
 package com.maratang.jamjam.domain.room.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,10 +22,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -76,6 +74,7 @@ public class Room extends BaseTimeEntity {
 	@PrePersist
 	protected void onCreate() {
 		this.roomUUID = UUID.randomUUID();
+		this.attendees = new ArrayList<>();
 	}
 
 	public void updateAttendee(Attendee attendee) {

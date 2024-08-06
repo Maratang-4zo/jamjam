@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { roomAtom } from "../../recoil/atoms/roomState";
+import { chatModalVisibleAtom, roomAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
 import TutorialModal from "./Tutorial";
@@ -92,10 +92,12 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
   const roomState = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const setRoomState = useSetRecoilState(roomAtom);
+  const setChatVisible = useSetRecoilState(chatModalVisibleAtom);
 
   const openTutorialModal = () => {
     setIsTutorialModalOpen(true);
     document.body.classList.add("modal-open");
+    setChatVisible(false); // 채팅 모달을 닫음
   };
 
   const closeTutorialModal = () => {
@@ -105,7 +107,7 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
 
   const handleFindCenter = async () => {
     try {
-      const data = await axiosGetMiddle({ roomId: roomState.roomId });
+      const data = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
       setRoomState((prev) => ({
         ...prev,
         centerPlace: data,

@@ -8,6 +8,5 @@ import lombok.Getter;
 @Getter
 public class AttendeeCreateReq {
 	@NotBlank
-	private UUID roomUUID;
 	private String nickname;
 }

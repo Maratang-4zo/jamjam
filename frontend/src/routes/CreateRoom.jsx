@@ -7,8 +7,13 @@ import "../index.css";
 import { useForm, Controller } from "react-hook-form";
 import { axiosCreateRoom } from "../apis/roomApi";
 import { useNavigate } from "react-router-dom";
-import { getCookie } from "../utils/Cookies";
 import useWs from "../hooks/useWs";
+import { jwtDecode } from "jwt-decode";
+import { useRecoilState } from "recoil";
+import { roomAtom } from "../recoil/atoms/roomState";
+import { getCookie } from "../utils/Cookies";
+import useOpenVidu from "../hooks/useOpenVidu";
+import { userInfoAtom } from "../recoil/atoms/userState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -18,21 +23,20 @@ const Wrapper = styled.div`
   border: 3px solid ${(props) => props.theme.accentColor};
   display: flex;
   flex-direction: column;
-  align-items: center;
+  overflow: hidden;
 `;
 
 const Content = styled.div`
   background-image: url(${Background});
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
-  width: 90%;
+  width: ${(props) => props.theme.wrapperWidth};
   flex: 1;
-  margin-top: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding-top: 200px; /* 입력창들을 위로 옮기기 위한 패딩 */
+  justify-content: center;
 `;
 
 const FormWrapper = styled.form`
@@ -46,6 +50,7 @@ const InputWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative; /* 추가 */
 `;
 
 const Label = styled.label`
@@ -54,11 +59,21 @@ const Label = styled.label`
   min-width: 100px; /* 라벨의 최소 너비 설정 */
 `;
 
+const DatePickerWrapper = styled.div`
+  position: relative;
+  width: 200px; /* 추가 */
+`;
+
 const DatePickerStyled = styled(DatePicker)`
   padding: 10px;
   font-size: 16px;
-  width: 200px;
+  width: 100%; /* 수정 */
   box-sizing: border-box;
+  border: 3px solid ${(props) => props.theme.textColor};
+  &:focus {
+    outline: none;
+    border: 3px solid ${(props) => props.theme.bgColor};
+  }
 `;
 
 const Select = styled.select`
@@ -66,6 +81,23 @@ const Select = styled.select`
   font-size: 16px;
   width: 200px;
   box-sizing: border-box;
+  border: 3px solid ${(props) => props.theme.textColor};
+  &:focus {
+    outline: none;
+    border: 3px solid ${(props) => props.theme.bgColor};
+  }
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  font-size: 16px;
+  width: 200px;
+  box-sizing: border-box;
+  border: 3px solid ${(props) => props.theme.textColor};
+  &:focus {
+    border: 3px solid ${(props) => props.theme.bgColor};
+    outline: none;
+  }
 `;
 
 const Button = styled.button`
@@ -73,12 +105,18 @@ const Button = styled.button`
   height: 50px;
   flex-shrink: 0;
   border-radius: 15px;
-  border: 3px solid var(--Color, #000);
   background: #fff;
   margin-top: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  &:hover {
+    background-color: ${(props) => props.theme.infoColor};
+    transition: 0.3s;
+  }
+  &:focus {
+    border: 3px solid ${(props) => props.theme.bgColor};
+  }
 `;
 
 const ButtonText = styled.p`
@@ -94,28 +132,31 @@ const ErrorBox = styled.div`
 
 function CreateRoom() {
   const navigate = useNavigate();
+  const { createSession } = useOpenVidu();
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
   } = useForm();
-  const { connect } = useWs();
 
   const createRoomFn = async (data) => {
-    let roomUUID, attendeeUUID;
-    axiosCreateRoom(data.purpose, data.meetingDate.toISOString(), data.nickname)
-      .then(() => {
-        roomUUID = getCookie("roomUUID");
-        attendeeUUID = getCookie("attendeeUUID");
-      })
-      .then(() => {
-        connect(roomUUID, attendeeUUID);
-      })
-      .then(() => {
-        // navigate(`/room/${roomUUID}`); 제가 진짜에요 주인님 밑에 녀석은 가짜입니다
-        navigate(`/room/:roomid`);
-      });
+    try {
+      const response = await axiosCreateRoom(
+        data.purpose,
+        data.meetingDate.toISOString(),
+        data.nickname,
+      );
+
+      const roomToken = getCookie("roomToken");
+      const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
+
+      await createSession();
+
+      navigate(`/room/${roomUUID}`);
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
   return (
@@ -125,24 +166,30 @@ function CreateRoom() {
         <FormWrapper onSubmit={handleSubmit(createRoomFn)}>
           <InputWrapper>
             <Label>닉네임:</Label>
-            <input type="text" {...register("nickname")} />
+            <Input
+              placeholder="닉네임을 입력하세요"
+              type="text"
+              {...register("nickname")}
+            />
           </InputWrapper>
           <InputWrapper>
             <Label>모임 날짜:</Label>
-            <Controller
-              name="meetingDate"
-              control={control}
-              defaultValue={null}
-              rules={{ required: "날짜를 선택하세요" }}
-              render={({ field }) => (
-                <DatePickerStyled
-                  selected={field.value}
-                  onChange={(date) => field.onChange(date)}
-                  dateFormat="yyyy/MM/dd"
-                  placeholderText="날짜를 선택하세요"
-                />
-              )}
-            />
+            <DatePickerWrapper>
+              <Controller
+                name="meetingDate"
+                control={control}
+                defaultValue={null}
+                rules={{ required: "날짜를 선택하세요" }}
+                render={({ field }) => (
+                  <DatePickerStyled
+                    selected={field.value}
+                    onChange={(date) => field.onChange(date)}
+                    dateFormat="yyyy/MM/dd"
+                    placeholderText="날짜를 선택하세요"
+                  />
+                )}
+              />
+            </DatePickerWrapper>
           </InputWrapper>
 
           <InputWrapper>

@@ -1,5 +1,6 @@
 package com.maratang.jamjam.domain.attendee.entity;
 
+import java.util.Random;
 import java.util.UUID;
 
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
@@ -7,6 +8,7 @@ import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.memberRoundRecord.entity.MemberRoundRecord;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
+import com.maratang.jamjam.global.room.constant.ProfileType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,9 +61,16 @@ public class Attendee extends BaseTimeEntity {
 	@JoinColumn(name = "member_round_record_id")
 	private MemberRoundRecord memberRoundRecord;
 
+	private Long duration; // 소요시간 (단위: 초)
+	private String route; // 경로
+
+	@Enumerated(EnumType.STRING)
+	private ProfileType profileImageUrl;
+
 	@Builder
 	public Attendee(Long attendeeId, String nickname, Member member, Room room, UUID attendeeUUID,
-		AttendeeStatus attendeeStatus, Double lat, Double lon, String address, MemberRoundRecord memberRoundRecord) {
+		AttendeeStatus attendeeStatus, Double lat, Double lon, String address,
+		MemberRoundRecord memberRoundRecord, Long duration, String route, ProfileType profileImageUrl) {
 		this.attendeeId = attendeeId;
 		this.nickname = nickname;
 		this.member = member;
@@ -72,11 +81,15 @@ public class Attendee extends BaseTimeEntity {
 		this.lon = lon;
 		this.address = address;
 		this.memberRoundRecord = memberRoundRecord;
+		this.duration = duration;
+		this.route = route;
+		this.profileImageUrl = profileImageUrl;
 	}
 
 	@PrePersist
 	protected void onCreate() {
 		this.attendeeUUID = UUID.randomUUID();
+		this.profileImageUrl = ProfileType.values()[new Random().nextInt(ProfileType.values().length)];
 	}
 
 	public void updateAttendeeLocation(AttendeeUpdateReq attendeeUpdateReq) {
@@ -92,5 +105,16 @@ public class Attendee extends BaseTimeEntity {
 	public void updateStatus(AttendeeStatus attendeeStatus) {
 		this.attendeeStatus = attendeeStatus;
 	}
-}
 
+	public void updateDuration(Long duration) {
+		this.duration = duration;
+	}
+
+	public void updateRoute(String route) {
+		this.route = route;
+	}
+
+	public void updateProfileImageUrl(ProfileType profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
+}

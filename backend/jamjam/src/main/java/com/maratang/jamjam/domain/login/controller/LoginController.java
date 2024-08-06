@@ -75,11 +75,11 @@ public class LoginController {
 		cookie.setHttpOnly(true);
 		cookie.setSecure(true);
 
-		Cookie aceessTokencookie = new Cookie("accessToken", loginRes.getAccessToken());
-		cookie.setPath("/");
+		Cookie aceessTokenCookie = new Cookie("accessToken", loginRes.getAccessToken());
+		aceessTokenCookie.setPath("/");
 
 		response.addCookie(cookie);
-		response.addCookie(aceessTokencookie);
+		response.addCookie(aceessTokenCookie);
 
 		HttpSession session = request.getSession();
 		String clientRedirectUri = (String) session.getAttribute("clientRedirectUri");

@@ -82,7 +82,9 @@ public class HaversineDistance {
 		nearbyStations.sort(
 			Comparator.comparingDouble(info -> calculateDistance(latitude, longitude, info.getLatitude(), info.getLongitude())));
 
-		// 상위 3개 요소만 반환
-		return nearbyStations.stream().limit(3).collect(Collectors.toList());
+		return nearbyStations.stream()
+			.skip(1)    // 첫 1개 요소를 건너뜀
+			.limit(3)   // 그 다음 3개 요소를 선택
+			.collect(Collectors.toList());
 	}
 }

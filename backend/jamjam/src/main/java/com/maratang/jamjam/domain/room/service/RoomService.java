@@ -19,6 +19,7 @@ import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.board.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCloseReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
+import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
@@ -334,6 +335,14 @@ public class RoomService {
 		}
 
 		return aroundStations;
+	}
+
+	@Transactional
+	public void moveRoom(UUID roomUUID, RoomMoveReq roomMoveReq) {
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		room.updateStartStation(roomMoveReq.getStartStation());
 	}
 }
 

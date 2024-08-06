@@ -26,7 +26,7 @@ export function axiosUpdateUserInfo({ address, lat, lon }) {
   });
 }
 
-export function axiosGetThreeStations({ roomUUID }) {
+export function axiosGetThreeStations(roomUUID) {
   return axios.get(BASE_URL + `/api/rooms/${roomUUID}/around`);
 }
 

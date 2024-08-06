@@ -61,7 +61,7 @@ const useWs = () => {
       case "ROOM_UPDATE":
         updateRoomStatus(message);
         break;
-      case "AVATAR_POSITION": // 게임관련 메시지
+      case "AVATAR_POSITION":
         handleAvatarPosition(message);
       default:
         console.error("Unknown message type:", message.type);

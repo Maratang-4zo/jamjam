@@ -193,3 +193,11 @@ export const currentRoundAtom = atom({
   key: "currentRound",
   default: 1,
 });
+
+export const currentSpeakersAtom = atom({
+  key: "currentSpeakers",
+  default: [
+    // "d58414fc-762d-4688-a2d7-abda358ef09d",
+    "d58414fc-762d-4688-a2d7-abda358ef08d",
+  ],
+});

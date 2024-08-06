@@ -61,7 +61,9 @@ public enum ErrorCode {
 
 	// middle
 	MIDDLE_SOMEONE_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI001","위치를 선택안한 사람이 존재합니다."),
-	MIDDLE_EVERY_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI002","아무도 위치를 선택하지 않았습니다.");
+	MIDDLE_EVERY_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI002","아무도 위치를 선택하지 않았습니다."),
+	MIDDLE_NOT_FOUND_STATION_LOCATION(HttpStatus.NOT_FOUND, "MI003","중간 지점 주변 역이 존재하지 않습니다."),
+	MIDDLE_NOT_FOUND_PURPOSE_LOCATION(HttpStatus.NOT_FOUND, "MI004","해당 목적지는 없습니다.");
 
 	private final HttpStatus status;
 	private final String code;

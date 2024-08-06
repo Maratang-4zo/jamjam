@@ -93,5 +93,10 @@ public class Room extends BaseTimeEntity {
 	public void updateStation(String station){
 		this.startStation = station;
 	}
+
+	public void updateStartStation(String startStation){
+		this.startStation = startStation;
+	}
+
 }
 

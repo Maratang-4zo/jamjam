@@ -23,6 +23,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomCloseReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.mapper.RoomMapper;
@@ -94,7 +95,7 @@ public class RoomService {
 	}
 
 	@Transactional
-	public SubwayInfo getMiddleStation(UUID roomUUID) {
+	public RoomMiddleRes getMiddleStation(UUID roomUUID) {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
@@ -125,7 +126,15 @@ public class RoomService {
 
 		saveOptimalRoutesForUsersInRoomToDatabase(room, selectedStation);
 
-		return selectedStation;
+		room.updateStartStation(selectedStation.getName());
+
+		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
+		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
+
+		return RoomMiddleRes.builder()
+			.roomCenterStart(selectedStation)
+			.attendees(attendeeList)
+			.build();
 	}
 
 	@Transactional

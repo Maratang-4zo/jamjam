@@ -26,15 +26,15 @@ export function axiosUpdateUserInfo({ address, lat, lon }) {
   });
 }
 
+export function axiosGetThreeStations({ roomUUID }) {
+  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/around`);
+}
+
 export function axiosGetAroundStores({ stationName, category }) {
   return axios.get(
     BASE_URL +
       `/api/local-info?stationName=${stationName}&category=${category}`,
   );
-}
-
-export function axiosGetThreeStations({ roomUUID }) {
-  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/around`);
 }
 
 export function axiosPatchNextMiddle({ roomUUID }) {

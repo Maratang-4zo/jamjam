@@ -248,22 +248,40 @@ function MyMap() {
           }
         />
       ) : null}
-      {selectedStation &&
-        isGameFinish &&
-        !isNextMiddleExist &&
-        selectedStation.stores.map((store, index) => (
+      {selectedStation && isGameFinish && !isNextMiddleExist && (
+        <>
           <Marker
-            key={index}
-            position={new navermaps.LatLng(store.latitude, store.longitude)}
-            title={store.name}
-            onClick={() =>
-              window.open(
-                `https://map.naver.com/v5/search/${store.name}`,
-                "_blank",
+            position={
+              new navermaps.LatLng(
+                selectedStation.latitude,
+                selectedStation.longitude,
               )
             }
+            icon={{
+              content: `
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <span style="border: 2px solid black; background: white; padding: 2px 5px; border-radius: 10px; font-size: 13px; color: black;">
+                    ${selectedStation.name}
+                  </span>
+                </div>
+              `,
+            }}
           />
-        ))}
+          {selectedStation.stores.map((store, index) => (
+            <Marker
+              key={index}
+              position={new navermaps.LatLng(store.latitude, store.longitude)}
+              title={store.name}
+              onClick={() =>
+                window.open(
+                  `https://map.naver.com/v5/search/${store.name}`,
+                  "_blank",
+                )
+              }
+            />
+          ))}
+        </>
+      )}
     </NaverMap>
   );
 }

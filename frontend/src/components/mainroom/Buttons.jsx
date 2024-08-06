@@ -286,7 +286,7 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
   const userInfo = useRecoilValue(userInfoAtom);
   const setRoomState = useSetRecoilState(roomAtom);
   const setChatVisible = useSetRecoilState(chatModalVisibleAtom);
-  const isGameFinish = useRecoilValue(isGameFinishAtom);
+  const [isGameFinish, setIsGameFinishAtom] = useRecoilState(isGameFinishAtom);
   const isNextMiddleExist = useRecoilValue(isNextMiddleExistAtom);
   const aroundStations = useRecoilValue(aroundStationsAtom);
   const [selectedStation, setSelectedStation] =
@@ -390,11 +390,15 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
     setCurrentRound((prev) => (prev += 1));
     navigate(`/room/${roomState.roomUUID}/gamechoice`);
     setSelectedStation(null);
+    setIsGameFinishAtom(false);
+    setIsNextMiddleExist(false);
   };
 
   const handleFinalResultBtnClick = () => {
     navigate(`/room/${roomState.roomUUID}/result`);
     setSelectedStation(null);
+    setIsGameFinishAtom(false);
+    setIsNextMiddleExist(false);
   };
 
   const handleClickOutside = (e) => {

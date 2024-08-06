@@ -3,7 +3,7 @@ import { atom } from "recoil";
 export const roomAtom = atom({
   key: "roomState",
   default: {
-    roomUUID: null,
+    roomUUID: "27ac6a00-a9cc-45cb-8734-83854c1f5735",
     roomName: "방 이름 예시",
     meetingDate: "2024-08-15T02:00:32.000Z",
     roomPurpose: "",

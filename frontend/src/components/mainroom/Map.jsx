@@ -158,6 +158,9 @@ function MyMap() {
       ref={setMap}
       scrollWheel={false}
       draggable={false}
+      disableDoubleClickZoom={true}
+      disableDoubleTapZoom={true}
+      disableTwoFingerTapZoom={true}
     >
       {attendeeDepartures.map((departure, index) => (
         <React.Fragment key={index}>

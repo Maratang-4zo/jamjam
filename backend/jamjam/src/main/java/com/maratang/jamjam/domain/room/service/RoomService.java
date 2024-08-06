@@ -173,11 +173,10 @@ public class RoomService {
 		// 3. 방장
 		// 3-1. 모임 결정 완료) 다른 사람들도 DONE 표시하고 로비로 모셔다드리기
 		// 3-2. 모임 결정 미완료) 다른 사람들을 내쫓기
-		Room room = roomRepository.findByRoomUUID(roomUUID)
-			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		if (room.getRoot().getAttendeeUUID().equals(attendeeUUID)) {
-			closeRoom(roomUUID, attendeeUUID, null);
-		}
+		// Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		// if(room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
+		// 	closeRoom(roomUUID, attendeeUUID, null);
+		// }
 	}
 
 	public void closeRoom(UUID roomUUID, UUID attendeeUUID, RoomCloseReq roomCloseReq) {

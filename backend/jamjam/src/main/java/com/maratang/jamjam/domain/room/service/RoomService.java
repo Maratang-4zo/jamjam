@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.context.annotation.Lazy;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,17 +33,17 @@ import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.station.Point;
 import com.maratang.jamjam.global.station.SubwayDataLoader;
 import com.maratang.jamjam.global.station.SubwayInfo;
+import com.maratang.jamjam.global.ws.BroadCastService;
+import com.maratang.jamjam.global.ws.BroadCastType;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Lazy})
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RoomService {
-	@Lazy
-	private final SimpMessagingTemplate messagingTemplate;
-	private final String ROOM_SUBSCRIBE_DEST = "/sub/rooms/";
+	private final BroadCastService broadCastService;
 	private final RoomRepository roomRepository;
 	private final AttendeeRepository attendeeRepository;
 	private final GrahamScan grahamScan;
@@ -128,9 +126,10 @@ public class RoomService {
 
 		// 3. 기존 인원들에게 알림
 		AttendeeInfo attendeeInfo = AttendeeMapper.INSTANCE.attendeeToAttendeeInfo(attendee);
-		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST + roomUUID, attendeeInfo, Map.of("type", "ROOM_ENTER"));
+		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ENTER);
 	}
 
+	@Transactional
 	public void leaveRoom(UUID roomUUID, UUID attendeeUUID) {
 		// 1. 현재 접속중인 사람 목록에서 제거한다.
 		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUUID)
@@ -140,7 +139,7 @@ public class RoomService {
 
 		// 2. 참여자가 떠남을 알리기
 		AttendeeInfo attendeeInfo = AttendeeMapper.INSTANCE.attendeeToAttendeeInfo(attendee);
-		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST + roomUUID, attendeeInfo, Map.of("type", "ROOM_LEAVE"));
+		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_LEAVE);
 
 		// 3. 방장
 		// 3-1. 모임 결정 완료) 다른 사람들도 DONE 표시하고 로비로 모셔다드리기
@@ -168,14 +167,13 @@ public class RoomService {
 		}
 		roomRepository.save(room);
 
-		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST + roomUUID, "쫓겨나랏!!", Map.of("type", "ROOM_CLOSE"));
-
+		broadCastService.broadcastToRoom(roomUUID, "쫓겨나랏!!", BroadCastType.ROOM_CLOSE);
 	}
 
 	public void updateAttendeeInfo(UUID roomUUID, AttendeeUpdateReq attendeeUpdateReq) {
 		// 1. DB 상태 변경
 		// 2. 참여자들에게 알리기
-		messagingTemplate.convertAndSend(ROOM_SUBSCRIBE_DEST, "", Map.of("type", "ATTENDEE_UPDATE"));
+		broadCastService.broadcastToRoom(roomUUID, "", BroadCastType.ATTENDEE_UPDATE);
 	}
 
 	public RoomGetRes findRoom(UUID roomUUID, String roomToken) {

@@ -8,6 +8,9 @@ WORKDIR /app
 # 컨테이너 내부로 package.json 파일들을 복사
 COPY package*.json ./
 
+# node_modules 폴더와 package-lock.json 파일 삭제
+RUN rm -rf node_modules package-lock.json
+
 # package.json 및 package-lock.json 파일에 명시된 의존성 패키지들을 설치
 RUN npm install
 

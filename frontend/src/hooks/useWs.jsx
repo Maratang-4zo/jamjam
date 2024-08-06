@@ -3,6 +3,7 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { chatAtom, roomAtom } from "../recoil/atoms/roomState";
+import { playerState } from "../recoil/atoms/playerState";
 
 const API_BASE_URL = "https://jjam.shop";
 
@@ -11,6 +12,7 @@ const useWs = () => {
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const client = useRef({});
   const roomInfo = useRecoilValue(roomAtom);
+  const [players, setPlayers] = useRecoilState(playerState);
 
   const connect = () => {
     return new Promise((resolve, reject) => {
@@ -59,6 +61,8 @@ const useWs = () => {
       case "ROOM_UPDATE":
         updateRoomStatus(message);
         break;
+      case "AVATAR_POSITION": // 게임관련 메시지
+        handleAvatarPosition(message);
       default:
         console.error("Unknown message type:", message.type);
     }
@@ -93,6 +97,26 @@ const useWs = () => {
     console.log("Room status updated:", message);
   };
 
+  const handleAvatarPosition = (message) => {
+    setPlayers((prevPlayers) => {
+      const updatedPlayers = prevPlayers.map((player) =>
+        player.attendeeUUID === message.attendeeUUID
+          ? { ...player, bottom: message.bottom }
+          : player,
+      );
+      return updatedPlayers;
+    });
+  };
+
+  const sendGame = ({ newBottom }) => {
+    if (client.current) {
+      client.current.publish({
+        destination: `/pub/game/updatePosition`,
+        body: JSON.stringify({ bottom: newBottom }),
+      });
+    }
+  };
+
   useEffect(() => {
     connect();
     return () => {
@@ -108,6 +132,7 @@ const useWs = () => {
     subscribe,
     disconnect,
     handleMessage,
+    sendGame,
   };
 };
 

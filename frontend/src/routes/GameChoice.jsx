@@ -1,9 +1,13 @@
 import GameBoxes from "../components/gamechoice/GameBoxes";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import NavBarLeft from "../components/fixed/NavBarLeft";
 import wavebutton from "../assets/wavebutton.svg";
+import { roomAtom } from "../recoil/atoms/roomState";
+import { playerState } from "../recoil/atoms/playerState";
+import { userInfoAtom } from "../recoil/atoms/userState";
 
 const GlobalStyle = createGlobalStyle`
   body, html {
@@ -43,7 +47,7 @@ const Header = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  margin-right: 40px;s
+  margin-right: 40px;
   width: calc(100% - 150px);
   display: flex;
   flex-direction: column;
@@ -77,6 +81,19 @@ function GameChoice() {
   const [selectedGame, setSelectedGame] = useState(null);
   const navigate = useNavigate();
   const { roomUUID } = useParams();
+  const roomInfo = useRecoilValue(roomAtom);
+  const userInfo = useRecoilValue(userInfoAtom);
+  const setPlayerState = useSetRecoilState(playerState);
+
+  useEffect(() => {
+    const initialPlayers = roomInfo.attendees.map((attendee) => ({
+      nickname: attendee.nickname,
+      attendeeUUID: attendee.attendeeUUID,
+      profile: userInfo.profile,
+      bottom: 0,
+    }));
+    setPlayerState(initialPlayers);
+  }, [roomInfo, userInfo, setPlayerState]);
 
   const handlePlayButtonClick = () => {
     if (selectedGame != null) {

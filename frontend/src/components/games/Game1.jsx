@@ -40,7 +40,7 @@ const Countdown = styled.div`
   color: #000;
 `;
 
-function Game1({ handleClick }) {
+function Game1({ handleClick, onWin }) {
   const [bottom, setBottom] = useState(0);
   const [win, setWin] = useState(false);
   const [countdown, setCountdown] = useState(4);
@@ -69,6 +69,7 @@ function Game1({ handleClick }) {
                 if (newBottom >= 480) {
                   setWin(true);
                   setWinner(player.nickname); // 승리자 설정
+                  onWin();
                 }
                 sendGame({ newBottom });
                 return { ...player, bottom: newBottom };
@@ -80,7 +81,7 @@ function Game1({ handleClick }) {
         }
       };
     }
-  }, [countdown, handleClick, win, winner, roomUUID, attendeeUUID]);
+  }, [countdown, handleClick, win, winner, roomUUID, attendeeUUID, onWin]);
 
   return (
     <>

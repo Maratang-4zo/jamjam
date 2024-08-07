@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import wavebutton from "../assets/wavebutton.svg";
@@ -10,6 +11,8 @@ import { roomAtom } from "../recoil/atoms/roomState";
 import useWs from "../hooks/useWs";
 import useOpenVidu from "../hooks/useOpenVidu";
 import axios from "axios";
+import Cookies from "js-cookie";
+
 const APP_KEY = process.env.REACT_APP_KAKAO_CLIENT_ID;
 const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
 // const link = `https://jjam.shop/api/login/authorize?redirectUri=`;
@@ -47,7 +50,8 @@ const KakaotalkButton = styled.button`
   background-image: url(${wavebutton});
   background-size: 100% 100%;
   border: none;
-  display: flex;
+  display: ${(props) =>
+    props.hide ? "none" : "flex"}; // 로그인 버튼 숨기기 조건 추가
   justify-content: center;
   align-items: center;
   position: relative;
@@ -67,6 +71,8 @@ const OrText = styled.h3`
   font-weight: 500;
   text-align: center;
   margin: 35px 0;
+  display: ${(props) =>
+    props.hide ? "none" : "block"}; // 'or' 텍스트 숨기기 조건 추가
 `;
 
 const NicknameInput = styled.div`
@@ -153,6 +159,14 @@ function JoinRoom() {
   const { register, handleSubmit } = useForm();
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+
+  useEffect(() => {
+    const token = Cookies.get("accessToken");
+    if (token) {
+      setIsLoggedIn(true); // accessToken이 있으면 로그인 상태로 설정
+    }
+  }, []);
 
   const attendRoomFn = async (data) => {
     try {
@@ -176,7 +190,9 @@ function JoinRoom() {
       <NavBarUp />
       <Container>
         <KakaotalkButton>
-          <a href="https://jjam.shop/api/login/authorize?redirectUri=/room/:roomUUID/join">
+          <a
+            href={`https://jjam.shop/api/login/authorize?redirectUri=/room/${roomUUID}/join`}
+          >
             카카오톡으로 로그인
           </a>
         </KakaotalkButton>

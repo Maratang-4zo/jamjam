@@ -1,6 +1,7 @@
 import styled, { keyframes } from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};

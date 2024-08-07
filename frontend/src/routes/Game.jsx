@@ -12,6 +12,7 @@ import {
   roomAtom,
 } from "../recoil/atoms/roomState";
 import { axiosGetAroundStores, axiosGetThreeStations } from "../apis/mapApi";
+import Loading from "../components/fixed/Loading";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
@@ -76,12 +77,14 @@ function Game() {
   const roomInfo = useRecoilValue(roomAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
   const setIsGameFinishAtom = useSetRecoilState(isGameFinishAtom);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleWin = () => {
     setShowButton(true); // 승리 시 버튼 표시
   };
 
   const handleNextPageBtn = async () => {
+    setIsLoading(true);
     const data = await axiosGetThreeStations(roomInfo.roomUUID);
     try {
       const aroundStationsData = await Promise.all(
@@ -101,6 +104,8 @@ function Game() {
       navigate(`/room/${roomInfo.roomUUID}`);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -108,6 +113,7 @@ function Game() {
     <Wrapper>
       <NavBarLeft />
       <ContentWrapper>
+        {isLoading ? <Loading message={"장소 로딩"} /> : null}
         <GameScreen onClick={() => handleClick.current()}>
           {selectedGame === 1 && (
             <Game1 handleClick={handleClick} onWin={handleWin} />

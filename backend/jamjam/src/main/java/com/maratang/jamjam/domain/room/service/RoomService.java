@@ -23,6 +23,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.mapper.RoomMapper;
@@ -202,6 +203,11 @@ public class RoomService {
 		// 1. DB 상태 변경
 		// 2. 참여자들에게 알리기
 		broadCastService.broadcastToRoom(roomUUID, "", BroadCastType.ATTENDEE_UPDATE);
+	}
+
+	public RoomRes isRoomExist(UUID roomUUID){
+		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		return RoomMapper.INSTANCE.roomToRoomRes(room);
 	}
 
 	public RoomGetRes findRoom(UUID roomUUID, String roomToken) {

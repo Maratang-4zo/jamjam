@@ -21,6 +21,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomRes;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -91,7 +92,7 @@ public class RoomController {
 	}
 
 	@GetMapping("/{roomUUID}")
-	@Operation(summary = "✨ 방 존재 유무 확인", description = "방이 존재하지 않거나, 중단, 종료 된 방은 404 에러 처리한다.")
+	@Operation(summary = "✨ 방 정보 받기", description = "방에 대한 정보를 받습니다.")
 	public ResponseEntity<?> getRoom(@PathVariable UUID roomUUID, HttpServletRequest request){
 		Cookie[] cookies = request.getCookies();
 		String roomToken = null;
@@ -113,6 +114,14 @@ public class RoomController {
 
 		return ResponseEntity.status(HttpStatus.OK).body(roomGetRes);
 	}
+
+	@GetMapping("/{roomUUID}/exists")
+	@Operation(summary = "✨ 방 존재 유무 확인", description = "방이 존재하지 않거나, 중단, 종료 된 방은 404 에러 처리한다.")
+	public ResponseEntity<?> isRoomExist(@PathVariable UUID roomUUID){
+		RoomRes roomGetRes = roomService.isRoomExist(roomUUID);
+		return ResponseEntity.status(HttpStatus.OK).body(roomGetRes);
+	}
+
 
 	@PostMapping("/{roomUUID}/join")
 	@Operation(summary = "✨ 참여자가 방에 입장한다.", description = "사용자가 방에 입장한다. cookie(roomToken)을 준다, 해당 방에 참여자를 추가한다.")

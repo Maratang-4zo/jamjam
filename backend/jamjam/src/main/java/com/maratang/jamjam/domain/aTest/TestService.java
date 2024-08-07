@@ -39,7 +39,7 @@ public class TestService {
 		// messagingTemplate.convertAndSendToUser(userId, "/sub/rooms/" + roomUuid, dtoList);
 	}
 
-	public List<RoomRes> getAllRoom() {
+	public List<RoomTestRes> getAllRoom() {
 		return RoomMapper.INSTANCE.roomListToRoomResList(roomRepository.findAll());
 	}
 

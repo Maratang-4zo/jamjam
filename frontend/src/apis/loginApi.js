@@ -9,7 +9,7 @@ const getAccessTokenFromCookie = () => {
 
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
-  baseURL: `http://localhost:8080`,
+  baseURL: `https://jjam.shop`,
   withCredentials: true,
 });
 

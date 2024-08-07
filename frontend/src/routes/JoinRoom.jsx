@@ -12,7 +12,7 @@ import useOpenVidu from "../hooks/useOpenVidu";
 import axios from "axios";
 const APP_KEY = process.env.REACT_APP_KAKAO_CLIENT_ID;
 const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
-// const link = `https://jjam.shop/api/login/authorize`;
+// const link = `https://jjam.shop/api/login/authorize?redirectUri=`;
 // const link = `http://70.12.114.94:8080/api/login/authorize`;
 
 // const loginHandler = () => {
@@ -176,7 +176,7 @@ function JoinRoom() {
       <NavBarUp />
       <Container>
         <KakaotalkButton>
-          <a href="https://jjam.shop/api/login/authorize">
+          <a href="https://jjam.shop/api/login/authorize?redirectUri=">
             카카오톡으로 로그인
           </a>
         </KakaotalkButton>

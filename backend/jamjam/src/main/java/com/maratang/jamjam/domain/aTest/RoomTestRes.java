@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class RoomRes {
+public class RoomTestRes {
 	private Long roomId;
 	private UUID roomUUID;
 }

@@ -15,8 +15,8 @@ function GameBox() {
   useEffect(() => {
     const fetchWinRates = async () => {
       try {
-        const response = await axiosGetWinRate();
-        setWinRates(response.data.winRates); // winRates 배열을 가져온다고 가정
+        const winRates = await axiosGetWinRate();
+        setWinRates(winRates);
       } catch (error) {
         console.error("승률 가져오기 실패", error);
       }

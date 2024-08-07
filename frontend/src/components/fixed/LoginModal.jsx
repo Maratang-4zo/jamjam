@@ -57,7 +57,9 @@ function LoginModal({ isVisible, toggleModal }) {
       <SideModal isVisible={isVisible}>
         <button onClick={toggleModal}>Close</button>
         <KakaotalkButton>
-          <p>카카오톡 로그인</p>
+          <a href="https://jjam.shop/api/login/authorize?redirectUri=/">
+            카카오톡으로 로그인
+          </a>
         </KakaotalkButton>
       </SideModal>
     </>

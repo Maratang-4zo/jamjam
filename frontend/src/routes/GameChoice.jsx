@@ -89,7 +89,7 @@ function GameChoice() {
     const initialPlayers = roomInfo.attendees.map((attendee) => ({
       nickname: attendee.nickname,
       attendeeUUID: attendee.attendeeUUID,
-      profile: userInfo.profile,
+      profileImageUrl: attendee.profileImageUrl,
       bottom: 0,
     }));
     setPlayerState(initialPlayers);

@@ -2,7 +2,7 @@ import React from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import polygon from "../../assets/polygon.svg";
 import YellowChatBubble from "../../assets/YellowChatBubble.svg"; // Assuming the correct path
-
+import stairs from "../../assets/game/stairs.gif";
 const GamesContainer = styled.div`
   display: flex;
   justify-content: center;

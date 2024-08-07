@@ -12,6 +12,7 @@ import {
   roomAtom,
 } from "../recoil/atoms/roomState";
 import { axiosGetAroundStores, axiosGetThreeStations } from "../apis/mapApi";
+import gameBg from "../assets/game/gameBg.jpg";
 import Loading from "../components/fixed/Loading";
 
 const Wrapper = styled.div`
@@ -30,6 +31,7 @@ const GameScreen = styled.div`
   flex-shrink: 0;
   border-radius: 30px;
   background: #fff;
+  background-image: url(${gameBg});
   position: relative; // Position relative to contain the absolute positioning of Block and WinMessage
   display: flex;
   align-items: center;

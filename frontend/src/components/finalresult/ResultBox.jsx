@@ -1,4 +1,4 @@
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import Round1 from "./Round1";
 import Round2 from "./Round2";
 import Round3 from "./Round3";
@@ -13,32 +13,6 @@ const Container = styled.div`
   outline: 3px solid black; /* 3px outline 추가 */
 `;
 
-const fadeIn = keyframes`
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: 20px;
-  margin-top: 20px;
-  animation: ${fadeIn} 2s ease-in-out;
-`;
-
-const AnimatedButton = styled.button`
-  padding: 10px 20px;
-  font-size: 1rem;
-  border: none;
-  cursor: pointer;
-  background-color: ${(props) => props.theme.accentColor};
-  color: white;
-  transition: transform 0.3s;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-`;
-
 function ResultBox() {
   return (
     <>
@@ -47,10 +21,6 @@ function ResultBox() {
         {round === 2 && <Round2 />}
         {round === 3 && <Round3 />}
       </Container>
-      <ButtonContainer>
-        <AnimatedButton>SHARE</AnimatedButton>
-        <AnimatedButton>MAIN</AnimatedButton>
-      </ButtonContainer>
     </>
   );
 }

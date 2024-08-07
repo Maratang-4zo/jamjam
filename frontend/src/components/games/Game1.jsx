@@ -4,19 +4,28 @@ import { useRecoilState } from "recoil";
 import { playerState } from "../../recoil/atoms/playerState";
 import { useLocation } from "react-router-dom";
 import useWs from "../../hooks/useWs";
-import sendGame from "../../hooks/useWs";
+import minGang from "../../assets/Mingang.png";
+
+const BlockContainer = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  height: 100%;
+`;
 
 const Block = styled.div`
   width: 50px;
   height: 50px;
-  position: absolute;
-  bottom: ${(props) => props.bottom}px;
-  left: ${(props) => props.left}px;
   transition: bottom 0.1s;
-  background-image: url(${(props) => props.profile});
-  background-size: contain;
+  background-image: url(${(props) => props.profileImageUrl});
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  margin: 0 10px;
+  position: relative;
+  border-radius: 50%;
+  border: 1px solid black;
 `;
 
 const WinMessage = styled.div`
@@ -89,14 +98,15 @@ function Game1({ handleClick, onWin }) {
         <Countdown>{countdown === 1 ? "START" : countdown - 1}</Countdown>
       ) : (
         <>
-          {players.map((player, index) => (
-            <Block
-              key={player.attendeeUUID}
-              bottom={player.bottom}
-              profile={player.profile} // 각 플레이어의 프로필 이미지 설정
-              left={50 * index + 50} // 간격을 주어 중앙정렬
-            />
-          ))}
+          <BlockContainer>
+            {players.map((player, index) => (
+              <Block
+                key={player.attendeeUUID}
+                bottom={player.bottom}
+                profileImageUrl={player.profileImageUrl} // 각 플레이어의 프로필 이미지 설정
+              />
+            ))}
+          </BlockContainer>
           <WinMessage show={!!winner}>
             {winner && `${winner} WIN!!!`}
           </WinMessage>

@@ -1,10 +1,8 @@
 import React, { useRef } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
-
 import InfoBox from "../components/mypage/InfoBox";
 import MeetingBox from "../components/mypage/MeetingBox";
-
 const GlobalStyle = createGlobalStyle`
   body, html {
     margin: 0;
@@ -143,7 +141,6 @@ const Mypage = () => {
           <InfoContainer ref={infoBoxRef}>
             <InfoBox />
           </InfoContainer>
-
           <Subtitle>MEETING HISTORY</Subtitle>
           <MeetingContainer ref={meetingBoxRef}>
             <MeetingBox />

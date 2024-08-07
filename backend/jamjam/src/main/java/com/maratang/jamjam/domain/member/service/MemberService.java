@@ -11,7 +11,6 @@ import com.maratang.jamjam.domain.member.repository.MemberRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 

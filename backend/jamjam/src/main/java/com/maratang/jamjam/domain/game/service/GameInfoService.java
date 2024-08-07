@@ -22,4 +22,5 @@ public class GameInfoService {
 		List<Game> gameList = gameInfoRepository.findAll();
 		return GameInfoMapper.INSTANCE.gameListToGameInfoListRes(gameList);
 	}
+
 }

@@ -1,5 +1,7 @@
 package com.maratang.jamjam.domain.member.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,8 @@ import com.maratang.jamjam.domain.member.dto.response.MemberRes;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.member.mapper.MemberMapper;
 import com.maratang.jamjam.domain.member.service.MemberService;
+import com.maratang.jamjam.domain.memberAnalysis.dto.response.MemberAnalysisRes;
+import com.maratang.jamjam.domain.memberAnalysis.service.MemberAnalysisService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +33,7 @@ public class MemberController {
 
 	private final MemberService memberService;
 	private final MemberMapper memberMapper;
+	private final MemberAnalysisService memberAnalysisService;
 
 	@GetMapping("/info")
 	@Operation(summary = "유저 정보 보기", description = "유저의 정보를 출력한다.")
@@ -70,11 +75,14 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(memberRes);
 	}
 
-	/*
+
 	@GetMapping("/game-history")
 	@Operation(summary = "게임 히스토리 보기", description = "회원의 게임 기록을 본다.")
-	public ResponseEntity<List<>>
-	 */
+	public ResponseEntity<List<MemberAnalysisRes>> getMemberAnalysis(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+		String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
+		Member member = memberService.findMemberByEmail(memberEmail);
+		return ResponseEntity.ok().body(memberAnalysisService.getMemberAnalysis(member.getMemberId()));
+	}
 
 	/*
 	@GetMapping("/room-history")

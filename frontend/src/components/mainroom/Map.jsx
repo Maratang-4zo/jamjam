@@ -26,10 +26,11 @@ function MyMap() {
   const [attendeeDepartures, setAttendeeDepartures] = useState([]);
   const [visibleDurationIndex, setVisibleDurationIndex] = useState(null);
   const { decodePath } = useDecoding();
-  const [centerPoint, setCenterPoint] = useState({
+  const defaultCenter = {
     lat: 37.5012748,
     lon: 127.039625,
-  });
+  };
+  const [centerPoint, setCenterPoint] = useState(defaultCenter);
 
   const routeColor = {
     "https://github.com/user-attachments/assets/81c6e571-004e-4905-a563-98e315fd5413":
@@ -63,7 +64,7 @@ function MyMap() {
       const colorThief = new ColorThief();
       const departures = await Promise.all(
         roomInfo.attendees.map(async (attendee) => {
-          const route = decodePath(attendee.route);
+          const route = attendee.route ? decodePath(attendee.route) : null;
           let color = routeColor[attendee.profileImageUrl];
 
           if (!color) {
@@ -108,31 +109,13 @@ function MyMap() {
         lat: roomInfo.centerPlace.latitude,
         lon: roomInfo.centerPlace.longitude,
       });
-    } else {
-      const latSum = attendeeDepartures.reduce(
-        (sum, departure) => sum + (departure.lat || 0),
-        0,
-      );
-      const lonSum = attendeeDepartures.reduce(
-        (sum, departure) => sum + (departure.lon || 0),
-        0,
-      );
-      const count = attendeeDepartures.filter(
-        (departure) => departure.lat && departure.lon,
-      ).length;
-
-      if (count > 0) {
-        setCenterPoint({
-          lat: latSum / count,
-          lon: lonSum / count,
-        });
-      }
     }
-  }, [roomInfo.isCenterExist, roomInfo.centerPlace, attendeeDepartures]);
+  }, [roomInfo.isCenterExist, roomInfo.centerPlace]);
 
   useEffect(() => {
     if (map) {
       const bounds = new navermaps.LatLngBounds();
+      let hasValidLocation = false;
 
       if (selectedStation && isGameFinish && !isNextMiddleExist) {
         bounds.extend(
@@ -147,19 +130,29 @@ function MyMap() {
         map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
       } else {
         attendeeDepartures.forEach((departure) => {
-          bounds.extend(new navermaps.LatLng(departure.lat, departure.lon));
+          if (departure.lat && departure.lon) {
+            bounds.extend(new navermaps.LatLng(departure.lat, departure.lon));
+            hasValidLocation = true;
+          }
         });
 
-        if (roomInfo.isCenterExist) {
-          bounds.extend(
-            new navermaps.LatLng(
-              roomInfo.centerPlace.latitude,
-              roomInfo.centerPlace.longitude,
-            ),
+        if (hasValidLocation) {
+          if (roomInfo.isCenterExist) {
+            bounds.extend(
+              new navermaps.LatLng(
+                roomInfo.centerPlace.latitude,
+                roomInfo.centerPlace.longitude,
+              ),
+            );
+          }
+          map.fitBounds(bounds);
+        } else {
+          setCenterPoint(defaultCenter);
+          map.setCenter(
+            new navermaps.LatLng(defaultCenter.lat, defaultCenter.lon),
           );
+          map.setZoom(17);
         }
-
-        map.fitBounds(bounds);
       }
     }
   }, [
@@ -180,7 +173,7 @@ function MyMap() {
   return (
     <NaverMap
       defaultCenter={new navermaps.LatLng(centerPoint.lat, centerPoint.lon)}
-      defaultZoom={10}
+      defaultZoom={17}
       ref={setMap}
       scrollWheel={false}
       draggable={false}
@@ -188,56 +181,60 @@ function MyMap() {
       disableDoubleTapZoom={true}
       disableTwoFingerTapZoom={true}
     >
-      {attendeeDepartures.map((departure, index) => (
-        <React.Fragment key={index}>
-          <Marker
-            position={new navermaps.LatLng(departure.lat, departure.lon)}
-            icon={{
-              content: `
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                  <img src="${departure.profileImageUrl}" style="width:40px;height:40px;border-radius:50%;" />
-                  <span style="border: 2px solid black; background: white; padding: 2px 5px; border-radius: 10px; font-size: 13px; color: black; margin-top: 2px;">
-                    ${departure.nickname}
-                  </span>
-                </div>
-              `,
-            }}
-          />
-          {isGameFinish ? null : (
-            <Polyline
-              path={departure.route.map(
-                (point) => new navermaps.LatLng(point[0], point[1]),
-              )}
-              clickable={true}
-              strokeColor={departure.color}
-              strokeStyle={"solid"}
-              strokeWeight={5}
-              strokeOpacity={1}
-              strokeLineJoin={"miter"}
-              strokeLineCap={"round"}
-              onClick={() => handlePolylineClick(index)}
-            />
-          )}
-
-          {visibleDurationIndex === index && (
+      {attendeeDepartures
+        .filter((departure) => departure.lat && departure.lon)
+        .map((departure, index) => (
+          <React.Fragment key={index}>
             <Marker
-              position={
-                new navermaps.LatLng(
-                  departure.route[Math.floor(departure.route.length / 2)][0],
-                  departure.route[Math.floor(departure.route.length / 2)][1],
-                )
-              }
+              position={new navermaps.LatLng(departure.lat, departure.lon)}
               icon={{
                 content: `
-                  <div style="background: white; padding: 2px 5px; border-radius: 10px; border: 2px solid black; font-size: 13px; color: black;">
-                    ${departure.duration}
+                  <div style="display: flex; flex-direction: column; align-items: center;">
+                    <img src="${departure.profileImageUrl}" style="width:40px;height:40px;border-radius:50%;" />
+                    <span style="border: 2px solid ${departure.color}; background: white; padding: 2px 5px; border-radius: 10px; font-size: 13px; color: black; font-weight:600; margin-top: 2px;">
+                      ${departure.nickname}
+                    </span>
                   </div>
                 `,
+                anchor: new navermaps.Point(20, 20), // 마커 중심점을 이미지 중앙으로 조정
               }}
             />
-          )}
-        </React.Fragment>
-      ))}
+            {!isGameFinish && roomInfo.isCenterExist && departure.route && (
+              <Polyline
+                path={departure.route.map(
+                  (point) => new navermaps.LatLng(point[0], point[1]),
+                )}
+                clickable={true}
+                strokeColor={departure.color}
+                strokeStyle={"solid"}
+                strokeWeight={5}
+                strokeOpacity={1}
+                strokeLineJoin={"miter"}
+                strokeLineCap={"round"}
+                onClick={() => handlePolylineClick(index)}
+              />
+            )}
+
+            {visibleDurationIndex === index && (
+              <Marker
+                position={
+                  new navermaps.LatLng(
+                    departure.route[Math.floor(departure.route.length / 2)][0],
+                    departure.route[Math.floor(departure.route.length / 2)][1],
+                  )
+                }
+                icon={{
+                  content: `
+                    <div style="background: white; padding: 2px 5px; border-radius: 10px; border: 2px solid black; font-size: 13px; color: black;">
+                      ${departure.duration}
+                    </div>
+                  `,
+                  anchor: new navermaps.Point(10, 10), // 마커 중심점을 이미지 중앙으로 조정
+                }}
+              />
+            )}
+          </React.Fragment>
+        ))}
       {roomInfo.isCenterExist && !isGameFinish ? (
         <Marker
           position={
@@ -265,6 +262,7 @@ function MyMap() {
                   </span>
                 </div>
               `,
+              anchor: new navermaps.Point(10, 10), // 마커 중심점을 이미지 중앙으로 조정
             }}
           />
           {selectedStation.stores.map((store, index) => (

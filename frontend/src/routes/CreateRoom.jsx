@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { getCookie } from "../utils/Cookies";
 import useOpenVidu from "../hooks/useOpenVidu";
+import { useSetRecoilState } from "recoil";
+import { userInfoAtom } from "../recoil/atoms/userState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -128,6 +130,7 @@ const ErrorBox = styled.div`
 
 function CreateRoom() {
   const navigate = useNavigate();
+  const setUserInfo = useSetRecoilState(userInfoAtom);
   const { createSession } = useOpenVidu();
   const {
     register,
@@ -148,6 +151,11 @@ function CreateRoom() {
       const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
 
       await createSession();
+      setUserInfo((prev) => ({
+        ...prev,
+        myUUID: attendeeUUID,
+        isHost: true,
+      }));
 
       navigate(`/room/${roomUUID}`);
     } catch (error) {

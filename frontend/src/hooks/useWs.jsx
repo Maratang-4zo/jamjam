@@ -117,12 +117,12 @@ const useWs = () => {
     }
   };
 
-  useEffect(() => {
-    connect();
-    return () => {
-      disconnect();
-    };
-  }, []);
+  // useEffect(() => {
+  //   connect();
+  //   return () => {
+  //     disconnect();
+  //   };
+  // }, []);
 
   return {
     connected,

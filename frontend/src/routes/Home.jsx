@@ -1,27 +1,31 @@
+import React, { useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
+import { userInfoAtom } from "../recoil/atoms/userState";
+import Cookies from "js-cookie";
+import { getUserInfo } from "../apis/loginApi";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
-  width: 100vw; // 전체 뷰포트를 사용하도록 수정
-  height: 100vh; // 전체 화면을 채우도록 수정
+  width: 100vw;
+  height: 100vh;
   color: ${(props) => props.theme.textColor};
   border: 3px solid ${(props) => props.theme.accentColor};
-  overflow: hidden; // 내부 스크롤 제거
+  overflow: hidden;
 `;
 
 const Container = styled.div`
   width: 100%;
   height: 100%;
-  overflow-y: scroll; // 세로 스크롤 가능하도록 설정
-  scroll-snap-type: y mandatory; // 스크롤 스냅 설정
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
 `;
 
 const Section = styled.div`
-  height: 100vh; // 각 섹션이 전체 화면을 채우도록 설정
-  scroll-snap-align: start; // 스크롤 스냅 시작점 설정
+  height: 100vh;
+  scroll-snap-align: start;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,7 +41,7 @@ const ButtonContainer = styled.div`
   display: flex;
   gap: 20px;
   margin-top: 20px;
-  animation: ${fadeIn} 2s ease-in-out; // 애니메이션 효과 추가
+  animation: ${fadeIn} 2s ease-in-out;
 `;
 
 const AnimatedButton = styled.button`
@@ -55,6 +59,26 @@ const AnimatedButton = styled.button`
 `;
 
 function Home() {
+  const setUserInfo = useSetRecoilState(userInfoAtom);
+
+  useEffect(() => {
+    const accessToken = Cookies.get("accessToken");
+    if (accessToken) {
+      getUserInfo()
+        .then((data) => {
+          setUserInfo((prevState) => ({
+            ...prevState,
+            isLogin: true,
+            profile: data.profile,
+            nickname: data.nickname,
+            email: data.email,
+          }));
+        })
+        .catch((error) => {
+          console.error("사용자 정보 가져오기 실패", error);
+        });
+    }
+  }, [setUserInfo]);
   return (
     <>
       <Wrapper>

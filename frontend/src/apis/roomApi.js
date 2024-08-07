@@ -12,7 +12,7 @@ export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
   };
 
   return axios
-    .post(BASE_URL + "/api/test/rooms", params, {
+    .post(BASE_URL + "/api/rooms", params, {
       withCredentials: true, // 자격 증명을 포함하도록 설정
     })
     .then((res) => {

@@ -82,6 +82,7 @@ public class Room extends BaseTimeEntity {
 	}
 
 	public void updateRoom(RoomUpdateReq roomUpdateReq){
+		this.meetingDate = roomUpdateReq.getMeetingDay();
 		this.name = roomUpdateReq.getName();
 		this.purpose = roomUpdateReq.getPurpose();
 	}

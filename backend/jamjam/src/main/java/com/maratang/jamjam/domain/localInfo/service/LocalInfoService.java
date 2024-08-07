@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class LocalInfoService {
 	private final LocalInfoRepository localInfoRepository;
 
+	// @Cacheable(value = "LOCAL_INFO_CACHE", key = "#stationName + '-' + #category", cacheManager = "cacheManager")
 	public List<LocalInfoRes> getLocalInfoList(String stationName, String category) {
 		return localInfoRepository.selectAllByStationNameAndCategory(stationName, category);
 	}

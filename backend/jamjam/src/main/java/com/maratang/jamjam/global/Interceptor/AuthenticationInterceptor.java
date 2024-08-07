@@ -14,7 +14,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,15 +38,19 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
 		// 2. 토큰 검증
 		String accessToken = authorizationHeader.split(" ")[1];
-		Claims tokenClaims = tokenManager.getTokenClaims(accessToken);
+		Claims tokenClaims;
 
 		log.info("여기는 들림?"+accessToken);
-		Cookie[] cookie = request.getCookies();
+		Cookie[] cookies = request.getCookies();
 
 		String refreshToken = null;
-		for (int i = 0; i < cookie.length; i++) {
-			if (cookie[i].getName().equals("refreshToken")) {
-				refreshToken = cookie[i].getValue();
+
+		if (cookies != null) {
+			for(Cookie cookie : cookies) {
+				if(cookie.getName().equals("refreshToken")) {
+					refreshToken = cookie.getValue();
+					break;
+				}
 			}
 		}
 
@@ -69,7 +72,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		}
 
 		if (newAccessToken != null) {
-			request.setAttribute("accessToken", accessToken);
+			Cookie aceessTokenCookie = new Cookie("accessToken", accessToken);
+			aceessTokenCookie.setPath("/");
 		}
 		request.setAttribute("email", tokenClaims.get("email"));
 

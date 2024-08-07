@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { axiosGetMeetingHistory } from "../../apis/loginApi";
 
 const MeetingHistory = styled.div`
   align-items: center;
@@ -31,31 +32,59 @@ const Element = styled.div`
 `;
 
 function MeetingBox() {
+  const [meetingHistory, setMeetingHistory] = useState([]);
+
+  useEffect(() => {
+    const fetchMeetingHistory = async () => {
+      try {
+        const history = await axiosGetMeetingHistory();
+        setMeetingHistory(history);
+      } catch (error) {
+        console.error("모임 기록 가져오기 실패", error);
+      }
+    };
+
+    fetchMeetingHistory();
+  }, []);
+
+  if (!meetingHistory || meetingHistory.length === 0) {
+    return <div>아직 만남이 이루어지지 않았어요ㅠㅠ</div>;
+  }
+
   return (
     <>
-      <MeetingHistory>
-        <MeetingTextWrapper>2024-07-24</MeetingTextWrapper>
-        <Element>
-          000님의 방
-          <br />
-          사당역
-          <br />
-          스터디
-        </Element>
-      </MeetingHistory>
-      <MeetingHistory>
-        <MeetingTextWrapper>2024-07-19</MeetingTextWrapper>
-        <Element>
-          1반 헤쳐모여
-          <br />
-          역삼역
-          <br />
-          맛집 탐방
-        </Element>
-      </MeetingHistory>
-      {/* 추가 MeetingHistory 컴포넌트들 */}
+      {meetingHistory.map((meeting, index) => {
+        const meetingDate = meeting.meetingDate.split("T")[0];
+        return (
+          <MeetingHistory key={index}>
+            <MeetingTextWrapper>{meetingDate}</MeetingTextWrapper>
+            <Element>
+              {meeting.name}
+              <br />
+              {meeting.finalStation}
+              <br />
+              {meeting.purpose}
+            </Element>
+          </MeetingHistory>
+        );
+      })}
     </>
   );
 }
 
 export default MeetingBox;
+
+// const [meetingHistory, setMeetingHistory] = useState([
+//   {
+//     name: "하이",
+//     purpose: "식당",
+//     meetingDate: "2023-08-07T10:00:00",
+//     finalStation: "사당",
+//   },
+//   {
+//     name: "멍멍",
+//     purpose: "스터디",
+//     meetingDate: "2023-08-08T09:00:00",
+//     finalStation: "강남",
+//   },
+// ]);

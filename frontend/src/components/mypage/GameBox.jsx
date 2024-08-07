@@ -26,7 +26,7 @@ function GameBox() {
   }, []);
 
   if (winRates.length === 0) {
-    return <div>Loading...</div>;
+    return <div>아직 게임을 하지 않았어요ㅠㅠ</div>;
   }
 
   return (

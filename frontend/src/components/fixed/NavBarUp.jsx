@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
+import Cookies from "js-cookie";
 import LoginModal from "./LoginModal"; // LoginModal import
 
 const Wrapper = styled.div`
@@ -37,6 +38,15 @@ const LoginP = styled.p`
 
 function NavBarUp() {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const token = Cookies.get("accessToken");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -50,7 +60,11 @@ function NavBarUp() {
         </Left>
         <Link to={`/`}>로고자리입니다</Link>
         <Right>
-          <LoginP onClick={toggleModal}>LOGIN</LoginP>
+          {isLoggedIn ? (
+            <Link to={`/`}>MY PAGE</Link> // 로그인 상태일 때 ${userUUID}
+          ) : (
+            <LoginP onClick={toggleModal}>LOGIN</LoginP> // 로그인되지 않은 상태일 때
+          )}
         </Right>
       </Wrapper>
       <LoginModal isVisible={isModalVisible} toggleModal={toggleModal} />

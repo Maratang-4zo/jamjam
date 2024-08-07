@@ -3,12 +3,12 @@ import { atom } from "recoil";
 export const roomAtom = atom({
   key: "roomState",
   default: {
-    roomUUID: "2ecddeee-c244-45f8-87f8-26e8c6a5827f",
+    roomUUID: "2",
     roomName: null,
     meetingDate: null,
     roomPurpose: null,
     attendees: [],
-    hostUUID: "50105103-dfb7-47f3-8c97-e36b1e44e8de",
+    hostUUID: "",
     isAllHasDeparture: false, // 모두가 출발지 입력을 함
     isCenterExist: false,
     isAllReadyToGame: false,

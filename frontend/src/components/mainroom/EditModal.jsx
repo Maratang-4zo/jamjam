@@ -95,9 +95,9 @@ function EditModal({ isOpen, onClose, onAddressSelect }) {
     setUserInfo((prevState) => ({
       ...prevState,
       departure: {
-        addressText: updatedAddress.addressText,
-        latitude: updatedAddress.latitude,
-        longitude: updatedAddress.longitude,
+        address: updatedAddress.address,
+        lat: updatedAddress.lat,
+        lon: updatedAddress.lon,
       },
     }));
 
@@ -150,7 +150,7 @@ function EditModal({ isOpen, onClose, onAddressSelect }) {
           </Calendar>
           {!address && !isFindDepartureOpen && (
             <FindBtn onClick={() => setIsFindDepartureOpen(true)}>
-              {userInfo.departure.addressText}
+              {userInfo.departure.address}
               <hr />
               다시 찾을래요
             </FindBtn>

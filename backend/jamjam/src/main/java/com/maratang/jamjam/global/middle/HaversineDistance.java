@@ -1,6 +1,10 @@
 package com.maratang.jamjam.global.middle;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -46,6 +50,41 @@ public class HaversineDistance {
 			}
 		}
 
+		if (selectedStation == null){
+			double closestDistance = radius; // 초기에는 주어진 반경 내의 최대 거리로 설정
+
+			for (SubwayInfo info : subwayMap.values()) {
+				double distance = calculateDistance(latitude, longitude, info.getLatitude(), info.getLongitude());
+				if (distance <= radius && distance < closestDistance) {
+					selectedStation = info;
+					closestDistance = distance; // 업데이트된 가장 가까운 거리
+				}
+			}
+		}
+
 		return selectedStation;
+	}
+
+	// 주어진 위치로부터 5km 이내의 지하철 역들 중 모임 목적에 맞는 역을 찾는 메서드
+	public List<SubwayInfo> aroundStation(Map<String, SubwayInfo> subwayMap, double latitude,
+		double longitude, double radius, String purpose) {
+
+		List<SubwayInfo> nearbyStations = new ArrayList<>();
+
+		for (SubwayInfo info : subwayMap.values()) {
+			double distance = calculateDistance(latitude, longitude, info.getLatitude(), info.getLongitude());
+			if (distance <= radius) {
+				nearbyStations.add(info);
+			}
+		}
+
+		// 정렬 기준을 거리로 설정
+		nearbyStations.sort(
+			Comparator.comparingDouble(info -> calculateDistance(latitude, longitude, info.getLatitude(), info.getLongitude())));
+
+		return nearbyStations.stream()
+			.skip(1)    // 첫 1개 요소를 건너뜀
+			.limit(3)   // 그 다음 3개 요소를 선택
+			.collect(Collectors.toList());
 	}
 }

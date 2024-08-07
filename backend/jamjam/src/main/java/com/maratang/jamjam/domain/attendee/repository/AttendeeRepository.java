@@ -5,10 +5,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.room.entity.Room;
-import org.springframework.data.jpa.repository.Query;
 
 public interface AttendeeRepository extends JpaRepository<Attendee, Long> {
 	Optional<Attendee> findByAttendeeUUIDAndRoom(UUID attendeeId, Room room);
@@ -22,4 +23,8 @@ public interface AttendeeRepository extends JpaRepository<Attendee, Long> {
         where a.room.roomId = :roomId
         """)
     List<Attendee> findAllByRoomId(Long roomId);
+
+	@Modifying
+	@Query("update Attendee set attendeeStatus = 'ENTERED' where room.roomId = :roomId")
+	void resetAttendees(Long roomId);
 }

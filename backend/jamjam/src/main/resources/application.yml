@@ -54,3 +54,8 @@ token:
 #logging:
 #  level:
 #    root: DEBUG
+
+otp:
+  user:
+    client:
+      url: ${OTP_USER_CLIENT_URL}

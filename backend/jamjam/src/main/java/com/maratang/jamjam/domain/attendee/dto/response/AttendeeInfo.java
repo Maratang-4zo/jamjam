@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class AttendeeInfo {
+	private Long attendeeId;
 	private UUID attendeeUUID;
 	private String nickname;
 	private Double lat;

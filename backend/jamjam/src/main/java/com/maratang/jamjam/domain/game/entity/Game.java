@@ -1,7 +1,9 @@
 package com.maratang.jamjam.domain.game.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "game")
 public class Game {
@@ -15,7 +17,7 @@ public class Game {
 	@Column(name = "`order`")
 	private Integer order;
 
-	private Boolean is_use;
+	private Boolean isUse;
 	private Integer difficulty;
 	private String description;
 }

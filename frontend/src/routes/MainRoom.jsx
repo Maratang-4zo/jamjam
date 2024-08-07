@@ -71,14 +71,7 @@ function Room() {
             roomName: response.data.roomName,
             meetingDate: response.data.roomTime,
             centerPlace: response.data.roomStartCenter,
-            attendees: {
-              departure: {
-                address: response.data.attendees.address,
-                lat: response.data.attendees.lat,
-                lon: response.data.attendees.lon,
-              },
-              ...response.data.attendees,
-            },
+            attendees: [...response.data.attendees],
             roomPurpose: response.data.roomPurpose,
             hostUUID: response.data.hostUUID,
           }));

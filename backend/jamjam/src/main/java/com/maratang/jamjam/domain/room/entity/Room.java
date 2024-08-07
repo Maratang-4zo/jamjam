@@ -40,6 +40,9 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "`start`")
 	private String startStation;
 
+	@Column(name = "`final`")
+	private String finalStation;
+
 	private LocalDateTime meetingDate;
 
 	@Enumerated(EnumType.STRING)
@@ -57,12 +60,13 @@ public class Room extends BaseTimeEntity {
 	private Attendee root;
 
 	@Builder
-	public Room(Long roomId, String name, String purpose, String startStation, LocalDateTime meetingDate,
+	public Room(Long roomId, String name, String purpose, String startStation, String finalStation ,LocalDateTime meetingDate,
 		RoomStatus roomStatus, LocalDateTime endedAt, List<Attendee> attendees, UUID roomUUID, Attendee root) {
 		this.roomId = roomId;
 		this.name = name;
 		this.purpose = purpose;
 		this.startStation = startStation;
+		this.finalStation = finalStation;
 		this.meetingDate = meetingDate;
 		this.roomStatus = roomStatus;
 		this.endedAt = endedAt;

@@ -22,10 +22,14 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
       open-in-view: true
-
   logging:
     level:
       com.app: debug
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
 kakao:
   client:
     id: ${KAKAO_CLIENT_ID}
@@ -41,7 +45,12 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     display-request-duration: true
+
 token:
   secret: ${TOKEN_CLIENT_SECRET}
   access-token-expiration-time: ${ACCESS_TOKEN_EXPIRATION_TIME}
   refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
+
+#logging:
+#  level:
+#    root: DEBUG

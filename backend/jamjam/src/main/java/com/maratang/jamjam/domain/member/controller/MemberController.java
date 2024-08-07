@@ -81,7 +81,8 @@ public class MemberController {
 	public ResponseEntity<List<MemberAnalysisRes>> getMemberAnalysis(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 		String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
 		Member member = memberService.findMemberByEmail(memberEmail);
-		return ResponseEntity.ok().body(memberAnalysisService.getMemberAnalysis(member.getMemberId()));
+		List<MemberAnalysisRes> list = memberAnalysisService.getMemberAnalysis(member.getMemberId());
+		return ResponseEntity.ok().body(list);
 	}
 
 	/*

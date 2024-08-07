@@ -34,9 +34,8 @@ function GameBox() {
       {winRates.map((winRate, index) => (
         <WinRateGraph
           key={index}
-          series={winRate.value}
-          label={winRate.label}
-          hollowSize={winRate.winRate}
+          series={[winRate.winRate]}
+          label={winRate.gameName}
         />
       ))}
     </GraphContainer>

@@ -176,7 +176,7 @@ function JoinRoom() {
       <NavBarUp />
       <Container>
         <KakaotalkButton>
-          <a href="https://jjam.shop/api/login/authorize?redirectUri=">
+          <a href="https://jjam.shop/api/login/authorize?redirectUri=/room/:roomUUID/join">
             카카오톡으로 로그인
           </a>
         </KakaotalkButton>

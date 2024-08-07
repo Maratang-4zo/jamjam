@@ -2,13 +2,19 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { OpenVidu } from "openvidu-browser";
 import axios from "axios";
 import { getCookie, setCookie } from "../utils/Cookies";
+import { useRecoilState } from "recoil";
+import { currentSpeakersAtom } from "../recoil/atoms/roomState";
 
 const APPLICATION_SERVER_URL = "https://jjam.shop/";
 
 const useOpenVidu = () => {
   const sessionRef = useRef(null);
   const ovRef = useRef(null);
+  const publisherRef = useRef(null); // Publisher 객체를 저장할 ref 추가
   const [connected, setConnected] = useState(false);
+  const [currentSpeakers, setCurrentSpeakers] =
+    useRecoilState(currentSpeakersAtom);
+  const [isMicOn, setIsMicOn] = useState(true); // 마이크 상태를 관리하는 상태 추가
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
@@ -26,6 +32,19 @@ const useOpenVidu = () => {
 
     newSession.on("streamCreated", function (event) {
       newSession.subscribe(event.stream, "subscriber");
+    });
+
+    newSession.on("publisherStartSpeaking", (event) => {
+      setCurrentSpeakers((prevSpeakers) => [
+        ...prevSpeakers,
+        event.connection.connectionId,
+      ]);
+    });
+
+    newSession.on("publisherStopSpeaking", (event) => {
+      setCurrentSpeakers((prevSpeakers) =>
+        prevSpeakers.filter((id) => id !== event.connection.connectionId),
+      );
     });
   }, []);
 
@@ -81,6 +100,7 @@ const useOpenVidu = () => {
         .connect(token)
         .then(() => {
           const newPublisher = ovRef.current.initPublisher("publisher");
+          publisherRef.current = newPublisher; // Publisher 객체 저장
           sessionRef.current.publish(newPublisher);
           setConnected(true);
         })
@@ -94,12 +114,23 @@ const useOpenVidu = () => {
     }
   }, [initSession]);
 
+  const toggleMic = () => {
+    if (publisherRef.current) {
+      const audioEnabled = publisherRef.current.stream.audioActive;
+      publisherRef.current.publishAudio(!audioEnabled); // 마이크 상태 토글
+      setIsMicOn(!audioEnabled); // 마이크 상태 업데이트
+    }
+  };
+
   return {
     connected,
+    currentSpeakers, // 현재 말하고 있는 사용자 상태 반환
     joinSession,
     leaveSession,
     createSession,
     createToken,
+    toggleMic, // 마이크 토글 함수 반환
+    isMicOn, // 마이크 상태 반환
   };
 };
 

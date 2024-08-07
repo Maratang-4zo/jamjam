@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import MicOn from "../../assets/icons/micon.png";
@@ -7,8 +7,13 @@ import MicOff from "../../assets/icons/micoff.png";
 import ChatOn from "../../assets/icons/chaton.png";
 import ChatOff from "../../assets/icons/chatoff.png";
 import ChattingModal from "./ChattingModal";
-import { useRecoilState } from "recoil";
-import { chatModalVisibleAtom } from "../../recoil/atoms/roomState";
+import { useRecoilState, useRecoilValue } from "recoil";
+import {
+  chatModalVisibleAtom,
+  currentSpeakersAtom,
+  roomAtom,
+} from "../../recoil/atoms/roomState";
+import useOpenVidu from "../../hooks/useOpenVidu"; // useOpenVidu 훅을 임포트
 
 const Wrapper = styled.div`
   width: 50px;
@@ -31,11 +36,12 @@ const Attendants = styled.div`
   gap: 10px;
 `;
 
-const Avatar = styled.div`
+const Avatar = styled.img`
   width: 35px;
   height: 35px;
-  background-color: yellow;
+  background: none;
   border-radius: 50%;
+  box-shadow: ${(props) => (props.isSpeaking ? "0 0 7px 2px #ffffff" : "none")};
 `;
 
 const Btns = styled.div`
@@ -78,22 +84,30 @@ const Home = styled.img`
 
 function NavBarLeft() {
   const [isChatOn, setIsChatOn] = useRecoilState(chatModalVisibleAtom);
-  const [isMicOn, setIsMicOn] = useState(true);
+  const roomInfo = useRecoilValue(roomAtom);
+  const currentSpeakers = useRecoilValue(currentSpeakersAtom);
+  const { toggleMic, isMicOn } = useOpenVidu(); // toggleMic 함수와 isMicOn 상태 가져오기
 
   useEffect(() => {
     setIsChatOn(false); // 컴포넌트가 마운트될 때 채팅 모달 상태를 초기화
   }, [setIsChatOn]);
 
   const handleChat = () => setIsChatOn(!isChatOn);
-  const handleMic = () => setIsMicOn(!isMicOn);
+  const handleMic = () => {
+    toggleMic(); // 마이크 토글 함수 호출
+  };
 
   return (
     <>
       <Wrapper>
         <Attendants>
-          <Avatar />
-          <Avatar />
-          <Avatar />
+          {roomInfo.attendees.map((attendee) => (
+            <Avatar
+              key={attendee.attendeeUUID}
+              src={attendee.profileImageUrl}
+              isSpeaking={currentSpeakers.includes(attendee.attendeeUUID)}
+            />
+          ))}
         </Attendants>
         <Btns>
           <Btn onClick={handleChat}>

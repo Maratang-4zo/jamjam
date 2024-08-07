@@ -1,6 +1,9 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import NavBarUp from "../components/fixed/NavBarUp";
+import character from "../assets/character.png";
+import chat from "../assets/CatChat2.png";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -15,12 +18,53 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-left: 100px;
-  width: calc(100% - 250px); //NavBarLeft의 너비를 제외한 나머지 영역
-  height: 100%;
+  align-items: start;
+  justify-content: space-between;
+  width: ${(props) => props.theme.wrapperWidth};
+  padding: 20px;
+  h1 {
+    font-size: 100px;
+    font-weight: 600;
+  }
+  h2 {
+    font-size: 40px;
+  }
+  button {
+    margin-top: 20px;
+  }
+`;
+
+const ImgBox = styled.div`
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+
+  .chat {
+    width: 300px;
+    height: 250px; /* 적절한 높이를 설정하세요 */
+    background-image: url(${chat});
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    a {
+      position: absolute;
+      top: 120px;
+      font-size: 30px;
+      text-decoration: underline;
+    }
+    span {
+      position: absolute;
+      top: 80px;
+      font-size: 20px;
+    }
+  }
+  img {
+    margin-top: 70px;
+  }
 `;
 
 function InvalidRoom() {
@@ -32,10 +76,19 @@ function InvalidRoom() {
 
   return (
     <Wrapper>
+      <NavBarUp />
       <Container>
-        <h1>시간과 정신의 방</h1>
-        <p>당신은 잘못된 방에 들어왔다.</p>
-        <button onClick={goToHome}>탈출시켜주세요ㅜㅜ</button>
+        <div>
+          <h1>404 Error</h1>
+          <h2>Page not found</h2>
+        </div>
+        <ImgBox>
+          <div className="chat">
+            <span>I want to go </span>
+            <Link to="/"> Home</Link>
+          </div>
+          <img src={character} alt="Character" />
+        </ImgBox>
       </Container>
     </Wrapper>
   );

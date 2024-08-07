@@ -16,6 +16,7 @@ import alertIcon from "../../assets/icons/alertIcon.png";
 import TutorialModal from "./Tutorial";
 import { axiosGetMiddle } from "../../apis/mapApi";
 import { useNavigate } from "react-router-dom";
+import Loading from "../fixed/Loading";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -294,6 +295,8 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
   const [totalRound, setTotalRound] = useRecoilState(totalRoundAtom);
   const [currentRound, setCurrentRound] = useRecoilState(currentRoundAtom);
+  const [isMiddleLoading, setIsMiddleLoading] = useState(false);
+  const [isFinalLoading, setIsFinalLoading] = useState(false);
 
   const lineColor = {
     LINE_1: "#0052A4", // 01호선
@@ -359,6 +362,7 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
   };
 
   const handleFindCenter = async () => {
+    setIsMiddleLoading(true);
     try {
       const data = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
       setRoomState((prev) => ({
@@ -369,6 +373,8 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
       }));
     } catch (error) {
       console.error("중심찾기 실패!!!", error);
+    } finally {
+      setIsMiddleLoading(false);
     }
   };
 
@@ -395,10 +401,13 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
   };
 
   const handleFinalResultBtnClick = () => {
-    navigate(`/room/${roomState.roomUUID}/result`);
     setSelectedStation(null);
     setIsGameFinishAtom(false);
     setIsNextMiddleExist(false);
+    setIsFinalLoading(true);
+    // 여기부터는 axios 호출 끝나고 넣을 애들
+    navigate(`/room/${roomState.roomUUID}/result`);
+    // setIsFinalLoading(false);
   };
 
   const handleClickOutside = (e) => {
@@ -437,6 +446,8 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
 
   return (
     <>
+      {isMiddleLoading ? <Loading message={"모임장소 찾는"} /> : null}
+      {isFinalLoading ? <Loading message={"모임장소 내역 불러오는"} /> : null}
       <BottomBtns>
         {isGameFinish ? null : (
           <>

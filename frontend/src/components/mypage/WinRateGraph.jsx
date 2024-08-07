@@ -6,7 +6,7 @@ class WinRateGraph extends React.Component {
     super(props);
 
     this.state = {
-      series: [props.series],
+      series: props.series,
       options: {
         chart: {
           height: 350,
@@ -16,7 +16,7 @@ class WinRateGraph extends React.Component {
           radialBar: {
             strokeWidth: "50%",
             hollow: {
-              size: `${props.hollowSize}%`, // hollow size를 props로 받아서 설정
+              size: "70%", // 모든 그래프의 hollow size를 동일하게 설정
             },
             dataLabels: {
               name: {
@@ -26,9 +26,7 @@ class WinRateGraph extends React.Component {
                 color: "#000000",
               },
               total: {
-                show: true,
-                label: "TOTAL",
-                color: "#000000",
+                show: false, // total 항목을 표시하지 않음
               },
             },
             track: {
@@ -38,7 +36,7 @@ class WinRateGraph extends React.Component {
           },
         },
         colors: ["#000000"],
-        labels: [props.label],
+        labels: [props.label], // props.label을 labels에 설정
       },
     };
   }

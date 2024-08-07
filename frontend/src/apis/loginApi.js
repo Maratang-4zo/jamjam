@@ -1,4 +1,5 @@
 import axios from "axios";
+const BASE_URL = `https://jjam.shop`;
 
 export const getUserInfo = async () => {
   try {
@@ -15,6 +16,16 @@ export const updateUserNickname = async (nickname) => {
     await axios.post("/api/members/info", { nickname });
   } catch (error) {
     console.error("닉네임 수정 실패", error);
+    throw error;
+  }
+};
+
+export const axiosGetWinRate = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/members/game-history`);
+    return response;
+  } catch (error) {
+    console.error("승률 가져오기 실패", error);
     throw error;
   }
 };

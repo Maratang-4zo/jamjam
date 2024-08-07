@@ -12,7 +12,7 @@ import {
   roomAtom,
 } from "../recoil/atoms/roomState";
 import { axiosGetAroundStores, axiosGetThreeStations } from "../apis/mapApi";
-
+import gameBg from "../assets/game/gameBg.jpg";
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
   width: ${(props) => props.theme.wrapperWidth};
@@ -29,6 +29,7 @@ const GameScreen = styled.div`
   flex-shrink: 0;
   border-radius: 30px;
   background: #fff;
+  background-image: url(${gameBg});
   position: relative; // Position relative to contain the absolute positioning of Block and WinMessage
   display: flex;
   align-items: center;

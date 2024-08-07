@@ -13,8 +13,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @Table(name = "member_analysis")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,9 +33,9 @@ public class MemberAnalysis {
 	@JoinColumn(name = "game_id")
 	private Game game;
 
-	private int gameCount;
+	private long gameCount;
 
-	private int gameWinCount;
+	private long gameWinCount;
 
 	@Builder
 	public MemberAnalysis(Long memberAnalysisId, String rate, Member member, Game game, int gameCount, int gameWinCount) {

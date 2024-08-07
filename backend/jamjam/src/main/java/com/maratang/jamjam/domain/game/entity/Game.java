@@ -20,6 +20,7 @@ public class Game {
 	private Boolean isUse;
 	private Integer difficulty;
 	private String description;
+
 }
 
 

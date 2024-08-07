@@ -349,5 +349,6 @@ public class RoomService {
 
 		room.updateStartStation(roomMoveReq.getStartStation());
 	}
+
 }
 

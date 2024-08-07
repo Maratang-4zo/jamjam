@@ -29,6 +29,9 @@ public enum ErrorCode {
 	ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT008", "access token이 존재하지 않습니다."),
 	// FORBIDDEN_ADMIN(HttpStatus.FORBIDDEN, "AT009", "관리자 ROLE이 아닙니다."),
 
+	// MemberAnalysis
+	MEMBERANALYSIS_NOT_FOUND(HttpStatus.NOT_FOUND, "MA001", "사용자의 게임 결과 기록이 없습니다." ),
+
 	// member
 	INVALID_MEMBER_TYPE(HttpStatus.BAD_REQUEST, "MB001", "잘못된 회원 타입입니다.(memberType : KAKAO"),
 	ALREADY_REGISTERED_MEMBER(HttpStatus.BAD_REQUEST, "MB002", "이미 가입된 회원입니다."),

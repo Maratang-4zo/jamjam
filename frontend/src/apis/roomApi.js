@@ -25,8 +25,13 @@ export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
     });
 }
 
-// 방 유효성 검사 + 방 정보 받기
+// 방 유효성 검사
 export function axiosIsRoomValid({ roomUUID }) {
+  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/exist`);
+}
+
+// 방 정보 받기
+export function axiosGetRoomInfo({ roomUUID }) {
   return axios.get(BASE_URL + `/api/rooms/${roomUUID}`);
 }
 

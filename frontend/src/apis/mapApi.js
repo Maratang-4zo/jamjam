@@ -1,61 +1,41 @@
 import axios from "axios";
 const BASE_URL = `https://jjam.shop`;
-import Cookies from "js-cookie";
 
-// 쿠키에서 accessToken을 가져오는 함수
-const getAccessTokenFromCookie = () => {
-  return Cookies.get("accessToken");
-};
+// 중심 장소 정보 가져오기
+export function axiosGetMiddle({ roomUUID }) {
+  return axios
+    .get(`${BASE_URL}/api/rooms/${roomUUID}/middle`, {
+      withCredentials: true, // 자격 증명을 포함하도록 설정
+    })
+    .then((res) => {
+      console.log("중심장소 가져오기 완료");
+      console.log(res);
+    })
+    .catch((err) => {
+      console.error("중심장소 가져오기 실패");
+      console.log(err);
+    });
+}
 
-// Axios 인스턴스 생성
-const axiosInstance = axios.create({
-  baseURL: `http://localhost:8080`,
-  withCredentials: true,
-});
+export function axiosUpdateUserInfo({ address, lat, lon }) {
+  return axios.patch(BASE_URL + `/api/attendees`, {
+    address,
+    lat,
+    lon,
+  });
+}
 
-// 요청 인터셉터 설정
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const accessToken = getAccessTokenFromCookie(); // 쿠키에서 토큰을 가져옴
+export function axiosGetThreeStations(roomUUID) {
+  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/around`);
+}
 
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`; // Authorization 헤더에 토큰 추가
-    }
+export function axiosGetAroundStores({ stationName, category }) {
+  return axios.get(
+    BASE_URL +
+      `/api/local-info?stationName=${stationName}&category=${category}`,
+  );
+}
 
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
-
-// 사용자 정보 가져오기 함수
-export const getUserInfo = async () => {
-  try {
-    const response = await axiosInstance.get("/api/members/info");
-    return response.data;
-  } catch (error) {
-    console.error("사용자 정보 가져오기 실패", error);
-    throw error;
-  }
-};
-
-// 닉네임 업데이트 함수
-export const updateUserNickname = async (nickname) => {
-  try {
-    await axiosInstance.post("/api/members/info", { nickname });
-  } catch (error) {
-    console.error("닉네임 수정 실패", error);
-    throw error;
-  }
-};
-
-export const axiosGetWinRate = async () => {
-  try {
-    const response = await axiosInstance.get("/api/members/game-history");
-    return response.data;
-  } catch (error) {
-    console.error("닉네임 수정 실패", error);
-    throw error;
-  }
-};
+export function axiosPatchNextMiddle({ roomUUID }) {
+  return axios.patch(BASE_URL + `/api/rooms/${roomUUID}/move`);
+}

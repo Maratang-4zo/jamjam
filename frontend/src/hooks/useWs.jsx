@@ -16,6 +16,10 @@ const useWs = () => {
 
   const connect = () => {
     return new Promise((resolve, reject) => {
+      if (connected) {
+        console.log("Already connected");
+        return resolve();
+      }
       client.current = new Client({
         webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
         debug: function (str) {
@@ -26,11 +30,13 @@ const useWs = () => {
         heartbeatOutgoing: 20000,
         onConnect: () => {
           console.log("Connected");
+          setConnected(true);
           subscribe();
           resolve();
         },
         onStompError: (frame) => {
           console.error(frame);
+          setConnected(false);
           reject(frame);
         },
       });
@@ -39,7 +45,6 @@ const useWs = () => {
   };
 
   const subscribe = () => {
-    setConnected(true);
     client.current.subscribe(`/sub/rooms/${roomInfo.roomUUID}`, (message) => {
       handleMessage(JSON.parse(message.body));
     });
@@ -63,6 +68,7 @@ const useWs = () => {
         break;
       case "AVATAR_POSITION":
         handleAvatarPosition(message);
+        break;
       default:
         console.error("Unknown message type:", message.type);
     }
@@ -79,7 +85,7 @@ const useWs = () => {
 
   const handleChatLogs = (message) => {
     const { attendeeUUID, content, createdAt } = message;
-    const attendant = roomInfo.attendants.find(
+    const attendant = roomInfo.attendees.find(
       (attendee) => attendee.attendeeUUID === attendeeUUID,
     );
     const nickname = attendant.nickname;
@@ -117,12 +123,12 @@ const useWs = () => {
     }
   };
 
-  // useEffect(() => {
-  //   connect();
-  //   return () => {
-  //     disconnect();
-  //   };
-  // }, []);
+  useEffect(() => {
+    connect();
+    return () => {
+      disconnect();
+    };
+  }, []);
 
   return {
     connected,

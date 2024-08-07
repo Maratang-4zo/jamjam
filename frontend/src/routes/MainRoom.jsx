@@ -11,7 +11,7 @@ import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
 import { axiosUpdateUserInfo } from "../apis/mapApi";
 import { useNavigate, useParams } from "react-router-dom";
-import { axiosIsRoomValid } from "../apis/roomApi";
+import { axiosIsRoomValid, axiosGetRoomInfo } from "../apis/roomApi";
 import { getCookie } from "../utils/Cookies";
 import { jwtDecode } from "jwt-decode";
 import useWs from "../hooks/useWs";
@@ -40,67 +40,91 @@ function Room() {
   const [modalTop, setModalTop] = useState("50px");
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
-  const [joinLoading, setJoinLoading] = useState(false);
-  const { connect } = useWs();
-  const { joinSession } = useOpenVidu();
+  const [joinLoading, setJoinLoading] = useState(true);
+  const { connect, connected } = useWs();
+  const { joinSession, joined } = useOpenVidu();
 
-  // useEffect(() => {
-  //   const checkRoomValidity = async () => {
-  // try {
-  //   const response = await axiosIsRoomValid({ roomUUID });
-  //   const roomToken = getCookie("roomToken");
-  //   if (roomToken) {
-  //     const myUUID = jwtDecode(roomToken).attendeeUUID;
-  //     const myAttendeeInfo = response.data.attendees.find(
-  //       (attendee) => attendee.attendeeUUID === myUUID,
-  //     );
-  //     if (
-  //       myAttendeeInfo &&
-  //       (!myAttendeeInfo.address ||
-  //         !myAttendeeInfo.lat ||
-  //         !myAttendeeInfo.lon)
-  //     ) {
-  //       setIsFindDepartureModalOpen(true);
-  //     }
-  //     setRoomInfo((prev) => ({
-  //       ...prev,
-  //       roomUUID,
-  //       isValid: true,
-  //       roomName: response.data.roomName,
-  //       meetingDate: response.data.roomTime,
-  //       centerPlace: response.data.roomStartCenter,
-  //       attendees: [...response.data.attendees],
-  //       roomPurpose: response.data.roomPurpose,
-  //       hostUUID: response.data.hostUUID,
-  //     }));
-  //     setUserInfo((prev) => ({
-  //       ...prev,
-  //       isHost: response.data.isHost,
-  //       departure: {
-  //         addressText: myAttendeeInfo.address,
-  //         latitude: myAttendeeInfo.lat,
-  //         longitude: myAttendeeInfo.lon,
-  //       },
-  //       nickname: myAttendeeInfo.nickname,
-  //       duration: myAttendeeInfo.duration,
-  //       route: myAttendeeInfo.route,
-  //       myUUID,
-  //     }));
-  //     await connect();
-  //     await joinSession();
-  //   } else {
-  //     navigate(`/room/${roomUUID}/join`);
-  //   }
-  // } catch (error) {
-  //   console.error("방 유효성 검사 실패:", error);
-  //   navigate("/invalid-room");
-  // } finally {
-  //   setJoinLoading(false);
-  // }
-  // };
+  useEffect(() => {
+    const initializeRoom = async () => {
+      try {
+        // 방 유효성 검사
+        await axiosIsRoomValid({ roomUUID });
 
-  //   checkRoomValidity();
-  // }, [roomUUID, navigate, setRoomInfo, setUserInfo, connect, joinSession]);
+        // 방 정보 가져오기
+        const roomResponse = await axiosGetRoomInfo({ roomUUID });
+        const roomData = roomResponse.data;
+
+        const roomToken = getCookie("roomToken");
+        if (roomToken) {
+          const myUUID = jwtDecode(roomToken).attendeeUUID;
+          const myAttendeeInfo = roomData.attendees.find(
+            (attendee) => attendee.attendeeUUID === myUUID,
+          );
+
+          if (
+            myAttendeeInfo &&
+            (!myAttendeeInfo.address ||
+              !myAttendeeInfo.lat ||
+              !myAttendeeInfo.lon)
+          ) {
+            setIsFindDepartureModalOpen(true);
+          }
+
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID,
+            isValid: true,
+            roomName: roomData.roomName,
+            meetingDate: roomData.roomTime,
+            centerPlace: roomData.roomStartCenter,
+            attendees: [...roomData.attendees],
+            roomPurpose: roomData.roomPurpose,
+            hostUUID: roomData.hostUUID,
+          }));
+
+          setUserInfo((prev) => ({
+            ...prev,
+            isHost: roomData.isHost,
+            departure: {
+              addressText: myAttendeeInfo.address,
+              latitude: myAttendeeInfo.lat,
+              longitude: myAttendeeInfo.lon,
+            },
+            nickname: myAttendeeInfo.nickname,
+            duration: myAttendeeInfo.duration,
+            route: myAttendeeInfo.route,
+            myUUID,
+          }));
+
+          if (!connected) {
+            await connect();
+          }
+
+          if (!joined) {
+            await joinSession();
+          }
+        } else {
+          navigate(`/room/${roomUUID}/join`);
+        }
+      } catch (error) {
+        console.error("방 유효성 검사 실패:", error);
+        navigate("/invalid-room");
+      } finally {
+        setJoinLoading(false);
+      }
+    };
+
+    initializeRoom();
+  }, [
+    roomUUID,
+    navigate,
+    setRoomInfo,
+    setUserInfo,
+    connect,
+    joinSession,
+    connected,
+    joined,
+  ]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);
@@ -121,20 +145,18 @@ function Room() {
           lon: longitude,
         });
 
-        // axios 요청이 성공적으로 완료된 후에 setUserInfo 호출
         setUserInfo((prev) => ({
           ...prev,
           departure: {
-            address: addressText,
-            lat: latitude,
-            lon: longitude,
+            addressText,
+            latitude,
+            longitude,
           },
         }));
 
-        // attendees 중에 내 UUID와 같은 객체 찾아서 주소 정보들 업데이트
         setRoomInfo((prev) => {
           const updatedAttendees = prev.attendees.map((attendee) =>
-            attendee.attendeeUUID === userInfo.attendeeUUID
+            attendee.attendeeUUID === userInfo.myUUID
               ? {
                   ...attendee,
                   address: addressText,
@@ -187,7 +209,7 @@ function Room() {
 
   return (
     <Wrapper>
-      {/* <NavBarLeft /> */}
+      <NavBarLeft />
       {joinLoading ? <Loading message={"접속"} /> : null}
       {isFindDepartureModalOpen && (
         <FindDeparture

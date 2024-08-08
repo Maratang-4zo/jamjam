@@ -15,7 +15,7 @@ public class UUIDArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
-		return UUID.class.isAssignableFrom(parameter.getParameterType());
+		return UUID.class.isAssignableFrom(parameter.getParameterType()) && !parameter.hasParameterAnnotations();
 	}
 
 	@Override

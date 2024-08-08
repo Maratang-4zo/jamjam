@@ -24,6 +24,8 @@ const useOpenVidu = () => {
   }, []);
 
   const initSession = useCallback(() => {
+    if (sessionRef.current) return; // 이미 초기화되었으면 리턴
+
     const newOv = new OpenVidu();
     const newSession = newOv.initSession();
 
@@ -46,7 +48,7 @@ const useOpenVidu = () => {
         prevSpeakers.filter((id) => id !== event.connection.connectionId),
       );
     });
-  }, []);
+  }, [setCurrentSpeakers]);
 
   const createSession = async () => {
     await axios.post(APPLICATION_SERVER_URL + "api/wr/rooms");
@@ -112,7 +114,7 @@ const useOpenVidu = () => {
           );
         });
     }
-  }, [initSession]);
+  }, [initSession, createToken]);
 
   const toggleMic = () => {
     if (publisherRef.current) {

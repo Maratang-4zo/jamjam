@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.member.dto.request.MemberPatchReq;
-import com.maratang.jamjam.domain.member.dto.request.MemberReq;
 import com.maratang.jamjam.domain.member.dto.response.MemberRes;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.member.mapper.MemberMapper;
@@ -58,26 +57,44 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(memberRes);
 	}
 
+	// @PatchMapping("/info")
+	// @Operation(summary = "유저 정보 수정", description = "원하는 닉네임으로 수정할 수 있다.")
+	// public ResponseEntity<?> updateMemberInfo(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, @RequestBody MemberPatchReq memberPatchReq) {
+	//
+	// 	String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
+	// 	log.info("업데이트 확인중");
+	// 	Member member = memberService.findMemberByEmail(memberEmail);
+	// 	Member updateMember = memberService.updateMember(member, memberPatchReq);
+	// 	MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(updateMember);
+	// 	log.info("업데이트 확인중22 : "+memberRes.getNickname());
+	//
+	// 	return ResponseEntity.status(HttpStatus.OK).body(memberRes);
+	// }
+
 	@PatchMapping("/info")
-	@Operation(summary = "유저 정보 수정", description = "원하는 닉네임으로 수정할 수 있다.")
 	public ResponseEntity<?> updateMemberInfo(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, @RequestBody MemberPatchReq memberPatchReq) {
+		try {
+			log.info("일단 들어옴");
+			String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
+			log.info("Updating member info for email: " + memberEmail);
+			log.info("Received patch request: " + memberPatchReq);
 
-		String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
-		MemberReq memberReq = MemberReq.builder()
-			.email(memberEmail)
-			.nickname(memberPatchReq.getNickname())
-			.build();
-		Member member = memberMapper.INSTANCE.memberReqToMember(memberReq);
-		Member updateMember = memberService.updateMember(member);
-		MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(updateMember);
+			Member member = memberService.findMemberByEmail(memberEmail);
+			log.info("Found member: " + member);
 
-		if(httpServletRequest.getAttribute("accessToken") != null) {
-			String accessToken = (String) httpServletRequest.getAttribute("accessToken");
-			httpServletResponse.addHeader("accessToken", accessToken);
+			Member updateMember = memberService.updateMember(member, memberPatchReq);
+			log.info("Updated member: " + updateMember);
+
+			MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(updateMember);
+			log.info("Mapped to MemberRes: " + memberRes);
+
+			return ResponseEntity.status(HttpStatus.OK).body(memberRes);
+		} catch (Exception e) {
+			log.error("Error updating member info", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
 		}
-
-		return ResponseEntity.status(HttpStatus.OK).body(memberRes);
 	}
+
 
 
 	@GetMapping("/game-history")

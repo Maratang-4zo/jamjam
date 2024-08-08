@@ -23,6 +23,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
@@ -304,8 +305,6 @@ public class RoomService {
 
 				attendee.updateRoute(combinedPolyline);
 				attendee.updateDuration(totalDuration);
-
-				System.out.println(attendee.getRoute() + "++" + attendee.getDuration());
 			}
 		}
 		attendeeRepository.saveAll(attendees);
@@ -314,12 +313,6 @@ public class RoomService {
 	public List<SubwayInfo> getAroundStation(UUID roomUUID) {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-
-		// Transforming attendees' coordinates into Point instances, skipping null values
-		List<Point> points = room.getAttendees().stream()
-			.filter(attendee -> attendee.getLat() != null && attendee.getLon() != null)
-			.map(attendee -> new Point(attendee.getLat(), attendee.getLon()))
-			.collect(Collectors.toList());
 
 		String startStation = room.getStartStation();
 
@@ -343,11 +336,25 @@ public class RoomService {
 	}
 
 	@Transactional
-	public void moveRoom(UUID roomUUID, RoomMoveReq roomMoveReq) {
+	public RoomMoveRes moveRoom(UUID roomUUID, RoomMoveReq roomMoveReq) {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		room.updateStartStation(roomMoveReq.getStartStation());
+
+		SubwayInfo selectedStation = subwayDataLoader.getSubwayInfo(roomMoveReq.getStartStation());
+
+		saveOptimalRoutesForUsersInRoomToDatabase(room, selectedStation);
+
+		room.updateStartStation(selectedStation.getName());
+
+		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
+		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
+
+		return RoomMoveRes.builder()
+			.roomCenterStart(selectedStation)
+			.attendees(attendeeList)
+			.build();
 	}
 
 }

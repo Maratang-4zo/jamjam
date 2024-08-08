@@ -41,9 +41,11 @@ export const getUserInfo = async () => {
 };
 
 // 닉네임 업데이트 함수
-export const updateUserNickname = async (nickname) => {
+export const updateUserNickname = async (newNickname) => {
   try {
-    await axiosInstance.patch("/api/members/info", { nickname });
+    await axiosInstance.patch("/api/members/info", {
+      nickname: newNickname,
+    });
   } catch (error) {
     console.error("닉네임 수정 실패", error);
     throw error;
@@ -64,7 +66,7 @@ export const axiosGetWinRate = async () => {
 // 모임 기록 가져오기 함수
 export const axiosGetMeetingHistory = async () => {
   try {
-    const response = await axiosInstance.get("api/members/meeting-history");
+    const response = await axiosInstance.get("api/members/room-history");
     return response.data;
   } catch (error) {
     console.error("모임 기록 가져오기 실패");

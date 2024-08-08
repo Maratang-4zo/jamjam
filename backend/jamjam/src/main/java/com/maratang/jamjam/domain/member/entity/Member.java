@@ -16,7 +16,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "member")
@@ -29,7 +28,6 @@ public class Member extends BaseTimeEntity {
 	private Long memberId;
 	@Column(nullable = false, length = 20)
 	private String name;
-	@Setter
 	@Column(nullable = false, length = 20)
 	private String nickname;
 	private String providerId;

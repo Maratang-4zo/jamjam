@@ -19,17 +19,24 @@ import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomHistoryRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
+import com.maratang.jamjam.domain.room.service.RoomHistoryService;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.error.ErrorCode;
+import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.error.exception.BusinessException;
+import com.maratang.jamjam.global.jwt.manager.TokenManager;
 import com.maratang.jamjam.global.room.RoomTokenProvider;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.room.dto.RoomJwtTokenDto;
 import com.maratang.jamjam.global.station.SubwayInfo;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,6 +50,8 @@ public class RoomController {
 	private final RoomService roomService;
 	private final RoomTokenProvider roomTokenProvider;
 	private final AttendeeService attendeeService;
+	private final RoomHistoryService roomHistoryService;
+	private final TokenManager tokenManager;
 
 	@PostMapping
 	@Operation(summary = "✨ 방 만들기", description = "방을 만들며, 방장을 설정하고, cookie(roomToken)을 준다, 해당 방에 참여자를 추가한다.")
@@ -67,12 +76,13 @@ public class RoomController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
+	// todo 모임 중심 위치가 마지막에 변경되면 변경된 중심역과 해당 역과의 참여자들의 route, duration 계산하기
 	@PatchMapping("/{roomUUID}/move")
 	@Operation(summary = "✨ 방 중심 위치 수정", description = "방 중심 위치 수정이 게임끝나고 모임위치 결정하고 나면 보낸다.")
 	public ResponseEntity<?> moveRoom(@PathVariable UUID roomUUID, @RequestBody RoomMoveReq roomMoveReq) {
-		roomService.moveRoom(roomUUID, roomMoveReq);
+		RoomMoveRes roomMoveRes = roomService.moveRoom(roomUUID, roomMoveReq);
 
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		return ResponseEntity.status(HttpStatus.OK).body(roomMoveRes);
 	}
 
 	@GetMapping("/{roomUUID}/middle")
@@ -122,16 +132,54 @@ public class RoomController {
 		return ResponseEntity.status(HttpStatus.OK).body(roomGetRes);
 	}
 
-
 	@PostMapping("/{roomUUID}/join")
 	@Operation(summary = "✨ 참여자가 방에 입장한다.", description = "사용자가 방에 입장한다. cookie(roomToken)을 준다, 해당 방에 참여자를 추가한다.")
-	public ResponseEntity<?> joinRoom(@PathVariable UUID roomUUID, @RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response){
-		RoomJoinRes roomJoinRes = attendeeService.createAttendee(roomUUID, attendeeCreateReq);
+	public ResponseEntity<?> joinRoom(@PathVariable UUID roomUUID, @RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response, HttpServletRequest request){
+
+		String email = "";
+		Cookie[] cookies = request.getCookies();
+		String accessToken = null;
+		String refreshToken = null;
+		for(Cookie cookie : cookies) {
+			if(cookie.getName().equals("accessToken")) {
+				accessToken = cookie.getValue();
+			}
+			if(cookie.getName().equals("refreshToken")) {
+				refreshToken = cookie.getValue();
+			}
+		}
+
+		if(accessToken != null && refreshToken != null) {
+			try {
+				Claims claims = tokenManager.getTokenClaims(accessToken);
+				email = claims.get("email").toString();
+			} catch (ExpiredJwtException e){
+				String newAccessToken = null;
+
+				if(tokenManager.validateRefreshToken(refreshToken))
+					newAccessToken = tokenManager.reissueToken(refreshToken);
+
+				if (newAccessToken != null) {
+					accessToken = newAccessToken;
+					Cookie aceessTokenCookie = new Cookie("accessToken", accessToken);
+					aceessTokenCookie.setPath("/");
+					response.addCookie(aceessTokenCookie);
+				}
+
+				Claims tokenClaims = tokenManager.getTokenClaims(accessToken);
+				email = tokenClaims.get("email").toString();
+
+			}catch (Exception e) {
+				throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
+			}
+		}
+
+		RoomJoinRes roomJoinRes = attendeeService.createAttendee(roomUUID, attendeeCreateReq, email);
 
 		RoomJwtTokenClaims roomJwtTokenClaims = RoomJwtTokenClaims.builder()
-				.roomUUID(roomJoinRes.getRoomUUID())
-				.attendeeUUID(roomJoinRes.getAttendeeUUID())
-				.build();
+			.roomUUID(roomJoinRes.getRoomUUID())
+			.attendeeUUID(roomJoinRes.getAttendeeUUID())
+			.build();
 
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims);
 
@@ -142,4 +190,13 @@ public class RoomController {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(roomJoinRes);
 	}
+
+	@GetMapping("/{roomUUID}/summary")
+	@Operation(summary = "초대장 생성을 위한 방 정보 api", description = "해당 방의 최종 정보를 가져온다.")
+	public ResponseEntity<?> getRoomSummary(@PathVariable UUID roomUUID){
+		RoomHistoryRes roomHistoryRes = roomHistoryService.getRoomSummary(roomUUID);
+		return ResponseEntity.status(HttpStatus.OK).body(roomHistoryRes);
+	}
+
+
 }

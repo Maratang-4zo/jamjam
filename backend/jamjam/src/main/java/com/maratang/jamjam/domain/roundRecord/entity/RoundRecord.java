@@ -1,23 +1,15 @@
 package com.maratang.jamjam.domain.roundRecord.entity;
 
-import java.time.LocalDateTime;
-
+import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.game.entity.Game;
 import com.maratang.jamjam.domain.gameRecord.entity.GameRecord;
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "round_record")
@@ -42,15 +34,22 @@ public class RoundRecord extends BaseTimeEntity {
 
 	private String stationName;
 
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "attendee_id")
+	private Attendee attendee;
+
 	@Builder
-	public RoundRecord(Long roundRecordId, Integer round, LocalDateTime endedAt, Game game, GameRecord gameRecord,
-		String stationName) {
+	public RoundRecord(Long roundRecordId, Integer round, LocalDateTime endedAt, Game game, GameRecord gameRecord, String stationName, Attendee attendee) {
 		this.roundRecordId = roundRecordId;
 		this.round = round;
 		this.endedAt = endedAt;
 		this.game = game;
 		this.gameRecord = gameRecord;
 		this.stationName = stationName;
+		this.attendee = attendee;
+	}
+
+	public void updateStationName(String stationName){
+		this.stationName = stationName;
 	}
 }
-

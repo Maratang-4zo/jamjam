@@ -101,16 +101,21 @@ const SaveButton = styled.button`
 `;
 
 function ProfileBox() {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState("");
-  const [newNickname, setNewNickname] = useState("");
-  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
+  const [modalVisible, setModalVisible] = useState(false); //닉네임 수정창 보이게
+  const [modalContent, setModalContent] = useState(""); // 닉네임 수정창 내용
+  const [newNickname, setNewNickname] = useState(""); // nickname 상태
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom); // userInfoAtom 에 변경된 nickname업뎃용
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const data = await getUserInfo();
-        setUserInfo(data);
+        setUserInfo((prevState) => ({
+          ...prevState,
+          nickname: data.nickname,
+          email: data.email,
+          profileImageUrl: data.profileImageUrl,
+        }));
       } catch (error) {
         console.error("사용자 정보 가져오기 실패", error);
       }
@@ -119,10 +124,13 @@ function ProfileBox() {
     fetchUserInfo();
   }, [setUserInfo]);
 
+  //모달 여는 함수
   const handleModalOpen = (content) => {
     setModalContent(content);
     setModalVisible(true);
-    setNewNickname(userInfo.nickname);
+    //모달 열었을 때 input 창에 기존 nickname 채워져 있기
+    // setNewNickname(userInfo.nickname);
+    setNewNickname("");
   };
 
   const handleModalClose = () => {
@@ -130,6 +138,7 @@ function ProfileBox() {
     setModalContent("");
   };
 
+  // 닉네임 수정 하고 저장 눌렀을 때 실행되는 함수
   const handleSaveNickname = async () => {
     try {
       await updateUserNickname(newNickname);
@@ -139,13 +148,14 @@ function ProfileBox() {
       }));
       handleModalClose();
     } catch (error) {
+      console.log();
       console.error("닉네임 수정 실패 ", error);
     }
   };
   return (
     <>
       <ProfileWrapper>
-        <ProfileImage src={userInfo.profile} alt="profile" />
+        <ProfileImage src={userInfo.profileImageUrl} alt="profile" />
       </ProfileWrapper>
       <Nickname onClick={() => handleModalOpen("닉네임 수정")}>
         {userInfo.nickname}
@@ -159,6 +169,7 @@ function ProfileBox() {
             <>
               <Input
                 type="text"
+                placeholder={userInfo.nickname}
                 value={newNickname}
                 onChange={(e) => setNewNickname(e.target.value)}
               />

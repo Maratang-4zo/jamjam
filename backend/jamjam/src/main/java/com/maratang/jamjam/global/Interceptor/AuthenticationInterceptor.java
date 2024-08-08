@@ -54,10 +54,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 			}
 		}
 
+		log.info("refresh"+refreshToken);
 		String newAccessToken = null;
 
 		if (!tokenManager.validateAccessToken(accessToken)) {
-			newAccessToken = tokenManager.reissueToken(refreshToken);
+			if(tokenManager.validateRefreshToken(refreshToken))
+				newAccessToken = tokenManager.reissueToken(refreshToken);
 		}
 
 		if (newAccessToken != null) {
@@ -74,7 +76,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		if (newAccessToken != null) {
 			Cookie aceessTokenCookie = new Cookie("accessToken", accessToken);
 			aceessTokenCookie.setPath("/");
+			response.addCookie(aceessTokenCookie);
 		}
+
 		request.setAttribute("email", tokenClaims.get("email"));
 
 		return true;

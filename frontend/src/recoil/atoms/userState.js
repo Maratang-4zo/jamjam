@@ -11,12 +11,10 @@ export const userInfoAtom = atom({
       lon: 127,
     },
     duration: null, //소요시간
-    route:
-      "ydrdFc{aeW@??@@r@DfBDv@I@Bh@J|@Px@^j@n@As@AHLmA`BW\\g@p@aChDoAbBy@hA", //중심지까지 경로
-    profileImgUrl:
-      "https://github.com/user-attachments/assets/abd3aedb-207c-429f-a47a-8d631a34a41b", // 이미지
-    nickname: "김민경",
-    email: "",
+    route: null, //중심지까지 경로
+    profileImageUrl: null, // 이미지
+    nickname: null,
+    email: null,
     winningRate: {},
     meetingHistory: [],
   },

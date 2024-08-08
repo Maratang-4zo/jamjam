@@ -57,19 +57,44 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(memberRes);
 	}
 
+	// @PatchMapping("/info")
+	// @Operation(summary = "유저 정보 수정", description = "원하는 닉네임으로 수정할 수 있다.")
+	// public ResponseEntity<?> updateMemberInfo(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, @RequestBody MemberPatchReq memberPatchReq) {
+	//
+	// 	String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
+	// 	log.info("업데이트 확인중");
+	// 	Member member = memberService.findMemberByEmail(memberEmail);
+	// 	Member updateMember = memberService.updateMember(member, memberPatchReq);
+	// 	MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(updateMember);
+	// 	log.info("업데이트 확인중22 : "+memberRes.getNickname());
+	//
+	// 	return ResponseEntity.status(HttpStatus.OK).body(memberRes);
+	// }
+
 	@PatchMapping("/info")
-	@Operation(summary = "유저 정보 수정", description = "원하는 닉네임으로 수정할 수 있다.")
 	public ResponseEntity<?> updateMemberInfo(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, @RequestBody MemberPatchReq memberPatchReq) {
+		try {
+			log.info("일단 들어옴");
+			String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
+			log.info("Updating member info for email: " + memberEmail);
+			log.info("Received patch request: " + memberPatchReq);
 
-		String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
-		log.info("업데이트 확인중");
-		Member member = memberService.findMemberByEmail(memberEmail);
-		Member updateMember = memberService.updateMember(member, memberPatchReq);
-		MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(updateMember);
-		log.info("업데이트 확인중22 : "+memberRes.getNickname());
+			Member member = memberService.findMemberByEmail(memberEmail);
+			log.info("Found member: " + member);
 
-		return ResponseEntity.status(HttpStatus.OK).body(memberRes);
+			Member updateMember = memberService.updateMember(member, memberPatchReq);
+			log.info("Updated member: " + updateMember);
+
+			MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(updateMember);
+			log.info("Mapped to MemberRes: " + memberRes);
+
+			return ResponseEntity.status(HttpStatus.OK).body(memberRes);
+		} catch (Exception e) {
+			log.error("Error updating member info", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+		}
 	}
+
 
 
 	@GetMapping("/game-history")

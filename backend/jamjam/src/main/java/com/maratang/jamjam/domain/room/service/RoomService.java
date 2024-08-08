@@ -1,15 +1,5 @@
 package com.maratang.jamjam.domain.room.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
@@ -43,9 +33,13 @@ import com.maratang.jamjam.global.station.SubwayDataLoader;
 import com.maratang.jamjam.global.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
-
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -304,8 +298,6 @@ public class RoomService {
 
 				attendee.updateRoute(combinedPolyline);
 				attendee.updateDuration(totalDuration);
-
-				System.out.println(attendee.getRoute() + "++" + attendee.getDuration());
 			}
 		}
 		attendeeRepository.saveAll(attendees);

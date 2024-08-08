@@ -30,6 +30,7 @@ public interface RoomMapper {
 	@Mapping(source = "room.purpose", target = "purpose")
 	RoomHistoryRes roomToRoomHistoryRes(Room room);
 
+	
 	@Mapping(source = "room.name", target = "name")
 	@Mapping(source = "room.finalStation", target = "finalStation")
 	@Mapping(source = "room.meetingDate", target = "meetingDate")

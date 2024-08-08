@@ -1,5 +1,15 @@
 package com.maratang.jamjam.domain.room.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
@@ -13,6 +23,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
@@ -33,13 +44,9 @@ import com.maratang.jamjam.global.station.SubwayDataLoader;
 import com.maratang.jamjam.global.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
+
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -307,12 +314,6 @@ public class RoomService {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
-		// Transforming attendees' coordinates into Point instances, skipping null values
-		List<Point> points = room.getAttendees().stream()
-			.filter(attendee -> attendee.getLat() != null && attendee.getLon() != null)
-			.map(attendee -> new Point(attendee.getLat(), attendee.getLon()))
-			.collect(Collectors.toList());
-
 		String startStation = room.getStartStation();
 
 		if (startStation == null){
@@ -335,11 +336,25 @@ public class RoomService {
 	}
 
 	@Transactional
-	public void moveRoom(UUID roomUUID, RoomMoveReq roomMoveReq) {
+	public RoomMoveRes moveRoom(UUID roomUUID, RoomMoveReq roomMoveReq) {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		room.updateStartStation(roomMoveReq.getStartStation());
+
+		SubwayInfo selectedStation = subwayDataLoader.getSubwayInfo(roomMoveReq.getStartStation());
+
+		saveOptimalRoutesForUsersInRoomToDatabase(room, selectedStation);
+
+		room.updateStartStation(selectedStation.getName());
+
+		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
+		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
+
+		return RoomMoveRes.builder()
+			.roomCenterStart(selectedStation)
+			.attendees(attendeeList)
+			.build();
 	}
 
 }

@@ -21,6 +21,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.error.ErrorCode;
@@ -67,12 +68,13 @@ public class RoomController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
+	// todo 모임 중심 위치가 마지막에 변경되면 변경된 중심역과 해당 역과의 참여자들의 route, duration 계산하기
 	@PatchMapping("/{roomUUID}/move")
 	@Operation(summary = "✨ 방 중심 위치 수정", description = "방 중심 위치 수정이 게임끝나고 모임위치 결정하고 나면 보낸다.")
 	public ResponseEntity<?> moveRoom(@PathVariable UUID roomUUID, @RequestBody RoomMoveReq roomMoveReq) {
-		roomService.moveRoom(roomUUID, roomMoveReq);
+		RoomMoveRes roomMoveRes = roomService.moveRoom(roomUUID, roomMoveReq);
 
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		return ResponseEntity.status(HttpStatus.OK).body(roomMoveRes);
 	}
 
 	@GetMapping("/{roomUUID}/middle")

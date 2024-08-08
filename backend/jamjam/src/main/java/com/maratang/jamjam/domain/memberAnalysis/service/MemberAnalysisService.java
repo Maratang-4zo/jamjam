@@ -32,7 +32,7 @@ public class MemberAnalysisService {
 			.orElseThrow(()-> new BusinessException(ErrorCode.MEMBERANALYSIS_NOT_FOUND));
 		List<MemberAnalysisRes> resList = new ArrayList<>();
 		for(MemberAnalysis memberAnalysis : list) {
-			int winRate = Math.round(memberAnalysis.getGameWinCount()/memberAnalysis.getGameCount()*100);
+			int winRate = Math.round((memberAnalysis.getGameWinCount()*100)/memberAnalysis.getGameCount());
 			MemberAnalysisRes res = MemberAnalysisRes.builder()
 				.gameName(memberAnalysis.getGame().getName())
 				.winRate(winRate)

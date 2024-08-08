@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.member.dto.request.MemberPatchReq;
-import com.maratang.jamjam.domain.member.dto.request.MemberReq;
 import com.maratang.jamjam.domain.member.dto.response.MemberRes;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.member.mapper.MemberMapper;
@@ -63,18 +62,11 @@ public class MemberController {
 	public ResponseEntity<?> updateMemberInfo(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, @RequestBody MemberPatchReq memberPatchReq) {
 
 		String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
-		MemberReq memberReq = MemberReq.builder()
-			.email(memberEmail)
-			.nickname(memberPatchReq.getNickname())
-			.build();
-		Member member = memberMapper.INSTANCE.memberReqToMember(memberReq);
-		Member updateMember = memberService.updateMember(member);
+		log.info("업데이트 확인중");
+		Member member = memberService.findMemberByEmail(memberEmail);
+		Member updateMember = memberService.updateMember(member, memberPatchReq);
 		MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(updateMember);
-
-		if(httpServletRequest.getAttribute("accessToken") != null) {
-			String accessToken = (String) httpServletRequest.getAttribute("accessToken");
-			httpServletResponse.addHeader("accessToken", accessToken);
-		}
+		log.info("업데이트 확인중22 : "+memberRes.getNickname());
 
 		return ResponseEntity.status(HttpStatus.OK).body(memberRes);
 	}

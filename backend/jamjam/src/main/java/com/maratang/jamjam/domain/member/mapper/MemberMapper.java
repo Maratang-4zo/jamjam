@@ -1,6 +1,7 @@
 package com.maratang.jamjam.domain.member.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.maratang.jamjam.domain.member.dto.request.MemberReq;
@@ -15,5 +16,8 @@ public interface MemberMapper {
 	MemberRes memberToMemberRes(Member member);
 
 	Member memberReqToMember(MemberReq memberReq);
+
+	@Mapping(source = "updateNickname", target = "nickname")
+	Member updateMember(String updateNickname, Member member);
 
 }

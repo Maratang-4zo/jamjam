@@ -64,7 +64,7 @@ export const axiosGetWinRate = async () => {
 // 모임 기록 가져오기 함수
 export const axiosGetMeetingHistory = async () => {
   try {
-    const response = await axiosInstance.get("api/members/meeting-history");
+    const response = await axiosInstance.get("api/members/room-history");
     return response.data;
   } catch (error) {
     console.error("모임 기록 가져오기 실패");

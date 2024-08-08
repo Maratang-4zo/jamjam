@@ -6,21 +6,27 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.maratang.jamjam.domain.member.dto.request.MemberPatchReq;
 import com.maratang.jamjam.domain.member.entity.Member;
+import com.maratang.jamjam.domain.member.mapper.MemberMapper;
 import com.maratang.jamjam.domain.member.repository.MemberRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.error.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+	private final MemberMapper memberMapper;
 
+	@Transactional
 	public Member registerMember(Member member) {
 		validateDuplicateMember(member);
 		return memberRepository.save(member);
@@ -42,7 +48,6 @@ public class MemberService {
 		return null;
 	}
 
-	@Transactional(readOnly = true)
 	public Member findMemberByRefreshToken(String refreshToken) {
 		Member member = memberRepository.findByRefreshToken(refreshToken)
 			.orElseThrow(() -> new AuthenticationException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
@@ -53,16 +58,11 @@ public class MemberService {
 		return member;
 	}
 
-	public Member updateMember(Member member) {
-		Optional<Member> postMember = memberRepository.findByEmail(member.getEmail());
-		if(postMember.isPresent()) {
-			Member memberToUpdate = postMember.get();
-			System.out.println(memberToUpdate.getNickname());
-			memberToUpdate.setNickname(member.getNickname());
-			return memberRepository.save(memberToUpdate);
-		}else{
-			throw new AuthenticationException(ErrorCode.MEMBER_NOT_EXISTS);
-		}
+	@Transactional
+	public Member updateMember(Member member, MemberPatchReq memberPatchReq) {
+		log.info("여기 멤버서비스 수정중"+memberPatchReq.getNickname());
+		Member updateMember = memberMapper.updateMember(memberPatchReq.getNickname(), member);
+		return memberRepository.save(updateMember);
 	}
 
 	// @Transactional(readOnly = true)

@@ -13,15 +13,6 @@ import useOpenVidu from "../hooks/useOpenVidu";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const APP_KEY = process.env.REACT_APP_KAKAO_CLIENT_ID;
-const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
-// const link = `https://jjam.shop/api/login/authorize?redirectUri=`;
-// const link = `http://70.12.114.94:8080/api/login/authorize`;
-
-// const loginHandler = () => {
-//   window.location.href = link;
-// };
-
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: ${(props) => props.theme.wrapperWidth};
@@ -124,34 +115,6 @@ const Form = styled.form`
   flex-direction: column;
   align-items: center;
 `;
-const fetchToken = async () => {
-  try {
-    const response = await axios.get("https://jjam.shop/api/login/authorize", {
-      withCredentials: true,
-    });
-
-    const accessToken = response.headers["accessToken"];
-    console.log(accessToken);
-    if (accessToken) {
-      window.localStorage.setItem("accessToken", accessToken);
-
-      console.log("Access Token:", accessToken);
-    } else {
-      console.error("토큰을 가져올 수 없습니다.");
-    }
-  } catch (error) {
-    console.error("axios 요청 실패 ", error);
-    if (error.response) {
-      console.error("Response data:", error.response.data);
-      console.error("Response status:", error.response.status);
-      console.error("Response headers:", error.response.headers);
-    } else if (error.request) {
-      console.error("Request data:", error.request);
-    } else {
-      console.error("Error message:", error.message);
-    }
-  }
-};
 
 function JoinRoom() {
   const { roomUUID } = useParams();
@@ -189,14 +152,14 @@ function JoinRoom() {
     <Wrapper>
       <NavBarUp />
       <Container>
-        <KakaotalkButton>
+        <KakaotalkButton hide={isLoggedIn}>
           <a
             href={`https://jjam.shop/api/login/authorize?redirectUri=/room/${roomUUID}/join`}
           >
             카카오톡으로 로그인
           </a>
         </KakaotalkButton>
-        <OrText>or</OrText>
+        <OrText hide={isLoggedIn}>or</OrText>
         <Form onSubmit={handleSubmit(attendRoomFn)}>
           <NicknameInput>
             <label> 닉네임: </label>

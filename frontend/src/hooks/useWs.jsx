@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { chatAtom, roomAtom } from "../recoil/atoms/roomState";
-import { playerState } from "../recoil/atoms/playerState";
+import { playerState, selectedGameAtom } from "../recoil/atoms/playerState";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = "https://jjam.shop";
@@ -14,7 +14,8 @@ const useWs = () => {
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const client = useRef({});
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
-  const [players, setPlayers] = useRecoilState(playerState);
+  const setPlayers = useSetRecoilState(playerState);
+  const setSelectedGame = useSetRecoilState(selectedGameAtom);
 
   const connect = () => {
     return new Promise((resolve, reject) => {
@@ -94,6 +95,20 @@ const useWs = () => {
     }
   };
 
+  const sendUpdatePage = ({ roomNextPage, gameId }) => {
+    client.current.publish({
+      destination: `/pub/page`,
+      body: JSON.stringify({
+        roomNextPage,
+        gameId,
+      }),
+    });
+  };
+
+  const handleWinnerUpdate = (message) => {
+    return;
+  };
+
   const handleGameCenterUpdate = (message) => {
     setRoomInfo((prev) => ({
       ...prev,
@@ -101,8 +116,9 @@ const useWs = () => {
     }));
   };
 
-  const handleRoomPageUpdate = ({ roomNextPage, roomUUID, game }) => {
+  const handleRoomPageUpdate = ({ roomNextPage, roomUUID, gameId }) => {
     if (roomNextPage === "game") {
+      setSelectedGame(gameId);
       navigate(`room/${roomUUID}/game`);
     } else if (roomNextPage === "gamechoice") {
       navigate(`room/${roomUUID}/gamechoice`);
@@ -198,12 +214,13 @@ const useWs = () => {
   return {
     connected,
     chatLogs,
-    sendChat,
     connect,
     subscribe,
     disconnect,
     handleMessage,
+    sendChat,
     sendGame,
+    sendUpdatePage,
   };
 };
 

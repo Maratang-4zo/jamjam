@@ -13,8 +13,9 @@ const useWs = () => {
   const [connected, setConnected] = useState(false);
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const client = useRef(null); // 초기화 null로 변경
-  const roomInfo = useRecoilValue(roomAtom);
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const [players, setPlayers] = useRecoilState(playerState);
+  const setSelectedGame = useSetRecoilState(selectedGameAtom);
 
   const connect = useCallback(() => {
     return new Promise((resolve, reject) => {

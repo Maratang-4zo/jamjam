@@ -18,6 +18,8 @@ import com.maratang.jamjam.domain.member.mapper.MemberMapper;
 import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.domain.memberAnalysis.dto.response.MemberAnalysisRes;
 import com.maratang.jamjam.domain.memberAnalysis.service.MemberAnalysisService;
+import com.maratang.jamjam.domain.room.dto.response.RoomHistoryRes;
+import com.maratang.jamjam.domain.room.service.RoomHistoryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +36,7 @@ public class MemberController {
 	private final MemberService memberService;
 	private final MemberMapper memberMapper;
 	private final MemberAnalysisService memberAnalysisService;
+	private final RoomHistoryService roomHistoryService;
 
 	@GetMapping("/info")
 	@Operation(summary = "유저 정보 보기", description = "유저의 정보를 출력한다.")
@@ -42,13 +45,14 @@ public class MemberController {
 		String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
 		log.info("정보임:"+memberEmail);
 		Member member = memberService.findMemberByEmail(memberEmail);
+		log.info("있니? "+member.getEmail());
 		MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(member);
-
-		log.info("정보내놔: ");
-		if(httpServletRequest.getAttribute("accessToken") != null) {
-			String accessToken = (String) httpServletRequest.getAttribute("accessToken");
-			httpServletResponse.addHeader("accessToken", accessToken);
-		}
+		//
+		// log.info("정보내놔: ");
+		// if(httpServletRequest.getAttribute("accessToken") != null) {
+		// 	String accessToken = (String) httpServletRequest.getAttribute("accessToken");
+		// 	httpServletResponse.addHeader("accessToken", accessToken);
+		// }
 		log.info("정보임:"+memberRes.getEmail());
 
 		return ResponseEntity.status(HttpStatus.OK).body(memberRes);
@@ -85,11 +89,16 @@ public class MemberController {
 		return ResponseEntity.ok().body(list);
 	}
 
-	/*
+
 	@GetMapping("/room-history")
 	@Operation(summary = "모임 히스토리 보기", description = "회원의 모임 기록을 본다.")
-	public ResponseEntity<List<>>
-	 */
+	public ResponseEntity<List<RoomHistoryRes>> getMemberRoomHistory(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+		String memberEmail = String.valueOf(httpServletRequest.getAttribute("email"));
+		Member member = memberService.findMemberByEmail(memberEmail);
+		List<RoomHistoryRes> list = roomHistoryService.getRoomHistory(member.getMemberId());
+		return ResponseEntity.ok().body(list);
+	}
+
 
 
 }

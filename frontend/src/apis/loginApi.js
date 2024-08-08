@@ -43,15 +43,22 @@ export const getUserInfo = async () => {
 // 닉네임 업데이트 함수
 export const updateUserNickname = async (newNickname) => {
   try {
-    await axiosInstance.patch("/api/members/info", {
+    const response = await axiosInstance.patch("/api/members/info", {
       nickname: newNickname,
     });
+    return response.data;
   } catch (error) {
     console.error("닉네임 수정 실패", error);
-    throw error;
+    if (error.response) {
+      console.error("서버 응답:", error.response.data);
+      throw new Error(`닉네임 수정 실패: ${error.response.data}`);
+    } else if (error.request) {
+      throw new Error("서버 응답 없음");
+    } else {
+      throw new Error(`오류 발생: ${error.message}`);
+    }
   }
 };
-
 // 승률 가져오기 함수
 export const axiosGetWinRate = async () => {
   try {

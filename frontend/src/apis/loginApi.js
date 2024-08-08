@@ -41,9 +41,11 @@ export const getUserInfo = async () => {
 };
 
 // 닉네임 업데이트 함수
-export const updateUserNickname = async (nickname) => {
+export const updateUserNickname = async (newNickname) => {
   try {
-    await axiosInstance.patch("/api/members/info", { nickname });
+    await axiosInstance.patch("/api/members/info", {
+      nickname: newNickname,
+    });
   } catch (error) {
     console.error("닉네임 수정 실패", error);
     throw error;

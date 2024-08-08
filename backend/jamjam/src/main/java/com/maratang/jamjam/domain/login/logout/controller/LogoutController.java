@@ -45,6 +45,12 @@ public class LogoutController {
 				cookie[i].setSecure(true);
 				httpServletResponse.addCookie(cookie[i]);
 			}
+			if (cookie[i].getName().equals("accessToken")) {
+				cookie[i].setMaxAge(0);
+				cookie[i].setValue(null);
+				cookie[i].setPath("/");
+				httpServletResponse.addCookie(cookie[i]);
+			}
 		}
 
 		log.info("LOGOUT SUCCESS");

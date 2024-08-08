@@ -105,6 +105,20 @@ public class TokenManager {
 		}
 	}
 
+	public boolean validateRefreshToken(String token) {
+		try {
+			Jwts.parser().setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
+				.parseClaimsJws(token);
+			return true;
+		} catch (ExpiredJwtException e) {
+			log.info("refreshToken 만료", e);
+			throw new AuthenticationException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+		} catch (Exception e) {
+			log.info("유효하지 않은 인증", e);
+			throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
+		}
+	}
+
 	public String reissueToken(String refreshToken) {
 		Member member = memberService.findMemberByRefreshToken(refreshToken);
 		String newToken = createAccessToken(member.getEmail(), member.getNickname(), createAccessTokenExpireTime());

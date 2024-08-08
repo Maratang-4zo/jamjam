@@ -54,10 +54,10 @@ function MeetingBox() {
   return (
     <>
       {meetingHistory.map((meeting, index) => {
-        const meetingDate = meeting.meetingDate.split("T")[0];
+        // const meetingDate = meeting.meetingDate.split("T")[0];
         return (
           <MeetingHistory key={index}>
-            <MeetingTextWrapper>{meetingDate}</MeetingTextWrapper>
+            <MeetingTextWrapper>{meeting.meetingDate}</MeetingTextWrapper>
             <Element>
               {meeting.name}
               <br />

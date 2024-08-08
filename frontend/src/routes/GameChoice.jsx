@@ -100,6 +100,7 @@ function GameChoice() {
       navigate(`/room/${roomUUID}/game`, { state: { selectedGame } });
     }
   };
+
   return (
     <>
       <GlobalStyle />

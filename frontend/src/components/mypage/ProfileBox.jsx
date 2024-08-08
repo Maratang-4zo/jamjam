@@ -110,7 +110,12 @@ function ProfileBox() {
     const fetchUserInfo = async () => {
       try {
         const data = await getUserInfo();
-        setUserInfo(data);
+        setUserInfo((prevState) => ({
+          ...prevState,
+          nickname: data.nickname,
+          email: data.email,
+          profileImageUrl: data.profileImageUrl,
+        }));
       } catch (error) {
         console.error("사용자 정보 가져오기 실패", error);
       }

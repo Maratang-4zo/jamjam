@@ -48,7 +48,7 @@ const IMG = styled.img`
 
 const TextContainer = styled.div`
   position: absolute;
-  left: -90%;
+  left: -80%;
   text-align: left;
   font-size: 90px;
   line-height: 1; /* 줄 사이 간격 줄이기 */

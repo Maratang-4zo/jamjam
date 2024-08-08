@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -10,11 +10,11 @@ const API_BASE_URL = "https://jjam.shop";
 const useWs = () => {
   const [connected, setConnected] = useState(false);
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
-  const client = useRef({});
+  const client = useRef(null); // 초기화 null로 변경
   const roomInfo = useRecoilValue(roomAtom);
   const [players, setPlayers] = useRecoilState(playerState);
 
-  const connect = () => {
+  const connect = useCallback(() => {
     return new Promise((resolve, reject) => {
       if (connected) {
         console.log("Already connected");
@@ -22,7 +22,7 @@ const useWs = () => {
       }
       client.current = new Client({
         webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
-        debug: function (str) {
+        debug: (str) => {
           console.log(str);
         },
         reconnectDelay: 5000,
@@ -42,22 +42,24 @@ const useWs = () => {
       });
       client.current.activate();
     });
-  };
+  }, [connected]);
 
-  const subscribe = () => {
-    client.current.subscribe(`/sub/rooms/${roomInfo.roomUUID}`, (message) => {
-      handleMessage(JSON.parse(message.body));
-    });
-  };
+  const subscribe = useCallback(() => {
+    if (client.current) {
+      client.current.subscribe(`/sub/rooms/${roomInfo.roomUUID}`, (message) => {
+        handleMessage(JSON.parse(message.body));
+      });
+    }
+  }, [roomInfo.roomUUID]);
 
-  const disconnect = () => {
+  const disconnect = useCallback(() => {
     if (client.current) {
       client.current.deactivate();
       setConnected(false);
     }
-  };
+  }, []);
 
-  const handleMessage = (message) => {
+  const handleMessage = useCallback((message) => {
     console.log(message.type);
     switch (message.type) {
       case "CHAT_RECEIVED":
@@ -72,63 +74,71 @@ const useWs = () => {
       default:
         console.error("Unknown message type:", message.type);
     }
-  };
+  }, []);
 
-  const sendChat = ({ content }) => {
-    client.current.publish({
-      destination: `/pub/chat/send`,
-      body: JSON.stringify({
-        content,
-      }),
-    });
-  };
+  const sendChat = useCallback(({ content }) => {
+    if (client.current) {
+      client.current.publish({
+        destination: `/pub/chat/send`,
+        body: JSON.stringify({ content }),
+      });
+    }
+  }, []);
 
-  const handleChatLogs = (message) => {
-    const { attendeeUUID, content, createdAt } = message;
-    const attendant = roomInfo.attendees.find(
-      (attendee) => attendee.attendeeUUID === attendeeUUID,
-    );
-    const nickname = attendant.nickname;
-    const n = {
-      attendeeUUID,
-      nickname,
-      content,
-      createdAt,
-    };
-    setChatLogs((prevChatLogs) => [...prevChatLogs, n]);
-    console.log(message);
-  };
-
-  const updateRoomStatus = (message) => {
-    console.log("Room status updated:", message);
-  };
-
-  const handleAvatarPosition = (message) => {
-    setPlayers((prevPlayers) => {
-      const updatedPlayers = prevPlayers.map((player) =>
-        player.attendeeUUID === message.attendeeUUID
-          ? { ...player, bottom: message.bottom }
-          : player,
+  const handleChatLogs = useCallback(
+    (message) => {
+      const { attendeeUUID, content, createdAt } = message;
+      const attendant = roomInfo.attendees.find(
+        (attendee) => attendee.attendeeUUID === attendeeUUID,
       );
-      return updatedPlayers;
-    });
-  };
+      const nickname = attendant ? attendant.nickname : "Unknown";
+      const newChatLog = {
+        attendeeUUID,
+        nickname,
+        content,
+        createdAt,
+      };
+      setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+      console.log(message);
+    },
+    [roomInfo.attendees, setChatLogs],
+  );
 
-  const sendGame = ({ newBottom }) => {
+  const updateRoomStatus = useCallback((message) => {
+    console.log("Room status updated:", message);
+  }, []);
+
+  const handleAvatarPosition = useCallback(
+    (message) => {
+      setPlayers((prevPlayers) => {
+        const updatedPlayers = prevPlayers.map((player) =>
+          player.attendeeUUID === message.attendeeUUID
+            ? { ...player, bottom: message.bottom }
+            : player,
+        );
+        return updatedPlayers;
+      });
+    },
+    [setPlayers],
+  );
+
+  const sendGame = useCallback(({ newBottom }) => {
     if (client.current) {
       client.current.publish({
         destination: `/pub/game/updatePosition`,
         body: JSON.stringify({ bottom: newBottom }),
       });
     }
-  };
+  }, []);
 
   useEffect(() => {
-    connect();
+    connect().catch((error) => {
+      console.error("WebSocket connection failed:", error);
+    });
     return () => {
       disconnect();
     };
-  }, []);
+  }, [connect, disconnect]);
 
   return {
     connected,

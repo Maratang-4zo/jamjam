@@ -114,6 +114,10 @@ public class Attendee extends BaseTimeEntity {
 		this.route = route;
 	}
 
+	public void updateMember(Member member) {
+		this.member = member;
+	}
+
 	public void updateProfileImageUrl(ProfileType profileImageUrl) {
 		this.profileImageUrl = profileImageUrl;
 	}

@@ -24,11 +24,15 @@ public interface RoomMapper {
 
 	Room roomCreateReqToAttendee(RoomCreateReq roomCreateReq);
 
-	@Mapping(target = "room.name", source = "name")
-	@Mapping(target = "room.finalStation", source = "finalStation")
-	@Mapping(target = "room.meetingDate", source = "meetingDate")
-	@Mapping(target = "room.purpose", source = "purpose")
+	@Mapping(source = "room.name", target = "name")
+	@Mapping(source = "room.finalStation", target = "finalStation")
+	@Mapping(source = "room.meetingDate", target = "meetingDate")
+	@Mapping(source = "room.purpose", target = "purpose")
 	RoomHistoryRes roomToRoomHistoryRes(Room room);
 
+	@Mapping(source = "room.name", target = "name")
+	@Mapping(source = "room.finalStation", target = "finalStation")
+	@Mapping(source = "room.meetingDate", target = "meetingDate")
+	@Mapping(source = "room.purpose", target = "purpose")
 	List<RoomHistoryRes> roomsToRoomHistoryResList(List<Room> rooms);
 }

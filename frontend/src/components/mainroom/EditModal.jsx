@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import styled, { createGlobalStyle } from "styled-components";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { roomAtom } from "../../recoil/atoms/roomState";
-import FindDeparture from "./Departure";
+import styled, { createGlobalStyle } from "styled-components";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { roomAtom } from "../../recoil/atoms/roomState";
+import { useForm, Controller } from "react-hook-form";
+import { axiosPatchRoomInfo } from "../../apis/roomApi";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 
 const GlobalStyle = createGlobalStyle`
@@ -23,7 +24,7 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 10000;
 `;
 
 const ModalContent = styled.div`
@@ -32,7 +33,21 @@ const ModalContent = styled.div`
   border-radius: 10px;
   text-align: center;
   z-index: 1001;
-  display: ${(props) => (props.hidden ? "none" : "flex")};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 10px;
+  right: 70px;
+`;
+
+const ModalContentForm = styled.form`
+  background: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  z-index: 1001;
+  display: flex;
   flex-direction: column;
   align-items: center;
   position: absolute;
@@ -42,17 +57,19 @@ const ModalContent = styled.div`
 
 const Calendar = styled.div`
   width: 250px;
-  margin-bottom: 20px;
 `;
 
 const Button = styled.button`
-  margin-top: 20px;
   padding: 10px 20px;
   background: black;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  &:hover {
+    background-color: #303030;
+    transition: 0.2s;
+  }
 `;
 
 const Btns = styled.div`
@@ -63,64 +80,91 @@ const Btns = styled.div`
   align-items: center;
 `;
 
-const FindBtn = styled.button`
+const NameInput = styled.input`
   width: 250px;
-  background-color: none;
-  border-radius: 15px;
-  border: 2px solid black;
-  padding: 10px 0;
-  &:hover {
-    background-color: #00000074;
-    transition: 0.3s;
-    color: white;
+  border: 1.5px solid #ffffff0f;
+  padding: 5px;
+  border-radius: 5px;
+  outline: none;
+  background: none;
+  margin-bottom: 10px;
+  background-color: #ffffff5c;
+
+  &:focus {
+    border: 1.5px solid white;
+    transition: 0.1s;
   }
 `;
 
-function EditModal({ isOpen, onClose, onAddressSelect }) {
-  const { isHost } = useRecoilValue(userInfoAtom);
-  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
-  const [roomInfo] = useRecoilState(roomAtom);
-  const [address, setAddress] = useState(null);
-  const [isFindDepartureOpen, setIsFindDepartureOpen] = useState(false);
-  const [meetingDate, setMeetingDate] = useState(new Date());
+const Select = styled.select`
+  width: 250px;
+  padding: 5px;
+  border: 1.5px solid #ffffff0f;
+  border-radius: 5px;
+  outline: none;
+  background-color: #ffffff5c;
+  margin-bottom: 10px;
+  option {
+    background: none;
+  }
+  &:focus {
+    border: 1.5px solid white;
+    transition: 0.1s;
+  }
+`;
 
-  const handleAddressSelect = (data) => {
-    setAddress(data);
-    setIsFindDepartureOpen(false);
-  };
+const InfoP = styled.p`
+  width: 250px;
+  padding: 10px;
+  border-radius: 5px;
+  outline: none;
+  background: none;
+  margin-bottom: 10px;
+  background-color: #ffffff5c;
+  display: flex;
+  justify-content: space-between;
+  span {
+    font-weight: 600;
+  }
+`;
 
-  const editInfoFn = () => {
-    const updatedAddress = address || userInfo.departure;
+function EditModal({ isOpen, onClose }) {
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const userInfo = useRecoilValue(userInfoAtom);
+  const { register, handleSubmit, control, setValue } = useForm({
+    defaultValues: {
+      roomName: roomInfo.roomName,
+      roomPurpose: roomInfo.roomPurpose,
+      meetingDate: new Date(roomInfo.meetingDate),
+    },
+  });
 
-    setUserInfo((prevState) => ({
-      ...prevState,
-      departure: {
-        address: updatedAddress.address,
-        lat: updatedAddress.lat,
-        lon: updatedAddress.lon,
-      },
-    }));
+  const onSubmit = async (data) => {
+    try {
+      await axiosPatchRoomInfo({
+        roomUUID: roomInfo.roomUUID,
+        meetingDate: data.meetingDate.toISOString(),
+        roomPurpose: data.roomPurpose,
+        roomName: data.roomName,
+      });
 
-    onAddressSelect({
-      addressText: updatedAddress.addressText,
-      latitude: updatedAddress.latitude,
-      longitude: updatedAddress.longitude,
-      meetingDate: meetingDate.toISOString(),
-    });
-
+      setRoomInfo((prev) => ({
+        ...prev,
+        meetingDate: data.meetingDate.toISOString(),
+        roomPurpose: data.roomPurpose,
+        roomName: data.roomName,
+      }));
+    } catch (error) {
+      console.error("방 정보 업데이트 실패:", error);
+    }
     onClose();
-  };
-
-  const handleRetry = () => {
-    setAddress(null);
-    setIsFindDepartureOpen(true);
   };
 
   useEffect(() => {
     if (roomInfo && roomInfo.meetingDate) {
-      setMeetingDate(new Date(roomInfo.meetingDate)); // roomInfo의 meetingDate로 설정
+      setValue("meetingDate", new Date(roomInfo.meetingDate));
     }
-  }, [roomInfo]);
+  }, [roomInfo, setValue]);
 
   if (!isOpen) {
     return null;
@@ -132,50 +176,93 @@ function EditModal({ isOpen, onClose, onAddressSelect }) {
     }
   };
 
+  const purpose = {
+    sports: "스포츠",
+    music: "음악",
+    study: "스터디",
+    travel: "여행",
+    food: "음식",
+  };
+
   return (
     <>
       <ModalOverlay onClick={handleOverlayClick}>
         <GlobalStyle />
-        <ModalContent
-          hidden={isFindDepartureOpen}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Calendar>
-            <DatePicker
-              selected={meetingDate}
-              onChange={(date) => setMeetingDate(date)}
-              dateFormat="yyyy/MM/dd"
-              inline
+        {userInfo.isHost ? (
+          <ModalContentForm
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <NameInput
+              {...register("roomName")}
+              placeholder={roomInfo.roomName}
             />
-          </Calendar>
-          {!address && !isFindDepartureOpen && (
-            <FindBtn onClick={() => setIsFindDepartureOpen(true)}>
-              {userInfo.departure.address}
-              <hr />
-              다시 찾을래요
-            </FindBtn>
-          )}
-          {address && (
-            <>
-              <FindBtn onClick={() => setIsFindDepartureOpen(true)}>
-                {address.addressText}
-                <hr />
-                다시 찾을래요
-              </FindBtn>
-            </>
-          )}
-          <Btns>
-            <Button onClick={onClose}>취소</Button>
-            <Button onClick={editInfoFn}>확인</Button>
-          </Btns>
-        </ModalContent>
+
+            <Select
+              {...register("roomPurpose", {
+                required: `${roomInfo.roomPurpose}`,
+              })}
+            >
+              <option value="" disabled hidden>
+                {roomInfo.roomPurpose}
+              </option>
+              <option value="sports">스포츠</option>
+              <option value="music">음악</option>
+              <option value="study">스터디</option>
+              <option value="travel">여행</option>
+              <option value="food">음식</option>
+            </Select>
+            <Calendar>
+              <Controller
+                control={control}
+                name="meetingDate"
+                render={({ field }) => (
+                  <DatePicker
+                    selected={field.value}
+                    onChange={(date) => field.onChange(date)}
+                    dateFormat="yyyy/MM/dd"
+                    inline
+                  />
+                )}
+              />
+            </Calendar>
+            <Btns>
+              <Button type="button" onClick={onClose}>
+                취소
+              </Button>
+              <Button type="submit">확인</Button>
+            </Btns>
+          </ModalContentForm>
+        ) : (
+          <ModalContent
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <InfoP>
+              방 이름
+              <span>{roomInfo.roomName}</span>
+            </InfoP>
+            <InfoP>
+              모임 목적
+              <span>{purpose[roomInfo.roomPurpose]}</span>
+            </InfoP>
+            <Calendar>
+              <Controller
+                control={control}
+                name="meetingDate"
+                render={({ field }) => (
+                  <DatePicker
+                    selected={field.value}
+                    onChange={(date) => field.onChange(date)}
+                    dateFormat="yyyy/MM/dd"
+                    inline
+                  />
+                )}
+              />
+            </Calendar>
+          </ModalContent>
+        )}
       </ModalOverlay>
-      {isFindDepartureOpen && (
-        <FindDeparture
-          onClose={() => setIsFindDepartureOpen(false)}
-          onAddressSelect={handleAddressSelect}
-        />
-      )}
     </>
   );
 }

@@ -17,6 +17,7 @@ export function axiosGetMiddle({ roomUUID }) {
     });
 }
 
+// 사용자 출발지 수정
 export function axiosUpdateUserInfo({ address, lat, lon }) {
   return axios.patch(BASE_URL + `/api/attendees`, {
     address,

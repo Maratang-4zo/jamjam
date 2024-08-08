@@ -2,11 +2,11 @@ import GameBoxes from "../components/gamechoice/GameBoxes";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import NavBarLeft from "../components/fixed/NavBarLeft";
 import wavebutton from "../assets/wavebutton.svg";
 import { roomAtom } from "../recoil/atoms/roomState";
-import { playerState } from "../recoil/atoms/playerState";
+import { playerState, selectedGameAtom } from "../recoil/atoms/playerState";
 import { userInfoAtom } from "../recoil/atoms/userState";
 
 const GlobalStyle = createGlobalStyle`
@@ -78,7 +78,7 @@ const PlayButtonText = styled.div`
 `;
 
 function GameChoice() {
-  const [selectedGame, setSelectedGame] = useState(null);
+  const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
   const navigate = useNavigate();
   const { roomUUID } = useParams();
   const roomInfo = useRecoilValue(roomAtom);

@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import styled, { keyframes } from "styled-components";
+import { useNavigate } from "react-router-dom";
 import {
-  chatModalVisibleAtom,
   roomAtom,
   isGameFinishAtom,
   isNextMiddleExistAtom,
-  aroundStationsAtom,
   selectedStationAtom,
   totalRoundAtom,
   currentRoundAtom,
+  chatModalVisibleAtom,
 } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
+import questionIcon from "../../assets/icons/questionMark.PNG";
+import inviteIcon from "../../assets/icons/inviteIcon.png";
+import shareIcon from "../../assets/icons/shareIcon.png";
+import updateIcon from "../../assets/icons/updateIcon.png";
 import TutorialModal from "./Tutorial";
-import { axiosGetMiddle } from "../../apis/mapApi";
-import { useNavigate } from "react-router-dom";
 import Loading from "../fixed/Loading";
+import FindDeparture from "./Departure";
+import { axiosGetMiddle } from "../../apis/mapApi";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -97,94 +101,6 @@ const SmallIcon = styled.img`
   height: 35px;
 `;
 
-const RightBtns = styled.div`
-  position: absolute;
-  right: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-`;
-
-const StationBtn = styled.div`
-  width: 180px;
-  height: 80px;
-  flex-shrink: 0;
-  border-radius: 30px;
-  border: 5px solid ${(props) => props.color};
-  background-color: ${(props) => props.theme.subaccentColor + "95"};
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  perspective: 1000px;
-  cursor: pointer;
-
-  &:hover .inner {
-    transform: rotateY(180deg);
-  }
-  &:focus {
-    outline: none;
-    background-color: ${(props) => props.theme.infoColorHover + "95"};
-  }
-
-  .inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-  }
-
-  .front,
-  .back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 30px;
-  }
-
-  .front {
-    span {
-      color: ${(props) => props.theme.accentColor};
-      font-family: "Galmuri11";
-      font-size: 40px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: normal;
-    }
-  }
-
-  .back {
-    background-color: none;
-    transform: rotateY(180deg);
-    span {
-      color: ${(props) => props.theme.accentColor};
-      font-family: "Galmuri11";
-      font-size: 20px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: normal;
-    }
-  }
-`;
-
-const fadeInUp = keyframes`
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(-0px);
-    opacity: 1;
-  }
-`;
-
 const RoundSetting = styled.div`
   display: flex;
   align-items: center;
@@ -195,7 +111,6 @@ const RoundSetting = styled.div`
   border: 3px solid #000;
   border-bottom: none;
   background-color: ${(props) => props.theme.bgColor};
-  animation: ${fadeInUp} 0.3s ease-in-out;
 `;
 
 const RoundBtn = styled.button`
@@ -216,8 +131,8 @@ const RoundBtn = styled.button`
     transition: 0.3s;
   }
   cursor: pointer;
-  z-index: 1000;
 `;
+
 const RoundBtn2 = styled.button`
   display: flex;
   width: 50px;
@@ -277,7 +192,79 @@ const OkBtn = styled.button`
   pointer-events: ${(props) => (props.isTutorialModalOpen ? "none" : "auto")};
 `;
 
-function Buttons({ onOpenEditModal, onOpenShareModal }) {
+const AddressButton = styled.button`
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffffff40;
+  border: 3px solid #000000;
+  border-radius: 14px;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1200; // 적절한 z-index 값 설정
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  p {
+    color: black;
+    width: 100%;
+    font-size: 15px;
+  }
+  &:hover {
+    background-color: #00000040;
+    transition: 0.3s;
+  }
+`;
+
+const ConfirmAddressModal = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: ${(props) => props.theme.bgColor + "a8"};
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1300;
+  text-align: center;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  p {
+    color: black;
+    font-weight: 600;
+  }
+`;
+
+const ConfirmAddressBtns = styled.div`
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+`;
+
+const ConfirmAddressBtn = styled.button`
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #303030;
+    transition: 0.2s;
+  }
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1299;
+`;
+
+function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const [isTutorialModalOpen, setIsTutorialModalOpen] = useState(false);
   const [currentTutorialPage, setCurrentTutorialPage] = useState(1);
   const [roundSetting, setRoundSetting] = useState(false);
@@ -289,7 +276,6 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
   const setChatVisible = useSetRecoilState(chatModalVisibleAtom);
   const [isGameFinish, setIsGameFinishAtom] = useRecoilState(isGameFinishAtom);
   const isNextMiddleExist = useRecoilValue(isNextMiddleExistAtom);
-  const aroundStations = useRecoilValue(aroundStationsAtom);
   const [selectedStation, setSelectedStation] =
     useRecoilState(selectedStationAtom);
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
@@ -297,58 +283,9 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
   const [currentRound, setCurrentRound] = useRecoilState(currentRoundAtom);
   const [isMiddleLoading, setIsMiddleLoading] = useState(false);
   const [isFinalLoading, setIsFinalLoading] = useState(false);
-
-  const lineColor = {
-    LINE_1: "#0052A4", // 01호선
-    LINE_2: "#009D3E", // 02호선
-    LINE_3: "#EF7C1C", // 03호선
-    LINE_4: "#00A5DE", // 04호선
-    LINE_5: "#996CAC", // 05호선
-    LINE_6: "#CD7C2F", // 06호선
-    LINE_7: "#747F00", // 07호선
-    LINE_8: "#EA545D", // 08호선
-    LINE_9: "#BDB092", // 09호선
-    GYEONGGANG: "#003DA5", // 경강선
-    GYEONGUI: "#77C4A3", // 경의선
-    GYEONGCHUN: "#0C8E72", // 경춘선
-    AIRPORT: "#0090D2", // 공항철도
-    GIMPOGOLD: "#AD8605", // 김포골드
-    BUNDANG: "#FABE00", // 분당선
-    SEOHAE: "#8FC31F", // 서해선
-    SUIIN: "#FABE00", // 수인선
-    SINBUNDANG: "#D31145", // 신분당선
-    YONGINGYEONGJEON: "#6FB245", // 용인경전철
-    UIISHINSEOLGYEONGJEON: "#B7C452", // 우이신설경전철
-    UIJEONBUGYEONGJEON: "#F5A200", // 의정부경전철
-    INCHEON: "#7CA8D5", // 인천선
-    INCHEON2: "#ED8B00", // 인천2호선
-  };
-
-  const lineName = {
-    LINE_1: "1호선",
-    LINE_2: "2호선",
-    LINE_3: "3호선",
-    LINE_4: "4호선",
-    LINE_5: "5호선",
-    LINE_6: "6호선",
-    LINE_7: "7호선",
-    LINE_8: "8호선",
-    LINE_9: "9호선",
-    GYEONGGANG: "경강선",
-    GYEONGUI: "경의선",
-    GYEONGCHUN: "경춘선",
-    AIRPORT: "공항철도",
-    GIMPOGOLD: "김포골드",
-    BUNDANG: "분당선",
-    SEOHAE: "서해선",
-    SUIIN: "수인선",
-    SINBUNDANG: "신분당선",
-    YONGINGYEONGJEON: "용인경전철",
-    UIISHINSEOLGYEONGJEON: "우이신설경전철",
-    UIJEONBUGYEONGJEON: "의정부경전철",
-    INCHEON: "인천선",
-    INCHEON2: "인천2호선",
-  };
+  const [isFindDepartureOpen, setIsFindDepartureOpen] = useState(false);
+  const [address, setAddress] = useState(null);
+  const [confirmAddressOpen, setConfirmAddressOpen] = useState(false);
 
   const openTutorialModal = () => {
     setIsTutorialModalOpen(true);
@@ -378,10 +315,6 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
     }
   };
 
-  const handleStationClick = (station) => {
-    setSelectedStation(station);
-  };
-
   const handleDecision = () => {
     if (selectedStation) {
       setRoomState((prev) => ({
@@ -408,6 +341,16 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
     // 여기부터는 axios 호출 끝나고 넣을 애들
     navigate(`/room/${roomState.roomUUID}/result`);
     // setIsFinalLoading(false);
+  };
+
+  const handleAddressSelect = (data) => {
+    setAddress(data);
+    setConfirmAddressOpen(true);
+  };
+
+  const handleConfirmAddress = () => {
+    onAddressSelect(address);
+    setConfirmAddressOpen(false);
   };
 
   const handleClickOutside = (e) => {
@@ -444,131 +387,119 @@ function Buttons({ onOpenEditModal, onOpenShareModal }) {
     setTotalRound(round);
   };
 
+  const handleCancelAddress = () => {
+    setConfirmAddressOpen(false);
+    setIsFindDepartureOpen(true);
+  };
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setConfirmAddressOpen(false);
+    }
+  };
+
   return (
     <>
       {isMiddleLoading ? <Loading message={"모임장소 찾는"} /> : null}
-      {isFinalLoading ? <Loading message={"모임장소 내역 불러오는"} /> : null}
       <BottomBtns>
-        {isGameFinish ? null : (
-          <>
-            <SmallBtn
-              onClick={openTutorialModal}
+        <SmallBtn
+          onClick={openTutorialModal}
+          isTutorialModalOpen={isTutorialModalOpen}
+        >
+          <SmallIcon src={questionIcon} />
+        </SmallBtn>
+        {roundSetting ? (
+          <RoundBox>
+            <RoundSetting>
+              <RoundBtn onClick={decreaseRound}>-</RoundBtn>
+              <span>{round}</span>
+              <RoundBtn2 onClick={increaseRound}>+</RoundBtn2>
+            </RoundSetting>
+            <OkBtn
+              onClick={handleConfirmGame}
               isTutorialModalOpen={isTutorialModalOpen}
+              highlight={currentTutorialPage === 2}
             >
-              <SmallIcon src={alertIcon} />
-            </SmallBtn>
-            {roundSetting ? (
-              <RoundBox>
-                <RoundSetting>
-                  <RoundBtn onClick={decreaseRound}>-</RoundBtn>
-                  <span>{round}</span>
-                  <RoundBtn2 onClick={increaseRound}>+</RoundBtn2>
-                </RoundSetting>
-                <OkBtn
-                  onClick={handleConfirmGame}
-                  isTutorialModalOpen={isTutorialModalOpen}
-                  highlight={currentTutorialPage === 2}
-                >
-                  확인
-                </OkBtn>
-              </RoundBox>
-            ) : (
-              <BigBtn
-                onClick={handleGameButtonClick}
-                disabled={!roomState.isCenterExist || !userInfo.isHost}
-                isTutorialModalOpen={isTutorialModalOpen}
-                highlight={currentTutorialPage === 2}
-              >
-                GAME
-              </BigBtn>
-            )}
-
-            <BigBtn
-              onClick={handleFindCenter}
-              disabled={
-                !roomState.isAllHasDeparture ||
-                !userInfo.isHost ||
-                roomState.isCenterExist
-              }
-              isTutorialModalOpen={isTutorialModalOpen}
-              highlight={currentTutorialPage === 1}
-            >
-              중심 찾기
-            </BigBtn>
-          </>
-        )}
-        {isGameFinish && !isNextMiddleExist ? (
-          <BigBtn onClick={handleDecision} disabled={!selectedStation}>
-            결정
+              확인
+            </OkBtn>
+          </RoundBox>
+        ) : (
+          <BigBtn
+            onClick={handleGameButtonClick}
+            disabled={!roomState.isCenterExist || !userInfo.isHost}
+            isTutorialModalOpen={isTutorialModalOpen}
+            highlight={currentTutorialPage === 2}
+          >
+            GAME
           </BigBtn>
-        ) : null}
-        {isGameFinish && isNextMiddleExist ? (
-          totalRound === currentRound ? (
-            <BigBtn onClick={handleFinalResultBtnClick}>Final Result</BigBtn>
-          ) : (
-            <BigBtn onClick={handleNextRoundBtnClick}>Next Round</BigBtn>
-          )
-        ) : null}
+        )}
+
+        <BigBtn
+          onClick={handleFindCenter}
+          disabled={
+            !roomState.isAllHasDeparture ||
+            !userInfo.isHost ||
+            roomState.isCenterExist
+          }
+          isTutorialModalOpen={isTutorialModalOpen}
+          highlight={currentTutorialPage === 1}
+        >
+          중심 찾기
+        </BigBtn>
       </BottomBtns>
-
-      {isGameFinish ? null : (
-        <RightTopBtns>
-          <SmallBtn
-            onClick={onOpenEditModal}
-            isTutorialModalOpen={isTutorialModalOpen}
-          >
-            수정
-          </SmallBtn>
-          <SmallBtn
-            onClick={() => onOpenShareModal("초대 링크 공유", "50px")}
-            isTutorialModalOpen={isTutorialModalOpen}
-          >
-            초대
-          </SmallBtn>
-          <SmallBtn
-            onClick={() => onOpenShareModal("모임 정보 공유", "110px")}
-            isTutorialModalOpen={isTutorialModalOpen}
-          >
-            공유
-          </SmallBtn>
-        </RightTopBtns>
-      )}
-
-      {isGameFinish && !isNextMiddleExist ? (
-        <RightBtns>
-          {aroundStations.map((station, index) => (
-            <StationBtn
-              tabIndex="0"
-              key={index}
-              className="station-btn"
-              color={lineColor[station.subwayLines[0]]}
-              onClick={() => handleStationClick(station)}
-            >
-              <div className="inner">
-                <div className="front">
-                  <span>{station.name}</span>
-                </div>
-                <div className="back">
-                  <span>
-                    {station.subwayLines
-                      .map((line) => lineName[line])
-                      .join(" ")}
-                  </span>
-                </div>
-              </div>
-            </StationBtn>
-          ))}
-        </RightBtns>
-      ) : null}
-
+      <RightTopBtns>
+        <SmallBtn
+          onClick={onOpenEditModal}
+          isTutorialModalOpen={isTutorialModalOpen}
+        >
+          <SmallIcon src={userInfo.isHost ? updateIcon : alertIcon} />
+        </SmallBtn>
+        <SmallBtn
+          onClick={() => onOpenShareModal("초대 링크 공유", "50px")}
+          isTutorialModalOpen={isTutorialModalOpen}
+        >
+          <SmallIcon src={inviteIcon} />
+        </SmallBtn>
+        <SmallBtn
+          onClick={() => onOpenShareModal("모임 정보 공유", "110px")}
+          isTutorialModalOpen={isTutorialModalOpen}
+        >
+          <SmallIcon src={shareIcon} />
+        </SmallBtn>
+      </RightTopBtns>
       <TutorialModal
         isOpen={isTutorialModalOpen}
         onClose={closeTutorialModal}
         currentPage={currentTutorialPage}
         setCurrentPage={setCurrentTutorialPage}
       />
+      <AddressButton onClick={() => setIsFindDepartureOpen(true)}>
+        <p>{userInfo.departure.address}</p>
+      </AddressButton>
+      {isFindDepartureOpen && (
+        <FindDeparture
+          onClose={() => setIsFindDepartureOpen(false)}
+          onAddressSelect={handleAddressSelect}
+        />
+      )}
+      {confirmAddressOpen && (
+        <ModalOverlay onClick={handleOverlayClick}>
+          <ConfirmAddressModal>
+            <p>{address.addressText}</p>
+            <ConfirmAddressBtns>
+              <ConfirmAddressBtn onClick={handleConfirmAddress}>
+                확인
+              </ConfirmAddressBtn>
+              <ConfirmAddressBtn onClick={handleCancelAddress}>
+                다시 찾기
+              </ConfirmAddressBtn>
+              <ConfirmAddressBtn onClick={() => setConfirmAddressOpen(false)}>
+                취소
+              </ConfirmAddressBtn>
+            </ConfirmAddressBtns>
+          </ConfirmAddressModal>
+        </ModalOverlay>
+      )}
     </>
   );
 }
-
-export default Buttons;
+export default MainButtons;

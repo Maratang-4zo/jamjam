@@ -19,10 +19,12 @@ import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomHistoryRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
+import com.maratang.jamjam.domain.room.service.RoomHistoryService;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -44,6 +46,7 @@ public class RoomController {
 	private final RoomService roomService;
 	private final RoomTokenProvider roomTokenProvider;
 	private final AttendeeService attendeeService;
+	private final RoomHistoryService roomHistoryService;
 
 	@PostMapping
 	@Operation(summary = "✨ 방 만들기", description = "방을 만들며, 방장을 설정하고, cookie(roomToken)을 준다, 해당 방에 참여자를 추가한다.")
@@ -143,5 +146,12 @@ public class RoomController {
 		response.addCookie(cookie);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(roomJoinRes);
+	}
+
+	@GetMapping("/{roomUUID}/summary")
+	@Operation(summary = "초대장 생성을 위한 방 정보 api", description = "해당 방의 최종 정보를 가져온다.")
+	public ResponseEntity<?> getRoomSummary(@PathVariable UUID roomUUID){
+		RoomHistoryRes roomHistoryRes = roomHistoryService.getRoomSummary(roomUUID);
+		return ResponseEntity.status(HttpStatus.OK).body(roomHistoryRes);
 	}
 }

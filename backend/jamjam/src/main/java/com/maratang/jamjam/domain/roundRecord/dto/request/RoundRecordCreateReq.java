@@ -3,7 +3,7 @@ package com.maratang.jamjam.domain.roundRecord.dto.request;
 import lombok.Getter;
 
 @Getter
-public class RoundRecordCreateRequest {
+public class RoundRecordCreateReq {
 
     private Integer round;
     private Long gameId;

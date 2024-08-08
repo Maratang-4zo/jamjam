@@ -3,8 +3,8 @@ package com.maratang.jamjam.domain.roundRecord.dto.request;
 import lombok.Getter;
 
 @Getter
-public class RoundRecordUpdateRequest {
+public class RoundRecordUpdateReq {
 
     private Long roundRecordId;
-    private String stationName;
+    private String roundStationName;
 }

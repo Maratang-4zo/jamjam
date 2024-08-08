@@ -1,15 +1,20 @@
 package com.maratang.jamjam.domain.roundRecord.controller;
 
-import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordCreateRequest;
-import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordUpdateRequest;
-import com.maratang.jamjam.domain.roundRecord.service.RoundRecordService;
-import io.swagger.v3.oas.annotations.Operation;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
+import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordCreateReq;
+import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordUpdateReq;
+import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordUpdateRes;
+import com.maratang.jamjam.domain.roundRecord.service.RoundRecordService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/roundRecord")
@@ -20,17 +25,17 @@ public class RoundRecordController {
 
     @PostMapping
     @Operation(summary = "✨ 라운드 기록을 저장한다.", description = "라운드가 시작할때 저장한다. (만들어진 시간(시작시간)을 잰다)")
-    public ResponseEntity<?> createRoundRecode(@PathVariable UUID roomUUID, @RequestBody RoundRecordCreateRequest roundRecodeCreateRequest) {
+    public ResponseEntity<?> createRoundRecode(@RequestBody RoundRecordCreateReq roundRecodeCreateRequest) {
         roundRecordService.createRoundRecord(roundRecodeCreateRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @PatchMapping("/{roomUUID}")
+    @PatchMapping
     @Operation(summary = "✨ 라운드 기록을 수정한다.", description = "라운드가 끝났을 때 결정된 역과 마지막 시간을 저장한다.")
-    public ResponseEntity<?> updateRoundRecode(@PathVariable UUID roomUUID, @RequestBody RoundRecordUpdateRequest roundRecodeUpdateRequest) {
-        roundRecordService.updateRoundRecord(roomUUID, roundRecodeUpdateRequest);
+    public ResponseEntity<?> updateRoundRecode(@RequestBody RoundRecordUpdateReq roundRecodeUpdateRequest) {
+        RoundRecordUpdateRes roundRecordUpdateRes = roundRecordService.updateRoundRecord(roundRecodeUpdateRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(roundRecordUpdateRes);
     }
 }

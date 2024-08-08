@@ -1,8 +1,15 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import InfoBox from "../components/mypage/InfoBox";
 import MeetingBox from "../components/mypage/MeetingBox";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import { useRecoilState } from "recoil";
+import { userInfoAtom } from "../recoil/atoms/userState";
+import "react-toastify/dist/ReactToastify.css";
+
 const GlobalStyle = createGlobalStyle`
   body, html {
     margin: 0;
@@ -110,6 +117,9 @@ const Subtitle = styled.h1`
 const Mypage = () => {
   const infoBoxRef = useRef(null);
   const meetingBoxRef = useRef(null);
+  const navigate = useNavigate();
+  const [isLogined, setIsLogined] = useState(false);
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
 
   const scrollToRef = (ref) => {
     if (ref.current) {
@@ -117,36 +127,57 @@ const Mypage = () => {
     }
   };
 
+  useEffect(() => {
+    const token = Cookies.get("accessToken");
+    if (token) {
+      setIsLogined(true); // accessToken이 있으면 로그인 상태로 설정
+    } else {
+      // accessToken이 없으면 팝업을 띄우고 로그인 페이지로 리다이렉트
+      toast.error("로그인이 필요합니다! 로그인하러 슈슝", {
+        position: "top-center",
+        autoClose: 3000,
+        onClose: () => {
+          navigate("/");
+        },
+      });
+    }
+  }, [navigate]);
+
   return (
     <>
       <GlobalStyle />
       <DivWrapperContainer>
         <NavBarUp />
-        <Frame>
-          <TextWrapper>Hi, 길동</TextWrapper>
-          <Btns>
-            <Button onClick={() => scrollToRef(infoBoxRef)}>
-              <ButtonText>INFO</ButtonText>
-            </Button>
-            <Button onClick={() => scrollToRef(meetingBoxRef)}>
-              <ButtonText>MEETING HISTORY</ButtonText>
-            </Button>
-            <Button>
-              <ButtonText>LOG OUT</ButtonText>
-            </Button>
-          </Btns>
-        </Frame>
-        <Frame2>
-          <Subtitle>INFO</Subtitle>
-          <InfoContainer ref={infoBoxRef}>
-            <InfoBox />
-          </InfoContainer>
-          <Subtitle>MEETING HISTORY</Subtitle>
-          <MeetingContainer ref={meetingBoxRef}>
-            <MeetingBox />
-          </MeetingContainer>
-        </Frame2>
+        {isLogined && ( // isLogined가 true일 때만 렌더링
+          <>
+            <Frame>
+              <TextWrapper>Hi,{userInfo.nickname}</TextWrapper>
+              <Btns>
+                <Button onClick={() => scrollToRef(infoBoxRef)}>
+                  <ButtonText>INFO</ButtonText>
+                </Button>
+                <Button onClick={() => scrollToRef(meetingBoxRef)}>
+                  <ButtonText>MEETING HISTORY</ButtonText>
+                </Button>
+                <Button>
+                  <ButtonText>LOG OUT</ButtonText>
+                </Button>
+              </Btns>
+            </Frame>
+            <Frame2>
+              <Subtitle>INFO</Subtitle>
+              <InfoContainer ref={infoBoxRef}>
+                <InfoBox />
+              </InfoContainer>
+              <Subtitle>MEETING HISTORY</Subtitle>
+              <MeetingContainer ref={meetingBoxRef}>
+                <MeetingBox />
+              </MeetingContainer>
+            </Frame2>
+          </>
+        )}
       </DivWrapperContainer>
+      <ToastContainer />
     </>
   );
 };

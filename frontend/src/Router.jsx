@@ -12,14 +12,13 @@ import Ws from "./routes/ws";
 import ConnectOpenVidu from "./routes/OpenVidu";
 import InvalidRoom from "./routes/InvalidRoom";
 import Han from "./routes/Han";
-// import Auth from "./components/Auth";
 
 function Router() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/:userUUID" element={<Mypage />} />
+        <Route path="/mypage" element={<Mypage />} />
         <Route path="/room/create" element={<CreateRoom />} />
         <Route path="/room/:roomUUID" element={<Room />} />
         <Route path="/room/:roomUUID/join" element={<JoinRoom />} />
@@ -31,7 +30,7 @@ function Router() {
         <Route path="/room/:roomUUID/openvidu" element={<ConnectOpenVidu />} />
         <Route path="/invalid-room" element={<InvalidRoom />} />
         {/* <Route path="/oauth/kakao/callback" element={<Auth />} /> */}
-        <Route path="/han" element={<Han/>}/>
+        <Route path="/han" element={<Han />} />
       </Routes>
     </BrowserRouter>
   );

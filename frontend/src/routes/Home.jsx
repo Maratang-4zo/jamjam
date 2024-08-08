@@ -6,7 +6,11 @@ import { useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import Cookies from "js-cookie";
 import { getUserInfo } from "../apis/loginApi";
-
+import jamHi from "../assets/intro/jamHi.PNG";
+import jamPointing from "../assets/intro/jamPointing.PNG";
+import jamThinking from "../assets/intro/jamThinking.PNG";
+import jamGame from "../assets/intro/jamGame.PNG";
+// import "../index.css";
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: 100vw;
@@ -30,6 +34,13 @@ const Section = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 2rem;
+  font-family: "DungGeunMo";
+  flex-direction: column;
+`;
+
+const SectionSplit = styled(Section)`
+  flex-direction: row;
+  justify-content: space-between;
 `;
 
 const fadeIn = keyframes`
@@ -58,6 +69,23 @@ const AnimatedButton = styled.button`
   }
 `;
 
+const Image = styled.img`
+  width: auto;
+  height: 40%; /* 이미지 크기를 적절히 설정 */
+`;
+
+const TextContainer = styled.div`
+  margin-top: 20px;
+`;
+
+const SideTextContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 20px;
+`;
+
 function Home() {
   const setUserInfo = useSetRecoilState(userInfoAtom);
 
@@ -79,13 +107,24 @@ function Home() {
         });
     }
   }, [setUserInfo]);
+
   return (
     <>
       <Wrapper>
         <NavBarUp />
         <Container>
-          <Section>안녕하세요 잼잼입니당</Section>
-          <Section>페이지 투!!</Section>
+          <Section>
+            <Image src={jamHi} />
+            <TextContainer>안녕하세요 잼잼입니당</TextContainer>
+          </Section>
+          <SectionSplit>
+            <Image src={jamThinking} style={{ height: "100%" }} />
+            <TextContainer>혹시 약속정하는게 힘들지 않나요?</TextContainer>
+          </SectionSplit>
+          <Section>
+            <Image src={jamGame} />
+            <TextContainer>게임을 통해서 약속 정하기 어때요?</TextContainer>
+          </Section>
           <Section>
             <ButtonContainer>
               <AnimatedButton>

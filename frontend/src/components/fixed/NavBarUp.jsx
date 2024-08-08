@@ -61,7 +61,7 @@ function NavBarUp() {
         <Link to={`/`}>로고자리입니다</Link>
         <Right>
           {isLoggedIn ? (
-            <Link to={`/`}>MY PAGE</Link> // 로그인 상태일 때 ${userUUID}
+            <Link to={`/mypage`}>MY PAGE</Link> // 로그인 상태일 때 ${userUUID}
           ) : (
             <LoginP onClick={toggleModal}>LOGIN</LoginP> // 로그인되지 않은 상태일 때
           )}

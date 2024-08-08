@@ -27,7 +27,7 @@ export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
 
 // 방 유효성 검사
 export function axiosIsRoomValid({ roomUUID }) {
-  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/exist`);
+  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/exists`);
 }
 
 // 방 정보 받기

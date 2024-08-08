@@ -4,14 +4,16 @@ import { Client } from "@stomp/stompjs";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { chatAtom, roomAtom } from "../recoil/atoms/roomState";
 import { playerState } from "../recoil/atoms/playerState";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = "https://jjam.shop";
 
 const useWs = () => {
+  const navigate = useNavigate();
   const [connected, setConnected] = useState(false);
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const client = useRef({});
-  const roomInfo = useRecoilValue(roomAtom);
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const [players, setPlayers] = useRecoilState(playerState);
 
   const connect = () => {
@@ -69,9 +71,72 @@ const useWs = () => {
       case "AVATAR_POSITION":
         handleAvatarPosition(message);
         break;
+      case "ROOM_INFO_UPDATE":
+        handleRoomInfoUpdate(message);
+        break;
+      case "DEPARTURE_UPDATE":
+        handleDepartureUpdate(message);
+        break;
+      case "ROOM_CENTER_UPDATE":
+        handleRoomCenterUpdate(message);
+        break;
+      case "ROOM_PAGE_UPDATE":
+        handleRoomPageUpdate(message);
+        break;
+      case "GAME_WINNER_UPDATE":
+        handleWinnerUpdate(message);
+        break;
+      case "GAME_CENTERPLACE_UPDATE":
+        handleGameCenterUpdate(message);
+        break;
       default:
         console.error("Unknown message type:", message.type);
     }
+  };
+
+  const handleGameCenterUpdate = (message) => {
+    setRoomInfo((prev) => ({
+      ...prev,
+      centerPlace: message,
+    }));
+  };
+
+  const handleRoomPageUpdate = ({ roomNextPage, roomUUID, game }) => {
+    if (roomNextPage === "game") {
+      navigate(`room/${roomUUID}/game`);
+    } else if (roomNextPage === "gamechoice") {
+      navigate(`room/${roomUUID}/gamechoice`);
+    } else if (roomNextPage === "finalresult") {
+      navigate(`room/${roomUUID}/result`);
+    } else if (roomNextPage === "main") {
+      navigate(`room/${roomUUID}`);
+    }
+  };
+
+  const handleRoomCenterUpdate = ({ roomCenterStart, attendees }) => {
+    setRoomInfo((prev) => ({
+      ...prev,
+      centerPlace: roomCenterStart,
+      attendees,
+    }));
+  };
+
+  const handleDepartureUpdate = ({ attendeeUUID, address, lat, lon }) => {
+    setRoomInfo((prevRoomInfo) => {
+      const updatedAttendees = prevRoomInfo.attendees.map((attendee) =>
+        attendee.attendeeUUID === attendeeUUID
+          ? { ...attendee, address, lat, lon }
+          : attendee,
+      );
+      return { ...prevRoomInfo, attendees: updatedAttendees };
+    });
+  };
+
+  const handleRoomInfoUpdate = ({ meetingDate }) => {
+    setRoomInfo((prev) => ({
+      ...prev,
+      meetingDate,
+    }));
   };
 
   const sendChat = ({ content }) => {

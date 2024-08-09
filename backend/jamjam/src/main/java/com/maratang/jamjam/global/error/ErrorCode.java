@@ -70,7 +70,13 @@ public enum ErrorCode {
 	MIDDLE_NOT_SET_START_LOCATION(HttpStatus.NOT_FOUND, "MI005","먼저 방의 중심점을 먼저 설정해주세요"),
 
 	// roundRecord
-	RR_NOT_FOUND(HttpStatus.NOT_FOUND,"RR001","미팅룸 게임 라운드별 기록을 찾을 수 없습니다.");
+	RR_NOT_FOUND(HttpStatus.NOT_FOUND,"RR001","미팅룸 게임 라운드별 기록을 찾을 수 없습니다."),
+
+	// game
+	GAME_NOT_FOUND(HttpStatus.NOT_FOUND,"GA001","게임을 찾을 수 없습니다."),
+
+	// gameRecord
+	GR_NOT_FOUND(HttpStatus.NOT_FOUND,"GR001","게임 레코드 기록을 찾을 수 없습니다.");
 
 	private final HttpStatus status;
 	private final String code;

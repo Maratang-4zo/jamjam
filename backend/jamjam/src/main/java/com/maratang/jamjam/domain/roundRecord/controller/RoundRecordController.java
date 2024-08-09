@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordCreateReq;
+import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordGetReq;
 import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordUpdateReq;
+import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordGetRes;
 import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordUpdateRes;
 import com.maratang.jamjam.domain.roundRecord.service.RoundRecordService;
 
@@ -37,5 +39,13 @@ public class RoundRecordController {
         RoundRecordUpdateRes roundRecordUpdateRes = roundRecordService.updateRoundRecord(roundRecodeUpdateRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(roundRecordUpdateRes);
+    }
+
+    @PostMapping("/find")
+    @Operation(summary = "✨ 라운드 기록을 찾는다.", description = "현재 라운드 게임 기록의 라운드 별 기록을 찾는다.")
+    public ResponseEntity<?> getRoundRecode(@RequestBody RoundRecordGetReq roundRecodeGetRequest) {
+        RoundRecordGetRes roundRecordGetRes = roundRecordService.getRoundRecord(roundRecodeGetRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body(roundRecordGetRes);
     }
 }

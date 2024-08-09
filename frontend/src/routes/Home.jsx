@@ -10,7 +10,8 @@ import FirstSection from "../components/home/FirstSection";
 import SecondSection from "../components/home/SecondSection";
 import ThirdSection from "../components/home/ThirdSection";
 import FourthSection from "../components/home/FourthSection";
-
+import FifthSection from "../components/home/FifthSection";
+import SixthSection from "../components/home/SixthSection";
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: 100vw;
@@ -70,6 +71,8 @@ function Home() {
         </Section>
         <ThirdSection />
         <FourthSection />
+        <FifthSection />
+        <SixthSection />
       </Container>
     </Wrapper>
   );

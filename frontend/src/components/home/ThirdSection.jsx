@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import jamGame from "../../assets/intro/jamGame.PNG";
+import JamMap from "../../assets/intro/JamMap.PNG";
 
 const Section = styled.div`
   height: 100vh;
@@ -24,20 +24,20 @@ const Image = styled.img`
 const TextContainer = styled.div`
   margin-top: 20px;
   position: relative;
-  left: 120px; /* 이미지 오른쪽에 위치하도록 조정 */
+  left: 20px; /* 이미지 오른쪽에 위치하도록 조정 */
   text-align: right; /* 오른쪽 정렬 */
 `;
 
 function ThirdSection() {
   return (
     <Section>
-      <Image src={jamGame} />
+      <Image src={JamMap} />
       <TextContainer>
-        게임을 통한
+        만나는 사람과의
         <br />
-        모임장소 정하기
+        거리, 장소 등
         <br />
-        어때요?
+        신경써야 할게 많잖아
       </TextContainer>
     </Section>
   );

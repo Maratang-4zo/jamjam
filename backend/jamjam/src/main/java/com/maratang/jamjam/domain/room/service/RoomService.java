@@ -17,6 +17,10 @@ import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 import com.maratang.jamjam.domain.attendee.mapper.AttendeeMapper;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.board.dto.request.AttendeeUpdateReq;
+import com.maratang.jamjam.domain.randomName.entity.Name;
+import com.maratang.jamjam.domain.randomName.entity.Nick;
+import com.maratang.jamjam.domain.randomName.repository.NameRepository;
+import com.maratang.jamjam.domain.randomName.repository.NickRepository;
 import com.maratang.jamjam.domain.room.dto.request.RoomCloseReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
@@ -61,6 +65,8 @@ public class RoomService {
 	private final RoomTokenProvider roomTokenProvider;
 	private final HaversineDistance haversineDistance;
 	private final OTPUserClient oTPUserClient;
+	private final NickRepository nickRepository;
+	private final NameRepository nameRepository;
 
 	@Transactional
 	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq) {
@@ -70,10 +76,23 @@ public class RoomService {
 
 		room.updateAttendee(attendee);
 
-		attendeeRepository.save(attendee);
-		roomRepository.save(room);
+		String roomName = attendee.getNickname();
+
+		if (roomName.equals("")){
+			//todo 여기서 nick 테이블에 잇는 모든 value 중에 랜덤 값으로 정하기
+			Nick nick = nickRepository.findRandomNick();
+			Name name = nameRepository.findRandomName();
+			roomName = nick.getNick() + name.getName();
+		}
+
+		roomName = roomName + "님의 방";
+
+		room.updateName(roomName);
 
 		attendee.updateRoom(room);
+
+		attendeeRepository.save(attendee);
+		roomRepository.save(room);
 
 		UUID roomUUID = room.getRoomUUID();
 

@@ -8,8 +8,6 @@ import lombok.Getter;
 @Getter
 public class RoomCreateReq {
 	@NotBlank
-	private String name;
-	@NotBlank
 	private String purpose;
 	@NotBlank
 	private LocalDateTime meetingDate;

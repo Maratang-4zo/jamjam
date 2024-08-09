@@ -9,9 +9,9 @@ import com.maratang.jamjam.domain.game.dto.response.GameInfoRes;
 import com.maratang.jamjam.domain.game.entity.Game;
 
 @Mapper(componentModel = "spring")
-public interface GameInfoMapper {
+public interface GameMapper {
 
-	GameInfoMapper INSTANCE = Mappers.getMapper(GameInfoMapper.class);
+	GameMapper INSTANCE = Mappers.getMapper(GameMapper.class);
 
 	List<GameInfoRes> gameListToGameInfoListRes(List<Game> gameList);
 

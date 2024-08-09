@@ -12,5 +12,4 @@ public interface GameRecordRepository extends JpaRepository<GameRecord, Long> {
 
 	@Query("SELECT g FROM GameRecord g WHERE g.gameRecordUUID = :gameRecordUUID")
 	Optional<GameRecord> findByUUID(UUID gameRecordUUID);
-
 }

@@ -12,6 +12,7 @@ import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordCreateReq;
 import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordGetReq;
 import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordUpdateReq;
 import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordGetRes;
+import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordCreateRes;
 import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordUpdateRes;
 import com.maratang.jamjam.domain.roundRecord.service.RoundRecordService;
 
@@ -28,9 +29,9 @@ public class RoundRecordController {
     @PostMapping
     @Operation(summary = "✨ 라운드 기록을 저장한다.", description = "라운드가 시작할때 저장한다. (만들어진 시간(시작시간)을 잰다)")
     public ResponseEntity<?> createRoundRecode(@RequestBody RoundRecordCreateReq roundRecodeCreateRequest) {
-        roundRecordService.createRoundRecord(roundRecodeCreateRequest);
+        RoundRecordCreateRes roundRecordCreateRes = roundRecordService.createRoundRecord(roundRecodeCreateRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(roundRecordCreateRes);
     }
 
     @PatchMapping

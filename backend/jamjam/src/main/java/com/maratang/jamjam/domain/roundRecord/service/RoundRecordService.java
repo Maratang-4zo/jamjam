@@ -15,6 +15,7 @@ import com.maratang.jamjam.domain.roundRecord.dto.RoundRecordDTO;
 import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordCreateReq;
 import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordGetReq;
 import com.maratang.jamjam.domain.roundRecord.dto.request.RoundRecordUpdateReq;
+import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordCreateRes;
 import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordGetRes;
 import com.maratang.jamjam.domain.roundRecord.dto.response.RoundRecordUpdateRes;
 import com.maratang.jamjam.domain.roundRecord.entity.RoundRecord;
@@ -41,19 +42,23 @@ public class RoundRecordService {
     private final GameRecordRepository gameRecordRepository;
 
     @Transactional
-    public void createRoundRecord(RoundRecordCreateReq roundRecordCreateReq) {
+    public RoundRecordCreateRes createRoundRecord(RoundRecordCreateReq roundRecordCreateReq) {
         RoundRecord roundRecord = RoundRecordMapper.INSTANCE.roundRecordCreateReqToRoundRecord(roundRecordCreateReq);
 
         Game game = gameRepository.findById(roundRecordCreateReq.getGameId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.GAME_NOT_FOUND));
 
-        GameRecord gameRecord = gameRecordRepository.findById(roundRecordCreateReq.getGameRecordId())
+        GameRecord gameRecord = gameRecordRepository.findByUUID(roundRecordCreateReq.getGameRecordUUID())
                 .orElseThrow(() -> new BusinessException(ErrorCode.GR_NOT_FOUND));
 
         roundRecord.updateGame(game);
         roundRecord.updateGameRecord(gameRecord);
 
         roundRecordRepository.save(roundRecord);
+
+        return RoundRecordCreateRes.builder()
+            .roundRecordId(roundRecord.getRoundRecordId())
+            .build();
     }
 
     @Transactional
@@ -71,7 +76,10 @@ public class RoundRecordService {
     }
 
 	public RoundRecordGetRes getRoundRecord(RoundRecordGetReq roundRecordGetReq) {
-        List<RoundRecord> roundRecords = roundRecordRepository.findAllByGameRecordId(roundRecordGetReq.getGameRecordId());
+        GameRecord gameRecord = gameRecordRepository.findByUUID(roundRecordGetReq.getGameRecordUUID())
+            .orElseThrow(()->new BusinessException(ErrorCode.GR_NOT_FOUND));
+
+        List<RoundRecord> roundRecords = roundRecordRepository.findAllByGameRecordId(gameRecord.getGameRecordId());
         List<RoundRecordDTO> roundRecordList = RoundRecordDTO.of(roundRecords);
 
         return RoundRecordGetRes.builder()

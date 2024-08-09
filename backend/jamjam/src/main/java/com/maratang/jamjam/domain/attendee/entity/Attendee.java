@@ -8,7 +8,7 @@ import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.memberRoundRecord.entity.MemberRoundRecord;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
-import com.maratang.jamjam.global.room.constant.ProfileType;
+import com.maratang.jamjam.global.auth.room.constant.ProfileType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

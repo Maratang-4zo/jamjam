@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import com.maratang.jamjam.domain.aTest.RoomTestRes;
+import com.maratang.jamjam.backup.aTest.RoomTestRes;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomHistoryRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
@@ -30,7 +30,7 @@ public interface RoomMapper {
 	@Mapping(source = "room.purpose", target = "purpose")
 	RoomHistoryRes roomToRoomHistoryRes(Room room);
 
-	
+
 	@Mapping(source = "room.name", target = "name")
 	@Mapping(source = "room.finalStation", target = "finalStation")
 	@Mapping(source = "room.meetingDate", target = "meetingDate")

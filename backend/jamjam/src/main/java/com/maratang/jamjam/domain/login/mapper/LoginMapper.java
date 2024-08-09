@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import com.maratang.jamjam.domain.login.dto.response.LoginRes;
-import com.maratang.jamjam.global.jwt.dto.JwtTokenDto;
+import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
 
 @Mapper(componentModel = "spring")
 public interface LoginMapper {

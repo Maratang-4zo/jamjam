@@ -1,10 +1,10 @@
 import GameBoxes from "../gamechoice/GameBoxes";
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import wavebutton from "../../assets/wavebutton.svg";
 import { roomAtom } from "../../recoil/atoms/roomState";
-import { playerState } from "../../recoil/atoms/playerState";
+import { playerState, selectedGameAtom } from "../../recoil/atoms/playerState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import useWs from "../../hooks/useWs";
 
@@ -55,6 +55,7 @@ function GameChoice() {
   const userInfo = useRecoilValue(userInfoAtom);
   const setPlayerState = useSetRecoilState(playerState);
   const { sendUpdatePage } = useWs();
+  const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
 
   useEffect(() => {
     const initialPlayers = roomInfo.attendees.map((attendee) => ({

@@ -38,12 +38,6 @@ const AnimatedButton = styled.button`
   }
 `;
 
-// const Container = styled.div`
-//   display: flex;
-//   /* justify-content: center; */
-//   /* text-align: center; */
-// `;
-
 function FinalResult() {
   return (
     <Wrapper>

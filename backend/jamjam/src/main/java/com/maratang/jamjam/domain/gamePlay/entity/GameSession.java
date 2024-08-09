@@ -1,5 +1,6 @@
 package com.maratang.jamjam.domain.gameRecord.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.maratang.jamjam.domain.room.entity.Room;
@@ -23,43 +24,47 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "game_record")
+@Table(name = "game_session")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GameRecord {
+public class GameSession {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(columnDefinition = "INT UNSIGNED")
-	private Long gameRecordId;
-
-	@Column(nullable = false, unique = true, updatable = false)
-	private UUID gameRecordUUID;
+	private Long gameSessionId;
 
 	private Integer roundCnt;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ROOM_ID")
-	private Room room;
-
 	private String finalStationName;
 
+	private LocalDateTime endedAt;
+
+	@Column(nullable = false, unique = true, updatable = false)
+	private UUID gameSessionUUID;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "room_id")
+	private Room room;
+
 	@Enumerated(EnumType.STRING)
-	private GameRecordStatus gameRecordStatus;
+	private GameSessionStatus gameSessionStatus;
 
 	@Builder
-	public GameRecord(Long gameRecordId, UUID gameRecordUUID, Integer roundCnt, Room room, String finalStationName,
-		GameRecordStatus gameRecordStatus) {
-		this.gameRecordId = gameRecordId;
-		this.gameRecordUUID = gameRecordUUID;
+	public GameSession(Long gameSessionId, Integer roundCnt, String finalStationName, LocalDateTime endedAt,
+		UUID gameSessionUUID, Room room, GameSessionStatus gameSessionStatus) {
+		this.gameSessionId = gameSessionId;
 		this.roundCnt = roundCnt;
-		this.room = room;
 		this.finalStationName = finalStationName;
-		this.gameRecordStatus = gameRecordStatus;
+		this.endedAt = endedAt;
+		this.gameSessionUUID = gameSessionUUID;
+		this.room = room;
+		this.gameSessionStatus = gameSessionStatus;
 	}
 
 	@PrePersist
 	protected void onCreate() {
-		this.gameRecordUUID = UUID.randomUUID();
+		this.gameSessionUUID = UUID.randomUUID();
 	}
+
 
 	public void updateRoom(Room room) {
 		this.room = room;

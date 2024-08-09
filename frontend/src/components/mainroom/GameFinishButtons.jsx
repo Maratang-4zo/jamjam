@@ -10,6 +10,7 @@ import {
   selectedStationAtom,
   totalRoundAtom,
   currentRoundAtom,
+  roomPageAtom,
 } from "../../recoil/atoms/roomState";
 import Loading from "../fixed/Loading";
 
@@ -57,16 +58,17 @@ const BigBtn = styled.button`
 `;
 const RightBtns = styled.div`
   position: absolute;
-  right: 10px;
+  right: 15px;
+  top: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 15px;
 `;
 
 const StationBtn = styled.div`
-  width: 180px;
-  height: 80px;
+  width: 170px;
+  height: 75px;
   flex-shrink: 0;
   border-radius: 30px;
   border: 5px solid ${(props) => props.color};
@@ -111,7 +113,7 @@ const StationBtn = styled.div`
     span {
       color: ${(props) => props.theme.accentColor};
       font-family: "Galmuri11";
-      font-size: 40px;
+      font-size: 30px;
       font-style: normal;
       font-weight: 400;
       line-height: normal;
@@ -142,9 +144,10 @@ function GameFinishButtons() {
   const [selectedStation, setSelectedStation] =
     useRecoilState(selectedStationAtom);
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
-  const [totalRound, setTotalRound] = useRecoilState(totalRoundAtom);
+  const totalRound = useRecoilValue(totalRoundAtom);
   const [currentRound, setCurrentRound] = useRecoilState(currentRoundAtom);
   const [isFinalLoading, setIsFinalLoading] = useState(false);
+  const setRoomPage = useSetRecoilState(roomPageAtom);
 
   const handleStationClick = (station) => {
     setSelectedStation(station);
@@ -162,7 +165,7 @@ function GameFinishButtons() {
 
   const handleNextRoundBtnClick = () => {
     setCurrentRound((prev) => (prev += 1));
-    navigate(`/room/${roomState.roomUUID}/gamechoice`);
+    setRoomPage("gamechoice");
     setSelectedStation(null);
     setIsGameFinishAtom(false);
     setIsNextMiddleExist(false);
@@ -174,7 +177,7 @@ function GameFinishButtons() {
     setIsNextMiddleExist(false);
     setIsFinalLoading(true);
     // 여기부터는 axios 호출 끝나고 넣을 애들
-    navigate(`/room/${roomState.roomUUID}/result`);
+    setRoomPage("result");
     // setIsFinalLoading(false);
   };
 
@@ -242,7 +245,7 @@ function GameFinishButtons() {
     INCHEON2: "인천2호선",
   };
   return (
-    <>
+    <div style={{ zIndex: "100", height: "100%" }}>
       {isFinalLoading ? <Loading message={"모임장소 내역 불러오는"} /> : null}
       <BottomBtns>
         {!isNextMiddleExist ? (
@@ -281,7 +284,7 @@ function GameFinishButtons() {
           ))}
         </RightBtns>
       ) : null}
-    </>
+    </div>
   );
 }
 

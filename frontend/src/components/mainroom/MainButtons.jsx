@@ -10,6 +10,7 @@ import {
   totalRoundAtom,
   currentRoundAtom,
   chatModalVisibleAtom,
+  roomPageAtom,
 } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
@@ -269,23 +270,18 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const [currentTutorialPage, setCurrentTutorialPage] = useState(1);
   const [roundSetting, setRoundSetting] = useState(false);
   const [round, setRound] = useState(1);
-  const navigate = useNavigate();
   const roomState = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const setRoomState = useSetRecoilState(roomAtom);
   const setChatVisible = useSetRecoilState(chatModalVisibleAtom);
-  const [isGameFinish, setIsGameFinishAtom] = useRecoilState(isGameFinishAtom);
-  const isNextMiddleExist = useRecoilValue(isNextMiddleExistAtom);
   const [selectedStation, setSelectedStation] =
     useRecoilState(selectedStationAtom);
-  const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
   const [totalRound, setTotalRound] = useRecoilState(totalRoundAtom);
-  const [currentRound, setCurrentRound] = useRecoilState(currentRoundAtom);
   const [isMiddleLoading, setIsMiddleLoading] = useState(false);
-  const [isFinalLoading, setIsFinalLoading] = useState(false);
   const [isFindDepartureOpen, setIsFindDepartureOpen] = useState(false);
   const [address, setAddress] = useState(null);
   const [confirmAddressOpen, setConfirmAddressOpen] = useState(false);
+  const setRoomPage = useSetRecoilState(roomPageAtom);
 
   const openTutorialModal = () => {
     setIsTutorialModalOpen(true);
@@ -313,34 +309,6 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
     } finally {
       setIsMiddleLoading(false);
     }
-  };
-
-  const handleDecision = () => {
-    if (selectedStation) {
-      setRoomState((prev) => ({
-        ...prev,
-        centerPlace: selectedStation,
-      }));
-      setIsNextMiddleExist(true);
-    }
-  };
-
-  const handleNextRoundBtnClick = () => {
-    setCurrentRound((prev) => (prev += 1));
-    navigate(`/room/${roomState.roomUUID}/gamechoice`);
-    setSelectedStation(null);
-    setIsGameFinishAtom(false);
-    setIsNextMiddleExist(false);
-  };
-
-  const handleFinalResultBtnClick = () => {
-    setSelectedStation(null);
-    setIsGameFinishAtom(false);
-    setIsNextMiddleExist(false);
-    setIsFinalLoading(true);
-    // 여기부터는 axios 호출 끝나고 넣을 애들
-    navigate(`/room/${roomState.roomUUID}/result`);
-    // setIsFinalLoading(false);
   };
 
   const handleAddressSelect = (data) => {
@@ -383,7 +351,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   const handleConfirmGame = () => {
-    navigate(`/room/${roomState.roomUUID}/gamechoice`);
+    setRoomPage("gamechoice");
     setTotalRound(round);
   };
 
@@ -398,7 +366,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   return (
-    <>
+    <div style={{ zIndex: "100" }}>
       {isMiddleLoading ? <Loading message={"모임장소 찾는"} /> : null}
       <BottomBtns>
         <SmallBtn
@@ -499,7 +467,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
           </ConfirmAddressModal>
         </ModalOverlay>
       )}
-    </>
+    </div>
   );
 }
 export default MainButtons;

@@ -5,7 +5,6 @@ const BASE_URL = `https://jjam.shop`;
 // 방 생성
 export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
   const params = {
-    name: "",
     purpose,
     meetingDate,
     nickname,

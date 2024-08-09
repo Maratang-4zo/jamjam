@@ -1,6 +1,6 @@
 import styled, { keyframes } from "styled-components";
-import NavBarUp from "../components/fixed/NavBarUp";
-import ResultBox from "../components/finalresult/ResultBox";
+import ResultBox from "../finalresult/ResultBox";
+
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: ${(props) => props.theme.wrapperWidth};
@@ -47,7 +47,6 @@ const AnimatedButton = styled.button`
 function FinalResult() {
   return (
     <Wrapper>
-      <NavBarUp />
       {/* <Container> */}
       <ResultBox></ResultBox>
       <ButtonContainer>

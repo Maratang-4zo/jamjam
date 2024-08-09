@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import com.maratang.jamjam.domain.randomName.entity.Nick;
 
 public interface NickRepository extends JpaRepository<Nick, Long> {
-	@Query(value = "SELECT * FROM inck ORDER BY RAND() LIMIT 1", nativeQuery = true)
+	@Query(value = "SELECT * FROM nick ORDER BY RAND() LIMIT 1", nativeQuery = true)
 	Nick findRandomNick();
 }

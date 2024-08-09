@@ -1,6 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-// const BASE_URL = `https://jjam.shop`;
+import { useSetRecoilState } from "recoil";
+import { userInfoAtom } from "../recoil/atoms/userState";
+import { useNavigate } from "react-router-dom";
 
 // 쿠키에서 accessToken을 가져오는 함수
 const getAccessTokenFromCookie = () => {
@@ -29,6 +31,22 @@ axiosInstance.interceptors.request.use(
   },
 );
 
+export const useKakaoLogout = () => {
+  const navigate = useNavigate();
+  const setUserInfo = useSetRecoilState(userInfoAtom);
+
+  const KakaoLogout = async () => {
+    try {
+      const response = await axiosInstance.post("api/logout");
+      setUserInfo(null);
+      navigate("/");
+    } catch (error) {
+      console.error("카카오 로그아웃 실패", error);
+    }
+  };
+
+  return KakaoLogout;
+};
 // 사용자 정보 가져오기 함수
 export const getUserInfo = async () => {
   try {

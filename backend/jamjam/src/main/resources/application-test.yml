@@ -1,0 +1,72 @@
+server:
+  servlet:
+    context-path: /api
+
+spring:
+
+  sql:
+    init:
+      mode: always
+
+  application:
+    name: jamjam
+
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:h2:mem:test #In-Memory 모드에서 사용
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    dialect: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+    
+    properties:
+      hibernate:
+        globally_quoted_identifiers: false
+        format_sql: true
+      open-in-view: true
+
+  logging:
+    level:
+      com.app: debug
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+kakao:
+  client:
+    id: ${KAKAO_CLIENT_ID}
+    secret: ${KAKAO_CLIENT_SECRET}
+  redirect:
+    uri: ${KAKAO_REDIRECT_URI}
+
+openvidu:
+  openvidu-url: ${OPENVIDU_URL:http://localhost:4443/}
+  openvidu-secret: ${OPENVIDU_SECRET:MY_SECRET}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+
+token:
+  secret: ${TOKEN_CLIENT_SECRET}
+  access-token-expiration-time: ${ACCESS_TOKEN_EXPIRATION_TIME}
+  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
+
+#logging:
+#  level:
+#    root: DEBUG
+
+otp:
+  user:
+    client:
+      url: ${OTP_USER_CLIENT_URL}

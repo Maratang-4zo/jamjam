@@ -59,14 +59,16 @@ public class GameRecordService {
 			.gameRecordStatus(GameRecordStatus.SUCCESS)
 			.finalStationName(gameRecordResultUpdateEndReq.getFinalStationName())
 			.build();
-		GameRecord gameRecord = gameRecordRepository.findByUUID(gamerecordUUID);
+		GameRecord gameRecord = gameRecordRepository.findByUUID(gamerecordUUID)
+			.orElseThrow(()-> new BusinessException(ErrorCode.GAMERECORD_NOT_FOUND));
 		GameRecord gameRecord1 = gameRecordMapper.INSTANCE.updateGameRecord(gameRecordUpdateReq, gameRecord);
 		gameRecordRepository.save(gameRecord1);
 	}
 
 	@Transactional
 	public void updateGameRecordStatus(UUID gamerecordUUID){
-		GameRecord gameRecord = gameRecordRepository.findByUUID(gamerecordUUID);
+		GameRecord gameRecord = gameRecordRepository.findByUUID(gamerecordUUID)
+			.orElseThrow(()-> new BusinessException(ErrorCode.GAMERECORD_NOT_FOUND));
 		GameRecord gameRecord1 = gameRecordMapper.updateGameRecordStatus(GameRecordStatus.NOTUSES, gameRecord);
 		gameRecordRepository.save(gameRecord1);
 	}

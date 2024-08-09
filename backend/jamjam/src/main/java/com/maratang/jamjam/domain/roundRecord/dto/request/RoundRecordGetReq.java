@@ -5,10 +5,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class RoundRecordCreateReq {
+public class RoundRecordGetReq {
 
-    private Integer round;
-    private Long gameId;
     private UUID gameRecordUUID;
-    private String stationName;
 }

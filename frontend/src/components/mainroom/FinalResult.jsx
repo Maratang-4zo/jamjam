@@ -42,12 +42,6 @@ const AnimatedButton = styled.button`
   }
 `;
 
-// const Container = styled.div`
-//   display: flex;
-//   /* justify-content: center; */
-//   /* text-align: center; */
-// `;
-
 function FinalResult() {
   const userInfo = useRecoilValue(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);

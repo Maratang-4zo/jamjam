@@ -37,6 +37,9 @@ public enum ErrorCode {
 	ALREADY_REGISTERED_MEMBER(HttpStatus.BAD_REQUEST, "MB002", "이미 가입된 회원입니다."),
 	MEMBER_NOT_EXISTS(HttpStatus.BAD_REQUEST, "MB003", "존재하지 않는 회원입니다."),
 
+	//GAMERECORD
+	GAMERECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "GR001", "게임 기록을 찾을 수 없습니다."),
+
 	// openvidu
 	OV_SERVER_ERROR(HttpStatus.BAD_REQUEST, "OV000", "OV 처리 중 오류가 발생했습니다."),
 	OV_CANNOT_CREATE_SESSION(HttpStatus.BAD_REQUEST, "OV001", "OV 세션을 생성하지 못했습니다."),
@@ -70,7 +73,13 @@ public enum ErrorCode {
 	MIDDLE_NOT_SET_START_LOCATION(HttpStatus.NOT_FOUND, "MI005","먼저 방의 중심점을 먼저 설정해주세요"),
 
 	// roundRecord
-	RR_NOT_FOUND(HttpStatus.NOT_FOUND,"RR001","미팅룸 게임 라운드별 기록을 찾을 수 없습니다.");
+	RR_NOT_FOUND(HttpStatus.NOT_FOUND,"RR001","미팅룸 게임 라운드별 기록을 찾을 수 없습니다."),
+
+	// game
+	GAME_NOT_FOUND(HttpStatus.NOT_FOUND,"GA001","게임을 찾을 수 없습니다."),
+
+	// gameRecord
+	GR_NOT_FOUND(HttpStatus.NOT_FOUND,"GR001","게임 레코드 기록을 찾을 수 없습니다.");
 
 	private final HttpStatus status;
 	private final String code;

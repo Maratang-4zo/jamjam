@@ -1,20 +1,20 @@
 import React, { useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import NavBarLeft from "../fixed/NavBarLeft";
 import Game1 from "../games/Game1";
 import Game2 from "../games/Game2";
 import Game3 from "../games/Game3";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import {
   aroundStationsAtom,
-  isGameFinishAtom,
   roomAtom,
   roomPageAtom,
 } from "../../recoil/atoms/roomState";
 import { axiosGetAroundStores, axiosGetThreeStations } from "../../apis/mapApi";
 import gameBg from "../../assets/game/gameBg.jpg";
 import Loading from "../fixed/Loading";
+import useWs from "../../hooks/useWs";
+import { isWinnerAtom } from "../../recoil/atoms/playerState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
@@ -50,7 +50,8 @@ const ContentWrapper = styled.div`
   height: 100%;
 `;
 const StyledButton = styled.button`
-  background-color: #ffe845;
+  background-color: ${(props) =>
+    props.disabled ? "gray" : props.theme.bgColor};
   border: 3px solid #000000;
   border-radius: 14px;
   height: 66px;
@@ -71,17 +72,16 @@ const StyledButton = styled.button`
 `;
 
 function Game() {
-  const navigate = useNavigate();
   const location = useLocation();
   const { selectedGame } = location.state || {};
   const handleClick = useRef(() => {});
   // 나중에 websocket 연결하고 나서 false 로 바꿀겁니다
   const [showButton, setShowButton] = useState(true);
   const roomInfo = useRecoilValue(roomAtom);
+  const isWinner = useRecoilValue(isWinnerAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
-  const setIsGameFinishAtom = useSetRecoilState(isGameFinishAtom);
   const [isLoading, setIsLoading] = useState(false);
-  const setRoomPage = useSetRecoilState(roomPageAtom);
+  const { sendUpdatePage } = useWs();
 
   const handleWin = () => {
     setShowButton(true); // 승리 시 버튼 표시
@@ -103,9 +103,10 @@ function Game() {
           };
         }),
       );
-      setAroundStations(aroundStationsData);
-      setIsGameFinishAtom(true);
-      setRoomPage("gamefinish");
+      setAroundStations(aroundStationsData); // 나중에 지워야할수도
+      sendUpdatePage({
+        roomNextPage: "gamefinish",
+      });
     } catch (error) {
       console.log(error);
     } finally {
@@ -123,7 +124,11 @@ function Game() {
           )}
           {selectedGame === 2 && <Game2 />}
           {selectedGame === 3 && <Game3 />}
-          <StyledButton show={showButton} onClick={handleNextPageBtn}>
+          <StyledButton
+            disabled={!isWinner}
+            show={showButton}
+            onClick={handleNextPageBtn}
+          >
             장소 선택하러 가기
           </StyledButton>
         </GameScreen>

@@ -8,9 +8,9 @@ import {
 } from "react-naver-maps";
 import { useRecoilValue } from "recoil";
 import {
-  isGameFinishAtom,
   isNextMiddleExistAtom,
   roomAtom,
+  roomPageAtom,
   selectedStationAtom,
 } from "../../recoil/atoms/roomState";
 import useDecoding from "../../hooks/useDecoding";
@@ -20,7 +20,7 @@ function MyMap() {
   const navermaps = useNavermaps();
   const roomInfo = useRecoilValue(roomAtom);
   const selectedStation = useRecoilValue(selectedStationAtom);
-  const isGameFinish = useRecoilValue(isGameFinishAtom);
+  const roomPage = useRecoilValue(roomPageAtom);
   const isNextMiddleExist = useRecoilValue(isNextMiddleExistAtom);
   const [map, setMap] = useState(null);
   const [attendeeDepartures, setAttendeeDepartures] = useState([]);
@@ -117,7 +117,7 @@ function MyMap() {
       const bounds = new navermaps.LatLngBounds();
       let hasValidLocation = false;
 
-      if (selectedStation && isGameFinish && !isNextMiddleExist) {
+      if (selectedStation && roomPage === "gamefinish" && !isNextMiddleExist) {
         bounds.extend(
           new navermaps.LatLng(
             selectedStation.latitude,
@@ -161,7 +161,6 @@ function MyMap() {
     roomInfo.isCenterExist,
     roomInfo.centerPlace,
     selectedStation,
-    isGameFinish,
     isNextMiddleExist,
     navermaps,
   ]);
@@ -199,21 +198,23 @@ function MyMap() {
                 anchor: new navermaps.Point(20, 20), // 마커 중심점을 이미지 중앙으로 조정
               }}
             />
-            {!isGameFinish && roomInfo.isCenterExist && departure.route && (
-              <Polyline
-                path={departure.route.map(
-                  (point) => new navermaps.LatLng(point[0], point[1]),
-                )}
-                clickable={true}
-                strokeColor={departure.color}
-                strokeStyle={"solid"}
-                strokeWeight={5}
-                strokeOpacity={1}
-                strokeLineJoin={"miter"}
-                strokeLineCap={"round"}
-                onClick={() => handlePolylineClick(index)}
-              />
-            )}
+            {roomPage === "main" &&
+              roomInfo.isCenterExist &&
+              departure.route && (
+                <Polyline
+                  path={departure.route.map(
+                    (point) => new navermaps.LatLng(point[0], point[1]),
+                  )}
+                  clickable={true}
+                  strokeColor={departure.color}
+                  strokeStyle={"solid"}
+                  strokeWeight={5}
+                  strokeOpacity={1}
+                  strokeLineJoin={"miter"}
+                  strokeLineCap={"round"}
+                  onClick={() => handlePolylineClick(index)}
+                />
+              )}
 
             {visibleDurationIndex === index && (
               <Marker
@@ -235,7 +236,7 @@ function MyMap() {
             )}
           </React.Fragment>
         ))}
-      {roomInfo.isCenterExist && !isGameFinish ? (
+      {roomInfo.isCenterExist && roomPage === "main" ? (
         <Marker
           position={
             new navermaps.LatLng(
@@ -245,7 +246,7 @@ function MyMap() {
           }
         />
       ) : null}
-      {selectedStation && isGameFinish && !isNextMiddleExist && (
+      {selectedStation && roomPage === "gamefinish" && !isNextMiddleExist && (
         <>
           <Marker
             position={

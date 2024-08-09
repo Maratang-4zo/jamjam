@@ -7,7 +7,6 @@ import {
   isGameFinishAtom,
   isNextMiddleExistAtom,
   selectedStationAtom,
-  totalRoundAtom,
   currentRoundAtom,
   chatModalVisibleAtom,
   roomPageAtom,
@@ -22,6 +21,8 @@ import TutorialModal from "./Tutorial";
 import Loading from "../fixed/Loading";
 import FindDeparture from "./Departure";
 import { axiosGetMiddle } from "../../apis/mapApi";
+import useWs from "../../hooks/useWs";
+import { totalRoundAtom } from "../../recoil/atoms/playerState";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -274,14 +275,12 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const userInfo = useRecoilValue(userInfoAtom);
   const setRoomState = useSetRecoilState(roomAtom);
   const setChatVisible = useSetRecoilState(chatModalVisibleAtom);
-  const [selectedStation, setSelectedStation] =
-    useRecoilState(selectedStationAtom);
   const [totalRound, setTotalRound] = useRecoilState(totalRoundAtom);
   const [isMiddleLoading, setIsMiddleLoading] = useState(false);
   const [isFindDepartureOpen, setIsFindDepartureOpen] = useState(false);
   const [address, setAddress] = useState(null);
   const [confirmAddressOpen, setConfirmAddressOpen] = useState(false);
-  const setRoomPage = useSetRecoilState(roomPageAtom);
+  const { sendGameRound } = useWs();
 
   const openTutorialModal = () => {
     setIsTutorialModalOpen(true);
@@ -321,24 +320,13 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
     setConfirmAddressOpen(false);
   };
 
-  const handleClickOutside = (e) => {
-    if (e.target.closest(".station-btn") === null) {
-      setSelectedStation(null);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
   const handleGameButtonClick = () => {
-    if (!roundSetting) {
-      setRoundSetting(true);
-    } else {
-      setRoundSetting(false);
+    if (userInfo.isHost) {
+      if (!roundSetting) {
+        setRoundSetting(true);
+      } else {
+        setRoundSetting(false);
+      }
     }
   };
 
@@ -351,14 +339,33 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   const handleConfirmGame = () => {
-    setRoomPage("gamechoice");
-    setTotalRound(round);
+    if (userInfo.isHost) {
+      sendGameRound({
+        roundCnt: round,
+        roomUUID: roomState.roomUUID,
+        finalStationName: roomState.centerPlace.name,
+      });
+    }
+    // try {
+    //   const res = await axiosCreateGameRecord({
+    //     roundCnt: round,
+    //     roomUUID: roomState.roomUUID,
+    //     finalStationName: roomState.centerPlace.name,
+    //   });
+    //   setTotalRound(round);
+    //   sendUpdatePage({
+    //     roomNextPage: "gamechoice",
+    //   });
+    // } catch (err) {
+    //   console.log("게임기록 생성 실패", err);
+    // }
   };
 
   const handleCancelAddress = () => {
     setConfirmAddressOpen(false);
     setIsFindDepartureOpen(true);
   };
+
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       setConfirmAddressOpen(false);
@@ -387,7 +394,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
               isTutorialModalOpen={isTutorialModalOpen}
               highlight={currentTutorialPage === 2}
             >
-              확인
+              START
             </OkBtn>
           </RoundBox>
         ) : (

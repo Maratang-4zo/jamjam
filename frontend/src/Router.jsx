@@ -20,8 +20,6 @@ function Router() {
         <Route path="/room/:roomUUID" element={<Room />} />
         <Route path="/room/:roomUUID/join" element={<JoinRoom />} />
         <Route path="/room/:roomUUID/reconnect" element={<Reconnect />} />
-        <Route path="/room/:roomUUID/ws" element={<Ws />} />
-        <Route path="/room/:roomUUID/openvidu" element={<ConnectOpenVidu />} />
         <Route path="/invalid-room" element={<InvalidRoom />} />
         {/* <Route path="/oauth/kakao/callback" element={<Auth />} /> */}
         <Route path="/han" element={<Han />} />

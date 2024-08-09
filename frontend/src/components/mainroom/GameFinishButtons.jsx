@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   roomAtom,
-  isGameFinishAtom,
   isNextMiddleExistAtom,
   aroundStationsAtom,
   selectedStationAtom,
-  totalRoundAtom,
-  currentRoundAtom,
   roomPageAtom,
 } from "../../recoil/atoms/roomState";
 import Loading from "../fixed/Loading";
+import { axiosPatchNextMiddle } from "../../apis/mapApi";
+import {
+  gameRecordAtom,
+  gameRecordUUIDAtom,
+  isWinnerAtom,
+  totalRoundAtom,
+  currentRoundAtom,
+} from "../../recoil/atoms/playerState";
+import useWs from "../../hooks/useWs";
+import { axiosGetRoundResult } from "../../apis/gameApi";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -135,10 +142,9 @@ const StationBtn = styled.div`
 `;
 
 function GameFinishButtons() {
-  const navigate = useNavigate();
+  const { roomUUID } = useParams();
   const roomState = useRecoilValue(roomAtom);
   const setRoomState = useSetRecoilState(roomAtom);
-  const [isGameFinish, setIsGameFinishAtom] = useRecoilState(isGameFinishAtom);
   const isNextMiddleExist = useRecoilValue(isNextMiddleExistAtom);
   const aroundStations = useRecoilValue(aroundStationsAtom);
   const [selectedStation, setSelectedStation] =
@@ -148,37 +154,63 @@ function GameFinishButtons() {
   const [currentRound, setCurrentRound] = useRecoilState(currentRoundAtom);
   const [isFinalLoading, setIsFinalLoading] = useState(false);
   const setRoomPage = useSetRecoilState(roomPageAtom);
+  const [isWinner, setIsWinner] = useRecoilState(isWinnerAtom);
+  const { sendUpdatePage } = useWs();
+  const gameRecordUUID = useRecoilValue(gameRecordUUIDAtom);
+  const setGameRecord = useSetRecoilState(gameRecordAtom);
 
   const handleStationClick = (station) => {
     setSelectedStation(station);
   };
 
-  const handleDecision = () => {
+  const handleDecision = async () => {
     if (selectedStation) {
-      setRoomState((prev) => ({
-        ...prev,
-        centerPlace: selectedStation,
-      }));
+      try {
+        const res = await axiosPatchNextMiddle({
+          roomUUID,
+          startStation: selectedStation.name,
+        });
+        setRoomState((prev) => ({
+          ...prev,
+          centerPlace: res.roomCenterStart,
+          attendees: res.attendees,
+        }));
+      } catch (err) {
+        console.log("방 중심 이동 실패", err);
+      }
       setIsNextMiddleExist(true);
     }
   };
 
   const handleNextRoundBtnClick = () => {
     setCurrentRound((prev) => (prev += 1));
-    setRoomPage("gamechoice");
+    sendUpdatePage({
+      roomNextPage: "gamechoice",
+    });
     setSelectedStation(null);
-    setIsGameFinishAtom(false);
     setIsNextMiddleExist(false);
+    setIsWinner(false);
   };
 
-  const handleFinalResultBtnClick = () => {
+  const handleFinalResultBtnClick = async () => {
     setSelectedStation(null);
-    setIsGameFinishAtom(false);
     setIsNextMiddleExist(false);
     setIsFinalLoading(true);
+    setIsWinner(false);
     // 여기부터는 axios 호출 끝나고 넣을 애들
-    setRoomPage("result");
-    // setIsFinalLoading(false);
+    try {
+      const res = await axiosGetRoundResult({ gameRecordUUID });
+
+      setGameRecord(res.roundRecordList);
+
+      sendUpdatePage({
+        roomNextPage: "result",
+      });
+    } catch (err) {
+      console.log("최종 결과 불러오기 실패", err);
+    } finally {
+      setIsFinalLoading(false);
+    }
   };
 
   const handleClickOutside = (e) => {
@@ -249,13 +281,20 @@ function GameFinishButtons() {
       {isFinalLoading ? <Loading message={"모임장소 내역 불러오는"} /> : null}
       <BottomBtns>
         {!isNextMiddleExist ? (
-          <BigBtn onClick={handleDecision} disabled={!selectedStation}>
+          <BigBtn
+            onClick={handleDecision}
+            disabled={!selectedStation || !isWinner}
+          >
             결정
           </BigBtn>
         ) : totalRound === currentRound ? (
-          <BigBtn onClick={handleFinalResultBtnClick}>Final Result</BigBtn>
+          <BigBtn onClick={handleFinalResultBtnClick} disabled={!isWinner}>
+            Final Result
+          </BigBtn>
         ) : (
-          <BigBtn onClick={handleNextRoundBtnClick}>Next Round</BigBtn>
+          <BigBtn onClick={handleNextRoundBtnClick} disabled={!isWinner}>
+            Next Round
+          </BigBtn>
         )}
       </BottomBtns>
       {!isNextMiddleExist ? (

@@ -1,4 +1,4 @@
-package com.maratang.jamjam.domain.gameRecord.entity;
+package com.maratang.jamjam.domain.gamePlay.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

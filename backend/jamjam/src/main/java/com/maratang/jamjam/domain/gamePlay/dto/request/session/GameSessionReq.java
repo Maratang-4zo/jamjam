@@ -1,16 +1,11 @@
-package com.maratang.jamjam.domain.gameRecord.dto.request;
-
-import java.util.UUID;
+package com.maratang.jamjam.domain.gamePlay.dto.request.session;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class GameRecordReq {
-
+public class GameSessionReq {
 	@NotBlank
 	private Integer roundCnt;
-	private UUID roomUUID;
 	private String finalStationName;
-
 }

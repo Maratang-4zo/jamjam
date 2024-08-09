@@ -72,7 +72,7 @@ const PlayButton = styled.button`
 
 const PlayButtonText = styled.div`
   color: #ffe845;
-  font-family: "Pixelroborobo-Medium", Helvetica;
+  font-family: "pixel", Helvetica;
   font-size: 36px;
   font-weight: 500;
 `;
@@ -98,7 +98,7 @@ function GameChoice() {
   }, [roomInfo, userInfo, setPlayerState]);
 
   const handlePlayButtonClick = () => {
-    if (localSelectedGame != null) {
+    if (localSelectedGame != null && userInfo.isHost) {
       setSelectedGame(localSelectedGame);
       setRoomPage("game");
     }
@@ -109,8 +109,8 @@ function GameChoice() {
       <ContentContainer>
         <Header>Choose The Game</Header>
         <GameBoxes
-          selectedGame={localSelectedGame}
-          setSelectedGame={setLocalSelectedGame}
+          selectedGame={selectedGame}
+          setSelectedGame={userInfo.isHost ? setSelectedGame : null}
         ></GameBoxes>
         <PlayButton onClick={handlePlayButtonClick}>
           <PlayButtonText>PLAY</PlayButtonText>

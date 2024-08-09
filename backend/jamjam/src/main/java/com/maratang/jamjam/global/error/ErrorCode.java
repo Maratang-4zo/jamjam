@@ -37,6 +37,9 @@ public enum ErrorCode {
 	ALREADY_REGISTERED_MEMBER(HttpStatus.BAD_REQUEST, "MB002", "이미 가입된 회원입니다."),
 	MEMBER_NOT_EXISTS(HttpStatus.BAD_REQUEST, "MB003", "존재하지 않는 회원입니다."),
 
+	//GAMERECORD
+	GAMERECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "GR001", "게임 기록을 찾을 수 없습니다."),
+
 	// openvidu
 	OV_SERVER_ERROR(HttpStatus.BAD_REQUEST, "OV000", "OV 처리 중 오류가 발생했습니다."),
 	OV_CANNOT_CREATE_SESSION(HttpStatus.BAD_REQUEST, "OV001", "OV 세션을 생성하지 못했습니다."),

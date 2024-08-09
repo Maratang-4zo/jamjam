@@ -208,3 +208,11 @@ SELECT * FROM (
                   SELECT 100, '행복한'
               ) AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM nick WHERE nick_id = 1);
+
+INSERT INTO game (name, order, isUse, difficulty, description)
+SELECT * FROM (
+                  SELECT 1, '영차', true, 1, '마우스 클릭으로 가장 먼저 위로 올라가는 사람이 승리!' UNION ALL
+                  SELECT 2, 'BigInteger', false, 0, '가장 큰 숫자를 뽑은 사람이 승리!' UNION ALL
+                  SELECT 3, '숨은 jamjam 찾기', false, 2, '그림 속에 숨은 jamjam이를 가장 먼저 찾은 사람이 승리!'
+              ) AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM game WHERE game_id = 1);

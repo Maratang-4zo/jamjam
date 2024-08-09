@@ -3,6 +3,9 @@ server:
     context-path: /api
 
 spring:
+  sql:
+    init:
+      mode: always
   application:
     name: jamjam
   config:
@@ -16,6 +19,8 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    defer-datasource-initialization: true
+
     properties:
       hibernate:
         globally_quoted_identifiers: false

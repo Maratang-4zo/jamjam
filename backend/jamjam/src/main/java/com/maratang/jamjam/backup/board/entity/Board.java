@@ -1,4 +1,4 @@
-package com.maratang.jamjam.domain.board.entity;
+package com.maratang.jamjam.backup.board.entity;
 
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
 

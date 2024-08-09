@@ -1,13 +1,13 @@
-package com.maratang.jamjam.domain.board.mapper;
+package com.maratang.jamjam.backup.board.mapper;
 
 import java.util.List;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import com.maratang.jamjam.domain.board.dto.request.BoardCreateReq;
-import com.maratang.jamjam.domain.board.dto.response.BoardRes;
-import com.maratang.jamjam.domain.board.entity.Board;
+import com.maratang.jamjam.backup.board.dto.request.BoardCreateReq;
+import com.maratang.jamjam.backup.board.entity.Board;
+import com.maratang.jamjam.backup.board.dto.response.BoardRes;
 
 @Mapper
 public interface BoardMapper {

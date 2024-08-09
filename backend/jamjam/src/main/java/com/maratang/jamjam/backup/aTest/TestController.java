@@ -1,4 +1,4 @@
-package com.maratang.jamjam.domain.aTest;
+package com.maratang.jamjam.backup.aTest;
 
 import java.util.UUID;
 
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
-import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenDto;
+import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
+import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
+import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenDto;
 
 import lombok.RequiredArgsConstructor;
 

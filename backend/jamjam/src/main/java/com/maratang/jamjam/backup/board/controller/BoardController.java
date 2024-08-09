@@ -1,4 +1,4 @@
-package com.maratang.jamjam.domain.board.controller;
+package com.maratang.jamjam.backup.board.controller;
 
 import java.util.List;
 
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.maratang.jamjam.domain.board.dto.request.BoardCreateReq;
-import com.maratang.jamjam.domain.board.dto.request.BoardUpdateReq;
-import com.maratang.jamjam.domain.board.dto.response.BoardRes;
-import com.maratang.jamjam.domain.board.service.BoardService;
+import com.maratang.jamjam.backup.board.dto.request.BoardCreateReq;
+import com.maratang.jamjam.backup.board.dto.request.BoardUpdateReq;
+import com.maratang.jamjam.backup.board.dto.response.BoardRes;
+import com.maratang.jamjam.backup.board.service.BoardService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

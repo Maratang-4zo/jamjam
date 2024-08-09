@@ -1,16 +1,16 @@
-package com.maratang.jamjam.domain.board.service;
+package com.maratang.jamjam.backup.board.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.maratang.jamjam.domain.board.dto.request.BoardCreateReq;
-import com.maratang.jamjam.domain.board.dto.request.BoardUpdateReq;
-import com.maratang.jamjam.domain.board.dto.response.BoardRes;
-import com.maratang.jamjam.domain.board.entity.Board;
-import com.maratang.jamjam.domain.board.mapper.BoardMapper;
-import com.maratang.jamjam.domain.board.repository.BoardRepository;
+import com.maratang.jamjam.backup.board.dto.request.BoardCreateReq;
+import com.maratang.jamjam.backup.board.dto.request.BoardUpdateReq;
+import com.maratang.jamjam.backup.board.entity.Board;
+import com.maratang.jamjam.backup.board.repository.BoardRepository;
+import com.maratang.jamjam.backup.board.dto.response.BoardRes;
+import com.maratang.jamjam.backup.board.mapper.BoardMapper;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
 

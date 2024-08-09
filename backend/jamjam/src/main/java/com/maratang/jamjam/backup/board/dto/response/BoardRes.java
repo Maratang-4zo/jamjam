@@ -1,4 +1,4 @@
-package com.maratang.jamjam.domain.board.dto.response;
+package com.maratang.jamjam.backup.board.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

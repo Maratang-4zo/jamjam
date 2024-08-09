@@ -1,4 +1,4 @@
-package com.maratang.jamjam.domain.aTest;
+package com.maratang.jamjam.backup.aTest;
 
 import java.util.UUID;
 

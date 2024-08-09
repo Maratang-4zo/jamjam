@@ -156,11 +156,6 @@ export const chatModalVisibleAtom = atom({
   default: false,
 });
 
-export const isGameFinishAtom = atom({
-  key: "isGameFinish",
-  default: false,
-});
-
 export const isNextMiddleExistAtom = atom({
   key: "isNextMiddleExist",
   default: false,
@@ -405,16 +400,6 @@ export const aroundStationsAtom = atom({
 export const selectedStationAtom = atom({
   key: "selectedStation",
   default: null,
-});
-
-export const totalRoundAtom = atom({
-  key: "totalRound",
-  default: 0,
-});
-
-export const currentRoundAtom = atom({
-  key: "currentRound",
-  default: 1,
 });
 
 export const currentSpeakersAtom = atom({

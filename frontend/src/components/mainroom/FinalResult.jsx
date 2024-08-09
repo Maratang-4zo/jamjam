@@ -1,5 +1,9 @@
 import styled, { keyframes } from "styled-components";
 import ResultBox from "../finalresult/ResultBox";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { userInfoAtom } from "../../recoil/atoms/userState";
+import { axiosPatchNextMiddle } from "../../apis/mapApi";
+import { roomAtom } from "../../recoil/atoms/roomState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -39,14 +43,50 @@ const AnimatedButton = styled.button`
 `;
 
 function FinalResult() {
+  const userInfo = useRecoilValue(userInfoAtom);
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+
+  // 방 종료
+  const handleExitBtn = async () => {
+    try {
+      const res = await axiosPatchNextMiddle({
+        startStation: roomInfo.centerPlace.name,
+      });
+    } catch (err) {
+      console.log("중심 장소 변경 실패", err);
+    }
+  };
+
+  // 중심 장소 변경 후 메인으로
+  const handleUpdatedCenter = async () => {
+    try {
+      const res = await axiosPatchNextMiddle({
+        startStation: roomInfo.centerPlace.name,
+      });
+      setRoomInfo((prev) => ({
+        ...prev,
+        centerPlace: res.roomCenterStart,
+        attendees: res.attendees,
+      }));
+    } catch (err) {
+      console.log("중심 장소 변경 실패", err);
+    }
+  };
+
+  // 중심 장소 리셋 후 메인으로
+  const handleResetCenter = async () => {};
+
   return (
     <Wrapper>
       {/* <Container> */}
       <ResultBox></ResultBox>
       <ButtonContainer>
         <AnimatedButton>SHARE</AnimatedButton>
-        <AnimatedButton>MAIN</AnimatedButton>
-        <AnimatedButton>종료</AnimatedButton>
+        {/* MAIN 버튼 누르면 home화면처럼 버튼 두개(중심역 리셋, 유지) 만든다음에 위에 함수 연결시키면 될것가타요 */}
+        <AnimatedButton disabled={!userInfo.isHost}>MAIN</AnimatedButton>
+        <AnimatedButton disabled={!userInfo.isHost} onClick={handleExitBtn}>
+          종료
+        </AnimatedButton>
       </ButtonContainer>
       {/* </Container> */}
     </Wrapper>

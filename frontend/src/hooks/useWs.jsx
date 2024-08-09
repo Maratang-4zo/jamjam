@@ -2,21 +2,39 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { chatAtom, roomAtom } from "../recoil/atoms/roomState";
-import { playerState, selectedGameAtom } from "../recoil/atoms/playerState";
+import {
+  aroundStationsAtom,
+  chatAtom,
+  roomAtom,
+  roomPageAtom,
+} from "../recoil/atoms/roomState";
+import {
+  gameRecordAtom,
+  gameRecordUUIDAtom,
+  isWinnerAtom,
+  playerState,
+  selectedGameAtom,
+  totalRoundAtom,
+} from "../recoil/atoms/playerState";
 import { useNavigate } from "react-router-dom";
+import { userInfoAtom } from "../recoil/atoms/userState";
 
 const API_BASE_URL = "https://jjam.shop";
 
 const useWs = () => {
-  const navigate = useNavigate();
+  const setRoomPage = useSetRecoilState(roomPageAtom);
   const [connected, setConnected] = useState(false);
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const client = useRef(null); // 초기화 null로 변경
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const [players, setPlayers] = useRecoilState(playerState);
   const setSelectedGame = useSetRecoilState(selectedGameAtom);
-
+  const setIsWinner = useSetRecoilState(isWinnerAtom);
+  const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
+  const setAroundStations = useSetRecoilState(aroundStationsAtom);
+  const setTotalRound = useSetRecoilState(totalRoundAtom);
+  const setGameRecordUUID = useSetRecoilState(gameRecordUUIDAtom);
+  const setGameRecord = useSetRecoilState(gameRecordAtom);
   const connect = useCallback(() => {
     return new Promise((resolve, reject) => {
       if (connected) {
@@ -92,12 +110,45 @@ const useWs = () => {
       case "GAME_CENTERPLACE_UPDATE":
         handleGameCenterUpdate(message);
         break;
+      case "AROUND_STATIONS":
+        handleGetAroundStations(message);
+        break;
+      case "GAME_SESSION_READY":
+        handleGameSessionReady(message);
+        break;
+      case "CENTER_HISTORY":
+        handleCenterHistory(message);
+        break;
       default:
         console.error("Unknown message type:", message.type);
     }
   }, []);
 
-  const sendUpdatePage = ({ roomNextPage, gameId }) => {
+  const handleCenterHistory = ({ gameSessionUUID, roundRecordList }) => {
+    setGameRecord(roundRecordList);
+  };
+
+  const handleGameSessionReady = ({ gameSessionUUID, roundCnt }) => {
+    setTotalRound(roundCnt);
+    setGameRecordUUID(gameSessionUUID);
+  };
+
+  const sendGameRound = ({ roundCnt, roomUUID, finalStationName }) => {
+    client.current.publish({
+      destination: `/pub/game/session.setting`,
+      body: JSON.stringify({
+        roundCnt,
+        roomUUID,
+        finalStationName,
+      }),
+    });
+  };
+
+  const handleGetAroundStations = ({ aroundStations }) => {
+    setAroundStations(aroundStations);
+  };
+
+  const sendUpdatePage = ({ roomNextPage, gameId = 0 }) => {
     client.current.publish({
       destination: `/pub/page`,
       body: JSON.stringify({
@@ -107,8 +158,10 @@ const useWs = () => {
     });
   };
 
-  const handleWinnerUpdate = (message) => {
-    return;
+  const handleWinnerUpdate = ({ winnerUUID }) => {
+    if (userInfo.myUUID === winnerUUID) {
+      setIsWinner(true);
+    }
   };
 
   const handleGameCenterUpdate = (message) => {
@@ -118,17 +171,9 @@ const useWs = () => {
     }));
   };
 
-  const handleRoomPageUpdate = ({ roomNextPage, roomUUID, gameId }) => {
-    if (roomNextPage === "game") {
-      setSelectedGame(gameId);
-      navigate(`room/${roomUUID}/game`);
-    } else if (roomNextPage === "gamechoice") {
-      navigate(`room/${roomUUID}/gamechoice`);
-    } else if (roomNextPage === "finalresult") {
-      navigate(`room/${roomUUID}/result`);
-    } else if (roomNextPage === "main") {
-      navigate(`room/${roomUUID}`);
-    }
+  const handleRoomPageUpdate = ({ roomNextPage, gameId }) => {
+    setSelectedGame(gameId);
+    setRoomPage(roomNextPage);
   };
 
   const handleRoomCenterUpdate = ({ roomCenterStart, attendees }) => {
@@ -231,6 +276,7 @@ const useWs = () => {
     sendChat,
     sendGame,
     sendUpdatePage,
+    sendGameRound,
   };
 };
 

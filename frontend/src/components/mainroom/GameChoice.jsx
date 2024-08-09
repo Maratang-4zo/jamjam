@@ -1,13 +1,13 @@
-import GameBoxes from "../components/gamechoice/GameBoxes";
+import GameBoxes from "../gamechoice/GameBoxes";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import NavBarLeft from "../components/fixed/NavBarLeft";
-import wavebutton from "../assets/wavebutton.svg";
-import { roomAtom } from "../recoil/atoms/roomState";
-import { playerState, selectedGameAtom } from "../recoil/atoms/playerState";
-import { userInfoAtom } from "../recoil/atoms/userState";
+import NavBarLeft from "../fixed/NavBarLeft";
+import wavebutton from "../../assets/wavebutton.svg";
+import { roomAtom, roomPageAtom } from "../../recoil/atoms/roomState";
+import { playerState, selectedGameAtom } from "../../recoil/atoms/playerState";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 
 const GlobalStyle = createGlobalStyle`
   body, html {
@@ -79,11 +79,13 @@ const PlayButtonText = styled.div`
 
 function GameChoice() {
   const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
+  const [localSelectedGame, setLocalSelectedGame] = useState(null);
   const navigate = useNavigate();
   const { roomUUID } = useParams();
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const setPlayerState = useSetRecoilState(playerState);
+  const setRoomPage = useSetRecoilState(roomPageAtom);
 
   useEffect(() => {
     const initialPlayers = roomInfo.attendees.map((attendee) => ({
@@ -96,29 +98,24 @@ function GameChoice() {
   }, [roomInfo, userInfo, setPlayerState]);
 
   const handlePlayButtonClick = () => {
-    if (selectedGame != null) {
-      navigate(`/room/${roomUUID}/game`, { state: { selectedGame } });
+    if (localSelectedGame != null) {
+      setSelectedGame(localSelectedGame);
+      setRoomPage("game");
     }
   };
 
   return (
     <>
-      <GlobalStyle />
-      <Wrapper>
-        <NavBarContainer>
-          <NavBarLeft />
-        </NavBarContainer>
-        <ContentContainer>
-          <Header>Choose The Game</Header>
-          <GameBoxes
-            selectedGame={selectedGame}
-            setSelectedGame={setSelectedGame}
-          ></GameBoxes>
-          <PlayButton onClick={handlePlayButtonClick}>
-            <PlayButtonText>PLAY</PlayButtonText>
-          </PlayButton>
-        </ContentContainer>
-      </Wrapper>
+      <ContentContainer>
+        <Header>Choose The Game</Header>
+        <GameBoxes
+          selectedGame={localSelectedGame}
+          setSelectedGame={setLocalSelectedGame}
+        ></GameBoxes>
+        <PlayButton onClick={handlePlayButtonClick}>
+          <PlayButtonText>PLAY</PlayButtonText>
+        </PlayButton>
+      </ContentContainer>
     </>
   );
 }

@@ -219,7 +219,7 @@ const useWs = () => {
     return () => {
       disconnect();
     };
-  }, [connect, disconnect]);
+  }, []);
 
   return {
     connected,

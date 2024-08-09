@@ -8,7 +8,11 @@ import MainButtons from "../components/mainroom/MainButtons";
 import ShareModal from "../components/mainroom/ShareModal";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
-import { isGameFinishAtom, roomAtom } from "../recoil/atoms/roomState";
+import {
+  isGameFinishAtom,
+  roomAtom,
+  roomPageAtom,
+} from "../recoil/atoms/roomState";
 import { axiosUpdateUserInfo } from "../apis/mapApi";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -22,6 +26,10 @@ import useWs from "../hooks/useWs";
 import useOpenVidu from "../hooks/useOpenVidu";
 import Loading from "../components/fixed/Loading";
 import GameFinishButtons from "../components/mainroom/GameFinishButtons";
+import GameChoice from "../components/mainroom/GameChoice";
+import { selectedGameAtom } from "../recoil/atoms/playerState";
+import FinalResult from "../components/mainroom/FinalResult";
+import Game from "../components/mainroom/Game";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -46,6 +54,8 @@ function Room() {
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const isGameFinish = useRecoilValue(isGameFinishAtom);
+  const roomPage = useRecoilValue(roomPageAtom);
+  const selectedGame = useRecoilValue(selectedGameAtom);
   const [joinLoading, setJoinLoading] = useState(false);
   const { connect, connected } = useWs();
   const { joinSession, joined } = useOpenVidu();
@@ -225,16 +235,26 @@ function Room() {
           onClose={handleCloseShareModal}
         />
       )}
-      <Map />
-      {isGameFinish ? (
-        <GameFinishButtons />
-      ) : (
-        <MainButtons
-          onOpenEditModal={handleOpenEditModal}
-          onOpenShareModal={handleOpenShareModal}
-          onAddressSelect={handleAddressSelect}
-        />
+      {/* <Map /> */}
+      {roomPage === "main" && (
+        <>
+          <MainButtons
+            onOpenEditModal={handleOpenEditModal}
+            onOpenShareModal={handleOpenShareModal}
+            onAddressSelect={handleAddressSelect}
+          />
+          <Map />
+        </>
       )}
+      {roomPage === "gamechoice" && <GameChoice />}
+      {roomPage === "game" && <Game />}
+      {roomPage === "gamefinish" && (
+        <>
+          <GameFinishButtons />
+          <Map />
+        </>
+      )}
+      {roomPage === "result" && <FinalResult />}
     </Wrapper>
   );
 }

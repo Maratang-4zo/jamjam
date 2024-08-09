@@ -1,19 +1,20 @@
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import NavBarLeft from "../components/fixed/NavBarLeft";
-import Game1 from "../components/games/Game1";
-import Game2 from "../components/games/Game2";
-import Game3 from "../components/games/Game3";
+import NavBarLeft from "../fixed/NavBarLeft";
+import Game1 from "../games/Game1";
+import Game2 from "../games/Game2";
+import Game3 from "../games/Game3";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import {
   aroundStationsAtom,
   isGameFinishAtom,
   roomAtom,
-} from "../recoil/atoms/roomState";
-import { axiosGetAroundStores, axiosGetThreeStations } from "../apis/mapApi";
-import gameBg from "../assets/game/gameBg.jpg";
-import Loading from "../components/fixed/Loading";
+  roomPageAtom,
+} from "../../recoil/atoms/roomState";
+import { axiosGetAroundStores, axiosGetThreeStations } from "../../apis/mapApi";
+import gameBg from "../../assets/game/gameBg.jpg";
+import Loading from "../fixed/Loading";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
@@ -80,6 +81,7 @@ function Game() {
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
   const setIsGameFinishAtom = useSetRecoilState(isGameFinishAtom);
   const [isLoading, setIsLoading] = useState(false);
+  const setRoomPage = useSetRecoilState(roomPageAtom);
 
   const handleWin = () => {
     setShowButton(true); // 승리 시 버튼 표시
@@ -103,7 +105,7 @@ function Game() {
       );
       setAroundStations(aroundStationsData);
       setIsGameFinishAtom(true);
-      navigate(`/room/${roomInfo.roomUUID}`);
+      setRoomPage("gamefinish");
     } catch (error) {
       console.log(error);
     } finally {
@@ -113,7 +115,6 @@ function Game() {
 
   return (
     <Wrapper>
-      <NavBarLeft />
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
         <GameScreen onClick={() => handleClick.current()}>

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
+import { useKakaoLogout } from "../apis/loginApi";
 import "react-toastify/dist/ReactToastify.css";
 
 const GlobalStyle = createGlobalStyle`
@@ -113,13 +114,13 @@ const Subtitle = styled.h1`
   font-family: "galmuriRegular";
   text-align: left;
 `;
-
 const Mypage = () => {
   const infoBoxRef = useRef(null);
   const meetingBoxRef = useRef(null);
   const navigate = useNavigate();
   const [isLogined, setIsLogined] = useState(false);
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
+  const KakaoLogout = useKakaoLogout();
 
   const scrollToRef = (ref) => {
     if (ref.current) {
@@ -160,7 +161,7 @@ const Mypage = () => {
                   <ButtonText>MEETING HISTORY</ButtonText>
                 </Button>
                 <Button>
-                  <ButtonText>LOG OUT</ButtonText>
+                  <ButtonText onClick={KakaoLogout}>LOG OUT</ButtonText>
                 </Button>
               </Btns>
             </Frame>

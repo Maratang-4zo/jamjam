@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { Link } from "react-router-dom";
-
+import "../../index.css";
 const Section = styled.div`
   height: 100vh;
   scroll-snap-align: start;
@@ -70,6 +70,14 @@ const StyledLink = styled(Link)`
   color: inherit;
 `;
 
+const PromptText = styled.div`
+  font-family: "DungGeunMo", sans-serif; /* 'pixel' 폰트 사용 */
+  font-size: 100px;
+  color: ${(props) => props.theme.textColor};
+  margin-bottom: 100px;
+  animation: ${fadeIn} 1.5s ease-in-out;
+`;
+
 function FifthSection() {
   const [buttonsSwitched, setButtonsSwitched] = useState(false);
 
@@ -79,6 +87,7 @@ function FifthSection() {
 
   return (
     <Section>
+      <PromptText>지금 바로 해볼래?</PromptText> {/* 문구 추가 */}
       <ButtonContainer>
         {buttonsSwitched ? (
           <>

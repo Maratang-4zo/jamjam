@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import { useSetRecoilState } from "recoil";
@@ -8,10 +8,12 @@ import { getUserInfo } from "../apis/loginApi";
 
 import FirstSection from "../components/home/FirstSection";
 import SecondSection from "../components/home/SecondSection";
+import ComicSection from "../components/home/ComicSection";
 import ThirdSection from "../components/home/ThirdSection";
 import FourthSection from "../components/home/FourthSection";
 import FifthSection from "../components/home/FifthSection";
 import SixthSection from "../components/home/SixthSection";
+
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: 100vw;
@@ -69,6 +71,7 @@ function Home() {
         <Section>
           <SecondSection />
         </Section>
+        <ComicSection />
         <ThirdSection />
         <FourthSection />
         <FifthSection />

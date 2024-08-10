@@ -8,6 +8,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class GamePlayRes {
+	boolean isGameEnded;
+	UUID winnerUUID;
+
 	UUID gameRoundUUID;
 	UUID attendeeUUID;
 	String data;

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.member.entity.Member;
-import com.maratang.jamjam.domain.memberRoundRecord.entity.MemberRoundRecord;
+import com.maratang.jamjam.domain.gamePlay.entity.MemberRoundRecord;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
 import com.maratang.jamjam.global.auth.room.constant.ProfileType;

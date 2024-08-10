@@ -23,10 +23,12 @@ const ModalOverlay = styled.div`
 
 const TutorialPage = styled.div`
   height: 100%;
+  width: 100%;
   flex-direction: column;
-  justify-content: start;
+  justify-content: end;
   align-items: center;
   display: ${(props) => (props.active ? "flex" : "none")};
+  cursor: pointer;
 `;
 
 const Bubble = styled.svg`
@@ -43,12 +45,12 @@ const Path = styled.path`
 
 const BubbleText = styled.text`
   fill: #000;
-  font-family: "ONE(Ed.) Galmuri11 Regular";
   font-size: 20px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
   text-anchor: middle;
+  font-family: "OldGalmuri";
 `;
 
 const RightTopFixed = styled.div`
@@ -103,10 +105,13 @@ const PixelChatText = styled.p`
   line-height: normal;
   position: absolute;
   top: 35px;
+  font-family: "OldGalmuri";
 `;
 
 const InfoText = styled.h1`
   color: #fff;
+  margin-bottom: 10px;
+  font-family: "OldGalmuri";
 `;
 
 function TutorialModal({ isOpen, onClose, currentPage, setCurrentPage }) {

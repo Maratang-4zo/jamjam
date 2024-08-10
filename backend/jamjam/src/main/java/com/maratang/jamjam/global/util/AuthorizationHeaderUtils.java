@@ -4,7 +4,7 @@ import org.springframework.util.StringUtils;
 
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
-import com.maratang.jamjam.global.jwt.constant.GrantType;
+import com.maratang.jamjam.global.auth.jwt.constant.GrantType;
 
 public class AuthorizationHeaderUtils {
 	public static void validateAuthorization(String authorizationHeader) {

@@ -20,8 +20,8 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
 	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
 		Map<String, Object> attributes) throws Exception {
 
-		if(request instanceof ServletServerHttpRequest) {
-			ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+		System.out.println("이건시작에불과하다");
+		if(request instanceof ServletServerHttpRequest servletRequest) {
 			HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
 
 			Cookie token = WebUtils.getCookie(httpServletRequest, "roomToken");

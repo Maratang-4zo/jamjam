@@ -17,11 +17,11 @@ import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
+import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.station.SubwayDataLoader;
-import com.maratang.jamjam.global.station.SubwayInfo;
+import com.maratang.jamjam.global.map.station.SubwayDataLoader;
+import com.maratang.jamjam.global.map.station.SubwayInfo;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;

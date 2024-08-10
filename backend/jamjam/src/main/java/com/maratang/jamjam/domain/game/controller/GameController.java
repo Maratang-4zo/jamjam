@@ -1,49 +1,30 @@
 package com.maratang.jamjam.domain.game.controller;
 
-import java.util.UUID;
+import java.util.List;
 
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.maratang.jamjam.domain.game.dto.request.GameAnswerReq;
-import com.maratang.jamjam.domain.game.dto.request.GameSettingReq;
+import com.maratang.jamjam.domain.game.dto.response.GameInfoRes;
 import com.maratang.jamjam.domain.game.service.GameService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
-@Controller
+@RestController
+@RequestMapping("/game")
 @RequiredArgsConstructor
 public class GameController {
 
 	private final GameService gameService;
 
-	// 게임 설정값 저장
-	@MessageMapping("/{roomUUID}/game/setting")
-	@Operation(summary = "🚗 구현 중")
-	public void setNewGame(@DestinationVariable UUID UUID, @Payload GameSettingReq gameSettingReq){
-		// 세팅값 따로 저장되나???? create???
-		gameService.setNewGame(gameSettingReq);
+	@GetMapping
+	@Operation(summary = "게임 정보", description = "게임 정보를 호출한다.")
+	public ResponseEntity<?> createGameRecord() {
+		List<GameInfoRes> gameList = gameService.getGameInfoList();
+		return ResponseEntity.ok().body(gameList);
 	}
 
-	// 게임 시작하기
-	@MessageMapping("/{roomId}/game/start")
-	@Operation(summary = "🚗 구현 중")
-	public void startNewGame(@DestinationVariable UUID roomUUID) {
-        gameService.startNewGame(roomUUID);
-    }
-
-	// 게임 답 입력
-	@MessageMapping("/{roomId}/game/answer")
-	@Operation(summary = "🚗 구현 중")
-    public void answerGameQuestion(@DestinationVariable UUID roomUUID, @Payload GameAnswerReq gameAnswerReq) {
-        gameService.answerGameQuestion(roomUUID, gameAnswerReq);
-    }
-
-	@MessageMapping("/{roomId}/game/reset")
-	public void resetGame(@DestinationVariable Long roomId) {
-        gameService.resetGame(roomId);
-    }
 }

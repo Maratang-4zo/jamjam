@@ -23,18 +23,7 @@ export const gameRecordUUIDAtom = atom({
 // 중심역 히스토리
 export const gameRecordAtom = atom({
   key: "gameRecord",
-  default: [
-    // {
-    //   "round": 1,
-    //   "stationName": "이수역",
-    //   "attendeeUUID": "김수현uuid" // 라운드 승자
-    // },
-    // {
-    //   "round": 2,
-    //   "stationName": "이수역",
-    //   "attendeeUUID": "김수현"
-    // }
-  ],
+  default: [],
 });
 
 export const totalRoundAtom = atom({

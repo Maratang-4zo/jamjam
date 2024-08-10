@@ -46,7 +46,10 @@ const Title = styled.p`
   border-bottom: 1.5px solid black;
   text-align: center;
   width: 160px;
-  font-size: 18px;
+  font-family: "NewGalmuriBold";
+  font-size: 20px;
+  padding-bottom: 3px;
+  margin-bottom: 3px;
 `;
 
 const BtnContainer = styled.div`
@@ -80,7 +83,8 @@ const ShareBtn = styled.button`
 `;
 
 const BtnSpan = styled.span`
-  font-size: 12px;
+  font-size: 15px;
+  font-family: "NewGalmuriRegular";
 `;
 
 const BtnIcon = styled.img`

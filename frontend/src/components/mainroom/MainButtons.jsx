@@ -4,10 +4,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
 import {
   roomAtom,
-  isGameFinishAtom,
-  isNextMiddleExistAtom,
-  selectedStationAtom,
-  currentRoundAtom,
   chatModalVisibleAtom,
   roomPageAtom,
 } from "../../recoil/atoms/roomState";
@@ -37,13 +33,15 @@ const BigBtn = styled.button`
   display: flex;
   width: 150px;
   height: 45px;
-  padding: 7px 17px;
+  padding: 5px 0;
   justify-content: center;
   align-items: center;
   gap: 8.229px;
   flex-shrink: 0;
   border-radius: 15px;
   border: 3px solid #000;
+  font-family: "DungGeunMo";
+  font-size: 30px;
   background-color: ${(props) => {
     if (props.isTutorialModalOpen) {
       return props.highlight ? props.theme.bgColor : "gray";
@@ -71,7 +69,6 @@ const SmallBtn = styled.button`
   display: flex;
   width: 45px;
   height: 45px;
-  padding: 10px 20px;
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
@@ -79,13 +76,17 @@ const SmallBtn = styled.button`
   border: 3px solid #000;
   background: ${(props) => props.theme.subaccentColor + "86"};
   &:hover {
-    background-color: ${(props) => (props.disabled ? "gray" : "#00000086")};
-    color: ${(props) => (props.disabled ? "none" : props.theme.subaccentColor)};
+    background-color: ${(props) => (props.disabled ? "gray" : "#76767685")};
     transition: 0.3s;
   }
   position: ${(props) => (props.isTutorialModalOpen ? "relative" : "static")};
   z-index: ${(props) => (props.isTutorialModalOpen ? 1100 : "auto")};
   pointer-events: ${(props) => (props.isTutorialModalOpen ? "none" : "auto")};
+  span {
+    font-size: 35px;
+    font-family: "DungGeunMo";
+    text-align: center;
+  }
 `;
 
 const RightTopBtns = styled.div`
@@ -205,14 +206,17 @@ const AddressButton = styled.button`
   padding: 10px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 1200; // 적절한 z-index 값 설정
+  z-index: 1001; // 적절한 z-index 값 설정
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: ${(props) => (props.isTutorialModalOpen ? 1100 : "auto")};
+  pointer-events: ${(props) => (props.isTutorialModalOpen ? "none" : "auto")};
   p {
+    font-family: "NewGalmuriBold";
     color: black;
     width: 100%;
-    font-size: 15px;
+    font-size: 20px;
   }
   &:hover {
     background-color: #00000040;
@@ -225,15 +229,16 @@ const ConfirmAddressModal = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: ${(props) => props.theme.bgColor + "a8"};
+  background-color: #a0a0a0;
   padding: 20px;
   border-radius: 10px;
   z-index: 1300;
   text-align: center;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
   p {
+    font-family: "DungGeunMo";
     color: black;
-    font-weight: 600;
+    font-size: 18px;
   }
 `;
 
@@ -245,13 +250,14 @@ const ConfirmAddressBtns = styled.div`
 
 const ConfirmAddressBtn = styled.button`
   padding: 10px 20px;
-  background: black;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid black;
+  border-radius: 10px;
   cursor: pointer;
+  font-family: "OldGalmuri";
   &:hover {
-    background-color: #303030;
+    background-color: ${(props) => props.theme.bgColor};
     transition: 0.2s;
   }
 `;
@@ -280,7 +286,21 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const [isFindDepartureOpen, setIsFindDepartureOpen] = useState(false);
   const [address, setAddress] = useState(null);
   const [confirmAddressOpen, setConfirmAddressOpen] = useState(false);
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false); // 스크립트 로드 상태 추가
   const { sendGameRound } = useWs();
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src =
+      "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    script.async = true;
+    script.onload = () => setIsScriptLoaded(true); // 스크립트 로드 완료 시 상태 업데이트
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const openTutorialModal = () => {
     setIsTutorialModalOpen(true);
@@ -372,6 +392,16 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
     }
   };
 
+  const handleOpenFindDeparture = () => {
+    if (isScriptLoaded) {
+      setIsFindDepartureOpen(true);
+    } else {
+      alert(
+        "주소 검색을 위한 스크립트를 로드하는 중입니다. 잠시만 기다려 주세요.",
+      );
+    }
+  };
+
   return (
     <div style={{ zIndex: "100" }}>
       {isMiddleLoading ? <Loading message={"모임장소 찾는"} /> : null}
@@ -380,7 +410,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
           onClick={openTutorialModal}
           isTutorialModalOpen={isTutorialModalOpen}
         >
-          <SmallIcon src={questionIcon} />
+          <span>?</span>
         </SmallBtn>
         {roundSetting ? (
           <RoundBox>
@@ -403,6 +433,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
             disabled={!roomState.isCenterExist || !userInfo.isHost}
             isTutorialModalOpen={isTutorialModalOpen}
             highlight={currentTutorialPage === 2}
+            style={{ fontSize: "45px" }}
           >
             GAME
           </BigBtn>
@@ -447,7 +478,10 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
         currentPage={currentTutorialPage}
         setCurrentPage={setCurrentTutorialPage}
       />
-      <AddressButton onClick={() => setIsFindDepartureOpen(true)}>
+      <AddressButton
+        isTutorialModalOpen={isTutorialModalOpen}
+        onClick={handleOpenFindDeparture}
+      >
         <p>{userInfo.departure.address}</p>
       </AddressButton>
       {isFindDepartureOpen && (

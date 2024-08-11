@@ -93,8 +93,6 @@ public class MemberController {
 		}
 	}
 
-
-
 	@GetMapping("/game-history")
 	@Operation(summary = "게임 히스토리 보기", description = "회원의 게임 기록을 본다.")
 	public ResponseEntity<List<MemberAnalysisRes>> getMemberAnalysis(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {

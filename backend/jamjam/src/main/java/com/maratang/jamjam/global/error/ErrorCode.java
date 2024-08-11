@@ -17,6 +17,7 @@ public enum ErrorCode {
 	// auth
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AT001", "인증 토큰이 올바르지 않습니다."),
 	FORBIDDEN(HttpStatus.FORBIDDEN, "AT002", "권한이 없습니다."),
+	KAKAO_RESPONSE_ERROR(HttpStatus.UNAUTHORIZED, "AT003", "카카오 통신 오류"),
 
 	// 인증(auth)
 	TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AT001", "만료된 토큰입니다."),
@@ -75,6 +76,9 @@ public enum ErrorCode {
 	// roundRecord
 	RR_NOT_FOUND(HttpStatus.NOT_FOUND,"RR001","미팅룸 게임 라운드별 기록을 찾을 수 없습니다."),
 
+	// JSON타입으로 변환
+	INVALID_JSON(HttpStatus.NOT_ACCEPTABLE, " CT001", "JSON타입으로 변환할 수 없습니다."),
+
 	// game
 	GAME_NOT_FOUND(HttpStatus.NOT_FOUND,"GA001","게임을 찾을 수 없습니다."),
 
@@ -83,6 +87,7 @@ public enum ErrorCode {
 
 	// localDate format
 	LF_FORMAT_NOT_MATCH(HttpStatus.BAD_REQUEST,"LD001","날짜 형식이 올바르지 않습니다. 형식은 yyyy-MM-dd'T'HH:mm:ss 입니다.");
+
 
 	private final HttpStatus status;
 	private final String code;

@@ -60,6 +60,25 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		if (!tokenManager.validateAccessToken(accessToken)) {
 			if(tokenManager.validateRefreshToken(refreshToken))
 				newAccessToken = tokenManager.reissueToken(refreshToken);
+			else{
+				for (int i = 0; i < cookies.length; i++) {
+					if (cookies[i].getName().equals("refreshToken")) {
+						cookies[i].setMaxAge(0);
+						cookies[i].setValue(null);
+						cookies[i].setPath("/");
+						cookies[i].setHttpOnly(true);
+						cookies[i].setSecure(true);
+						response.addCookie(cookies[i]);
+					}
+					if (cookies[i].getName().equals("accessToken")) {
+						cookies[i].setMaxAge(0);
+						cookies[i].setValue(null);
+						cookies[i].setPath("/");
+						response.addCookie(cookies[i]);
+					}
+				}
+				throw new AuthenticationException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+			}
 		}
 
 		if (newAccessToken != null) {

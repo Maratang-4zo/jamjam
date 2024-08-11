@@ -39,7 +39,10 @@ public class Member extends BaseTimeEntity {
 	private String profile;
 	@Column(length = 512)
 	private String refreshToken;
-
+	@Column(length = 512)
+	private String kakaoAccessToken;
+	@Column(length = 512)
+	private String kakaoRefreshToken;
 	private LocalDateTime tokenExpirationTime;
 
 	@Builder
@@ -57,6 +60,11 @@ public class Member extends BaseTimeEntity {
 	public void updateRefreshToken(JwtTokenDto jwtTokenDto) {
 		this.refreshToken = jwtTokenDto.getRefreshToken();
 		this.tokenExpirationTime = DateTimeUtils.convertToLocalDateTime(jwtTokenDto.getRefreshTokenExpireTime());
+	}
+
+	public void updateTokens(String kakaoAccessToken, String kakaoRefreshToken) {
+		this.kakaoAccessToken = kakaoAccessToken;
+		this.kakaoRefreshToken = kakaoRefreshToken;
 	}
 
 	public void expireRefreshToken(LocalDateTime now) {

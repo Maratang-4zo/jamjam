@@ -179,12 +179,5 @@ public class RoomController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(roomJoinRes);
 	}
 
-	@GetMapping("/{roomUUID}/summary")
-	@Operation(summary = "초대장 생성을 위한 방 정보 api", description = "해당 방의 최종 정보를 가져온다.")
-	public ResponseEntity<?> getRoomSummary(@PathVariable UUID roomUUID){
-		RoomHistoryRes roomHistoryRes = roomHistoryService.getRoomSummary(roomUUID);
-		return ResponseEntity.status(HttpStatus.OK).body(roomHistoryRes);
-	}
-
 
 }

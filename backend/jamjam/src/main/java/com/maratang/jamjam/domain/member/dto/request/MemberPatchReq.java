@@ -1,11 +1,10 @@
 package com.maratang.jamjam.domain.member.dto.request;
 
-
-import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@Builder
+@RequiredArgsConstructor
 public class MemberPatchReq {
 
 	private String nickname;

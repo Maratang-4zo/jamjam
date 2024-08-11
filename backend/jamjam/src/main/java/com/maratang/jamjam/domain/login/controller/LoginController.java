@@ -1,6 +1,7 @@
 package com.maratang.jamjam.domain.login.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.maratang.jamjam.domain.login.dto.response.LoginRes;
 import com.maratang.jamjam.domain.login.service.LoginService;
-import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 
@@ -65,10 +66,13 @@ public class LoginController {
 		HttpServletResponse response) throws IOException {
 
 		// 인가 코드로 kakao 액세스 토큰 요청
-		String accessToken = getAccessToken(code);
+		log.info("code: "+code);
+		Map<String, String> tokens = getTokens(code);
+		String accessToken = tokens.get("access_token");
+		String refreshToken = tokens.get("refresh_token");
 
 		// 액세스 토큰을 이용해 로그인 처리
-		JwtTokenDto loginRes = loginService.oauthLogin(accessToken);
+		LoginRes loginRes = loginService.oauthLogin(accessToken, refreshToken);
 
 		Cookie cookie = new Cookie("refreshToken", loginRes.getRefreshToken());
 		cookie.setPath("/");
@@ -93,7 +97,7 @@ public class LoginController {
 		// httpServletResponse.sendRedirect("http://70.12.114.94:3000/");
 	}
 
-	private String getAccessToken(String code) {
+	private Map<String, String> getTokens(String code) {
 		String tokenUrl = "https://kauth.kakao.com/oauth/token";
 
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -112,7 +116,10 @@ public class LoginController {
 			ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
 			if (response.getStatusCode() == HttpStatus.OK) {
 				Map<String, Object> responseBody = response.getBody();
-				return responseBody.get("access_token").toString();
+				Map<String, String> tokens = new HashMap<>();
+				tokens.put("access_token", responseBody.get("access_token").toString());
+				tokens.put("refresh_token", responseBody.get("refresh_token").toString());
+				return tokens;
 			} else {
 				throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
 			}

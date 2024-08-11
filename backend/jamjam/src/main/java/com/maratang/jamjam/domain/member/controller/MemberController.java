@@ -44,7 +44,7 @@ public class MemberController {
 		Member member = memberService.findMemberByEmail(memberEmail);
 		log.info("있니? "+member.getEmail());
 		MemberRes memberRes = MemberRes.of(member);
-		//
+        //
 		// log.info("정보내놔: ");
 		// if(httpServletRequest.getAttribute("accessToken") != null) {
 		// 	String accessToken = (String) httpServletRequest.getAttribute("accessToken");

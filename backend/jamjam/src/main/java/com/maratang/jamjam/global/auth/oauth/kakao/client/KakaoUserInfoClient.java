@@ -19,7 +19,7 @@ public interface KakaoUserInfoClient {
 	KakaoUserInfoRes getKakaoUserInfo(@RequestHeader("Content-type") String contentType,
 		@RequestHeader("Authorization") String accessToken);
 
-	@PostMapping("/v2/api/calendar/create/event")
+	@PostMapping(value = "/v2/api/calendar/create/event", consumes = "application/json")
 	ResponseEntity<Map> createKakaoCalendarEvent(
 		@RequestHeader("Authorization") String authorization,
 		@RequestBody String eventJson

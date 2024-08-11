@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
-import com.maratang.jamjam.global.station.SubwayInfo;
+import com.maratang.jamjam.global.map.station.SubwayInfo;
 
 import lombok.Builder;
 import lombok.Getter;

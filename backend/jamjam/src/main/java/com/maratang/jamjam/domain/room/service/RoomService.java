@@ -1,22 +1,12 @@
 package com.maratang.jamjam.domain.room.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.maratang.jamjam.backup.board.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 import com.maratang.jamjam.domain.attendee.mapper.AttendeeMapper;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
-import com.maratang.jamjam.domain.board.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.randomName.entity.Name;
 import com.maratang.jamjam.domain.randomName.entity.Nick;
 import com.maratang.jamjam.domain.randomName.repository.NameRepository;
@@ -33,24 +23,28 @@ import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.mapper.RoomMapper;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
+import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
+import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.middle.GeometryUtils;
-import com.maratang.jamjam.global.middle.GrahamScan;
-import com.maratang.jamjam.global.middle.HaversineDistance;
-import com.maratang.jamjam.global.middle.PolylineUtils;
-import com.maratang.jamjam.global.middle.client.OTPUserClient;
-import com.maratang.jamjam.global.middle.dto.OTPUserRes;
-import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
-import com.maratang.jamjam.global.station.Point;
-import com.maratang.jamjam.global.station.SubwayDataLoader;
-import com.maratang.jamjam.global.station.SubwayInfo;
+import com.maratang.jamjam.global.map.middle.GeometryUtils;
+import com.maratang.jamjam.global.map.middle.GrahamScan;
+import com.maratang.jamjam.global.map.middle.HaversineDistance;
+import com.maratang.jamjam.global.map.middle.PolylineUtils;
+import com.maratang.jamjam.global.map.middle.client.OTPUserClient;
+import com.maratang.jamjam.global.map.middle.dto.OTPUserRes;
+import com.maratang.jamjam.global.map.station.Point;
+import com.maratang.jamjam.global.map.station.SubwayDataLoader;
+import com.maratang.jamjam.global.map.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
-
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,7 +72,7 @@ public class RoomService {
 
 		String roomName = attendee.getNickname();
 
-		if (roomName.equals("")){
+		if (roomName == null || roomName.isEmpty()){
 			//todo 여기서 nick 테이블에 잇는 모든 value 중에 랜덤 값으로 정하기
 			Nick nick = nickRepository.findRandomNick();
 			Name name = nameRepository.findRandomName();

@@ -1,19 +1,33 @@
-import React, { useEffect } from "react";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
+// NavBarLeft.jsx
+import React, { useState, useEffect, useRef } from "react";
+import styled, { keyframes } from "styled-components";
+import { useNavigate } from "react-router-dom";
 import MicOn from "../../assets/icons/micon.png";
 import HomeIcon from "../../assets/icons/homeIcon.png";
 import MicOff from "../../assets/icons/micoff.png";
 import ChatOn from "../../assets/icons/chaton.png";
 import ChatOff from "../../assets/icons/chatoff.png";
 import ChattingModal from "./ChattingModal";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue, useResetRecoilState } from "recoil";
 import {
-  chatModalVisibleAtom,
+  chatAtom,
   currentSpeakersAtom,
   roomAtom,
 } from "../../recoil/atoms/roomState";
-import useOpenVidu from "../../hooks/useOpenVidu"; // useOpenVidu 훅을 임포트
+import useOpenVidu from "../../hooks/useOpenVidu";
+import { userInfoAtom } from "../../recoil/atoms/userState";
+import UserInfoModal from "./userInfoModal"; // Import the modal component
+import { userColor } from "../../utils/userColor";
+import ColorThief from "colorthief"; // Import ColorThief
+
+const bounceAnimation = keyframes`
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+`;
 
 const Wrapper = styled.div`
   width: 50px;
@@ -26,6 +40,7 @@ const Wrapper = styled.div`
   padding: 10px 0 0 0;
   border-right: 3px solid ${(props) => props.theme.accentColor};
   z-index: 10000;
+  position: relative; /* position to manage modal positioning */
 `;
 
 const Attendants = styled.div`
@@ -40,8 +55,9 @@ const Avatar = styled.img`
   width: 35px;
   height: 35px;
   background: none;
-  border-radius: 50%;
+  border-radius: 30%;
   box-shadow: ${(props) => (props.isSpeaking ? "0 0 7px 2px #ffffff" : "none")};
+  cursor: pointer;
 `;
 
 const Btns = styled.div`
@@ -64,6 +80,9 @@ const Btn = styled.div`
   &:active {
     background-color: #ffffff52;
   }
+  &.bounce {
+    animation: ${bounceAnimation} 0.5s ease;
+  }
 `;
 
 const Icon = styled.img`
@@ -83,43 +102,118 @@ const Home = styled.img`
 `;
 
 function NavBarLeft() {
-  const [isChatOn, setIsChatOn] = useRecoilState(chatModalVisibleAtom);
+  const [isChatOn, setIsChatOn] = useState(false);
+  const [bounce, setBounce] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null); // State for selected user
+  const [modalTop, setModalTop] = useState(0); // State for modal top position
   const roomInfo = useRecoilValue(roomAtom);
+  const userInfo = useRecoilValue(userInfoAtom);
+  const chatLogs = useRecoilValue(chatAtom);
+  const resetUserInfo = useResetRecoilState(userInfoAtom);
+  const resetRoomInfo = useResetRecoilState(roomAtom);
   const currentSpeakers = useRecoilValue(currentSpeakersAtom);
-  const { toggleMic, isMicOn } = useOpenVidu(); // toggleMic 함수와 isMicOn 상태 가져오기
+  const { toggleMic, isMicOn } = useOpenVidu();
+  const navigate = useNavigate();
+  const prevChatLogsLength = useRef(chatLogs.length);
+
+  const handleChat = () => {
+    setIsChatOn((prev) => !prev);
+  };
+
+  const handleMic = () => {
+    toggleMic();
+  };
+
+  const handleHomeClick = () => {
+    const confirmLeave = window.confirm("정말 나가시겠습니까?");
+    if (confirmLeave) {
+      navigate("/");
+      resetUserInfo();
+      resetRoomInfo();
+      if (userInfo.isHost) {
+        console.log("방장임");
+      } else {
+        console.log("방장x임");
+      }
+    }
+  };
+
+  const handleAvatarClick = async (attendee, index) => {
+    let color = userColor[attendee.profileImageUrl];
+    if (!color) {
+      try {
+        const colorThief = new ColorThief();
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = attendee.profileImageUrl;
+        await new Promise((resolve) => {
+          img.onload = () => {
+            const result = colorThief.getColor(img);
+            color = `rgb(${result[0]}, ${result[1]}, ${result[2]})`;
+            resolve();
+          };
+        });
+      } catch (error) {
+        color = "#000000"; // 기본 색상
+        console.error("Error fetching color from image:", error);
+      }
+    }
+
+    setSelectedUser({
+      color,
+      profileImageUrl: attendee.profileImageUrl,
+      nickname: attendee.nickname,
+      address: attendee.address,
+    });
+
+    const avatarTop = 10 + 45 * index;
+    setModalTop(avatarTop);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedUser(null);
+  };
 
   useEffect(() => {
-    setIsChatOn(false); // 컴포넌트가 마운트될 때 채팅 모달 상태를 초기화
-  }, [setIsChatOn]);
-
-  const handleChat = () => setIsChatOn(!isChatOn);
-  const handleMic = () => {
-    toggleMic(); // 마이크 토글 함수 호출
-  };
+    if (prevChatLogsLength.current !== chatLogs.length) {
+      setBounce(true);
+      const timer = setTimeout(() => setBounce(false), 500);
+      return () => clearTimeout(timer);
+    }
+    prevChatLogsLength.current = chatLogs.length;
+  }, [chatLogs]);
 
   return (
     <>
       <Wrapper>
         <Attendants>
-          {roomInfo.attendees.map((attendee) => (
+          {roomInfo.attendees.map((attendee, index) => (
             <Avatar
               key={attendee.attendeeUUID}
               src={attendee.profileImageUrl}
               isSpeaking={currentSpeakers.includes(attendee.attendeeUUID)}
+              onClick={() => handleAvatarClick(attendee, index)}
             />
           ))}
         </Attendants>
         <Btns>
-          <Btn onClick={handleChat}>
+          <Btn onClick={handleChat} className={bounce ? "bounce" : ""}>
             <Icon src={isChatOn ? ChatOn : ChatOff} />
           </Btn>
           <Btn onClick={handleMic}>
             <Icon src={isMicOn ? MicOn : MicOff} />
           </Btn>
-          <Link to={`/`}>
+          <Btn onClick={handleHomeClick}>
             <Home src={HomeIcon} />
-          </Link>
+          </Btn>
         </Btns>
+        {selectedUser && (
+          <UserInfoModal
+            user={selectedUser}
+            top={modalTop}
+            onClose={handleCloseModal}
+          />
+        )}
       </Wrapper>
       <ChattingModal isVisible={isChatOn} toggleModal={handleChat} />
     </>

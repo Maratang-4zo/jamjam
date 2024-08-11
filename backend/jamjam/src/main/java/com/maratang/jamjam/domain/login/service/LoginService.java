@@ -7,11 +7,11 @@ import com.maratang.jamjam.domain.login.dto.response.LoginRes;
 import com.maratang.jamjam.domain.login.mapper.LoginMapper;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.member.service.MemberService;
-import com.maratang.jamjam.global.jwt.dto.JwtTokenDto;
-import com.maratang.jamjam.global.jwt.manager.TokenManager;
-import com.maratang.jamjam.global.oauth.kakao.service.SocialLoginApiServiceFactory;
-import com.maratang.jamjam.global.oauth.model.OAuthAttributes;
-import com.maratang.jamjam.global.oauth.service.SocialLoginApiService;
+import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
+import com.maratang.jamjam.global.auth.jwt.manager.TokenManager;
+import com.maratang.jamjam.global.auth.oauth.kakao.service.SocialLoginApiServiceFactory;
+import com.maratang.jamjam.global.auth.oauth.model.OAuthAttributes;
+import com.maratang.jamjam.global.auth.oauth.service.SocialLoginApiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

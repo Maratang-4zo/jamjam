@@ -1,40 +1,12 @@
 import GameBoxes from "../gamechoice/GameBoxes";
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import NavBarLeft from "../fixed/NavBarLeft";
 import wavebutton from "../../assets/wavebutton.svg";
-import { roomAtom, roomPageAtom } from "../../recoil/atoms/roomState";
+import { roomAtom } from "../../recoil/atoms/roomState";
 import { playerState, selectedGameAtom } from "../../recoil/atoms/playerState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
-
-const GlobalStyle = createGlobalStyle`
-  body, html {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-`;
-
-const Wrapper = styled.div`
-  background-color: ${(props) => props.theme.bgColor};
-  border: 3px solid ${(props) => props.theme.accentColor};
-  border-left: none;
-  width: 100%;
-  height: 100vh;
-  color: ${(props) => props.theme.textColor};
-  display: flex;
-  overflow: hidden;
-  z-index: 1;
-`;
-
-const NavBarContainer = styled.div`
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 150px;
-`;
+import useWs from "../../hooks/useWs";
 
 const Header = styled.div`
   color: #000000;
@@ -72,20 +44,18 @@ const PlayButton = styled.button`
 
 const PlayButtonText = styled.div`
   color: #ffe845;
-  font-family: "Pixelroborobo-Medium", Helvetica;
+  font-family: "pixel", Helvetica;
   font-size: 36px;
   font-weight: 500;
 `;
 
 function GameChoice() {
-  const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
   const [localSelectedGame, setLocalSelectedGame] = useState(null);
-  const navigate = useNavigate();
-  const { roomUUID } = useParams();
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const setPlayerState = useSetRecoilState(playerState);
-  const setRoomPage = useSetRecoilState(roomPageAtom);
+  const { sendUpdatePage } = useWs();
+  const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
 
   useEffect(() => {
     const initialPlayers = roomInfo.attendees.map((attendee) => ({
@@ -99,8 +69,10 @@ function GameChoice() {
 
   const handlePlayButtonClick = () => {
     if (localSelectedGame != null) {
-      setSelectedGame(localSelectedGame);
-      setRoomPage("game");
+      sendUpdatePage({
+        roomNextPage: "game",
+        gameId: localSelectedGame,
+      });
     }
   };
 
@@ -109,10 +81,10 @@ function GameChoice() {
       <ContentContainer>
         <Header>Choose The Game</Header>
         <GameBoxes
-          selectedGame={localSelectedGame}
-          setSelectedGame={setLocalSelectedGame}
+          selectedGame={selectedGame}
+          setSelectedGame={userInfo.isHost ? setSelectedGame : null}
         ></GameBoxes>
-        <PlayButton onClick={handlePlayButtonClick}>
+        <PlayButton disabled={!userInfo.isHost} onClick={handlePlayButtonClick}>
           <PlayButtonText>PLAY</PlayButtonText>
         </PlayButton>
       </ContentContainer>

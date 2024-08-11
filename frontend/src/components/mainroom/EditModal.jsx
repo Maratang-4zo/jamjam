@@ -78,6 +78,8 @@ const Btns = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: "OldGalmuri";
+  font-size: 18px;
 `;
 
 const NameInput = styled.input`
@@ -89,7 +91,8 @@ const NameInput = styled.input`
   background: none;
   margin-bottom: 10px;
   background-color: #ffffff5c;
-
+  font-family: "NewGalmuriRegular";
+  font-size: 20px;
   &:focus {
     border: 1.5px solid white;
     transition: 0.1s;
@@ -104,6 +107,8 @@ const Select = styled.select`
   outline: none;
   background-color: #ffffff5c;
   margin-bottom: 10px;
+  font-family: "NewGalmuriRegular";
+  font-size: 20px;
   option {
     background: none;
   }

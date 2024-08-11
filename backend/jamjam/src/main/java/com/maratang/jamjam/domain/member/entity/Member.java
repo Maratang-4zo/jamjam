@@ -3,7 +3,7 @@ package com.maratang.jamjam.domain.member.entity;
 import java.time.LocalDateTime;
 
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
-import com.maratang.jamjam.global.jwt.dto.JwtTokenDto;
+import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
 import com.maratang.jamjam.global.util.DateTimeUtils;
 
 import jakarta.persistence.Column;

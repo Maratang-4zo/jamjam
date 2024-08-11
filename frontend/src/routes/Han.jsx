@@ -4,7 +4,7 @@ import axios from "axios";
 import {Client} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
-function Han(){
+function Han() {
     // const APPLICATION_SERVER_URL = "http://localhost:8080/";
     const APPLICATION_SERVER_URL = "https://jjam.shop/";
 
@@ -15,14 +15,16 @@ function Han(){
 
     const sessionRef = useRef(null);
     const ovRef = useRef(null);
-    const [sessionId, setSessionId] = useState("324e6cea-ee55-49a4-9154-b14351f32539");
+    const [sessionId, setSessionId] = useState("f64fd068-647a-4be1-a7d1-7bdc55740093");
     const [inputSessionId, setInputSessionId] = useState("");
-    const roomUUID = useRef("324e6cea-ee55-49a4-9154-b14351f32539");
-    const attendeeUUID = useRef("30c4e699-0ca9-4680-82b1-40b9fdfd0e6a");
-
+    const roomUUID = useRef("f64fd068-647a-4be1-a7d1-7bdc55740093");
+    const attendeeUUID = useRef("ec163708-0062-4c8c-9038-14f740b4affc");
+    const gameSessionUUID = useRef(null);
+    const gameRoundUUID = useRef(null);
     const [connected, setConnected] = useState(false);
     const [chat, setChat] = useState('');
     const [chatLogs, setChatLogs] = useState([]);
+    const [gameLogs, setGameLogs] = useState([]);
     const client = useRef({});
 
     const leaveSession = useCallback(() => {
@@ -117,26 +119,25 @@ function Han(){
     };
 
     const joinSession = useCallback(async (existingSessionId = null) => {
-        initSession();
+        // initSession();
 
-        getToken(existingSessionId).then((token) => {
-            if (sessionRef.current && ovRef.current) {
-                sessionRef.current
-                    .connect(token)
-                    .then(() => {
-                        const newPublisher = ovRef.current.initPublisher("publisher");
-                        sessionRef.current.publish(newPublisher);
-                    })
-                    .catch((error) => {
-                        console.log(
-                            "There was an error connecting to the session:",
-                            error.code,
-                            error.message,
-                        );
-                    });
-            }
-        });
-
+        // getToken(existingSessionId).then((token) => {
+        //     if (sessionRef.current && ovRef.current) {
+        //         sessionRef.current
+        //             .connect(token)
+        //             .then(() => {
+        //                 const newPublisher = ovRef.current.initPublisher("publisher");
+        //                 sessionRef.current.publish(newPublisher);
+        //             })
+        //             .catch((error) => {
+        //                 console.log(
+        //                     "There was an error connecting to the session:",
+        //                     error.code,
+        //                     error.message,
+        //                 );
+        //             });
+        //     }
+        // });
 
 
         connect();
@@ -207,6 +208,39 @@ function Han(){
             case 'ROOM_UPDATE':
                 updateRoomStatus(body);
                 break;
+            case "GAME_SESSION_READY":
+                setSessionReady(body);
+                break;
+            case "GAME_READY":
+                setGameReady(body);
+                break;
+            case "GAME_COUNTDOWN":
+                setGameCountdown(body);
+                break;
+            case "GAME_START":
+                setGameStart(body);
+                break;
+            case "GAME_PLAY":
+                setGamePlay(body);
+                break;
+            case "GAME_END":
+                setGameEnd(body);
+                break;
+            case "GAME_WINNER":
+                setGameWinner(body);
+                break;
+            case "GAME_CENTER_UPDATE":
+                setGameCenterUpdate(body);
+                break;
+            case "CENTER_HISTORY":
+                setCenterHistory(body);
+                break;
+            case "GAME_RESULT_APPLY":
+                setGameResultApply(body);
+                break;
+            case "GAME_RESET":
+                setGameReset(body);
+                break;
             default:
                 console.error('Unknown message type:', message.type);
         }
@@ -241,8 +275,113 @@ function Han(){
     const gogo = ()  => {
         setConnected(true)
     }
+    const setGameSession = () => {
+        client.current.publish({
+            destination: `/pub/game/session.setting`,
+            body: JSON.stringify({
+                roundCnt: 3,
+                roomUUID: roomUUID.current,
+                finalStationName: "이수역"
+            })
+        })
+    }
+    const setSessionReady = (body) => {
+        gameSessionUUID.current = body.gameSessionUUID;
+        setGameLogs(prev => [...prev, "gameSessionUUID: "+gameSessionUUID.current])
+    }
+    const setRound = () => {
+        client.current.publish({
+            destination: `/pub/game/round.setting`,
+            body: JSON.stringify({
+                round: 1,
+                gameId: 1,
+                gameSessionUUID: gameSessionUUID.current,
+                roomUUID: roomUUID.current,
+                stationName: "이수역"
+            })
+        })
+    }
+    const setGameReady = (body) => {
+        gameRoundUUID.current = body.gameRoundUUID;
+        setGameLogs(prev => [...prev, "gameRoundUUID: "+gameRoundUUID.current])
+    }
+    const gameStart = () => {
+        client.current.publish({
+            destination: `/pub/game/round.start`,
+            body: JSON.stringify({
+                gameRoundUUID: gameRoundUUID.current,
+                roomUUID: roomUUID.current
+            })
+        })
+    }
+    const setGameCountdown = (body) => {
+        setGameLogs(prev => [...prev, "gameCountdown: "+body.countdown])
+    }
+    const setGameStart = (body) => {
+        setGameLogs(prev => [...prev, "gameStart: "+body.gameRoundUUID])
+    }
+    const gamePlay = () => {
+        client.current.publish({
+            destination: `/pub/game/round.play`,
+            body: JSON.stringify({
+                gameRoundUUID: gameRoundUUID.current,
+                attendeeUUID: attendeeUUID.current,
+                roomUUID: roomUUID.current,
+                data: 10
+            })
+        })
+    }
+    const setGamePlay = (body) => {
+        setGameLogs(prev => [...prev, "gamePlay: "+body.gameRoundUUID+" attendeeUUID: "+body.attendeeUUID+" data: "+body.data])
+    }
+    const setGameEnd = (body) => {
+        setGameLogs(prev => [...prev, "gameEnd: "+body.gameRoundUUID])
+    }
+    const setGameWinner = (body) => {
+        setGameLogs(prev => [...prev, "gameWinner: "+body.gameRoundUUID+" attendeeUUID: "+body.attendeeUUID])
+    }
+    const gameRoundStation = () => {
+        client.current.publish({
+            destination: `/pub/game/round.station`,
+            body: JSON.stringify({
+                gameRoundUUID: gameRoundUUID.current,
+                roomUUID: roomUUID.current,
+                roundStationName: "역삼역"
+            })
+        })
+    }
+    const setGameCenterUpdate = (body) => {
+        setGameLogs(prev => [...prev, "gameCenterUpdate: "+body.gameRoundUUID+" data: "+body])
+    }
+    const setCenterHistory = (body) => {
+        setGameLogs(prev => [...prev, "centerHistory: "+body])
+    }
+    const gamesessionStation = () => {
+        client.current.publish({
+            destination: `/pub/game/session.station`,
+            body: JSON.stringify({
+                gameSessionUUID: gameSessionUUID.current,
+                finalStationName: "이수역역",
+                roomUUID: roomUUID.current
 
-
+            })
+        })
+    }
+    const setGameResultApply = (body) => {
+        setGameLogs(prev => [...prev, "gameResultApply: "+body.gameSessionUUID+" finalStationName: "+body.finalStationName])
+    }
+    const gameReset = () => {
+        client.current.publish({
+            destination: `/pub/game/session.reset`,
+            body: JSON.stringify({
+                roomUUID: roomUUID.current,
+                gameSessionUUID: gameSessionUUID.current
+            })
+        })
+    }
+    const setGameReset = (body) => {
+        setGameLogs(prev => [...prev, "gameReset: "+body.gameSessionUUID])
+    }
     return (
 
         <>
@@ -270,33 +409,49 @@ function Han(){
                     </div>
                 </div>
             </div>
-    <div>
-        <div>
-            <h1>Chat Room</h1>
             <div>
-                {connected ? <p>Connected</p> : <p>Connecting...</p>}
                 <div>
-                    <input
-                        type="text"
-                        value={chat}
-                        onChange={(e) => setChat(e.target.value)}
-                        placeholder="Type a message"
-                    />
-                    <button onClick={sendChat}>Send</button>
+                    <button onClick={setGameSession}>세션만들기</button>
+                    <button onClick={setRound}>게임라운드선택</button>
+                    <button onClick={gameStart}>게임시작</button>
+                    <button onClick={gamePlay}>게임플레이</button>
+                    <button onClick={gameRoundStation}>중심역이동</button>
+                    <button onClick={gamesessionStation}>최종게임기록반영</button>
+                    <button onClick={gameReset}>게임리셋</button>
+                    <div>
+                        <ul>
+                            {gameLogs.map((msg, idx) => (
+                                <li key={idx}>{msg}</li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
                 <div>
-                    <h2>Messages</h2>
-                    <ul>
-                        {chatLogs.map((msg, index) => (
-                            <li key={index}>{msg}</li>
-                        ))}
-                    </ul>
+                    <h1>Chat Room</h1>
+                    <div>
+                        {connected ? <p>Connected</p> : <p>Connecting...</p>}
+                        <div>
+                            <input
+                                type="text"
+                                value={chat}
+                                onChange={(e) => setChat(e.target.value)}
+                                placeholder="Type a message"
+                            />
+                            <button onClick={sendChat}>Send</button>
+                        </div>
+                        <div>
+                            <h2>Messages</h2>
+                            <ul>
+                                {chatLogs.map((msg, index) => (
+                                    <li key={index}>{msg}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    </>
-)
+        </>
+    )
 }
 
 export default Han;

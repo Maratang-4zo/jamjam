@@ -77,7 +77,17 @@ public enum ErrorCode {
 	RR_NOT_FOUND(HttpStatus.NOT_FOUND,"RR001","미팅룸 게임 라운드별 기록을 찾을 수 없습니다."),
 
 	// JSON타입으로 변환
-	INVALID_JSON(HttpStatus.NOT_ACCEPTABLE, " CT001", "JSON타입으로 변환할 수 없습니다.");
+	INVALID_JSON(HttpStatus.NOT_ACCEPTABLE, " CT001", "JSON타입으로 변환할 수 없습니다."),
+
+	// game
+	GAME_NOT_FOUND(HttpStatus.NOT_FOUND,"GA001","게임을 찾을 수 없습니다."),
+
+	// gameRecord
+	GR_NOT_FOUND(HttpStatus.NOT_FOUND,"GR001","게임 레코드 기록을 찾을 수 없습니다."),
+
+	// localDate format
+	LF_FORMAT_NOT_MATCH(HttpStatus.BAD_REQUEST,"LD001","날짜 형식이 올바르지 않습니다. 형식은 yyyy-MM-dd'T'HH:mm:ss 입니다.");
+
 
 	private final HttpStatus status;
 	private final String code;

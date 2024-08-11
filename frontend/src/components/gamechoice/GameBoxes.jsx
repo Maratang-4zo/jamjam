@@ -3,6 +3,7 @@ import styled, { createGlobalStyle } from "styled-components";
 import polygon from "../../assets/polygon.svg";
 import YellowChatBubble from "../../assets/YellowChatBubble.svg"; // Assuming the correct path
 import stairs from "../../assets/game/stairs.gif";
+import SecondCardBg from "../../assets/2ndImg.png";
 
 const GamesContainer = styled.div`
   display: flex;
@@ -42,7 +43,7 @@ const GameCard1 = styled.div`
 `;
 
 const GameCard2 = styled.div`
-  clip-path: polygon(
+  /* clip-path: polygon(
     20% 0%,
     80% 0%,
     100% 12%,
@@ -51,12 +52,12 @@ const GameCard2 = styled.div`
     20% 100%,
     0% 88%,
     0% 12%
-  );
-  background-color: #ffffff;
-  border: ${(props) =>
+  ); */
+  background-image: url(${SecondCardBg});
+  /* border: ${(props) =>
     props.selected
       ? "9px solid #000000"
-      : "3px solid #000000"}; // 선택된 카드의 테두리 두께 조정
+      : "3px solid #000000"}; // 선택된 카드의 테두리 두께 조정 */
   height: 429px;
   width: 343px;
   display: flex;
@@ -67,23 +68,44 @@ const GameCard2 = styled.div`
   background-position: center;
   position: relative;
   transition: 0.5s ease;
-  /* z-index: 1; */
-
-  &:hover .image {
-    opacity: 0.3;
-  }
+  /* pointer-events: none; */
 
   &:hover .middle {
     opacity: 1;
+  }
+
+  &:hover .middle2 {
+    opacity: 1;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.56);
+    clip-path: polygon(
+      15% 0%,
+      85% 0%,
+      100% 10%,
+      100% 90%,
+      85% 100%,
+      15% 100%,
+      0% 90%,
+      0% 10%
+    );
   }
 `;
 
 const GameCard3 = styled.div`
   background-color: #ffffff;
-  border: ${(props) =>
+  border: 3px solid black;
+  /* border: ${(props) =>
     props.selected
       ? "9px solid #000000"
-      : "3px solid #000000"}; // 선택된 카드의 테두리 두께 조정
+      : "3px solid #000000"}; // 선택된 카드의 테두리 두께 조정 */
   border-radius: 35px;
   height: 429px;
   width: 343px;
@@ -97,12 +119,19 @@ const GameCard3 = styled.div`
   transition: 0.5s ease;
   /* z-index: 1; */
 
-  &:hover .image {
-    opacity: 0.3;
+  &:hover .middle2 {
+    opacity: 1;
   }
 
-  &:hover .middle {
-    opacity: 1;
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 33px;
+    background: rgba(0, 0, 0, 0.56);
   }
 `;
 
@@ -116,18 +145,7 @@ const Middle = styled.div`
   text-align: center;
   img {
     width: ${({ width }) => width || "220px"};
-    /* margin: ${({ margin }) => margin || "100"};
-    padding: ${({ padding }) => padding || "300"}; */
   }
-`;
-
-const Image = styled.img`
-  opacity: 1;
-  display: block;
-  width: 100%;
-  height: auto;
-  transition: 0.5s ease;
-  backface-visibility: hidden;
 `;
 
 const GameName = styled.div`
@@ -151,8 +169,8 @@ const OverlapGroup = styled.div`
 
 const TextWrapper = styled.div`
   color: #000000;
-  font-family: "Galmuri11-Regular", Helvetica;
-  font-size: 31.5px;
+  font-family: "OldGalmuri", Helvetica;
+  font-size: 29px;
   font-weight: 400;
   text-align: center;
 `;
@@ -163,18 +181,35 @@ const TextAboveBubble = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   color: #000;
-  font-size: 20px;
-  font-family: Arial, sans-serif;
+  font-size: 19px;
+  font-family: "NewGalmuriRegular", sans-serif;
+`;
+
+const Middle2 = styled.div`
+  transition: 0.5s ease;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #000000; /* 검정색 글씨 */
+  font-size: 30px;
+  font-weight: bold;
+  font-family: "NewGalmuriBold", sans-serif;
 `;
 
 function GameBoxes({ selectedGame, setSelectedGame }) {
+  const handleClick = (gameId) => {
+    if (setSelectedGame) {
+      setSelectedGame(gameId);
+    }
+  };
+
   return (
     <>
       <GamesContainer>
-        <GameCard1
-          selected={selectedGame === 1}
-          onClick={() => setSelectedGame(1)}
-        >
+        <GameCard1 selected={selectedGame === 1} onClick={() => handleClick(1)}>
           <Middle className="middle" top="50%">
             <TextAboveBubble>
               마우스 클릭으로 가장 먼저 위로 올라가는 사람이 승리!
@@ -183,34 +218,21 @@ function GameBoxes({ selectedGame, setSelectedGame }) {
           </Middle>
           <GameName>
             <OverlapGroup>
-              <TextWrapper>YounCha</TextWrapper>
+              <TextWrapper>YoungCha</TextWrapper>
             </OverlapGroup>
           </GameName>
         </GameCard1>
-        <GameCard2
-          // style={{ backgroundImage: `url(${polygon})` }}
-          selected={selectedGame === 2}
-          onClick={() => setSelectedGame(2)}
-        >
-          <Middle className="middle" top="80%">
-            <TextAboveBubble>어쩌구 저쩌구 블랑블랑</TextAboveBubble>
-            <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
-          </Middle>
+        <GameCard2>
+          <Middle2 className="middle2">Coming Soon!</Middle2>
+
           <GameName>
             <OverlapGroup>
               <TextWrapper>COFFEE</TextWrapper>
             </OverlapGroup>
           </GameName>
         </GameCard2>
-        <GameCard3
-          selected={selectedGame === 3}
-          onClick={() => setSelectedGame(3)}
-        >
-          <Middle className="middle" top="40%">
-            <TextAboveBubble>어쩌구 저쩌구 블랑블랑</TextAboveBubble>
-
-            <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
-          </Middle>
+        <GameCard3>
+          <Middle2 className="middle2">Coming Soon!</Middle2>
           <GameName>
             <OverlapGroup>
               <TextWrapper>PIZZA</TextWrapper>

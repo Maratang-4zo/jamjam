@@ -37,6 +37,9 @@ export function axiosGetAroundStores({ stationName, category }) {
   );
 }
 
-export function axiosPatchNextMiddle({ roomUUID }) {
-  return axios.patch(BASE_URL + `/api/rooms/${roomUUID}/move`);
+export function axiosPatchNextMiddle({ roomUUID, startStation }) {
+  const params = {
+    startStation,
+  };
+  return axios.patch(BASE_URL + `/api/rooms/${roomUUID}/move`, params);
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import jamThinking from "../../assets/intro/jamThinking.PNG";
 import questionMark from "../../assets/intro/questionMark.PNG";
 
@@ -25,7 +25,7 @@ const Img = styled.img`
   position: relative;
   height: 90%;
   top: 50%;
-  left: 160%; /* 왼쪽으로 30% 이동 */
+  left: 160%;
   transform: translate(-50%, -50%);
   object-fit: cover;
 `;
@@ -40,15 +40,28 @@ const QuestionText = styled.div`
   color: #000;
 `;
 
+const floatAnimation = keyframes`
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+`;
+
 const IMG = styled.img`
   height: 12%;
   position: absolute;
   object-fit: cover;
+  animation: ${floatAnimation} 2s ease-in-out infinite;
 `;
 
 const TextContainer = styled.div`
   position: absolute;
-  left: -90%;
+  left: -75%;
   text-align: left;
   font-size: 90px;
   line-height: 1; /* 줄 사이 간격 줄이기 */

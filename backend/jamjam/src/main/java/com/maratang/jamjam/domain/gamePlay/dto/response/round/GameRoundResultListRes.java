@@ -9,4 +9,10 @@ import lombok.Getter;
 @Builder
 public class GameRoundResultListRes {
     List<GameRoundResultRes> gameRoundResultResList;
+
+    public static GameRoundResultListRes of(List<GameRoundResultRes> gameRoundResultResList) {
+        return GameRoundResultListRes.builder()
+               .gameRoundResultResList(gameRoundResultResList)
+               .build();
+    }
 }

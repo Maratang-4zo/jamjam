@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.maratang.jamjam.domain.member.dto.request.MemberPatchReq;
 import com.maratang.jamjam.domain.member.entity.Member;
-import com.maratang.jamjam.domain.member.mapper.MemberMapper;
 import com.maratang.jamjam.domain.member.repository.MemberRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
@@ -24,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
-	private final MemberMapper memberMapper;
 
 	@Transactional
 	public Member registerMember(Member member) {
@@ -61,8 +59,8 @@ public class MemberService {
 	@Transactional
 	public Member updateMember(Member member, MemberPatchReq memberPatchReq) {
 		log.info("여기 멤버서비스 수정중"+memberPatchReq.getNickname());
-		Member updateMember = memberMapper.updateMember(memberPatchReq.getNickname(), member);
-		return memberRepository.save(updateMember);
+		member.updateNickname(memberPatchReq.getNickname());
+		return memberRepository.save(member);
 	}
 
 	// @Transactional(readOnly = true)

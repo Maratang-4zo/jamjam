@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.maratang.jamjam.domain.member.dto.request.MemberPatchReq;
 import com.maratang.jamjam.domain.member.dto.response.MemberRes;
 import com.maratang.jamjam.domain.member.entity.Member;
-import com.maratang.jamjam.domain.member.mapper.MemberMapper;
 import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.domain.memberAnalysis.dto.response.MemberAnalysisRes;
 import com.maratang.jamjam.domain.memberAnalysis.service.MemberAnalysisService;
@@ -33,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberController {
 
 	private final MemberService memberService;
-	private final MemberMapper memberMapper;
 	private final MemberAnalysisService memberAnalysisService;
 	private final RoomHistoryService roomHistoryService;
 
@@ -45,7 +43,7 @@ public class MemberController {
 		log.info("정보임:"+memberEmail);
 		Member member = memberService.findMemberByEmail(memberEmail);
 		log.info("있니? "+member.getEmail());
-		MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(member);
+		MemberRes memberRes = MemberRes.of(member);
 		//
 		// log.info("정보내놔: ");
 		// if(httpServletRequest.getAttribute("accessToken") != null) {
@@ -85,7 +83,7 @@ public class MemberController {
 			Member updateMember = memberService.updateMember(member, memberPatchReq);
 			log.info("Updated member: " + updateMember);
 
-			MemberRes memberRes = memberMapper.INSTANCE.memberToMemberRes(updateMember);
+			MemberRes memberRes = MemberRes.of(member);
 			log.info("Mapped to MemberRes: " + memberRes);
 
 			return ResponseEntity.status(HttpStatus.OK).body(memberRes);

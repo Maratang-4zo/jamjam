@@ -17,6 +17,7 @@ public enum ErrorCode {
 	// auth
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AT001", "인증 토큰이 올바르지 않습니다."),
 	FORBIDDEN(HttpStatus.FORBIDDEN, "AT002", "권한이 없습니다."),
+	KAKAO_RESPONSE_ERROR(HttpStatus.UNAUTHORIZED, "AT003", "카카오 통신 오류"),
 
 	// 인증(auth)
 	TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AT001", "만료된 토큰입니다."),
@@ -73,7 +74,10 @@ public enum ErrorCode {
 	MIDDLE_NOT_SET_START_LOCATION(HttpStatus.NOT_FOUND, "MI005","먼저 방의 중심점을 먼저 설정해주세요"),
 
 	// roundRecord
-	RR_NOT_FOUND(HttpStatus.NOT_FOUND,"RR001","미팅룸 게임 라운드별 기록을 찾을 수 없습니다.");
+	RR_NOT_FOUND(HttpStatus.NOT_FOUND,"RR001","미팅룸 게임 라운드별 기록을 찾을 수 없습니다."),
+
+	// JSON타입으로 변환
+	INVALID_JSON(HttpStatus.NOT_ACCEPTABLE, " CT001", "JSON타입으로 변환할 수 없습니다.");
 
 	private final HttpStatus status;
 	private final String code;

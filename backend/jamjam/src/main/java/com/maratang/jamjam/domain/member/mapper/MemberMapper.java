@@ -20,4 +20,5 @@ public interface MemberMapper {
 	@Mapping(source = "updateNickname", target = "nickname")
 	Member updateMember(String updateNickname, Member member);
 
+
 }

@@ -19,7 +19,6 @@ import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
-import com.maratang.jamjam.domain.room.dto.response.RoomHistoryRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
@@ -189,13 +188,6 @@ public class RoomController {
 		response.addCookie(cookie);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(roomJoinRes);
-	}
-
-	@GetMapping("/{roomUUID}/summary")
-	@Operation(summary = "초대장 생성을 위한 방 정보 api", description = "해당 방의 최종 정보를 가져온다.")
-	public ResponseEntity<?> getRoomSummary(@PathVariable UUID roomUUID){
-		RoomHistoryRes roomHistoryRes = roomHistoryService.getRoomSummary(roomUUID);
-		return ResponseEntity.status(HttpStatus.OK).body(roomHistoryRes);
 	}
 
 

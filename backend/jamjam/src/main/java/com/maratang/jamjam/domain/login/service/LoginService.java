@@ -26,7 +26,7 @@ public class LoginService {
 	private final TokenManager tokenManager;
 	private final LoginMapper loginMapper;
 
-	public LoginRes oauthLogin(String accessToken) {
+	public LoginRes oauthLogin(String accessToken, String refreshToken) {
 
 		SocialLoginApiService socialLoginApiService = SocialLoginApiServiceFactory.getSocialLoginApiService();
 
@@ -44,10 +44,12 @@ public class LoginService {
 			oauthMember = memberService.registerMember(oauthMember);
 			jwtTokenDto = tokenManager.createJwtToken(oauthMember.getEmail(), oauthMember.getNickname());
 			oauthMember.updateRefreshToken(jwtTokenDto);
+			oauthMember.updateTokens(accessToken, refreshToken);
 			log.info("신규회원: "+oauthMember.getNickname() + " " + oauthMember.getEmail());
 		} else {// 기존 회원일 경우
 			jwtTokenDto = tokenManager.createJwtToken(optionalMember.getEmail(), optionalMember.getNickname());
 			optionalMember.updateRefreshToken(jwtTokenDto);
+			optionalMember.updateTokens(accessToken, refreshToken);
 			log.info("기존회원: " + optionalMember.getNickname() + " " + optionalMember.getEmail());
 		}
 

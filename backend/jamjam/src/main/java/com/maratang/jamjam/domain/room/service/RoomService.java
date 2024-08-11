@@ -24,6 +24,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomCloseReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
+import com.maratang.jamjam.domain.room.dto.response.CenterLoadingDto;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
@@ -97,11 +98,13 @@ public class RoomService {
 	@Transactional
 	public void updateRoom(UUID roomUUID, RoomUpdateReq roomUpdateReq) {
 		// 1. DB 상태 변경
-		// 2. 참여자들에게 알리기
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
 		room.updateRoom(roomUpdateReq);
+
+		// 2. 참여자들에게 알리기
+		broadCastService.broadcastToRoom(roomUUID, roomUpdateReq, BroadCastType.ROOM_INFO_UPDATE);
 	}
 
 	@Transactional
@@ -109,6 +112,7 @@ public class RoomService {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
+		broadCastService.broadcastToRoom(roomUUID, CenterLoadingDto.of(true), BroadCastType.HOST_FIND_CENTER);
 		// Transforming attendees' coordinates into Point instances, skipping null values
 		List<Point> points = room.getAttendees().stream()
 			.filter(attendee -> attendee.getLat() != null && attendee.getLon() != null)
@@ -141,7 +145,9 @@ public class RoomService {
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
 		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
 
-		return RoomMiddleRes.of(selectedStation, attendeeList);
+		RoomMiddleRes res = RoomMiddleRes.of(selectedStation, attendeeList);
+		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.ROOM_CENTER_UPDATE);
+		return res;
 	}
 
 	@Transactional

@@ -16,7 +16,7 @@ public class MemberRes {
         return MemberRes.builder()
 			.nickname(member.getNickname())
 			.email(member.getEmail())
-			.profile(member.getEmail())
+			.profile(member.getProfile())
 			.build();
     }
 }

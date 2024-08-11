@@ -1,5 +1,6 @@
 package com.maratang.jamjam.domain.member.dto.response;
 
+import com.maratang.jamjam.domain.member.entity.Member;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -11,4 +12,11 @@ public class MemberRes {
 	private String email;
 	private String profile;
 
+	public static MemberRes of(Member member) {
+        return MemberRes.builder()
+			.nickname(member.getNickname())
+			.email(member.getEmail())
+			.profile(member.getEmail())
+			.build();
+    }
 }

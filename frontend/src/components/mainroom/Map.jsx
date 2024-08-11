@@ -8,19 +8,21 @@ import {
 } from "react-naver-maps";
 import { useRecoilValue } from "recoil";
 import {
-  isGameFinishAtom,
   isNextMiddleExistAtom,
   roomAtom,
+  roomPageAtom,
   selectedStationAtom,
 } from "../../recoil/atoms/roomState";
 import useDecoding from "../../hooks/useDecoding";
 import ColorThief from "colorthief";
+import { userColor } from "../../utils/userColor";
+import fireGif from "../../assets/icons/fire-fireball.gif";
 
 function MyMap() {
   const navermaps = useNavermaps();
   const roomInfo = useRecoilValue(roomAtom);
   const selectedStation = useRecoilValue(selectedStationAtom);
-  const isGameFinish = useRecoilValue(isGameFinishAtom);
+  const roomPage = useRecoilValue(roomPageAtom);
   const isNextMiddleExist = useRecoilValue(isNextMiddleExistAtom);
   const [map, setMap] = useState(null);
   const [attendeeDepartures, setAttendeeDepartures] = useState([]);
@@ -32,40 +34,13 @@ function MyMap() {
   };
   const [centerPoint, setCenterPoint] = useState(defaultCenter);
 
-  const routeColor = {
-    "https://github.com/user-attachments/assets/81c6e571-004e-4905-a563-98e315fd5413":
-      "#7304D7",
-    "https://github.com/user-attachments/assets/20f9f469-2687-46ef-893b-a932d048a921":
-      "#5665FF",
-    "https://github.com/user-attachments/assets/ba8d1f38-a48c-4581-be35-9e00d01ce31f":
-      "#FB3E01",
-    "https://github.com/user-attachments/assets/28991fc0-1e74-4c56-908b-6a133946a39a":
-      "#C328D0",
-    "https://github.com/user-attachments/assets/9ab979f9-50a9-4b79-a755-d135a8772048":
-      "#13BABF",
-    "https://github.com/user-attachments/assets/5ed15082-6117-4c26-8781-21b82281d625":
-      "#FB038E",
-    "https://github.com/user-attachments/assets/abd3aedb-207c-429f-a47a-8d631a34a41b":
-      "#FB3E01",
-    "https://github.com/user-attachments/assets/addd99b2-a661-4640-a490-a20108bfa3e0":
-      "#5665FF",
-    "https://github.com/user-attachments/assets/de6abb23-a2e0-4839-b4b3-d130474b0705":
-      "#FCAF01",
-    "https://github.com/user-attachments/assets/b652768d-733e-4fbd-928b-003e999c5962":
-      "#77C914",
-    "https://github.com/user-attachments/assets/8cad8c12-2dff-478d-91ff-e693c0119b6c":
-      "#FEDB00",
-    "https://github.com/user-attachments/assets/229b38a5-0024-4c1c-ad5a-b3ad613ccf8c":
-      "#D2D600",
-  };
-
   useEffect(() => {
-    const fetchRouteColors = async () => {
+    const fetchuserColors = async () => {
       const colorThief = new ColorThief();
       const departures = await Promise.all(
         roomInfo.attendees.map(async (attendee) => {
           const route = attendee.route ? decodePath(attendee.route) : null;
-          let color = routeColor[attendee.profileImageUrl];
+          let color = userColor[attendee.profileImageUrl];
 
           if (!color) {
             try {
@@ -100,7 +75,7 @@ function MyMap() {
       setAttendeeDepartures(departures);
     };
 
-    fetchRouteColors();
+    fetchuserColors();
   }, [roomInfo.attendees, decodePath]);
 
   useEffect(() => {
@@ -117,7 +92,7 @@ function MyMap() {
       const bounds = new navermaps.LatLngBounds();
       let hasValidLocation = false;
 
-      if (selectedStation && isGameFinish && !isNextMiddleExist) {
+      if (selectedStation && roomPage === "gamefinish" && !isNextMiddleExist) {
         bounds.extend(
           new navermaps.LatLng(
             selectedStation.latitude,
@@ -161,14 +136,38 @@ function MyMap() {
     roomInfo.isCenterExist,
     roomInfo.centerPlace,
     selectedStation,
-    isGameFinish,
     isNextMiddleExist,
     navermaps,
   ]);
 
-  const handlePolylineClick = (index) => {
-    setVisibleDurationIndex(index);
+  const formatDuration = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (hours > 0 && minutes > 0) {
+      return `${hours}시간 ${minutes}분`;
+    } else if (hours > 0) {
+      return `${hours}시간`;
+    } else if (minutes > 0) {
+      return `${minutes}분`;
+    } else {
+      return "1분 미만";
+    }
   };
+
+  const bounceAnimation = `
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-30px);
+      }
+      60% {
+        transform: translateY(-15px);
+      }
+    }
+  `;
 
   return (
     <NaverMap
@@ -189,9 +188,16 @@ function MyMap() {
               position={new navermaps.LatLng(departure.lat, departure.lon)}
               icon={{
                 content: `
-                  <div style="display: flex; flex-direction: column; align-items: center;">
+                  <style>
+                    ${bounceAnimation}
+                  </style>
+                  <div style="display: flex; flex-direction: column; align-items: center; animation: bounce 1s ease;">
                     <img src="${departure.profileImageUrl}" style="width:40px;height:40px;border-radius:50%;" />
-                    <span style="border: 2px solid ${departure.color}; background: white; padding: 2px 5px; border-radius: 10px; font-size: 13px; color: black; font-weight:600; margin-top: 2px;">
+                    <span style="text-shadow: 
+        -1.5px -1px 0 #000,  
+        1.5px -1px 0 #000, 
+        -1.5px 1px 0 #000, 
+        1.5px 1px 0 #000;font-size: 20px; color: #FFE845; font-weight:600; margin-top: 2px; font-family: DungGeunMo">
                       ${departure.nickname}
                     </span>
                   </div>
@@ -199,43 +205,58 @@ function MyMap() {
                 anchor: new navermaps.Point(20, 20), // 마커 중심점을 이미지 중앙으로 조정
               }}
             />
-            {!isGameFinish && roomInfo.isCenterExist && departure.route && (
-              <Polyline
-                path={departure.route.map(
-                  (point) => new navermaps.LatLng(point[0], point[1]),
-                )}
-                clickable={true}
-                strokeColor={departure.color}
-                strokeStyle={"solid"}
-                strokeWeight={5}
-                strokeOpacity={1}
-                strokeLineJoin={"miter"}
-                strokeLineCap={"round"}
-                onClick={() => handlePolylineClick(index)}
-              />
-            )}
+            {roomPage === "main" &&
+              roomInfo.isCenterExist &&
+              departure.route &&
+              departure.duration && (
+                <>
+                  <Polyline
+                    path={departure.route.map(
+                      (point) => new navermaps.LatLng(point[0], point[1]),
+                    )}
+                    clickable={true}
+                    strokeColor={departure.color}
+                    strokeStyle={"solid"}
+                    strokeWeight={5}
+                    strokeOpacity={1}
+                    strokeLineJoin={"miter"}
+                    strokeLineCap={"round"}
+                  />
 
-            {visibleDurationIndex === index && (
-              <Marker
-                position={
-                  new navermaps.LatLng(
-                    departure.route[Math.floor(departure.route.length / 2)][0],
-                    departure.route[Math.floor(departure.route.length / 2)][1],
-                  )
-                }
-                icon={{
-                  content: `
-                    <div style="background: white; padding: 2px 5px; border-radius: 10px; border: 2px solid black; font-size: 13px; color: black;">
-                      ${departure.duration}
-                    </div>
-                  `,
-                  anchor: new navermaps.Point(10, 10), // 마커 중심점을 이미지 중앙으로 조정
-                }}
-              />
-            )}
+                  <Marker
+                    position={
+                      new navermaps.LatLng(
+                        departure.route[
+                          Math.floor(departure.route.length / 2)
+                        ][0],
+                        departure.route[
+                          Math.floor(departure.route.length / 2)
+                        ][1],
+                      )
+                    }
+                    icon={{
+                      content: `
+
+      <div style="background: ${
+        departure.color
+      }; padding: 3px 5px; border-radius: 5px; border: none; font-size: 14px; box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.35);">
+        <span style="font-family: 'OldGalmuri'; color: white; text-shadow: 
+        -1px -1px 0 #000,  
+        1px -1px 0 #000, 
+        -1px 1px 0 #000, 
+        1px 1px 0 #000;">
+          ${formatDuration(departure.duration)}
+        </span>
+      </div>
+    `,
+                      anchor: new navermaps.Point(35, 10), // 마커 중심점을 이미지 중앙으로 조정
+                    }}
+                  />
+                </>
+              )}
           </React.Fragment>
         ))}
-      {roomInfo.isCenterExist && !isGameFinish ? (
+      {roomInfo.isCenterExist && roomPage === "main" ? (
         <Marker
           position={
             new navermaps.LatLng(
@@ -243,9 +264,18 @@ function MyMap() {
               roomInfo.centerPlace.longitude,
             )
           }
+          icon={{
+            content: `
+        <div style="display: flex; justify-content: center; align-items: center;">
+          <img src="${fireGif}" style="width:50px; height:50px;" />
+        </div>
+      `,
+            anchor: new navermaps.Point(25, 25), // 이미지 중심점을 조정
+          }}
         />
       ) : null}
-      {selectedStation && isGameFinish && !isNextMiddleExist && (
+
+      {selectedStation && roomPage === "gamefinish" && !isNextMiddleExist && (
         <>
           <Marker
             position={

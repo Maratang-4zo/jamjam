@@ -9,9 +9,18 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class RoomCreateReq {
-	@NotBlank
+	@NotBlank(message = "목적은 필수 입력 사항입니다.")
 	private String purpose;
-	@NotBlank
+
+	@NotNull(message = "미팅 날짜는 필수 입력 사항입니다.")
 	private LocalDateTime meetingDate;
+
 	private String nickname;
+
+	public Room toEntity(){
+		return Room.builder()
+                .purpose(purpose)
+                .meetingDate(meetingDate)
+                .build();
+	}
 }

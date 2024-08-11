@@ -10,13 +10,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.maratang.jamjam.backup.board.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
-import com.maratang.jamjam.domain.attendee.mapper.AttendeeMapper;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
-import com.maratang.jamjam.domain.board.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.randomName.entity.Name;
 import com.maratang.jamjam.domain.randomName.entity.Nick;
 import com.maratang.jamjam.domain.randomName.repository.NameRepository;
@@ -31,21 +30,20 @@ import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
-import com.maratang.jamjam.domain.room.mapper.RoomMapper;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
+import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
+import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.middle.GeometryUtils;
-import com.maratang.jamjam.global.middle.GrahamScan;
-import com.maratang.jamjam.global.middle.HaversineDistance;
-import com.maratang.jamjam.global.middle.PolylineUtils;
-import com.maratang.jamjam.global.middle.client.OTPUserClient;
-import com.maratang.jamjam.global.middle.dto.OTPUserRes;
-import com.maratang.jamjam.global.room.RoomTokenProvider;
-import com.maratang.jamjam.global.room.dto.RoomJwtTokenClaims;
-import com.maratang.jamjam.global.station.Point;
-import com.maratang.jamjam.global.station.SubwayDataLoader;
-import com.maratang.jamjam.global.station.SubwayInfo;
+import com.maratang.jamjam.global.map.middle.GeometryUtils;
+import com.maratang.jamjam.global.map.middle.GrahamScan;
+import com.maratang.jamjam.global.map.middle.HaversineDistance;
+import com.maratang.jamjam.global.map.middle.PolylineUtils;
+import com.maratang.jamjam.global.map.middle.client.OTPUserClient;
+import com.maratang.jamjam.global.map.middle.dto.OTPUserRes;
+import com.maratang.jamjam.global.map.station.Point;
+import com.maratang.jamjam.global.map.station.SubwayDataLoader;
+import com.maratang.jamjam.global.map.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
 
@@ -70,15 +68,14 @@ public class RoomService {
 
 	@Transactional
 	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq) {
-		Room room = RoomMapper.INSTANCE.roomCreateReqToAttendee(roomCreateReq);
-
-		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(roomCreateReq);
+		Room room = roomCreateReq.toEntity();
+		Attendee attendee = Attendee.builder().nickname(roomCreateReq.getNickname()).build();
 
 		room.updateAttendee(attendee);
 
 		String roomName = attendee.getNickname();
 
-		if (roomName.equals("")){
+		if (roomName == null || roomName.isEmpty()){
 			//todo 여기서 nick 테이블에 잇는 모든 value 중에 랜덤 값으로 정하기
 			Nick nick = nickRepository.findRandomNick();
 			Name name = nameRepository.findRandomName();
@@ -94,14 +91,7 @@ public class RoomService {
 		attendeeRepository.save(attendee);
 		roomRepository.save(room);
 
-		UUID roomUUID = room.getRoomUUID();
-
-		RoomJwtTokenClaims roomJwtTokenClaims = RoomJwtTokenClaims.builder()
-			.roomUUID(roomUUID)
-			.attendeeUUID(attendee.getAttendeeUUID())
-			.build();
-
-		return roomJwtTokenClaims;
+		return RoomJwtTokenClaims.of(room, attendee);
 	}
 
 	@Transactional
@@ -151,10 +141,7 @@ public class RoomService {
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
 		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
 
-		return RoomMiddleRes.builder()
-			.roomCenterStart(selectedStation)
-			.attendees(attendeeList)
-			.build();
+		return RoomMiddleRes.of(selectedStation, attendeeList);
 	}
 
 	@Transactional
@@ -175,7 +162,7 @@ public class RoomService {
 		attendeeRepository.save(attendee);
 
 		// 3. 기존 인원들에게 알림
-		AttendeeInfo attendeeInfo = AttendeeMapper.INSTANCE.attendeeToAttendeeInfo(attendee);
+		AttendeeInfo attendeeInfo = AttendeeInfo.of(attendee);
 		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ENTER);
 	}
 
@@ -188,7 +175,7 @@ public class RoomService {
 		attendeeRepository.save(attendee);
 
 		// 2. 참여자가 떠남을 알리기
-		AttendeeInfo attendeeInfo = AttendeeMapper.INSTANCE.attendeeToAttendeeInfo(attendee);
+		AttendeeInfo attendeeInfo = AttendeeInfo.of(attendee);
 		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_LEAVE);
 
 		// 3. 방장
@@ -227,7 +214,7 @@ public class RoomService {
 
 	public RoomRes isRoomExist(UUID roomUUID){
 		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		return RoomMapper.INSTANCE.roomToRoomRes(room);
+		return RoomRes.of(room);
 	}
 
 	public RoomGetRes findRoom(UUID roomUUID, String roomToken) {
@@ -252,30 +239,9 @@ public class RoomService {
 
 		//roomToken end
 
-		boolean isHost = false;
+		SubwayInfo roomCenterStart = subwayDataLoader.getSubwayInfo(room.getStartStation());
 
-		if (room.getRoot().getAttendeeUUID().equals(attendeeUUID)) {
-			isHost = true;
-		}
-
-		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
-		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
-
-		String startStation = room.getStartStation();
-
-		SubwayInfo roomCenterStart = subwayDataLoader.getSubwayInfo(startStation);
-
-		return RoomGetRes.builder()
-			.isHost(isHost)
-			.RoomUUID(roomUUID)
-			.attendeeUUID(attendeeUUID)
-			.roomName(room.getName())
-			.roomCenterStart(roomCenterStart)
-			.roomTime(room.getMeetingDate())
-			.roomPurpose(room.getPurpose())
-			.hostUUID(room.getRoomUUID())
-			.attendees(attendeeList)
-			.build();
+		return RoomGetRes.of(room, attendeeUUID, roomCenterStart);
 	}
 
 	private void saveOptimalRoutesForUsersInRoomToDatabase(Room room, SubwayInfo selectedStation) {
@@ -370,10 +336,7 @@ public class RoomService {
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
 		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
 
-		return RoomMoveRes.builder()
-			.roomCenterStart(selectedStation)
-			.attendees(attendeeList)
-			.build();
+		return RoomMoveRes.of(selectedStation, attendeeList);
 	}
 
 }

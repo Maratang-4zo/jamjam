@@ -3,7 +3,7 @@ package com.maratang.jamjam.domain.member.entity;
 import java.time.LocalDateTime;
 
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
-import com.maratang.jamjam.global.jwt.dto.JwtTokenDto;
+import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
 import com.maratang.jamjam.global.util.DateTimeUtils;
 
 import jakarta.persistence.Column;
@@ -39,7 +39,10 @@ public class Member extends BaseTimeEntity {
 	private String profile;
 	@Column(length = 512)
 	private String refreshToken;
-
+	@Column(length = 512)
+	private String kakaoAccessToken;
+	@Column(length = 512)
+	private String kakaoRefreshToken;
 	private LocalDateTime tokenExpirationTime;
 
 	@Builder
@@ -59,8 +62,17 @@ public class Member extends BaseTimeEntity {
 		this.tokenExpirationTime = DateTimeUtils.convertToLocalDateTime(jwtTokenDto.getRefreshTokenExpireTime());
 	}
 
+	public void updateTokens(String kakaoAccessToken, String kakaoRefreshToken) {
+		this.kakaoAccessToken = kakaoAccessToken;
+		this.kakaoRefreshToken = kakaoRefreshToken;
+	}
+
 	public void expireRefreshToken(LocalDateTime now) {
 		this.tokenExpirationTime = now;
+	}
+
+	public void updateNickname(String nickname){
+		this.nickname = nickname;
 	}
 }
 

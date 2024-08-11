@@ -4,6 +4,7 @@ import App from "./App";
 import { RecoilRoot } from "recoil";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { QueryClient, QueryClientProvider } from "react-query";
+import "./index.css";
 
 const queryClient = new QueryClient();
 

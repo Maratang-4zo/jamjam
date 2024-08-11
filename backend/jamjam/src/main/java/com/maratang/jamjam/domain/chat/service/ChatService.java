@@ -10,7 +10,6 @@ import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.chat.dto.request.ChatReq;
 import com.maratang.jamjam.domain.chat.dto.response.ChatRes;
 import com.maratang.jamjam.domain.chat.entity.Chat;
-import com.maratang.jamjam.domain.chat.mapper.ChatMapper;
 import com.maratang.jamjam.domain.chat.repository.ChatRepository;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
@@ -31,19 +30,15 @@ public class ChatService {
 	private final AttendeeRepository attendeeRepository;
 	private final BroadCastService broadCastService;
 
-	private static final ChatMapper mapper = ChatMapper.INSTANCE;
-
 	@Transactional
 	public void sendMessage(UUID roomUUID, UUID attendeeUUID, ChatReq chatReq) {
 		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUUID).orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 		// member
-		Chat chat = mapper.chatReqToChat(chatReq, room, attendee);
+		Chat chat = chatReq.toEntity(room, attendee);
 		chatRepository.save(chat);
 
-		ChatRes res = ChatRes.builder()
-			.attendeeUUID(attendeeUUID).content(chatReq.getContent()).createdAt(chat.getCreatedAt())
-			.build();
+		ChatRes res = ChatRes.of(chat);
 		// chat to chatReq
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.CHAT_RECEIVED);
 	}

@@ -6,20 +6,12 @@ import FindDeparture from "../components/mainroom/Departure";
 import EditModal from "../components/mainroom/EditModal";
 import MainButtons from "../components/mainroom/MainButtons";
 import ShareModal from "../components/mainroom/ShareModal";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
-import {
-  isGameFinishAtom,
-  roomAtom,
-  roomPageAtom,
-} from "../recoil/atoms/roomState";
+import { roomAtom, roomPageAtom } from "../recoil/atoms/roomState";
 import { axiosUpdateUserInfo } from "../apis/mapApi";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  axiosIsRoomValid,
-  axiosGetRoomInfo,
-  axiosPatchRoomInfo,
-} from "../apis/roomApi";
+import { axiosIsRoomValid, axiosGetRoomInfo } from "../apis/roomApi";
 import { getCookie } from "../utils/Cookies";
 import { jwtDecode } from "jwt-decode";
 import useWs from "../hooks/useWs";
@@ -52,10 +44,8 @@ function Room() {
   const [modalTitle, setModalTitle] = useState("");
   const [modalTop, setModalTop] = useState("50px");
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
-  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
-  const isGameFinish = useRecoilValue(isGameFinishAtom);
+  const setRoomInfo = useSetRecoilState(roomAtom);
   const roomPage = useRecoilValue(roomPageAtom);
-  const selectedGame = useRecoilValue(selectedGameAtom);
   const [joinLoading, setJoinLoading] = useState(false);
   const { connect, connected } = useWs();
   const { joinSession, joined } = useOpenVidu();

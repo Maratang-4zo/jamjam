@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import useWs from "../../hooks/useWs";
 import { useRecoilValue } from "recoil";
 import { chatAtom, roomAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
+import sendIcon from "../../assets/icons/sendIcon.png";
 
 const SideModal = styled.div`
   position: fixed;
@@ -11,12 +12,13 @@ const SideModal = styled.div`
   left: ${({ isVisible }) => (isVisible ? "50px" : "-600px")};
   width: 360px;
   height: 100%;
-  background-color: #000000a1;
+  background-color: #000000b2;
   transition: left 0.3s ease-in-out;
   z-index: 9999;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 10px;
 `;
 
 const ChatHeader = styled.div`
@@ -28,58 +30,98 @@ const ChatHeader = styled.div`
 `;
 
 const ChatTitle = styled.h1`
-  font-size: 20px;
+  font-size: 25px;
   color: white;
+  font-family: "OldGalmuri";
 `;
 
 const CloseButton = styled.button`
   color: white;
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: 25px;
   cursor: pointer;
+  font-family: "OldGalmuri";
 `;
 
 const ChatMessages = styled.div`
   flex: 1;
-  padding: 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
-`;
 
-const ChatBubble = styled.div`
-  max-width: 70%;
-  padding: 10px;
-  border-radius: 15px;
-  background-color: ${({ isSender }) => (isSender ? "#4caf50" : "#f1f1f1")};
-  color: ${({ isSender }) => (isSender ? "white" : "black")};
-  align-self: ${({ isSender }) => (isSender ? "flex-end" : "flex-start")};
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* Webkit 기반 브라우저에서 스크롤바 스타일 */
+  &::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 10px; /* 스크롤바 자체를 둥글게 */
+  }
+
+  &::-webkit-scrollbar-track {
+    background: none;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: ${(props) => props.theme.infoColor + 80};
+    border-radius: 10px;
+    /* border: 2px solid #282828; */
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: ${(props) => props.theme.bgColor + 80};
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none; /* 스크롤바 화살표 제거 */
+  }
 `;
 
 const ChatInputWrapper = styled.form`
-  border-top: 1px solid #ccc;
-  padding: 10px;
+  padding: 3px 3px 3px 10px;
+  border: 2px solid #ccc;
+  border-radius: 30px;
   display: flex;
 `;
 
 const ChatInput = styled.input`
+  background: none;
   flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
+  caret-color: white;
+  color: white;
+  font-family: "NewGalmuriRegular";
+  font-size: 20px;
+  border: none;
+  &::placeholder {
+    color: #ababab;
+    font-family: "NewGalmuriRegular";
+  }
+  &:focus {
+    border: none;
+    outline: none;
+  }
 `;
 
 const SendButton = styled.button`
-  padding: 10px;
   border: none;
-  background-color: ${(props) => props.theme.accentColor};
+  background: none;
   color: white;
-  border-radius: 4px;
+  border-radius: 50%;
   cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    transition: 0.2s;
+    background-color: #00000047;
+  }
+`;
+
+const SendIcon = styled.img`
+  width: 30px;
+  height: 25px;
 `;
 
 const ChatBox = styled.div`
@@ -102,13 +144,13 @@ const ChatInfoBox = styled.div`
 const ChatInfoUser = styled.span`
   color: #ffe845;
   font-size: 20px;
-  font-family: "ONE(Ed.) Galmuri11 Bold";
+  font-family: "NewGalmuriBold";
 `;
 
 const ChatInfoTime = styled.span`
   color: #d6d6d6;
   font-size: 12px;
-  font-family: Galmuri11;
+  font-family: "NewGalmuriBold";
 `;
 
 const ChatContentBox = styled.div`
@@ -120,7 +162,7 @@ const ChatContentBox = styled.div`
 
 const ChatContentLine = styled.p`
   color: #fff;
-  font-family: "ONE(Ed.) Galmuri11 Regular";
+  font-family: "NewGalmuriBold";
   font-size: 20px;
 `;
 
@@ -128,8 +170,21 @@ function ChattingModal({ isVisible, toggleModal }) {
   const { sendChat } = useWs();
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
-  const [chatContent, setChatContent] = useState("");
   const chatLogs = useRecoilValue(chatAtom);
+  const [chatContent, setChatContent] = useState("");
+  const chatMessagesRef = useRef(null);
+
+  useEffect(() => {
+    if (isVisible) {
+      scrollToBottom();
+    }
+  }, [isVisible, chatLogs]);
+
+  const scrollToBottom = () => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+    }
+  };
 
   const handleChange = (event) => {
     setChatContent(event.target.value);
@@ -137,7 +192,7 @@ function ChattingModal({ isVisible, toggleModal }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setChatContent(""); // Clear input after sending
+    setChatContent(""); // 입력창 초기화
     sendChat({
       content: chatContent,
       roomUUID: roomInfo.roomUUID,
@@ -145,13 +200,19 @@ function ChattingModal({ isVisible, toggleModal }) {
     });
   };
 
+  const formatTime = (createdAt) => {
+    const chatTime = new Date(createdAt);
+    const hours = chatTime.getHours().toString().padStart(2, "0");
+    const minutes = chatTime.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
   const groupMessages = () => {
     const grouped = [];
     let currentGroup = { user: null, nickname: null, time: null, messages: [] };
 
     chatLogs.forEach((chat, index) => {
-      const chatTime = new Date(chat.timestamp);
-      const chatTimeFormatted = `${chatTime.getHours()}:${chatTime.getMinutes()}`;
+      const chatTimeFormatted = formatTime(chat.createdAt);
 
       if (
         currentGroup.user === chat.senderUUID &&
@@ -186,7 +247,7 @@ function ChattingModal({ isVisible, toggleModal }) {
         <ChatTitle>{roomInfo.roomName}</ChatTitle>
         <CloseButton onClick={toggleModal}>X</CloseButton>
       </ChatHeader>
-      <ChatMessages>
+      <ChatMessages ref={chatMessagesRef}>
         {groupedMessages.map((group, index) => (
           <ChatBox key={index}>
             <ChatInfoBox>
@@ -204,11 +265,13 @@ function ChattingModal({ isVisible, toggleModal }) {
       <ChatInputWrapper onSubmit={handleSubmit}>
         <ChatInput
           type="text"
-          placeholder="Type a message..."
+          placeholder="텍스트를 입력하세요."
           value={chatContent}
           onChange={handleChange}
         />
-        <SendButton type="submit">Send</SendButton>
+        <SendButton type="submit">
+          <SendIcon src={sendIcon} />
+        </SendButton>
       </ChatInputWrapper>
     </SideModal>
   );

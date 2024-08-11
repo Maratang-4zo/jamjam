@@ -216,5 +216,3 @@ VALUES
     (3, '숨은 jamjam 찾기', 3, 0, 2, '그림 속에 숨은 jamjam이를 가장 먼저 찾은 사람이 승리!')
     ON DUPLICATE KEY UPDATE
                          game_id = VALUES(game_id);
-
-

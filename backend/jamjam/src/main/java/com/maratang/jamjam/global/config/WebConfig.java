@@ -10,8 +10,8 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.maratang.jamjam.global.Interceptor.AuthenticationInterceptor;
-import com.maratang.jamjam.global.Interceptor.RoomAuthenticationInterceptor;
+import com.maratang.jamjam.global.auth.Interceptor.AuthenticationInterceptor;
+import com.maratang.jamjam.global.auth.Interceptor.RoomAuthenticationInterceptor;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,7 +42,7 @@ public class WebConfig implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(authenticationInterceptor)
 			.order(1)
-			.addPathPatterns("/members/**");
+			.addPathPatterns("/members/**", "/summary/kakaoCalendar/*");
 			// .excludePathPatterns("/login", "/logout");
 
 		registry.addInterceptor(roomAuthenticationInterceptor)

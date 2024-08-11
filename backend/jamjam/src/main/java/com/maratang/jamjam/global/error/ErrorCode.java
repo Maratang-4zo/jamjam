@@ -79,7 +79,10 @@ public enum ErrorCode {
 	GAME_NOT_FOUND(HttpStatus.NOT_FOUND,"GA001","게임을 찾을 수 없습니다."),
 
 	// gameRecord
-	GR_NOT_FOUND(HttpStatus.NOT_FOUND,"GR001","게임 레코드 기록을 찾을 수 없습니다.");
+	GR_NOT_FOUND(HttpStatus.NOT_FOUND,"GR001","게임 레코드 기록을 찾을 수 없습니다."),
+
+	// localDate format
+	LF_FORMAT_NOT_MATCH(HttpStatus.BAD_REQUEST,"LD001","날짜 형식이 올바르지 않습니다. 형식은 yyyy-MM-dd'T'HH:mm:ss 입니다.");
 
 	private final HttpStatus status;
 	private final String code;

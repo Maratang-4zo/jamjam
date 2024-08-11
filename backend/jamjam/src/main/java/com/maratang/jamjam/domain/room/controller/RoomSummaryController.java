@@ -34,8 +34,10 @@ public class RoomSummaryController {
 	@Operation(summary = "카카오톡 캘린더에 일정 생성", description = "카카오톡 일정에 추가해준다.")
 	public ResponseEntity<?> getRoomKakaoCalendar(@PathVariable UUID roomUUID, HttpServletRequest request) {
 		String email = request.getAttribute("email").toString();
-		return roomHistoryService.createEventInKakaoCalendar(roomUUID, email);
+		String event_id = roomHistoryService.createEventInKakaoCalendar(roomUUID, email);
+		return ResponseEntity.status(HttpStatus.OK).body(event_id);
 	}
+
 }
 
 // @GetMapping("/kakaoCalendar/{roomUUID}")

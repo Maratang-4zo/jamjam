@@ -66,6 +66,7 @@ public class LoginController {
 		HttpServletResponse response) throws IOException {
 
 		// 인가 코드로 kakao 액세스 토큰 요청
+		log.info("code: "+code);
 		Map<String, String> tokens = getTokens(code);
 		String accessToken = tokens.get("access_token");
 		String refreshToken = tokens.get("refresh_token");

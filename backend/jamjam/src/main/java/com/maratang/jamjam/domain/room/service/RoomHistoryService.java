@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.commons.security.ResourceServerTokenRelayAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,10 @@ import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.util.DateTimeUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RoomHistoryService {
@@ -38,6 +41,7 @@ public class RoomHistoryService {
 	private final KakaoUserInfoClient kakaoUserInfoClient;
 	private final DateTimeUtils dateTimeUtils;
 	private final ObjectMapper objectMapper;
+	private final ResourceServerTokenRelayAutoConfiguration resourceServerTokenRelayAutoConfiguration;
 
 	@Value("${kakao.client.id}")
 	private String clientId;
@@ -46,6 +50,7 @@ public class RoomHistoryService {
 
 	public List<RoomHistoryRes> getRoomHistory(long memberId) {
 		List<Room> list = roomRepository.findByMemberId(memberId);
+		log.info(list.get(0).getRoomUUID().toString());
 		List<RoomHistoryRes> resList = roomMapper.INSTANCE.roomsToRoomHistoryResList(list);
 		return resList;
 	}
@@ -57,7 +62,7 @@ public class RoomHistoryService {
 		return roomHistoryRes;
 	}
 
-	public ResponseEntity<?> createEventInKakaoCalendar(UUID roomUUID, String email) {
+	public String createEventInKakaoCalendar(UUID roomUUID, String email) {
 		Member member = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new AuthenticationException(ErrorCode.MEMBER_NOT_EXISTS));
 
@@ -89,17 +94,18 @@ public class RoomHistoryService {
 		try {
 			ResponseEntity<Map> response = kakaoUserInfoClient.createKakaoCalendarEvent("Bearer " + kakaoAccessToken, eventJson);
 			if (response.getStatusCode() == HttpStatus.OK) {
-				return ResponseEntity.status(HttpStatus.OK).body(response.getBody());
+				return response.getBody().toString();
 			} else {
 				throw new AuthenticationException(ErrorCode.KAKAO_RESPONSE_ERROR);
 			}
 		} catch (Exception e) {
+			log.info("에러가 뭐길래"+e.getMessage());
 			if (e.getMessage().contains("401")) {
 				reissueTokens(member);
 
 				kakaoAccessToken = member.getKakaoAccessToken();
 				ResponseEntity<Map> response = kakaoUserInfoClient.createKakaoCalendarEvent("Bearer " + kakaoAccessToken, eventJson);
-				return ResponseEntity.status(HttpStatus.OK).body(response.getBody());
+				return response.getBody().toString();
 			} else {
 				throw new AuthenticationException(ErrorCode.KAKAO_RESPONSE_ERROR);
 			}
@@ -110,14 +116,17 @@ public class RoomHistoryService {
 		ResponseEntity<Map> response = kakaoUserInfoClient.reissueTokens(
 			"refresh_token",clientId,member.getKakaoRefreshToken(),clientSecret);
 
+		log.info("여기까진 나왔니..11");
 		if (response.getStatusCode() == HttpStatus.OK) {
 			Map<String, Object> responseBody = response.getBody();
 			if (responseBody.get("refresh_token") != null) {
 				member.updateTokens(responseBody.get("access_token").toString(), responseBody.get("refresh_token").toString());
 			} else {
 				member.updateTokens(responseBody.get("access_token").toString(), member.getKakaoRefreshToken());
+				log.info("여기까진 나왔니...");
 			}
 		} else {
+
 			throw new AuthenticationException(ErrorCode.KAKAO_RESPONSE_ERROR);
 		}
 	}

@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -21,7 +22,7 @@ public interface KakaoUserInfoClient {
 	@PostMapping("/v2/api/calendar/create/event")
 	ResponseEntity<Map> createKakaoCalendarEvent(
 		@RequestHeader("Authorization") String authorization,
-		@RequestParam("event") String eventJson
+		@RequestBody String eventJson
 	);
 
 	@PostMapping("/oauth/token")

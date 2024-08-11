@@ -18,7 +18,6 @@ import com.maratang.jamjam.domain.member.repository.MemberRepository;
 import com.maratang.jamjam.domain.room.dto.RoomHistoryDTO;
 import com.maratang.jamjam.domain.room.dto.response.RoomHistoryRes;
 import com.maratang.jamjam.domain.room.entity.Room;
-import com.maratang.jamjam.domain.room.mapper.RoomMapper;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.auth.oauth.kakao.client.KakaoUserInfoClient;
 import com.maratang.jamjam.global.error.ErrorCode;
@@ -36,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class RoomHistoryService {
 
 	private final RoomRepository roomRepository;
-	private final RoomMapper roomMapper;
 	private final MemberRepository memberRepository;
 	private final KakaoUserInfoClient kakaoUserInfoClient;
 	private final DateTimeUtils dateTimeUtils;
@@ -51,14 +49,14 @@ public class RoomHistoryService {
 	public List<RoomHistoryRes> getRoomHistory(long memberId) {
 		List<Room> list = roomRepository.findByMemberId(memberId);
 		log.info(list.get(0).getRoomUUID().toString());
-		List<RoomHistoryRes> resList = roomMapper.INSTANCE.roomsToRoomHistoryResList(list);
+		List<RoomHistoryRes> resList = RoomHistoryRes.of(list);
 		return resList;
 	}
 
 	public RoomHistoryRes getRoomSummary(UUID roomUUID) {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		RoomHistoryRes roomHistoryRes = roomMapper.INSTANCE.roomToRoomHistoryRes(room);
+		RoomHistoryRes roomHistoryRes = RoomHistoryRes.of(room);
 		return roomHistoryRes;
 	}
 

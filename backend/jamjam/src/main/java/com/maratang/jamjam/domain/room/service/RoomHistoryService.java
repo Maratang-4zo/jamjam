@@ -19,10 +19,10 @@ import com.maratang.jamjam.domain.room.dto.response.RoomHistoryRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.mapper.RoomMapper;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
+import com.maratang.jamjam.global.auth.oauth.kakao.client.KakaoUserInfoClient;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.oauth.kakao.client.KakaoUserInfoClient;
 import com.maratang.jamjam.global.util.DateTimeUtils;
 
 import lombok.RequiredArgsConstructor;

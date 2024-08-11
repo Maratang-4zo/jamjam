@@ -4,7 +4,12 @@ import styled from "styled-components";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import wavebutton from "../../assets/wavebutton.svg";
 import { roomAtom } from "../../recoil/atoms/roomState";
-import { playerState, selectedGameAtom } from "../../recoil/atoms/playerState";
+import {
+  currentRoundAtom,
+  gameSessionUUIDAtom,
+  playerState,
+  selectedGameAtom,
+} from "../../recoil/atoms/gameState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import useWs from "../../hooks/useWs";
 
@@ -54,8 +59,10 @@ function GameChoice() {
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const setPlayerState = useSetRecoilState(playerState);
-  const { sendUpdatePage } = useWs();
+  const { sendRoundInfo } = useWs();
   const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
+  const currentRound = useRecoilValue(currentRoundAtom);
+  const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
 
   useEffect(() => {
     const initialPlayers = roomInfo.attendees.map((attendee) => ({
@@ -69,9 +76,10 @@ function GameChoice() {
 
   const handlePlayButtonClick = () => {
     if (localSelectedGame != null) {
-      sendUpdatePage({
-        roomNextPage: "game",
+      sendRoundInfo({
+        round: currentRound,
         gameId: localSelectedGame,
+        gameSessionUUID: gameSessionUUID,
       });
     }
   };

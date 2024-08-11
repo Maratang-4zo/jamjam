@@ -19,7 +19,7 @@ import useOpenVidu from "../hooks/useOpenVidu";
 import Loading from "../components/fixed/Loading";
 import GameFinishButtons from "../components/mainroom/GameFinishButtons";
 import GameChoice from "../components/mainroom/GameChoice";
-import { selectedGameAtom } from "../recoil/atoms/playerState";
+import { selectedGameAtom } from "../recoil/atoms/gameState";
 import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
 
@@ -225,7 +225,6 @@ function Room() {
           onClose={handleCloseShareModal}
         />
       )}
-      {/* <Map /> */}
       {roomPage === "main" && (
         <>
           <MainButtons

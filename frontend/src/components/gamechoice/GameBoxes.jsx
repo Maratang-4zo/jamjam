@@ -1,9 +1,9 @@
 import React from "react";
-import styled, { createGlobalStyle } from "styled-components";
-import polygon from "../../assets/polygon.svg";
-import YellowChatBubble from "../../assets/YellowChatBubble.svg"; // Assuming the correct path
-import stairs from "../../assets/game/stairs.gif";
+import styled from "styled-components";
+import YellowChatBubble from "../../assets/YellowChatBubble.svg";
 import SecondCardBg from "../../assets/2ndImg.png";
+import { useRecoilValue } from "recoil";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 
 const GamesContainer = styled.div`
   display: flex;
@@ -11,7 +11,6 @@ const GamesContainer = styled.div`
   flex-wrap: wrap;
   gap: 14px;
   width: 100%;
-  /* z-index: 1; */
 `;
 
 const GameCard1 = styled.div`
@@ -31,7 +30,10 @@ const GameCard1 = styled.div`
   background-position: center;
   position: relative;
   transition: 0.5s ease;
-  /* z-index: 1; */
+  pointer-events: ${(props) =>
+    props.disabled ? "none" : "auto"}; /* disabled일 때 클릭 방지 */
+  opacity: ${(props) =>
+    props.disabled ? 0.5 : 1}; /* disabled일 때 투명도 조정 */
 
   &:hover .image {
     opacity: 0.3;
@@ -43,21 +45,7 @@ const GameCard1 = styled.div`
 `;
 
 const GameCard2 = styled.div`
-  /* clip-path: polygon(
-    20% 0%,
-    80% 0%,
-    100% 12%,
-    100% 88%,
-    80% 100%,
-    20% 100%,
-    0% 88%,
-    0% 12%
-  ); */
   background-image: url(${SecondCardBg});
-  /* border: ${(props) =>
-    props.selected
-      ? "9px solid #000000"
-      : "3px solid #000000"}; // 선택된 카드의 테두리 두께 조정 */
   height: 429px;
   width: 343px;
   display: flex;
@@ -68,7 +56,10 @@ const GameCard2 = styled.div`
   background-position: center;
   position: relative;
   transition: 0.5s ease;
-  /* pointer-events: none; */
+  pointer-events: ${(props) =>
+    props.disabled ? "none" : "auto"}; /* disabled일 때 클릭 방지 */
+  opacity: ${(props) =>
+    props.disabled ? 0.5 : 1}; /* disabled일 때 투명도 조정 */
 
   &:hover .middle {
     opacity: 1;
@@ -102,10 +93,6 @@ const GameCard2 = styled.div`
 const GameCard3 = styled.div`
   background-color: #ffffff;
   border: 3px solid black;
-  /* border: ${(props) =>
-    props.selected
-      ? "9px solid #000000"
-      : "3px solid #000000"}; // 선택된 카드의 테두리 두께 조정 */
   border-radius: 35px;
   height: 429px;
   width: 343px;
@@ -117,7 +104,10 @@ const GameCard3 = styled.div`
   background-position: center;
   position: relative;
   transition: 0.5s ease;
-  /* z-index: 1; */
+  pointer-events: ${(props) =>
+    props.disabled ? "none" : "auto"}; /* disabled일 때 클릭 방지 */
+  opacity: ${(props) =>
+    props.disabled ? 0.5 : 1}; /* disabled일 때 투명도 조정 */
 
   &:hover .middle2 {
     opacity: 1;
@@ -200,47 +190,52 @@ const Middle2 = styled.div`
 `;
 
 function GameBoxes({ selectedGame, setSelectedGame }) {
+  const userInfo = useRecoilValue(userInfoAtom);
+  const isHost = userInfo.isHost;
+
   const handleClick = (gameId) => {
-    if (setSelectedGame) {
+    if (isHost && setSelectedGame) {
       setSelectedGame(gameId);
     }
   };
 
   return (
-    <>
-      <GamesContainer>
-        <GameCard1 selected={selectedGame === 1} onClick={() => handleClick(1)}>
-          <Middle className="middle" top="50%">
-            <TextAboveBubble>
-              마우스 클릭으로 가장 먼저 위로 올라가는 사람이 승리!
-            </TextAboveBubble>
-            <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
-          </Middle>
-          <GameName>
-            <OverlapGroup>
-              <TextWrapper>YoungCha</TextWrapper>
-            </OverlapGroup>
-          </GameName>
-        </GameCard1>
-        <GameCard2>
-          <Middle2 className="middle2">Coming Soon!</Middle2>
+    <GamesContainer>
+      <GameCard1
+        selected={selectedGame === 1}
+        onClick={() => handleClick(1)}
+        disabled={!isHost}
+      >
+        <Middle className="middle" top="50%">
+          <TextAboveBubble>
+            마우스 클릭으로 가장 먼저 위로 올라가는 사람이 승리!
+          </TextAboveBubble>
+          <img src={YellowChatBubble} alt="Yellow Chat Bubble" />
+        </Middle>
+        <GameName>
+          <OverlapGroup>
+            <TextWrapper>YoungCha</TextWrapper>
+          </OverlapGroup>
+        </GameName>
+      </GameCard1>
+      <GameCard2 disabled={!isHost}>
+        <Middle2 className="middle2">Coming Soon!</Middle2>
 
-          <GameName>
-            <OverlapGroup>
-              <TextWrapper>COFFEE</TextWrapper>
-            </OverlapGroup>
-          </GameName>
-        </GameCard2>
-        <GameCard3>
-          <Middle2 className="middle2">Coming Soon!</Middle2>
-          <GameName>
-            <OverlapGroup>
-              <TextWrapper>PIZZA</TextWrapper>
-            </OverlapGroup>
-          </GameName>
-        </GameCard3>
-      </GamesContainer>
-    </>
+        <GameName>
+          <OverlapGroup>
+            <TextWrapper>COFFEE</TextWrapper>
+          </OverlapGroup>
+        </GameName>
+      </GameCard2>
+      <GameCard3 disabled={!isHost}>
+        <Middle2 className="middle2">Coming Soon!</Middle2>
+        <GameName>
+          <OverlapGroup>
+            <TextWrapper>PIZZA</TextWrapper>
+          </OverlapGroup>
+        </GameName>
+      </GameCard3>
+    </GamesContainer>
   );
 }
 

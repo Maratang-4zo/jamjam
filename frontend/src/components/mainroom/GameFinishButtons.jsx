@@ -13,13 +13,21 @@ import Loading from "../fixed/Loading";
 import { axiosPatchNextMiddle } from "../../apis/mapApi";
 import {
   gameRecordAtom,
-  gameRecordUUIDAtom,
   isWinnerAtom,
   totalRoundAtom,
   currentRoundAtom,
-} from "../../recoil/atoms/playerState";
+  gameSessionUUIDAtom,
+  currentRoundUUIDAtom,
+  winnerUUIDAtom,
+  winnerNicknameAtom,
+} from "../../recoil/atoms/gameState";
 import useWs from "../../hooks/useWs";
-import { axiosGetRoundResult } from "../../apis/gameApi";
+import { lineColor } from "../../utils/lineColor";
+import { lineName } from "../../utils/lineName";
+import {
+  isHistoryLoadingAtom,
+  isThreeStationLoadingAtom,
+} from "../../recoil/atoms/loadingState";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -152,12 +160,15 @@ function GameFinishButtons() {
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
   const totalRound = useRecoilValue(totalRoundAtom);
   const [currentRound, setCurrentRound] = useRecoilState(currentRoundAtom);
-  const [isFinalLoading, setIsFinalLoading] = useState(false);
-  const setRoomPage = useSetRecoilState(roomPageAtom);
+  const [isFinalLoading, setIsFinalLoading] =
+    useRecoilState(isHistoryLoadingAtom);
   const [isWinner, setIsWinner] = useRecoilState(isWinnerAtom);
-  const { sendUpdatePage } = useWs();
-  const gameRecordUUID = useRecoilValue(gameRecordUUIDAtom);
+  const { sendNextRound } = useWs();
+  const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
+  const gameRoundUUID = useRecoilValue(currentRoundUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);
+  const setWinnerUUID = useSetRecoilState(winnerUUIDAtom);
+  const setWinnerNicknameUUID = useSetRecoilState(winnerNicknameAtom);
 
   const handleStationClick = (station) => {
     setSelectedStation(station);
@@ -165,52 +176,28 @@ function GameFinishButtons() {
 
   const handleDecision = async () => {
     if (selectedStation) {
-      try {
-        const res = await axiosPatchNextMiddle({
-          roomUUID,
-          startStation: selectedStation.name,
-        });
-        setRoomState((prev) => ({
-          ...prev,
-          centerPlace: res.roomCenterStart,
-          attendees: res.attendees,
-        }));
-      } catch (err) {
-        console.log("방 중심 이동 실패", err);
-      }
-      setIsNextMiddleExist(true);
+    } else {
+      alert("역을 선택해주세요");
     }
   };
 
   const handleNextRoundBtnClick = () => {
-    setCurrentRound((prev) => (prev += 1));
-    sendUpdatePage({
-      roomNextPage: "gamechoice",
-    });
+    sendNextRound({ gameRoundUUID, currentRound, totalRound });
     setSelectedStation(null);
     setIsNextMiddleExist(false);
     setIsWinner(false);
+    setWinnerUUID("");
+    setWinnerNicknameUUID("");
   };
 
   const handleFinalResultBtnClick = async () => {
+    sendNextRound({ gameRoundUUID, currentRound, totalRound });
     setSelectedStation(null);
     setIsNextMiddleExist(false);
     setIsFinalLoading(true);
     setIsWinner(false);
-    // 여기부터는 axios 호출 끝나고 넣을 애들
-    try {
-      const res = await axiosGetRoundResult({ gameRecordUUID });
-
-      setGameRecord(res.roundRecordList);
-
-      sendUpdatePage({
-        roomNextPage: "result",
-      });
-    } catch (err) {
-      console.log("최종 결과 불러오기 실패", err);
-    } finally {
-      setIsFinalLoading(false);
-    }
+    setWinnerUUID("");
+    setWinnerNicknameUUID("");
   };
 
   const handleClickOutside = (e) => {
@@ -225,57 +212,7 @@ function GameFinishButtons() {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-  const lineColor = {
-    LINE_1: "#0052A4", // 01호선
-    LINE_2: "#009D3E", // 02호선
-    LINE_3: "#EF7C1C", // 03호선
-    LINE_4: "#00A5DE", // 04호선
-    LINE_5: "#996CAC", // 05호선
-    LINE_6: "#CD7C2F", // 06호선
-    LINE_7: "#747F00", // 07호선
-    LINE_8: "#EA545D", // 08호선
-    LINE_9: "#BDB092", // 09호선
-    GYEONGGANG: "#003DA5", // 경강선
-    GYEONGUI: "#77C4A3", // 경의선
-    GYEONGCHUN: "#0C8E72", // 경춘선
-    AIRPORT: "#0090D2", // 공항철도
-    GIMPOGOLD: "#AD8605", // 김포골드
-    BUNDANG: "#FABE00", // 분당선
-    SEOHAE: "#8FC31F", // 서해선
-    SUIIN: "#FABE00", // 수인선
-    SINBUNDANG: "#D31145", // 신분당선
-    YONGINGYEONGJEON: "#6FB245", // 용인경전철
-    UIISHINSEOLGYEONGJEON: "#B7C452", // 우이신설경전철
-    UIJEONBUGYEONGJEON: "#F5A200", // 의정부경전철
-    INCHEON: "#7CA8D5", // 인천선
-    INCHEON2: "#ED8B00", // 인천2호선
-  };
 
-  const lineName = {
-    LINE_1: "1호선",
-    LINE_2: "2호선",
-    LINE_3: "3호선",
-    LINE_4: "4호선",
-    LINE_5: "5호선",
-    LINE_6: "6호선",
-    LINE_7: "7호선",
-    LINE_8: "8호선",
-    LINE_9: "9호선",
-    GYEONGGANG: "경강선",
-    GYEONGUI: "경의선",
-    GYEONGCHUN: "경춘선",
-    AIRPORT: "공항철도",
-    GIMPOGOLD: "김포골드",
-    BUNDANG: "분당선",
-    SEOHAE: "서해선",
-    SUIIN: "수인선",
-    SINBUNDANG: "신분당선",
-    YONGINGYEONGJEON: "용인경전철",
-    UIISHINSEOLGYEONGJEON: "우이신설경전철",
-    UIJEONBUGYEONGJEON: "의정부경전철",
-    INCHEON: "인천선",
-    INCHEON2: "인천2호선",
-  };
   return (
     <div style={{ zIndex: "100", height: "100%" }}>
       {isFinalLoading ? <Loading message={"모임장소 내역 불러오는"} /> : null}

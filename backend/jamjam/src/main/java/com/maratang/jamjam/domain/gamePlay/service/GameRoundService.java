@@ -1,15 +1,18 @@
 package com.maratang.jamjam.domain.gamePlay.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.maratang.jamjam.domain.game.entity.Game;
 import com.maratang.jamjam.domain.game.repository.GameRepository;
+import com.maratang.jamjam.domain.gamePlay.dto.request.play.GameNextRoundReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundCreateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundUpdateReq;
+import com.maratang.jamjam.domain.gamePlay.dto.response.play.GameNextRoundRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundCreateRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundResultListRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundResultRes;
@@ -71,4 +74,8 @@ public class GameRoundService {
         return GameRoundResultListRes.of(gameRoundResultResList);
     }
 
+    public GameNextRoundRes nextRound(GameNextRoundReq req, UUID roomUUID) {
+        // fixme
+        return GameNextRoundRes.of(req.getCurrentRound() == req.getTotalRound() ? "finalResult" : "nextRound");
+    }
 }

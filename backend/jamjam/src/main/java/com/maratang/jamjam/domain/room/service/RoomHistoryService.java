@@ -100,11 +100,12 @@ public class RoomHistoryService {
 			log.info("에러가 뭐길래"+e.getMessage());
 			if (e.getMessage().contains("401")) {
 				reissueTokens(member);
-
 				kakaoAccessToken = member.getKakaoAccessToken();
 				ResponseEntity<Map> response = kakaoUserInfoClient.createKakaoCalendarEvent("Bearer " + kakaoAccessToken, eventJson);
 				return response.getBody().toString();
-			} else {
+			} else if (e.getMessage().contains("403")) {
+				throw new AuthenticationException(ErrorCode.FORBIDDEN);
+			}else {
 				throw new AuthenticationException(ErrorCode.KAKAO_RESPONSE_ERROR);
 			}
 		}

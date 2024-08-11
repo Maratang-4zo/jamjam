@@ -51,6 +51,7 @@ public class LoginController {
 	public void redirectToKakao(@RequestParam("redirectUri") String clientRedirectUri, HttpServletRequest request, HttpServletResponse httpServletResponse) throws IOException {
 		String authorizeUrl = "https://kauth.kakao.com/oauth/authorize"
 			+ "?response_type=code"
+			+ "&scope=talk_calendar"
 			+ "&client_id=" + clientId
 			+ "&redirect_uri=" + redirectUri;
 
@@ -70,6 +71,7 @@ public class LoginController {
 		Map<String, String> tokens = getTokens(code);
 		String accessToken = tokens.get("access_token");
 		String refreshToken = tokens.get("refresh_token");
+
 
 		// 액세스 토큰을 이용해 로그인 처리
 		LoginRes loginRes = loginService.oauthLogin(accessToken, refreshToken);
@@ -92,6 +94,7 @@ public class LoginController {
 		if (clientRedirectUri.isEmpty()) {
 			// clientRedirectUri = "http://localhost:3000/"; // 기본 리디렉션 URL
 			clientRedirectUri = "https://jjam.shop/";
+
 		}
 		response.sendRedirect(clientRedirectUri);
 		// httpServletResponse.sendRedirect("http://70.12.114.94:3000/");
@@ -107,6 +110,7 @@ public class LoginController {
 		params.add("code", code);
 		params.add("client_secret", clientSecret);
 
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -119,6 +123,7 @@ public class LoginController {
 				Map<String, String> tokens = new HashMap<>();
 				tokens.put("access_token", responseBody.get("access_token").toString());
 				tokens.put("refresh_token", responseBody.get("refresh_token").toString());
+				log.info("scope:"+responseBody.get("scope"));
 				return tokens;
 			} else {
 				throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);

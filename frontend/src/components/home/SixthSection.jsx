@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { Link } from "react-router-dom";
 import "../../index.css";
+import { useRecoilState } from "recoil"; // RecoilState import
+import { loginModalState } from "../../recoil/atoms/loginState"; // loginModalState atom import
+
 const Section = styled.div`
   height: 100vh;
   scroll-snap-align: start;
@@ -11,6 +14,7 @@ const Section = styled.div`
   font-size: 2rem;
   font-family: "DungGeunMo";
   flex-direction: column;
+  background-color: #ffe845;
 `;
 
 const fadeIn = keyframes`
@@ -78,21 +82,26 @@ const PromptText = styled.div`
   animation: ${fadeIn} 1.5s ease-in-out;
 `;
 
-function FifthSection() {
+function SixthSection() {
   const [buttonsSwitched, setButtonsSwitched] = useState(false);
+  const [, setModalVisible] = useRecoilState(loginModalState); // Recoil 상태 사용
 
   const handleButtonClick = () => {
     setButtonsSwitched(true);
   };
 
+  const handleGuestButtonClick = () => {
+    setModalVisible(true); // 비회원 버튼 클릭 시 모달 열기
+  };
+
   return (
     <Section>
-      <PromptText>지금 바로 해볼래?</PromptText> {/* 문구 추가 */}
+      <PromptText>지금 바로 해볼래?</PromptText>
       <ButtonContainer>
         {buttonsSwitched ? (
           <>
-            <AnimatedButton2>
-              <StyledLink to={"/"}>회원으로</StyledLink>
+            <AnimatedButton2 onClick={handleGuestButtonClick}>
+              회원으로
             </AnimatedButton2>
             <AnimatedButton2>
               <StyledLink to={"/room/create"}>비회원으로</StyledLink>
@@ -109,4 +118,4 @@ function FifthSection() {
   );
 }
 
-export default FifthSection;
+export default SixthSection;

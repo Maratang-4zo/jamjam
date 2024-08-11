@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
+import com.maratang.jamjam.domain.attendee.dto.response.AttendeeUpdateRes;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.member.entity.Member;
@@ -21,6 +22,8 @@ import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.map.station.SubwayDataLoader;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
+import com.maratang.jamjam.global.ws.BroadCastService;
+import com.maratang.jamjam.global.ws.BroadCastType;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,7 @@ public class AttendeeService {
 	private final RoomTokenProvider roomTokenProvider;
 	private final SubwayDataLoader subwayDataLoader;
 	private final MemberService memberService;
+	private final BroadCastService broadCastService;
 
 	@Transactional
 	public RoomJoinRes createAttendee(UUID roomUUID, AttendeeCreateReq attendeeCreateReq, String email) {
@@ -68,6 +72,7 @@ public class AttendeeService {
 		Claims claims = roomTokenProvider.getTokenClaims(roomToken);
 
 		String attendeeUUIDString = (String) claims.get("attendeeUUID");
+		UUID roomUUID = UUID.fromString((String) claims.get("roomUUID"));
 
 		UUID attendeeUUID = UUID.fromString(attendeeUUIDString);
 
@@ -75,5 +80,7 @@ public class AttendeeService {
 			.orElseThrow(()->new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
 		attendee.updateAttendeeLocation(attendeeUpdateReq);
+
+		broadCastService.broadcastToRoom(roomUUID, AttendeeUpdateRes.of(attendee), BroadCastType.DEPARTURE_UPDATE);
 	}
 }

@@ -40,6 +40,7 @@ public class StompHandler implements ChannelInterceptor {
 
 
 	void handleConnectCommand(StompHeaderAccessor accessor){
+		// 연결시 토큰 검증
 		String token = accessor.getSessionAttributes().get("roomToken").toString();
 		RoomJwtTokenClaims claims = roomTokenProvider.getUUIDs(token);
 
@@ -51,14 +52,11 @@ public class StompHandler implements ChannelInterceptor {
 
 
 	public void handleSubscribeCommand(StompHeaderAccessor accessor){
-		// ** JWT 토큰 상세 검증 로직을 실행한다.
-
-		// 1. 일단 토큰 X 정보 추출
+		// 1. UUID 정보 추출
 		UUID attendeeUUID = (UUID)accessor.getSessionAttributes().get("attendeeUUID");
 		UUID roomUUID = (UUID)accessor.getSessionAttributes().get("roomUUID");
 
 		// 2. 유효한 방이면 입장 요청
-		// 3. 구독자들에게 새로운 참여자 브로드캐스팅
 		roomService.enterRoom(roomUUID, attendeeUUID);
 
 		Map<String ,Object> attributes =  accessor.getSessionAttributes();

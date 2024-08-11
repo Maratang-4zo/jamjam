@@ -2,6 +2,7 @@ package com.maratang.jamjam.global.ws;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -25,7 +26,12 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
 			HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
 
 			Cookie token = WebUtils.getCookie(httpServletRequest, "roomToken");
-			attributes.put("roomToken", token != null ? token.getValue() : null);
+
+			if(token == null){
+				response.setStatusCode(HttpStatus.UNAUTHORIZED);
+				return false;
+			}
+			attributes.put("roomToken", token.getValue());
 		}
 		return true;
 	}

@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Cookies from "js-cookie";
 import LoginModal from "./LoginModal"; // LoginModal import
+import { useRecoilState } from "recoil"; // RecoilState import
+import { loginModalState } from "../../recoil/atoms/loginState"; // loginModalState atom import
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -37,7 +39,7 @@ const LoginP = styled.p`
 `;
 
 function NavBarUp() {
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useRecoilState(loginModalState); // Recoil 상태 사용
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
 
   // 로그인 상태 확인
@@ -61,13 +63,13 @@ function NavBarUp() {
         <Link to={`/`}>로고자리입니다</Link>
         <Right>
           {isLoggedIn ? (
-            <Link to={`/mypage`}>MY PAGE</Link> // 로그인 상태일 때 ${userUUID}
+            <Link to={`/mypage`}>MY PAGE</Link> // 로그인 상태일 때
           ) : (
-            <LoginP onClick={toggleModal}>LOGIN</LoginP> // 로그인되지 않은 상태일 때
+            <LoginP onClick={() => setModalVisible(true)}>LOGIN</LoginP> // 로그인되지 않은 상태일 때
           )}
         </Right>
       </Wrapper>
-      <LoginModal isVisible={isModalVisible} toggleModal={toggleModal} />
+      <LoginModal /> {/* LoginModal을 직접 렌더링 */}
     </>
   );
 }

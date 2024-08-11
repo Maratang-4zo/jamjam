@@ -12,6 +12,7 @@ const Section = styled.div`
   font-family: "DungGeunMo";
   position: relative;
   padding-left: 0%;
+  background-color: #ffe845;
 `;
 
 const Image = styled.img`

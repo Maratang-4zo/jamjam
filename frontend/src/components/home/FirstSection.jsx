@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import JamHi1 from "../../assets/intro/JamHi1.PNG";
 import JamHi2 from "../../assets/intro/JamHi2.PNG";
@@ -8,22 +8,21 @@ import JamHi5 from "../../assets/intro/JamHi5.PNG";
 import JamHi6 from "../../assets/intro/JamHi6.PNG";
 import JamHi7 from "../../assets/intro/JamHi7.PNG";
 import JamHi8 from "../../assets/intro/JamHi8.PNG";
-import handcursor from "../../assets/intro/handcursor.png";
 
 const Section = styled.div`
   height: 100vh;
-  scroll-snap-align: start;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 2rem;
   font-family: "DungGeunMo";
   flex-direction: column;
+  overflow: auto; /* 이 부분을 수정하여 스크롤 가능하게 설정 */
 `;
 
 const ImageContainer = styled.div`
   width: 100%;
-  height: 40%;
+  height: 60%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,7 +31,6 @@ const ImageContainer = styled.div`
 const Image = styled.img`
   max-width: 100%;
   max-height: 100%;
-  cursor: pointer;
 `;
 
 const TextContainer = styled.div`
@@ -51,32 +49,21 @@ function FirstSection() {
     JamHi7,
     JamHi8,
   ];
-  const [currentImage, setCurrentImage] = useState(images[0]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLastImage, setIsLastImage] = useState(false);
 
-  const handleImageClick = () => {
-    const currentIndex = images.indexOf(currentImage);
-    if (currentIndex < images.length - 1) {
-      const nextIndex = currentIndex + 1;
-      setCurrentImage(images[nextIndex]);
-      if (nextIndex === images.length - 1) {
-        setIsLastImage(true);
-      }
-    }
+  const handleScroll = () => {
+    console.log("Scroll event detected"); // 이 로그가 출력되는지 확인하세요
   };
 
   return (
-    <Section>
+    <Section onScroll={handleScroll}>
       <ImageContainer>
-        <br />
-        <Image
-          src={currentImage}
-          alt="JamHi"
-          onClick={handleImageClick}
-          style={{ cursor: isLastImage ? "default" : "pointer" }}
-        />
+        <Image src={images[currentImageIndex]} alt="JamHi" />
       </ImageContainer>
-      <TextContainer isVisible={isLastImage}>안녕! 나는 잼잼이야</TextContainer>
+      {isLastImage && (
+        <TextContainer isVisible={true}>안녕! 나는 잼잼이야</TextContainer>
+      )}
     </Section>
   );
 }

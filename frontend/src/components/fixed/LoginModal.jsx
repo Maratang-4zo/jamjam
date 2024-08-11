@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
 import wavebutton from "../../assets/wavebutton.svg";
+import { useRecoilState } from "recoil"; // RecoilState import
+import { loginModalState } from "../../recoil/atoms/loginState"; // loginModalState atom import
 
 const ModalBackground = styled.div`
   display: ${({ isVisible }) => (isVisible ? "block" : "none")};
@@ -27,7 +29,24 @@ const SideModal = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+`;
+
+const CloseButton = styled.button`
+  align-self: flex-start; /* 상단 왼쪽에 배치 */
+  margin-bottom: 10px; /* Close 버튼 아래에 간격 추가 */
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+`;
+
+const Divider = styled.div`
+  width: 100%;
+  height: 3px;
+  background-color: black;
+  margin-top: 12px;
+  margin-bottom: 400px; /* Divider 아래에 간격 추가 */
 `;
 
 const KakaotalkButton = styled.button`
@@ -50,12 +69,19 @@ const KakaotalkButton = styled.button`
   }
 `;
 
-function LoginModal({ isVisible, toggleModal }) {
+function LoginModal() {
+  const [isVisible, setIsVisible] = useRecoilState(loginModalState); // Recoil 상태 사용
+
+  const toggleModal = () => {
+    setIsVisible(!isVisible); // 모달 상태를 전환
+  };
+
   return (
     <>
       <ModalBackground isVisible={isVisible} onClick={toggleModal} />
       <SideModal isVisible={isVisible}>
-        <button onClick={toggleModal}>Close</button>
+        <CloseButton onClick={toggleModal}>X</CloseButton>
+        <Divider />
         <KakaotalkButton>
           <a href="https://jjam.shop/api/login/authorize?redirectUri=/">
             카카오톡으로 로그인

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Game1 from "../games/Game1";
 import Game2 from "../games/Game2";
 import Game3 from "../games/Game3";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   aroundStationsAtom,
   roomAtom,
@@ -14,7 +14,8 @@ import { axiosGetAroundStores, axiosGetThreeStations } from "../../apis/mapApi";
 import gameBg from "../../assets/game/gameBg.jpg";
 import Loading from "../fixed/Loading";
 import useWs from "../../hooks/useWs";
-import { isWinnerAtom } from "../../recoil/atoms/playerState";
+import { isWinnerAtom } from "../../recoil/atoms/gameState";
+import { isThreeStationLoadingAtom } from "../../recoil/atoms/loadingState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
@@ -80,37 +81,38 @@ function Game() {
   const roomInfo = useRecoilValue(roomAtom);
   const isWinner = useRecoilValue(isWinnerAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
-  const [isLoading, setIsLoading] = useState(false);
-  const { sendUpdatePage } = useWs();
+  const [isLoading, setIsLoading] = useRecoilState(isThreeStationLoadingAtom);
 
   const handleWin = () => {
     setShowButton(true); // 승리 시 버튼 표시
   };
 
   const handleNextPageBtn = async () => {
-    setIsLoading(true);
-    const data = await axiosGetThreeStations(roomInfo.roomUUID);
-    try {
-      const aroundStationsData = await Promise.all(
-        data.map(async (station) => {
-          const response = await axiosGetAroundStores({
-            stationName: station.name,
-            category: roomInfo.roomPurpose,
-          });
-          return {
-            ...station,
-            stores: response.data,
-          };
-        }),
-      );
-      setAroundStations(aroundStationsData); // 나중에 지워야할수도
-      sendUpdatePage({
-        roomNextPage: "gamefinish",
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
+    if (isWinner) {
+      setIsLoading(true);
+      try {
+        const data = await axiosGetThreeStations(roomInfo.roomUUID);
+        try {
+          const aroundStationsData = await Promise.all(
+            data.map(async (station) => {
+              const response = await axiosGetAroundStores({
+                stationName: station.name,
+                category: roomInfo.roomPurpose,
+              });
+              return {
+                ...station,
+                stores: response.data,
+              };
+            }),
+          );
+        } catch (error) {
+          console.log("역 주변 상권정보 가져오기 실패", error);
+        }
+      } catch (err) {
+        console.log("역 3개 가져오기 실패", err);
+      }
+    } else {
+      alert("권한이 없습니다.");
     }
   };
 

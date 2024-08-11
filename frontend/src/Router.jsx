@@ -9,6 +9,7 @@ import Ws from "./routes/ws";
 import ConnectOpenVidu from "./routes/OpenVidu";
 import InvalidRoom from "./routes/InvalidRoom";
 import Han from "./routes/Han";
+import Test from "./routes/Test";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
         <Route path="/room/:roomUUID/join" element={<JoinRoom />} />
         <Route path="/room/:roomUUID/reconnect" element={<Reconnect />} />
         <Route path="/invalid-room" element={<InvalidRoom />} />
+        <Route path="/test" element={<Test />} />
         {/* <Route path="/oauth/kakao/callback" element={<Auth />} /> */}
         <Route path="/han" element={<Han />} />
       </Routes>

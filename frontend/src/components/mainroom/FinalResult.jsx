@@ -1,9 +1,17 @@
+import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import ResultBox from "../finalresult/ResultBox";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import { axiosPatchNextMiddle } from "../../apis/mapApi";
 import { roomAtom } from "../../recoil/atoms/roomState";
+import useWs from "../../hooks/useWs";
+import {
+  gameSessionUUIDAtom,
+  roundCenterAtom,
+} from "../../recoil/atoms/gameState";
+import { isMainConnectingAtom } from "../../recoil/atoms/loadingState";
+import Loading from "../fixed/Loading";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -16,6 +24,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
 `;
+
 const fadeIn = keyframes`
   0% { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -45,15 +54,25 @@ const AnimatedButton = styled.button`
 function FinalResult() {
   const userInfo = useRecoilValue(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const [mainClicked, setMainClicked] = useState(false);
+  const { sendReset, sendFinalStation } = useWs();
+  const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
+  const roundCenter = useRecoilValue(roundCenterAtom);
+  const [isMainConnecting, setIsMainConnecting] =
+    useRecoilState(isMainConnectingAtom);
 
   // 방 종료
   const handleExitBtn = async () => {
-    try {
-      const res = await axiosPatchNextMiddle({
-        startStation: roomInfo.centerPlace.name,
-      });
-    } catch (err) {
-      console.log("중심 장소 변경 실패", err);
+    if (userInfo.isHost) {
+      try {
+        const res = await axiosPatchNextMiddle({
+          startStation: roomInfo.centerPlace.name,
+        });
+      } catch (err) {
+        console.log("중심 장소 변경 실패", err);
+      }
+    } else {
+      alert("권한이 없습니다.");
     }
   };
 
@@ -63,32 +82,51 @@ function FinalResult() {
       const res = await axiosPatchNextMiddle({
         startStation: roomInfo.centerPlace.name,
       });
-      setRoomInfo((prev) => ({
-        ...prev,
-        centerPlace: res.roomCenterStart,
-        attendees: res.attendees,
-      }));
+      setMainClicked(false); // 버튼을 다시 리셋
+      sendFinalStation({
+        finalStationName: roundCenter.name,
+      });
     } catch (err) {
       console.log("중심 장소 변경 실패", err);
+      alert("다시 시도해 주세요.");
     }
   };
 
   // 중심 장소 리셋 후 메인으로
-  const handleResetCenter = async () => {};
+  const handleResetCenter = async () => {
+    sendReset({ gameSessionUUID });
+    setMainClicked(false); // 버튼을 다시 리셋
+  };
+
+  // MAIN 버튼 클릭 핸들러
+  const handleMainClick = () => {
+    setMainClicked(true);
+  };
 
   return (
     <Wrapper>
-      {/* <Container> */}
-      <ResultBox></ResultBox>
+      {isMainConnecting ? <Loading message={"로딩"} /> : null}
+      <ResultBox />
       <ButtonContainer>
         <AnimatedButton>SHARE</AnimatedButton>
-        {/* MAIN 버튼 누르면 home화면처럼 버튼 두개(중심역 리셋, 유지) 만든다음에 위에 함수 연결시키면 될것가타요 */}
-        <AnimatedButton disabled={!userInfo.isHost}>MAIN</AnimatedButton>
+        {mainClicked ? (
+          <>
+            <AnimatedButton onClick={handleResetCenter}>
+              중심역 리셋
+            </AnimatedButton>
+            <AnimatedButton onClick={handleUpdatedCenter}>
+              중심역 유지
+            </AnimatedButton>
+          </>
+        ) : (
+          <AnimatedButton disabled={!userInfo.isHost} onClick={handleMainClick}>
+            MAIN
+          </AnimatedButton>
+        )}
         <AnimatedButton disabled={!userInfo.isHost} onClick={handleExitBtn}>
           종료
         </AnimatedButton>
       </ButtonContainer>
-      {/* </Container> */}
     </Wrapper>
   );
 }

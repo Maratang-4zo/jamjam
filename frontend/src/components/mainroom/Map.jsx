@@ -17,6 +17,7 @@ import useDecoding from "../../hooks/useDecoding";
 import ColorThief from "colorthief";
 import { userColor } from "../../utils/userColor";
 import fireGif from "../../assets/icons/fire-fireball.gif";
+import { lineColor } from "../../utils/lineColor";
 
 function MyMap() {
   const navermaps = useNavermaps();
@@ -260,16 +261,28 @@ function MyMap() {
         <Marker
           position={
             new navermaps.LatLng(
-              roomInfo.centerPlace.latitude,
+              roomInfo.centerPlace.latitude + 0.007,
               roomInfo.centerPlace.longitude,
             )
           }
           icon={{
             content: `
-        <div style="display: flex; justify-content: center; align-items: center;">
-          <img src="${fireGif}" style="width:50px; height:50px;" />
-        </div>
-      `,
+            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <span style="
+                font-family: 'DungGeunMo'; 
+                background-color: white; 
+                box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.35); 
+                border-radius: 5px; 
+                padding: 3px; 
+                border: 2px solid ${
+                  lineColor[roomInfo.centerPlace.subwayLines[0]]
+                };
+              ">
+                ${roomInfo.centerPlace.name}
+              </span>
+              <img src="${fireGif}" style="width:50px; height:50px;" />
+            </div>
+          `,
             anchor: new navermaps.Point(25, 25), // 이미지 중심점을 조정
           }}
         />

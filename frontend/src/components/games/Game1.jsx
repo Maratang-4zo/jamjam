@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useRecoilState } from "recoil";
-import { playerState } from "../../recoil/atoms/playerState";
+import { useRecoilState, useRecoilValue } from "recoil";
+import {
+  gameCountAtom,
+  gameStateAtom,
+  isWinnerAtom,
+  playerState,
+  winnerNicknameAtom,
+} from "../../recoil/atoms/gameState";
 import { useLocation } from "react-router-dom";
 import useWs from "../../hooks/useWs";
 import minGang from "../../assets/Mingang.png";
@@ -51,20 +57,14 @@ const Countdown = styled.div`
 
 function Game1({ handleClick, onWin }) {
   const [bottom, setBottom] = useState(0);
-  const [win, setWin] = useState(false);
-  const [countdown, setCountdown] = useState(4);
+  const [win, setWin] = useRecoilState(isWinnerAtom);
+  const [countdown, setCountdown] = useRecoilState(gameCountAtom);
   const [players, setPlayers] = useRecoilState(playerState);
-  const [winner, setWinner] = useState(null); // 승리자 상태 추가
+  const [winner, setWinner] = useRecoilState(winnerNicknameAtom); // 승리자 상태 추가
   const location = useLocation();
   const { roomUUID, attendeeUUID } = location.state || {};
   const { sendGame } = useWs(); // useWs 훅 사용
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
+  const gameState = useRecoilValue(gameStateAtom);
 
   useEffect(() => {
     if (countdown === 0) {
@@ -76,8 +76,6 @@ function Game1({ handleClick, onWin }) {
               if (player.attendeeUUID === attendeeUUID) {
                 const newBottom = player.bottom + 10;
                 if (newBottom >= 480) {
-                  setWin(true);
-                  setWinner(player.nickname); // 승리자 설정
                   onWin();
                 }
                 sendGame({ newBottom });
@@ -94,9 +92,11 @@ function Game1({ handleClick, onWin }) {
 
   return (
     <>
-      {countdown > 0 ? (
+      {countdown === 99 ? <Countdown>READY</Countdown> : null}
+      {countdown > 0 && countdown < 99 ? (
         <Countdown>{countdown === 1 ? "START" : countdown - 1}</Countdown>
-      ) : (
+      ) : null}
+      {countdown === 0 ? (
         <>
           <BlockContainer>
             {players.map((player, index) => (
@@ -107,11 +107,11 @@ function Game1({ handleClick, onWin }) {
               />
             ))}
           </BlockContainer>
-          <WinMessage show={!!winner}>
+          <WinMessage show={gameState === "end"}>
             {winner && `${winner} WIN!!!`}
           </WinMessage>
         </>
-      )}
+      ) : null}
     </>
   );
 }

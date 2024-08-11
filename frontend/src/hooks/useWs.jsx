@@ -9,15 +9,30 @@ import {
   roomPageAtom,
 } from "../recoil/atoms/roomState";
 import {
+  currentRoundAtom,
+  currentRoundUUIDAtom,
+  gameCountAtom,
   gameRecordAtom,
-  gameRecordUUIDAtom,
+  gameSessionUUIDAtom,
+  gameStateAtom,
   isWinnerAtom,
   playerState,
+  roundCenterAtom,
   selectedGameAtom,
   totalRoundAtom,
-} from "../recoil/atoms/playerState";
+  winnerNicknameAtom,
+  winnerUUIDAtom,
+} from "../recoil/atoms/gameState";
 import { useNavigate } from "react-router-dom";
 import { userInfoAtom } from "../recoil/atoms/userState";
+import { axiosPatchNextMiddle } from "../apis/mapApi";
+import {
+  isCenterMoveLoadingAtom,
+  isFindCenterLoadingAtom,
+  isHistoryLoadingAtom,
+  isMainConnectingAtom,
+  isThreeStationLoadingAtom,
+} from "../recoil/atoms/loadingState";
 
 const API_BASE_URL = "https://jjam.shop";
 
@@ -33,8 +48,23 @@ const useWs = () => {
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
   const setTotalRound = useSetRecoilState(totalRoundAtom);
-  const setGameRecordUUID = useSetRecoilState(gameRecordUUIDAtom);
+  const [gameSessionUUID, setGameSessionUUID] =
+    useRecoilState(gameSessionUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);
+  const [currentRoundUUID, setCurrentRoundUUID] =
+    useRecoilState(currentRoundUUIDAtom);
+  const setGameState = useSetRecoilState(gameStateAtom);
+  const setWinnerUUID = useSetRecoilState(winnerUUIDAtom);
+  const setWinnerNickname = useSetRecoilState(winnerNicknameAtom);
+  const setGameCount = useSetRecoilState(gameCountAtom);
+  const setCurrentRound = useSetRecoilState(currentRoundAtom);
+  const [roundCenter, setRoundCenter] = useRecoilState(roundCenterAtom);
+  const setIsCenterMoveLoading = useSetRecoilState(isCenterMoveLoadingAtom);
+  const setIsFindCenterLoading = useSetRecoilState(isFindCenterLoadingAtom);
+  const setIsThreeStationLoading = useSetRecoilState(isThreeStationLoadingAtom);
+  const setIsHistoryLoading = useSetRecoilState(isHistoryLoadingAtom);
+  const setIsMainConnecting = useSetRecoilState(isMainConnectingAtom);
+
   const connect = useCallback(() => {
     return new Promise((resolve, reject) => {
       if (connected) {
@@ -104,10 +134,7 @@ const useWs = () => {
       case "ROOM_PAGE_UPDATE":
         handleRoomPageUpdate(message);
         break;
-      case "GAME_WINNER_UPDATE":
-        handleWinnerUpdate(message);
-        break;
-      case "GAME_CENTERPLACE_UPDATE":
+      case "GAME_CENTER_UPDATE":
         handleGameCenterUpdate(message);
         break;
       case "AROUND_STATIONS":
@@ -119,20 +146,157 @@ const useWs = () => {
       case "CENTER_HISTORY":
         handleCenterHistory(message);
         break;
+      case "GAME_READY":
+        handleGameReady(message);
+        break;
+      case "GAME_END":
+        handleGameEnd(message);
+        break;
+      case "GAME_WINNER":
+        handleGameWinner(message);
+        break;
+      case "GAME_COUNTDOWN":
+        handleGameCountdown(message);
+        break;
+      case "GAME_START":
+        handleGameStart(message);
+        break;
+      case "GAME_RESULT_APPLY":
+        handleGameResultApply(message);
+        break;
+      case "GAME_RESET":
+        handleGameReset(message);
+        break;
+      case "HOST_FIND_CENTER":
+        handleHostFindCenter(message);
+        break;
+      case "GAME_NEXT_ROUND":
+        handleNextRound(message);
       default:
         console.error("Unknown message type:", message.type);
     }
   }, []);
 
+  const sendNextRound = ({ gameRoundUUID, currentRound, totalRound }) => {
+    client.current.publish({
+      destination: `/pub/game/round.next`,
+      body: JSON.stringify({ gameRoundUUID, currentRound, totalRound }),
+    });
+  };
+
+  const handleNextRound = ({ next }) => {
+    if (next === "nextRound") {
+      setCurrentRound((prev) => (prev += 1));
+    } else {
+      setCurrentRound(1);
+    }
+    setRoomPage(next);
+  };
+
+  const handleHostFindCenter = ({ isFindCenterLoading }) => {
+    setIsFindCenterLoading(isFindCenterLoading);
+  };
+
+  // 최종 장소 리셋
+  const sendReset = ({ gameSessionUUID }) => {
+    client.current.publish({
+      destination: `/pub/game/session.station`,
+      body: JSON.stringify({ gameSessionUUID }),
+    });
+  };
+
+  const handleGameReset = ({ gameSessionUUID }) => {
+    setRoundCenter({});
+    setRoomPage("main");
+    setGameSessionUUID("");
+    setTotalRound(0);
+    setCurrentRound(1);
+    setCurrentRoundUUID("");
+    setGameRecord([]);
+    setWinnerUUID("");
+    setIsWinner(false);
+    setSelectedGame(0);
+    setPlayers([]);
+  };
+
+  const handleGameResultApply = ({
+    gameSessionUUID,
+    roomCenterStart,
+    attendees,
+  }) => {
+    setIsMainConnecting(false);
+    setRoomPage("main");
+    setIsCenterMoveLoading(false);
+    setGameSessionUUID("");
+    setTotalRound(0);
+    setCurrentRound(1);
+    setCurrentRoundUUID("");
+    setGameRecord([]);
+    setWinnerUUID("");
+    setIsWinner(false);
+    setSelectedGame(0);
+    setPlayers([]);
+    setRoomInfo((prev) => ({
+      ...prev,
+      centerPlace: roomCenterStart,
+      attendees,
+    }));
+  };
+
+  // 최종 장소 기록에 반영
+  const sendFinalStation = ({ finalStationName }) => {
+    client.current.publish({
+      destination: `/pub/game/session.station`,
+      body: JSON.stringify({ gameSessionUUID, finalStationName }),
+    });
+    console.log("hi");
+  };
+
+  const handleGameStart = ({ gameRoundUUID }) => {
+    setGameCount(0);
+    setGameState("ing");
+  };
+
+  const handleGameCountdown = ({ gameRoundUUID, countdown }) => {
+    setGameCount(countdown);
+  };
+
+  const sendGameStart = (gameRoundUUID) => {
+    client.current.publish({
+      destination: `/pub/game/round.start`,
+      body: JSON.stringify({ gameRoundUUID }),
+    });
+  };
+
+  const handleGameEnd = ({ gameRoundUUID }) => {
+    setGameState("end");
+    setGameCount(99);
+  };
+
+  const handleGameReady = ({ gameRoundUUID }) => {
+    setCurrentRoundUUID(gameRoundUUID);
+    setRoomPage("game");
+    sendGameStart(gameRoundUUID);
+  };
+
+  const sendRoundInfo = ({ round, gameId, gameSessionUUID, stationName }) => {
+    client.current.publish({
+      destination: `/pub/game/round.setting`,
+      body: JSON.stringify({ round, gameId, gameSessionUUID, stationName }),
+    });
+  };
+
   const handleCenterHistory = ({ gameSessionUUID, roundRecordList }) => {
     setGameRecord(roundRecordList);
+    setIsHistoryLoading(false);
   };
 
   const handleGameSessionReady = ({ gameSessionUUID, roundCnt }) => {
     setTotalRound(roundCnt);
-    setGameRecordUUID(gameSessionUUID);
+    setGameSessionUUID(gameSessionUUID);
   };
 
+  // 게임 라운드 설정
   const sendGameRound = ({ roundCnt, roomUUID, finalStationName }) => {
     client.current.publish({
       destination: `/pub/game/session.setting`,
@@ -146,29 +310,42 @@ const useWs = () => {
 
   const handleGetAroundStations = ({ aroundStations }) => {
     setAroundStations(aroundStations);
+    setIsThreeStationLoading(false);
+    setRoomPage("gamefinish");
   };
 
-  const sendUpdatePage = ({ roomNextPage, gameId = 0 }) => {
-    client.current.publish({
-      destination: `/pub/page`,
-      body: JSON.stringify({
-        roomNextPage,
-        gameId,
-      }),
-    });
-  };
+  const handleGameWinner = ({ gameRoundUUID, attendeeUUID }) => {
+    // winnerUUID 설정
+    setWinnerUUID(attendeeUUID);
 
-  const handleWinnerUpdate = ({ winnerUUID }) => {
-    if (userInfo.myUUID === winnerUUID) {
+    // attendees 배열에서 attendeeUUID와 일치하는 사람을 찾기
+    const winner = roomInfo.attendees.find(
+      (attendee) => attendee.attendeeUUID === attendeeUUID,
+    );
+
+    // 해당 유저가 있으면 그 사람의 닉네임을 winnerNicknameAtom에 저장
+    if (winner) {
+      setWinnerNickname(winner.nickname);
+    }
+
+    // 현재 유저가 승자인지 확인하고 isWinner 상태 업데이트
+    if (userInfo.myUUID === attendeeUUID) {
       setIsWinner(true);
     }
   };
 
-  const handleGameCenterUpdate = (message) => {
-    setRoomInfo((prev) => ({
-      ...prev,
-      centerPlace: message,
-    }));
+  const sendNextRoundCenter = ({ roundStationName }) => {
+    client.current.publish({
+      destination: `/pub/game/round.station`,
+      body: JSON.stringify({
+        gameRoundUUID: currentRoundUUID,
+        roundStationName,
+      }),
+    });
+  };
+
+  const handleGameCenterUpdate = ({ roundCenterStation }) => {
+    setRoundCenter(roundCenterStation);
   };
 
   const handleRoomPageUpdate = ({ roomNextPage, gameId }) => {
@@ -182,6 +359,8 @@ const useWs = () => {
       centerPlace: roomCenterStart,
       attendees,
     }));
+    setRoundCenter(roomCenterStart);
+    setIsFindCenterLoading(false);
   };
 
   const handleDepartureUpdate = ({ attendeeUUID, address, lat, lon }) => {
@@ -275,8 +454,12 @@ const useWs = () => {
     handleMessage,
     sendChat,
     sendGame,
-    sendUpdatePage,
     sendGameRound,
+    sendRoundInfo,
+    sendNextRoundCenter,
+    sendFinalStation,
+    sendReset,
+    sendNextRound,
   };
 };
 

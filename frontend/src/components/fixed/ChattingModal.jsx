@@ -53,7 +53,7 @@ const ChatMessages = styled.div`
 
   /* Webkit 기반 브라우저에서 스크롤바 스타일 */
   &::-webkit-scrollbar {
-    width: 5px;
+    width: 6px;
     border-radius: 10px; /* 스크롤바 자체를 둥글게 */
   }
 
@@ -73,7 +73,7 @@ const ChatMessages = styled.div`
   }
 
   &::-webkit-scrollbar-button {
-    display: none; /* 스크롤바 화살표 제거 */
+    display: none;
   }
 `;
 

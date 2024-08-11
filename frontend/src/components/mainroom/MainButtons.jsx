@@ -18,7 +18,7 @@ import Loading from "../fixed/Loading";
 import FindDeparture from "./Departure";
 import { axiosGetMiddle } from "../../apis/mapApi";
 import useWs from "../../hooks/useWs";
-import { totalRoundAtom } from "../../recoil/atoms/playerState";
+import { totalRoundAtom } from "../../recoil/atoms/gameState";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -347,6 +347,8 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
       } else {
         setRoundSetting(false);
       }
+    } else {
+      alert("권한이 없습니다.");
     }
   };
 
@@ -365,20 +367,9 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
         roomUUID: roomState.roomUUID,
         finalStationName: roomState.centerPlace.name,
       });
+    } else {
+      alert("권한이 없습니다.");
     }
-    // try {
-    //   const res = await axiosCreateGameRecord({
-    //     roundCnt: round,
-    //     roomUUID: roomState.roomUUID,
-    //     finalStationName: roomState.centerPlace.name,
-    //   });
-    //   setTotalRound(round);
-    //   sendUpdatePage({
-    //     roomNextPage: "gamechoice",
-    //   });
-    // } catch (err) {
-    //   console.log("게임기록 생성 실패", err);
-    // }
   };
 
   const handleCancelAddress = () => {

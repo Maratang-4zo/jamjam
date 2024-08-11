@@ -49,7 +49,7 @@ public class GamePlayController {
 	@Operation(summary = "✨ 라운드 정보를 저장한다.", description = "게임 세션에서 진행될 라운드를 생성한다.")
 	public void createGameRound(@Payload GameRoundCreateReq req, UUID roomUUID){
 		GameRoundCreateRes res = gameRoundService.createGameRound(req);
-		gamePlayService.createGameRound(res.getGameRoundUUID(), roomUUID);
+		gamePlayService.createGameRound(res.getGameRoundUUID(), req.getGameId());
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.GAME_READY);
 	}
 

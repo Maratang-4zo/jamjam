@@ -3,36 +3,24 @@ server:
     context-path: /api
 
 spring:
-
-  sql:
-    init:
-      mode: always
-
-  application:
-    name: jamjam
-
-  config:
-    import: optional:file:.env[.properties]
-
   datasource:
-    url: jdbc:h2:mem:test #In-Memory 모드에서 사용
+    url: jdbc:h2:mem:test;MODE=MySQL
     driver-class-name: org.h2.Driver
     username: sa
     password:
-
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: create-drop
-    dialect: org.hibernate.dialect.H2Dialect
-    defer-datasource-initialization: true
-    
+      dialect: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
-        globally_quoted_identifiers: false
         format_sql: true
-      open-in-view: true
-
+        globally_quoted_identifiers: false
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
   logging:
     level:
       com.app: debug
@@ -40,7 +28,6 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-
 kakao:
   client:
     id: ${KAKAO_CLIENT_ID}

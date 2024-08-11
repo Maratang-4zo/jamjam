@@ -40,14 +40,14 @@ public class GamePlayService {
 		game.startGame();
 
 		for (int i = 3; i > 0; i--) {
-			broadCastService.broadcastToRoom(roomUUID, GameCountdown.builder().gameRoundUUID(gameStartReq.getGameRoundUUID()).countdown(i).build(), BroadCastType.GAME_COUNTDOWN);
+			broadCastService.broadcastToRoom(roomUUID, GameCountdown.of(gameStartReq.getGameRoundUUID(), i), BroadCastType.GAME_COUNTDOWN);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
 		}
-		broadCastService.broadcastToRoom(roomUUID, GameRoundIdRes.builder().gameRoundUUID(gameStartReq.getGameRoundUUID()).build(), BroadCastType.GAME_START);
+		broadCastService.broadcastToRoom(roomUUID, GameRoundIdRes.of(gameStartReq.getGameRoundUUID()), BroadCastType.GAME_START);
 	}
 
 	public void playGame(GamePlayReq req, UUID roomUUID, UUID attendeeUUID){

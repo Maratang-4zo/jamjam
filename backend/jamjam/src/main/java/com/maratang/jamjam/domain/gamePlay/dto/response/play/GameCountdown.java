@@ -10,4 +10,11 @@ import lombok.Getter;
 public class GameCountdown {
 	private UUID gameRoundUUID;
 	private int countdown;
+
+	public static GameCountdown of(UUID gameRoundUUID, int countdown) {
+		return GameCountdown.builder()
+                .gameRoundUUID(gameRoundUUID)
+                .countdown(countdown)
+                .build();
+	}
 }

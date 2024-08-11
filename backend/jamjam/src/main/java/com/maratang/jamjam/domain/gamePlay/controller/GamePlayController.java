@@ -7,10 +7,10 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
 import com.maratang.jamjam.domain.gamePlay.dto.request.play.GamePlayReq;
+import com.maratang.jamjam.domain.gamePlay.dto.request.play.GameStartReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundCreateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundUpdateReq;
-import com.maratang.jamjam.domain.gamePlay.dto.request.play.GameStartReq;
-import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionReq;
+import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionCreateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionResultResetReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionResultUpdateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundCreateRes;
@@ -39,7 +39,7 @@ public class GamePlayController {
 	// 게임 설정값 저장
 	@MessageMapping("/game/session.setting")
 	@Operation(summary = "✨ 새로운 게임 세션을 생성한다.", description = "미팅룸 방장이 정한 게임 설정값으로 게임 세션을 생성한다.")
-	public void createGameSession(@Payload GameSessionReq gameSessionReq, UUID roomUUID){
+	public void createGameSession(@Payload GameSessionCreateReq gameSessionReq, UUID roomUUID){
 		GameSessionRes res = gameSessionService.createGameSession(gameSessionReq, roomUUID);
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.GAME_SESSION_READY);
 	}
@@ -84,9 +84,8 @@ public class GamePlayController {
 	@MessageMapping("/game/session.reset")
 	@Operation(summary = "✨ 게임 결과 리셋", description = "모든 라운드가 끝나고 결정된 역을 모임 장소로 택하지 않는다.")
 	public void resetGame(@Payload GameSessionResultResetReq req, UUID roomUUID) {
-		gameSessionService.updateGameSessionStatus(req.getGameSessionUUID());
+		GameSessionIdRes res = gameSessionService.updateGameSessionStatus(req.getGameSessionUUID());
 		// gameRoundService.updateRoundRecord(gameRoundUpdateReq);
-		GameSessionIdRes res = GameSessionIdRes.builder().gameSessionUUID(req.getGameSessionUUID()).build();
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.GAME_RESET);
 	}
 }

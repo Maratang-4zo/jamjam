@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.maratang.jamjam.domain.game.dto.response.GameInfoRes;
 import com.maratang.jamjam.domain.game.entity.Game;
-import com.maratang.jamjam.domain.game.mapper.GameMapper;
 import com.maratang.jamjam.domain.game.repository.GameRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ public class GameService {
 
 	public List<GameInfoRes> getGameInfoList() {
 		List<Game> gameList = gameRepository.findAll();
-		return GameMapper.INSTANCE.gameListToGameInfoListRes(gameList);
+		return GameInfoRes.of(gameList);
 	}
 
 }

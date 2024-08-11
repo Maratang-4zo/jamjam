@@ -8,11 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
-import com.maratang.jamjam.domain.attendee.mapper.AttendeeMapper;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
-import com.maratang.jamjam.domain.room.mapper.RoomMapper;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -28,19 +26,19 @@ public class TestService {
 	private final RoomRepository roomRepository;
 
 	public List<AttendeeInfo> getAllAttendee() {
-		return AttendeeMapper.INSTANCE.attendeeListToAttendeeInfoList(attendeeRepository.findAll());
+		return AttendeeInfo.of(attendeeRepository.findAll());
 	}
 
 
 	public void getAttendeeList(UUID roomUUID, UUID attendeeUUID, String userId){
 		List<Attendee> attendeeList = attendeeRepository.findByRoom_RoomUUID(roomUUID);
-		List<AttendeeInfo> dtoList = AttendeeMapper.INSTANCE.attendeeListToAttendeeInfoList(attendeeList);
+		List<AttendeeInfo> dtoList = AttendeeInfo.of(attendeeList);
 
 		// messagingTemplate.convertAndSendToUser(userId, "/sub/rooms/" + roomUuid, dtoList);
 	}
 
 	public List<RoomTestRes> getAllRoom() {
-		return RoomMapper.INSTANCE.roomListToRoomResList(roomRepository.findAll());
+		return RoomTestRes.of(roomRepository.findAll());
 	}
 
 	@Transactional
@@ -64,6 +62,7 @@ public class TestService {
 			.purpose("tr")
 			.roomStatus(RoomStatus.CREATED)
 			.meetingDate(LocalDateTime.now())
+			.startStation("역삼역")
 			.root(attendee)
 			.build();
 

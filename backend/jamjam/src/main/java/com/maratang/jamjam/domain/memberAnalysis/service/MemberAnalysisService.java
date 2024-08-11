@@ -1,6 +1,5 @@
 package com.maratang.jamjam.domain.memberAnalysis.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -10,7 +9,6 @@ import com.maratang.jamjam.domain.game.repository.GameRepository;
 import com.maratang.jamjam.domain.member.repository.MemberRepository;
 import com.maratang.jamjam.domain.memberAnalysis.dto.response.MemberAnalysisRes;
 import com.maratang.jamjam.domain.memberAnalysis.entity.MemberAnalysis;
-import com.maratang.jamjam.domain.memberAnalysis.mapper.MemberAnalysisMapper;
 import com.maratang.jamjam.domain.memberAnalysis.repository.MemberAnalysisRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -25,21 +23,18 @@ public class MemberAnalysisService {
 	private final MemberRepository memberRepository;
 	private final MemberAnalysisRepository memberAnalysisRepository;
 	private final GameRepository gameRepository;
-	private final MemberAnalysisMapper memberAnalysisMapper;
 
 	public List<MemberAnalysisRes> getMemberAnalysis(long memberId) {
 		List<MemberAnalysis> list = memberAnalysisRepository.findAllByMemberId(memberId)
 			.orElseThrow(()-> new BusinessException(ErrorCode.MEMBERANALYSIS_NOT_FOUND));
-		List<MemberAnalysisRes> resList = new ArrayList<>();
-		for(MemberAnalysis memberAnalysis : list) {
-			int winRate = Math.round((memberAnalysis.getGameWinCount()*100)/memberAnalysis.getGameCount());
-			MemberAnalysisRes res = MemberAnalysisRes.builder()
-				.gameName(memberAnalysis.getGame().getName())
-				.winRate(winRate)
-				.build();
-			resList.add(res);
-		}
-		return resList;
+
+		return list.stream()
+			.map(ma -> {
+				int winRate = Math.round((float)(ma.getGameWinCount() * 100) /ma.getGameCount());
+				return MemberAnalysisRes.of(ma.getGame().getName(), winRate);
+			})
+			.toList();
+
 	}
 
 	@Transactional
@@ -58,7 +53,7 @@ public class MemberAnalysisService {
 		if(isWin){
 			long wincnt = memberAnalysis.getGameWinCount();
 			wincnt++;
-			memberAnalysisMapper.updateMemberAnalysis(wincnt, memberAnalysis);
+			memberAnalysis.updateGameWinCount(wincnt);
 		}
 		memberAnalysisRepository.save(memberAnalysis);
 	}

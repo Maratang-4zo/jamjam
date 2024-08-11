@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.maratang.jamjam.domain.room.dto.response.RoomHistoryRes;
 import com.maratang.jamjam.domain.room.entity.Room;
-import com.maratang.jamjam.domain.room.mapper.RoomMapper;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -21,19 +20,16 @@ import lombok.RequiredArgsConstructor;
 public class RoomHistoryService {
 
 	private final RoomRepository roomRepository;
-	private final RoomMapper roomMapper;
 
 	public List<RoomHistoryRes> getRoomHistory(long memberId) {
 		List<Room> list = roomRepository.findByMemberId(memberId);
-		List<RoomHistoryRes> resList = roomMapper.INSTANCE.roomsToRoomHistoryResList(list);
-		return resList;
+		return RoomHistoryRes.of(list);
 	}
 
 	public RoomHistoryRes getRoomSummary(UUID roomUUID) {
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		RoomHistoryRes roomHistoryRes = roomMapper.INSTANCE.roomToRoomHistoryRes(room);
-		return roomHistoryRes;
+		return RoomHistoryRes.of(room);
 	}
 
 }

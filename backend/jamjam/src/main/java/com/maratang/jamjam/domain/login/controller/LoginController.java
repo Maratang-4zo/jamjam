@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.maratang.jamjam.domain.login.dto.response.LoginRes;
 import com.maratang.jamjam.domain.login.service.LoginService;
+import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 
@@ -68,7 +68,7 @@ public class LoginController {
 		String accessToken = getAccessToken(code);
 
 		// 액세스 토큰을 이용해 로그인 처리
-		LoginRes loginRes = loginService.oauthLogin(accessToken);
+		JwtTokenDto loginRes = loginService.oauthLogin(accessToken);
 
 		Cookie cookie = new Cookie("refreshToken", loginRes.getRefreshToken());
 		cookie.setPath("/");

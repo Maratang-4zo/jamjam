@@ -10,4 +10,11 @@ import lombok.Setter;
 public class MemberAnalysisRes {
 	private String gameName;
 	private int winRate;
+
+	public static MemberAnalysisRes of(String gameName, int winRate) {
+		return MemberAnalysisRes.builder()
+                .gameName(gameName)
+                .winRate(winRate)
+                .build();
+	}
 }

@@ -69,5 +69,13 @@ public class GameSession {
 	public void updateRoom(Room room) {
 		this.room = room;
 	}
+
+	public void updateFinalStationName(String finalStationName) {
+        this.finalStationName = finalStationName;
+    }
+
+	public void updateGameSessionStatus(GameSessionStatus gameSessionStatus) {
+		this.gameSessionStatus = gameSessionStatus;
+	}
 }
 

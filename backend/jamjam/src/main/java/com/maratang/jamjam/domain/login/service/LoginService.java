@@ -3,8 +3,6 @@ package com.maratang.jamjam.domain.login.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.maratang.jamjam.domain.login.dto.response.LoginRes;
-import com.maratang.jamjam.domain.login.mapper.LoginMapper;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
@@ -24,9 +22,8 @@ public class LoginService {
 
 	private final MemberService memberService;
 	private final TokenManager tokenManager;
-	private final LoginMapper loginMapper;
 
-	public LoginRes oauthLogin(String accessToken) {
+	public JwtTokenDto oauthLogin(String accessToken) {
 
 		SocialLoginApiService socialLoginApiService = SocialLoginApiServiceFactory.getSocialLoginApiService();
 
@@ -51,9 +48,7 @@ public class LoginService {
 			log.info("기존회원: " + optionalMember.getNickname() + " " + optionalMember.getEmail());
 		}
 
-		LoginRes loginRes = loginMapper.INSTANCE.jwtTokenDtoToLoginRes(jwtTokenDto);
-
-		return loginRes;
+		return jwtTokenDto;
 
 	}
 

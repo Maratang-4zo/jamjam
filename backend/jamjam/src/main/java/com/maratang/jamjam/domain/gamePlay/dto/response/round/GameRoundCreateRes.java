@@ -9,4 +9,10 @@ import lombok.Getter;
 @Builder
 public class GameRoundCreateRes {
 	private UUID gameRoundUUID;
+
+	public static GameRoundCreateRes of(UUID gameRoundUUID) {
+		return GameRoundCreateRes.builder()
+                .gameRoundUUID(gameRoundUUID)
+                .build();
+	}
 }

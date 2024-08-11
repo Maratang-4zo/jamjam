@@ -10,7 +10,6 @@ import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
-import com.maratang.jamjam.domain.attendee.mapper.AttendeeMapper;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.member.service.MemberService;
@@ -38,8 +37,9 @@ public class AttendeeService {
 
 	@Transactional
 	public RoomJoinRes createAttendee(UUID roomUUID, AttendeeCreateReq attendeeCreateReq, String email) {
-		Attendee attendee = AttendeeMapper.INSTANCE.attendeeCreateReqToAttendee(attendeeCreateReq);
-		if(!email.equals("")){
+		Attendee attendee = attendeeCreateReq.toEntity();
+
+		if(!email.isEmpty()){
 			Member member = memberService.findMemberByEmail(email);
 			attendee.updateMember(member);
 		}
@@ -60,16 +60,7 @@ public class AttendeeService {
 
 		SubwayInfo roomCenterStart = subwayDataLoader.getSubwayInfo(startStation);
 
-		return RoomJoinRes.builder()
-			.RoomUUID(roomUUID)
-			.AttendeeUUID(attendeeUUID)
-			.roomName(room.getName())
-			.roomCenterStart(roomCenterStart)
-			.roomTime(room.getMeetingDate())
-			.roomPurpose(room.getPurpose())
-			.hostUUID(room.getRoomUUID())
-			.attendees(attendeeList)
-			.build();
+		return RoomJoinRes.of(roomUUID, attendeeUUID, room, roomCenterStart, attendeeList);
 	}
 
 	@Transactional

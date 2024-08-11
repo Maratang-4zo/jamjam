@@ -10,13 +10,12 @@ import com.maratang.jamjam.domain.game.repository.GameRepository;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundCreateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundUpdateReq;
-import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundResultRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundCreateRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundResultListRes;
+import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundResultRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundStationRes;
 import com.maratang.jamjam.domain.gamePlay.entity.GameRound;
 import com.maratang.jamjam.domain.gamePlay.entity.GameSession;
-import com.maratang.jamjam.domain.gamePlay.mapper.GameRoundMapper;
 import com.maratang.jamjam.domain.gamePlay.repository.GameRoundRepository;
 import com.maratang.jamjam.domain.gamePlay.repository.GameSessionRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
@@ -37,22 +36,17 @@ public class GameRoundService {
 
     @Transactional
     public GameRoundCreateRes createGameRound(GameRoundCreateReq gameRoundCreateReq) {
-        GameRound gameRound = GameRoundMapper.INSTANCE.roundRecordCreateReqToRoundRecord(gameRoundCreateReq);
-
         Game game = gameRepository.findById(gameRoundCreateReq.getGameId())
             .orElseThrow(() -> new BusinessException(ErrorCode.GAME_NOT_FOUND));
 
         GameSession gameSession = gameSessionRepository.findByGameSessionUUID(gameRoundCreateReq.getGameSessionUUID())
             .orElseThrow(() -> new BusinessException(ErrorCode.GR_NOT_FOUND));
 
-        gameRound.updateGame(game);
-        gameRound.updateGameRecord(gameSession);
+        GameRound gameRound = gameRoundCreateReq.toEntity(game, gameSession);
 
         GameRound gameRound2 = gameRoundRepository.save(gameRound);
 
-        return GameRoundCreateRes.builder()
-            .gameRoundUUID(gameRound2.getGameRoundUUID())
-            .build();
+        return GameRoundCreateRes.of(gameRound2.getGameRoundUUID());
     }
 
     @Transactional
@@ -64,9 +58,7 @@ public class GameRoundService {
 
         SubwayInfo selectedStation = subwayDataLoader.getSubwayInfo(req.getRoundStationName());
 
-        return GameRoundStationRes.builder()
-            .roundCenterStation(selectedStation)
-            .build();
+        return GameRoundStationRes.of(req.getGameRoundUUID(), selectedStation);
     }
 
     public GameRoundResultListRes getRoundRecord(GameRoundReq gameRoundReq) {
@@ -76,9 +68,7 @@ public class GameRoundService {
         List<GameRound> gameRounds = gameRoundRepository.findAllByGameSessionId(gameSession.getGameSessionId());
         List<GameRoundResultRes> gameRoundResultResList = GameRoundResultRes.of(gameRounds);
 
-        return GameRoundResultListRes.builder()
-            .gameRoundResultResList(gameRoundResultResList)
-            .build();
+        return GameRoundResultListRes.of(gameRoundResultResList);
     }
 
 }

@@ -13,4 +13,11 @@ import lombok.Getter;
 public class RoomMiddleRes {
 	SubwayInfo roomCenterStart;
 	List<AttendeeDTO> attendees;
+
+	public static RoomMiddleRes of(SubwayInfo roomCenterStart, List<AttendeeDTO> attendees) {
+		return RoomMiddleRes.builder()
+            .roomCenterStart(roomCenterStart)
+            .attendees(attendees)
+            .build();
+	}
 }

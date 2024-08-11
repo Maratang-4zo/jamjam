@@ -110,5 +110,9 @@ public class Room extends BaseTimeEntity {
 	public boolean isRoomClosed(){
 		return this.roomStatus == RoomStatus.FINISHED || this.roomStatus == RoomStatus.ABORTED;
 	}
+
+	public void updateRoot(Attendee attendee){
+		this.root = attendee;
+	}
 }
 

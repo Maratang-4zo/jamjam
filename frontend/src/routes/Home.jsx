@@ -28,7 +28,9 @@ const Wrapper = styled.div`
   height: 100vh;
   color: ${(props) => props.theme.textColor};
   border: 3px solid ${(props) => props.theme.accentColor};
-  overflow: hidden;
+  overflow-x: hidden; /* 가로 스크롤을 없애기 위해 추가 */
+  display: flex;
+  flex-direction: column;
 `;
 
 const Container = styled.div`
@@ -36,9 +38,11 @@ const Container = styled.div`
   height: 100%;
   overflow-y: scroll;
   scroll-snap-type: y mandatory; /* 스크롤 시 각 섹션으로 바로 전환되게 설정 */
+  overflow-x: hidden; /* 가로 스크롤 방지 */
 `;
 
 const Section = styled.div`
+  width: 100%;
   height: 100vh;
   scroll-snap-align: start;
   display: flex;
@@ -47,6 +51,8 @@ const Section = styled.div`
   font-size: 2rem;
   font-family: "DungGeunMo";
   flex-direction: column;
+  box-sizing: border-box; /* 섹션 내부의 모든 요소의 크기를 부모 요소의 크기에 맞춤 */
+  overflow-x: hidden; /* 가로 스크롤 방지 */
 `;
 
 const FirstSection = styled(Section)`
@@ -54,8 +60,8 @@ const FirstSection = styled(Section)`
 `;
 
 const Image = styled.img`
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 80%; /* 이미지 크기 조정 */
+  max-height: 80%;
   position: absolute; /* 이미지가 항상 중앙에 위치하도록 설정 */
   top: 50%;
   left: 50%;

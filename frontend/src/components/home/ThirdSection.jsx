@@ -17,7 +17,7 @@ const Section = styled.div`
 
 const Image = styled.img`
   position: relative;
-  left: 0;
+  left: -50px;
   height: 70%;
   object-fit: cover;
 `;
@@ -25,7 +25,7 @@ const Image = styled.img`
 const TextContainer = styled.div`
   margin-top: 20px;
   position: relative;
-  left: 20px; /* 이미지 오른쪽에 위치하도록 조정 */
+  left: 0px; /* 이미지 오른쪽에 위치하도록 조정 */
   text-align: right; /* 오른쪽 정렬 */
 `;
 

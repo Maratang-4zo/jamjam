@@ -2,11 +2,9 @@ package com.maratang.jamjam.domain.room.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 @Builder
-@RequiredArgsConstructor
 public class RoomHistoryDTO {
 
 	public String title;

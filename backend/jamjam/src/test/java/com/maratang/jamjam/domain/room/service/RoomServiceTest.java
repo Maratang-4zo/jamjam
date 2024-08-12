@@ -16,7 +16,6 @@ import com.maratang.jamjam.config.IntegrationTestConfig;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
-import com.maratang.jamjam.domain.attendee.service.AttendeeService;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
@@ -29,15 +28,13 @@ import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 class RoomServiceTest extends IntegrationTestConfig {
     private final RoomService roomService;
     private final RoomRepository roomRepository;
-    private final AttendeeService attendeeService;
     private final AttendeeRepository attendeeRepository;
     private final RoomMapService roomMapService;
 
     @Autowired
-    public RoomServiceTest(RoomService roomService, RoomRepository roomRepository, AttendeeService attendeeService, AttendeeRepository attendeeRepository, RoomMapService roomMapService) {
+    public RoomServiceTest(RoomService roomService, RoomRepository roomRepository, AttendeeRepository attendeeRepository) {
         this.roomService = roomService;
         this.roomRepository = roomRepository;
-        this.attendeeService = attendeeService;
         this.attendeeRepository = attendeeRepository;
         this.roomMapService = roomMapService;
     }
@@ -97,7 +94,7 @@ class RoomServiceTest extends IntegrationTestConfig {
 
 
     @Nested
-    @DisplayName("방 성공/수정/삭제 테스트 ")
+    @DisplayName("방 생성/수정/중심역 변경 테스트 ")
     class RoomFunction {
         @Test
         @Transactional
@@ -122,7 +119,7 @@ class RoomServiceTest extends IntegrationTestConfig {
         }
 
         @Test
-        void 성공_방을_업데이트_한다() {
+        void 성공_방을_수정_한다() {
             //given
             String purpose = "스터디룸";
             LocalDateTime meetingDate = LocalDateTime.parse("2024-08-11T05:14:01.290");

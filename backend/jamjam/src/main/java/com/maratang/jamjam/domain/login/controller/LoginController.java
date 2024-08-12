@@ -94,7 +94,7 @@ public class LoginController {
 		if (clientRedirectUri.isEmpty()) {
 			// clientRedirectUri = "http://localhost:3000/"; // 기본 리디렉션 URL
 			clientRedirectUri = "https://jjam.shop/";
-			// clientRedirectUri = "http://localhost:8080/";
+			// clientRedirectUri = "http://localhost:8080/api/members/info";
 
 		}
 		response.sendRedirect(clientRedirectUri);
@@ -133,4 +133,5 @@ public class LoginController {
 			throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
 		}
 	}
+
 }

@@ -1,11 +1,28 @@
 package com.maratang.jamjam.domain.room.controller;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.service.AttendeeService;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
-import com.maratang.jamjam.domain.room.dto.response.*;
+import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
+import com.maratang.jamjam.domain.room.dto.response.RoomRes;
 import com.maratang.jamjam.domain.room.service.RoomHistoryService;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.auth.jwt.manager.TokenManager;
@@ -16,6 +33,7 @@ import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,12 +42,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/rooms")
@@ -144,7 +156,7 @@ public class RoomController {
 			} catch (ExpiredJwtException e){
 				String newAccessToken = null;
 
-				if(tokenManager.validateRefreshToken(refreshToken))
+				if(tokenManager.validateRefreshToken(refreshToken, request, response))
 					newAccessToken = tokenManager.reissueToken(refreshToken);
 
 				if (newAccessToken != null) {

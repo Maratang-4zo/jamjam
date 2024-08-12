@@ -138,6 +138,7 @@ public class RoomMapService {
 		saveOptimalRoutesForUsersInRoomToDatabase(room, selectedStation);
 
 		room.updateStartStation(selectedStation.getName());
+		room.updateFinalStation(selectedStation.getName());
 
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
 		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
@@ -179,6 +180,7 @@ public class RoomMapService {
 		saveOptimalRoutesForUsersInRoomToDatabase(room, selectedStation);
 
 		room.updateStartStation(selectedStation.getName());
+		room.updateFinalStation(selectedStation.getName());
 
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
 		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);

@@ -8,7 +8,7 @@ df = pd.read_csv(file_path, header=None, names=['C1', 'C2', 'C3', 'C4', 'C5'])
 
 # 모든 지하철역에 대해 상권정보 요청 및 파싱
 def crawling_places():
-    keywords = ['스터디룸', '식당', '카페']
+    keywords = ['스터디룸', '식당', '카페', '호프', '헬스클럽', '도서관', '공원', '미술관', '애견카페', '셀프사진']
     all_places = []
 
     for keyword in keywords:
@@ -22,8 +22,8 @@ def crawling_places():
             page = 1
             while True:
                 data = fetch_places_from_api(keyword, center_lat, center_lon, page)
-                if not data['documents']:
-                    break
+                if not data: break
+                if not data['documents']: break
 
                 places = parse_places(data, station_name, keyword)
                 all_places.extend(places)
@@ -68,6 +68,8 @@ def fetch_places_from_api(keyword, center_lat, center_lon, page):
 def parse_places(data, station_name, keyword):
     places = []
     for place in data['documents']:
+        if not place.get('id'):  # id가 비어있으면 건너뛰기
+            continue
         place_info = {
             'station_name': station_name,
             'name': place['place_name'],

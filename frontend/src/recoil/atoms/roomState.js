@@ -4,14 +4,14 @@ export const roomAtom = atom({
   key: "roomState",
   default: {
     roomUUID: "",
-    roomName: "",
+    roomName: "어디서 볼래 사당빼고",
     meetingDate: "",
     roomPurpose: "",
     attendees: [],
     host: {},
     hostUUID: "",
     isAllHasDeparture: false, // 모두가 출발지 입력을 함
-    isCenterExist: true,
+    isCenterExist: false,
     isAllReadyToGame: false,
     centerPlace: {},
     isValid: false,

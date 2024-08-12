@@ -8,6 +8,9 @@ import com.maratang.jamjam.global.auth.jwt.constant.GrantType;
 
 public class AuthorizationHeaderUtils {
 	public static void validateAuthorization(String authorizationHeader) {
+	    if (authorizationHeader == null) {
+            throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
+        }
 
 		// 1. authorizationHeader 필수 체크
 		if (!StringUtils.hasText(authorizationHeader)) {

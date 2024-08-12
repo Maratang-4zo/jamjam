@@ -29,12 +29,14 @@ class RoomServiceTest extends IntegrationTestConfig {
     private final RoomService roomService;
     private final RoomRepository roomRepository;
     private final AttendeeRepository attendeeRepository;
+    private final RoomMapService roomMapService;
 
     @Autowired
     public RoomServiceTest(RoomService roomService, RoomRepository roomRepository, AttendeeRepository attendeeRepository) {
         this.roomService = roomService;
         this.roomRepository = roomRepository;
         this.attendeeRepository = attendeeRepository;
+        this.roomMapService = roomMapService;
     }
 
     private Room room;
@@ -152,7 +154,7 @@ class RoomServiceTest extends IntegrationTestConfig {
             RoomMoveReq roomMoveReq = new RoomMoveReq(finalStation);
 
             //when
-            roomService.moveRoom(roomUUID, roomMoveReq);
+            roomMapService.moveRoom(roomUUID, roomMoveReq);
 
             //then
             SoftAssertions.assertSoftly(softAssertions -> {

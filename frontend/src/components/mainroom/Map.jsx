@@ -17,7 +17,9 @@ import useDecoding from "../../hooks/useDecoding";
 import ColorThief from "colorthief";
 import { userColor } from "../../utils/userColor";
 import fireGif from "../../assets/icons/fire-fireball.gif";
+import pinIcon from "../../assets/icons/pinIcon.png";
 import { lineColor } from "../../utils/lineColor";
+import { roundCenterAtom } from "../../recoil/atoms/gameState";
 
 function MyMap() {
   const navermaps = useNavermaps();
@@ -34,6 +36,7 @@ function MyMap() {
     lon: 127.039625,
   };
   const [centerPoint, setCenterPoint] = useState(defaultCenter);
+  const roundCenter = useRecoilValue(roundCenterAtom);
 
   useEffect(() => {
     const fetchuserColors = async () => {
@@ -267,23 +270,60 @@ function MyMap() {
           }
           icon={{
             content: `
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <span style="
-                font-family: 'DungGeunMo'; 
-                background-color: white; 
-                box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.35); 
-                border-radius: 5px; 
-                padding: 3px; 
-                border: 2px solid ${
-                  lineColor[roomInfo.centerPlace.subwayLines[0]]
-                };
-              ">
-                ${roomInfo.centerPlace.name}
-              </span>
-              <img src="${fireGif}" style="width:50px; height:50px;" />
-            </div>
-          `,
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <span style="
+            font-family: 'DungGeunMo'; 
+            background-color: white; 
+            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.35); 
+            border-radius: 5px; 
+            padding: 3px; 
+            border: 2px solid ${
+              roomInfo.centerPlace.subwayLines &&
+              roomInfo.centerPlace.subwayLines.length > 0
+                ? lineColor[roomInfo.centerPlace.subwayLines[0]]
+                : "black"
+            };
+          ">
+            ${roomInfo.centerPlace.name}
+          </span>
+          <img src="${fireGif}" style="width:50px; height:50px;" />
+        </div>
+      `,
             anchor: new navermaps.Point(25, 25), // 이미지 중심점을 조정
+          }}
+        />
+      ) : null}
+
+      {roundCenter && roomPage === "gamefinish" ? (
+        <Marker
+          position={
+            new navermaps.LatLng(
+              roundCenter.latitude + 0.007,
+              roundCenter.longitude,
+            )
+          }
+          icon={{
+            content: `
+
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; animation: bounce 1s ease infinite;">
+          <span style="
+            font-family: 'DungGeunMo'; 
+            background-color: white; 
+            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.35); 
+            border-radius: 5px; 
+            padding: 3px; 
+            border: 2px solid ${
+              roundCenter.subwayLines && roundCenter.subwayLines.length > 0
+                ? lineColor[roundCenter.subwayLines[0]]
+                : "black"
+            };
+          ">
+            ${roundCenter.name}
+          </span>
+          <img src="${pinIcon}" style="width:50px; height:50px;" />
+        </div>
+      `,
+            anchor: new navermaps.Point(25, 50), // 이미지 중심점을 조정
           }}
         />
       ) : null}
@@ -299,13 +339,29 @@ function MyMap() {
             }
             icon={{
               content: `
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                  <span style="border: 2px solid black; background: white; padding: 2px 5px; border-radius: 10px; font-size: 13px; color: black;">
-                    ${selectedStation.name}
-                  </span>
-                </div>
+        <style>
+          ${bounceAnimation}
+        </style>
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; animation: bounce 1s ease infinite;">
+          <span style="
+            font-family: 'DungGeunMo'; 
+            background-color: white; 
+            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.35); 
+            border-radius: 5px; 
+            padding: 3px; 
+            border: 2px solid ${
+              selectedStation.subwayLines &&
+              selectedStation.subwayLines.length > 0
+                ? lineColor[selectedStation.subwayLines[0]]
+                : "black"
+            };
+          ">
+          ${selectedStation.name}
+          </span>
+          <img src="${pinIcon}" style="width:50px; height:50px;" />
+        </div>
               `,
-              anchor: new navermaps.Point(10, 10), // 마커 중심점을 이미지 중앙으로 조정
+              anchor: new navermaps.Point(25, 70),
             }}
           />
           {selectedStation.stores.map((store, index) => (

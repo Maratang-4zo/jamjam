@@ -93,7 +93,7 @@ public class AttendeeService {
 		room.updateIsCenterExist(false);
 
 		return AttendeeIsAllHasRes.builder()
-			.isAllHasRes(isAllHasDeparture)
+			.isAllHasDeparture(isAllHasDeparture)
 			.isCenterExist(room.isCenterExist())
 			.build();
 	}

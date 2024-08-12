@@ -32,7 +32,7 @@ class RoomServiceTest extends IntegrationTestConfig {
     private final RoomMapService roomMapService;
 
     @Autowired
-    public RoomServiceTest(RoomService roomService, RoomRepository roomRepository, AttendeeRepository attendeeRepository) {
+    public RoomServiceTest(RoomService roomService, RoomRepository roomRepository, AttendeeRepository attendeeRepository, RoomMapService roomMapService) {
         this.roomService = roomService;
         this.roomRepository = roomRepository;
         this.attendeeRepository = attendeeRepository;

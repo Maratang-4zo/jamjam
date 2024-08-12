@@ -73,11 +73,5 @@ export const gameCountAtom = atom({
 // 전 라운드의 중심을 저장함
 export const roundCenterAtom = atom({
   key: "roundCenter",
-  default: {
-    name: "사당역",
-    latitude: 37.476559992,
-    longitude: 126.98163857,
-    region: "CAPITAL",
-    subwayLines: ["LINE_2"],
-  },
+  default: {},
 });

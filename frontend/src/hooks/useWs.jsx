@@ -30,13 +30,16 @@ import {
   isCenterMoveLoadingAtom,
   isFindCenterLoadingAtom,
   isHistoryLoadingAtom,
+  isHostOutAtom,
   isMainConnectingAtom,
   isThreeStationLoadingAtom,
 } from "../recoil/atoms/loadingState";
+import useOpenVidu from "./useOpenVidu";
 
 const API_BASE_URL = "https://jjam.shop";
 
 const useWs = () => {
+  const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);
   const [connected, setConnected] = useState(false);
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
@@ -64,6 +67,8 @@ const useWs = () => {
   const setIsThreeStationLoading = useSetRecoilState(isThreeStationLoadingAtom);
   const setIsHistoryLoading = useSetRecoilState(isHistoryLoadingAtom);
   const setIsMainConnecting = useSetRecoilState(isMainConnectingAtom);
+  const setIsHostOut = useSetRecoilState(isHostOutAtom);
+  const { leaveSession } = useOpenVidu();
 
   const connect = useCallback(() => {
     return new Promise((resolve, reject) => {
@@ -95,13 +100,20 @@ const useWs = () => {
     });
   }, [connected]);
 
-  const subscribe = useCallback(() => {
-    if (client.current) {
-      client.current.subscribe(`/sub/rooms/${roomInfo.roomUUID}`, (message) => {
-        handleMessage(JSON.parse(message.body));
-      });
-    }
-  }, [roomInfo.roomUUID]);
+  const subscribe = () => {
+    client.current.subscribe(
+      `/sub/rooms/${roomInfo.roomUUID}`,
+      (message) => {
+        handleMessage(message);
+      },
+      null,
+      {},
+    );
+
+    client.current.subscribe(`/user/sub/errors`, (message) => {
+      alert(message.body);
+    });
+  };
 
   const disconnect = useCallback(() => {
     if (client.current) {
@@ -179,10 +191,121 @@ const useWs = () => {
       case "HOST_GO_MAIN":
         handleHostGoMain(message);
         break;
+      case "ROOM_ROOT_LEAVE":
+        handleRoomRootLeave(message);
+        break;
+      case "ROOM_LEAVE":
+        handleRoomLeave(message);
+        break;
+      case "ROOM_ENTER":
+        handleRoomEnter(message);
+        break;
+      case "ROOM_FORCE_EXIT":
+        handleRoomExit(message);
+        break;
       default:
         console.error("Unknown message type:", message.type);
     }
   }, []);
+
+  const handleRoomEnter = (message) => {
+    const { attendeeUUID, address, nickname, lat, lon, isRoot } = message;
+
+    const newAttendee = {
+      address,
+      lat,
+      lon,
+      attendeeUUID,
+      nickname,
+    };
+
+    // 현재 유저의 정보 업데이트
+    if (userInfo.myUUID === attendeeUUID) {
+      setUserInfo((prev) => ({
+        ...prev,
+        isHost: isRoot,
+        nickname,
+        departure: {
+          address,
+          lat,
+          lon,
+        },
+      }));
+    }
+
+    // roomInfo 업데이트
+    setRoomInfo((prevRoomInfo) => ({
+      ...prevRoomInfo,
+      attendees: [...prevRoomInfo.attendees, newAttendee],
+      hostUUID: isRoot ? attendeeUUID : prevRoomInfo.hostUUID,
+    }));
+
+    // 채팅로그에 추가
+    const newChatLog = {
+      type: "alert",
+      alertType: "in",
+      attendeeUUID,
+      nickname,
+    };
+    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+  };
+
+  const handleRoomLeave = (message) => {
+    const { attendeeUUID, nickname, lat, lon, attendeeStatus } = message;
+
+    setRoomInfo((prevRoomInfo) => ({
+      ...prevRoomInfo,
+      attendees: prevRoomInfo.attendees.filter(
+        (attendee) => attendee.attendeeUUID !== attendeeUUID,
+      ),
+    }));
+
+    const newChatLog = {
+      type: "alert",
+      alertType: "out",
+      attendeeUUID,
+      nickname,
+    };
+    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+  };
+
+  const handleRoomRootLeave = ({
+    attendeeUUID,
+    estimatedForceCloseAt,
+    nickname,
+  }) => {
+    setIsHostOut(true);
+
+    setRoomInfo((prevRoomInfo) => ({
+      ...prevRoomInfo,
+      attendees: prevRoomInfo.attendees.filter(
+        (attendee) => attendee.attendeeUUID !== attendeeUUID,
+      ),
+    }));
+
+    const newChatLog = {
+      type: "alert",
+      alertType: "out",
+      attendeeUUID,
+      nickname,
+    };
+    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+  };
+
+  const handleRoomExit = () => {
+    setIsHostOut(false); // 호스트가 나간 상태를 false로 설정
+
+    // OpenVidu 세션 종료
+    leaveSession(); // useOpenVidu 훅에서 제공하는 leaveSession 함수 호출
+
+    // STOMP WebSocket 연결 종료
+    disconnect(); // WebSocket 연결을 해제하는 함수 호출
+
+    // 홈 페이지로 이동
+    navigate("/");
+
+    // 추가적인 클린업 작업이 필요한 경우 이곳에 작성
+  };
 
   const handleHostGoMain = ({ isMainConnecting }) => {
     setIsMainConnecting(isMainConnecting);
@@ -427,6 +550,7 @@ const useWs = () => {
       );
       const nickname = attendant ? attendant.nickname : "Unknown";
       const newChatLog = {
+        type: "chat",
         attendeeUUID,
         nickname,
         content,

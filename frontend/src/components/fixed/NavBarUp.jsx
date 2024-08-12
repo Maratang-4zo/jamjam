@@ -18,6 +18,8 @@ const Wrapper = styled.div`
   align-items: center;
   border-bottom: 3px solid ${(props) => props.theme.accentColor};
   position: relative;
+  font-family: "DungGeunMo";
+  font-size: 30px;
 `;
 
 const Left = styled.div`
@@ -68,7 +70,14 @@ function NavBarUp() {
         <Left>
           <Link to={`/room/create`}>CREATE</Link>
         </Left>
-        <Link to={`/`}>
+        <Link
+          to={`/`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <LogoImage src={logo} alt="Logo" />
         </Link>
         <Right>

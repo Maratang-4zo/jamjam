@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
+import com.maratang.jamjam.domain.attendee.dto.response.AttendeeIsAllHasRes;
 import com.maratang.jamjam.domain.attendee.service.AttendeeService;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -42,8 +43,8 @@ public class AttendeeController {
 			throw new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND);
 		}
 
-		attendeeService.updateAttendee(attendeeUpdateReq, roomToken);
+		AttendeeIsAllHasRes attendeeIsAllHasRes = attendeeService.updateAttendee(attendeeUpdateReq, roomToken);
 
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		return ResponseEntity.status(HttpStatus.OK).body(attendeeIsAllHasRes);
 	}
 }

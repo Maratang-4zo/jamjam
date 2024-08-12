@@ -25,7 +25,9 @@ public enum BroadCastType {
 	DEPARTURE_UPDATE("참여자 출발지 변경"),
 	ROOM_CENTER_UPDATE("중심역 변경"),
 	HOST_FIND_CENTER("중심역 찾는 중"),
-	GAME_NEXT_ROUND("다음 라운드");
+	GAME_NEXT_ROUND("다음 라운드"),
+	ROOM_ROOT_LEAVE("방장 떠남"),
+	ROOM_ROOT_REENTRY("방장 재입장");
 
 	private final String desc;
 }

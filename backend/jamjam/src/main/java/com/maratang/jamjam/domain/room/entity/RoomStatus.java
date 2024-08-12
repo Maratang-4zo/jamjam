@@ -7,6 +7,7 @@ public enum RoomStatus {
 	CREATED("미팅룸생성"),
 	ONGOING("미팅룸진행중"),
 	ABORTED("미팅룸중단"),
+	RESERVED("보류"),
 	FINISHED("미팅룸종료");
 
 	private final String desc;

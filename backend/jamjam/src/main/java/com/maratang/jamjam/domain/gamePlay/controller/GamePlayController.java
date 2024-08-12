@@ -64,7 +64,7 @@ public class GamePlayController {
 
 	// 게임 답 입력
 	@MessageMapping("/game/round.play")
-	@Operation(summary = "🚗 구현 중")
+	@Operation(summary = "✨ 게임을 진행한다")
     public void playGame(@Payload GamePlayReq gamePlayReq, UUID roomUUID, UUID attendeeUUID) {
         gamePlayService.playGame(gamePlayReq, roomUUID, attendeeUUID);
     }

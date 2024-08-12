@@ -94,6 +94,7 @@ public class LoginController {
 		if (clientRedirectUri.isEmpty()) {
 			// clientRedirectUri = "http://localhost:3000/"; // 기본 리디렉션 URL
 			clientRedirectUri = "https://jjam.shop/";
+			// clientRedirectUri = "http://localhost:8080/";
 
 		}
 		response.sendRedirect(clientRedirectUri);

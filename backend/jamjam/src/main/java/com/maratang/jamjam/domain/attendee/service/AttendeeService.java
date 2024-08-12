@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
+import com.maratang.jamjam.domain.attendee.dto.response.AttendeeIsAllHasRes;
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeUpdateRes;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
@@ -68,7 +69,7 @@ public class AttendeeService {
 	}
 
 	@Transactional
-	public void updateAttendee(AttendeeUpdateReq attendeeUpdateReq, String roomToken) {
+	public AttendeeIsAllHasRes updateAttendee(AttendeeUpdateReq attendeeUpdateReq, String roomToken) {
 		Claims claims = roomTokenProvider.getTokenClaims(roomToken);
 
 		String attendeeUUIDString = (String) claims.get("attendeeUUID");
@@ -81,6 +82,19 @@ public class AttendeeService {
 
 		attendee.updateAttendeeLocation(attendeeUpdateReq);
 
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+				.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		boolean isAllHasDeparture = room.getAttendees().stream()
+			.allMatch(attendeeTmp -> attendeeTmp.getLat() != null && attendeeTmp.getLon() != null);
+
 		broadCastService.broadcastToRoom(roomUUID, AttendeeUpdateRes.of(attendee), BroadCastType.DEPARTURE_UPDATE);
+
+		room.updateIsCenterExist(false);
+
+		return AttendeeIsAllHasRes.builder()
+			.isAllHasRes(isAllHasDeparture)
+			.isCenterExist(room.isCenterExist())
+			.build();
 	}
 }

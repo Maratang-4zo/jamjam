@@ -298,6 +298,8 @@ public class RoomService {
 				attendee.updateDuration(totalDuration);
 			}
 		}
+		room.updateIsCenterExist(true);
+
 		attendeeRepository.saveAll(attendees);
 	}
 

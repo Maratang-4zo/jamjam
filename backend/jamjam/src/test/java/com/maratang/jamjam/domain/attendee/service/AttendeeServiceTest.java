@@ -26,6 +26,8 @@ import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
 import com.maratang.jamjam.global.auth.room.constant.ProfileType;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 
+import io.jsonwebtoken.Claims;
+
 @Transactional
 class AttendeeServiceTest extends IntegrationTestConfig {
 
@@ -132,8 +134,11 @@ class AttendeeServiceTest extends IntegrationTestConfig {
 
 			String roomToken = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims).getRoomToken();
 
+			Claims claims = roomTokenProvider.getTokenClaims(roomToken);
+
 			//when
-			attendeeService.updateAttendee(attendeeUpdateReq, roomToken);
+			attendeeService.updateAttendee(attendeeUpdateReq, (UUID)claims.get("roomUUID"),
+				(UUID)claims.get("attendeeUUID"));
 
 			//then
 			SoftAssertions.assertSoftly(softAssertions -> {

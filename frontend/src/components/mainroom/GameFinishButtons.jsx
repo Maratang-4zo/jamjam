@@ -28,6 +28,7 @@ import {
   isHistoryLoadingAtom,
   isThreeStationLoadingAtom,
 } from "../../recoil/atoms/loadingState";
+import { getCookie } from "../../utils/Cookies";
 
 const BottomBtns = styled.div`
   position: absolute;

@@ -172,10 +172,25 @@ const useWs = () => {
         break;
       case "GAME_NEXT_ROUND":
         handleNextRound(message);
+        break;
+      case "WINNER_NEXT_PAGE":
+        handleWinnerNextPage(message);
+        break;
+      case "HOST_GO_MAIN":
+        handleHostGoMain(message);
+        break;
       default:
         console.error("Unknown message type:", message.type);
     }
   }, []);
+
+  const handleHostGoMain = ({ isMainConnecting }) => {
+    setIsMainConnecting(isMainConnecting);
+  };
+
+  const handleWinnerNextPage = ({ isThreeStationLoading }) => {
+    setIsThreeStationLoading(isThreeStationLoading);
+  };
 
   const sendNextRound = ({ gameRoundUUID, currentRound, totalRound }) => {
     client.current.publish({
@@ -217,6 +232,7 @@ const useWs = () => {
     setIsWinner(false);
     setSelectedGame(0);
     setPlayers([]);
+    setIsMainConnecting(false);
   };
 
   const handleGameResultApply = ({
@@ -358,19 +374,32 @@ const useWs = () => {
       ...prev,
       centerPlace: roomCenterStart,
       attendees,
+      isCenterExist: true,
     }));
     setRoundCenter(roomCenterStart);
     setIsFindCenterLoading(false);
   };
 
-  const handleDepartureUpdate = ({ attendeeUUID, address, lat, lon }) => {
+  const handleDepartureUpdate = ({
+    attendeeUUID,
+    address,
+    lat,
+    lon,
+    isAllHasDeparture,
+    isCenterExist,
+  }) => {
     setRoomInfo((prevRoomInfo) => {
       const updatedAttendees = prevRoomInfo.attendees.map((attendee) =>
         attendee.attendeeUUID === attendeeUUID
           ? { ...attendee, address, lat, lon }
           : attendee,
       );
-      return { ...prevRoomInfo, attendees: updatedAttendees };
+      return {
+        ...prevRoomInfo,
+        attendees: updatedAttendees,
+        isAllHasDeparture,
+        isCenterExist,
+      };
     });
   };
 

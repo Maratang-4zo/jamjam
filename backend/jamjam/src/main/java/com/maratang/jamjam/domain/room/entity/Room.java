@@ -59,9 +59,11 @@ public class Room extends BaseTimeEntity {
 	@OneToOne(fetch = FetchType.LAZY)
 	private Attendee root;
 
+	private boolean isCenterExist;
+
 	@Builder
 	public Room(Long roomId, String name, String purpose, String startStation, String finalStation ,LocalDateTime meetingDate,
-		RoomStatus roomStatus, LocalDateTime endedAt, List<Attendee> attendees, UUID roomUUID, Attendee root) {
+		RoomStatus roomStatus, LocalDateTime endedAt, List<Attendee> attendees, UUID roomUUID, Attendee root, boolean isCenterExist) {
 		this.roomId = roomId;
 		this.name = name;
 		this.purpose = purpose;
@@ -73,6 +75,7 @@ public class Room extends BaseTimeEntity {
 		this.attendees = attendees;
 		this.roomUUID = roomUUID;
 		this.root = root;
+		this.isCenterExist = isCenterExist;
 	}
 
 	@PrePersist
@@ -109,6 +112,14 @@ public class Room extends BaseTimeEntity {
 
 	public boolean isRoomClosed(){
 		return this.roomStatus == RoomStatus.FINISHED || this.roomStatus == RoomStatus.ABORTED;
+	}
+
+	public void updateRoot(Attendee attendee){
+		this.root = attendee;
+	}
+
+	public void updateIsCenterExist(boolean isCenterExist){
+		this.isCenterExist = isCenterExist;
 	}
 }
 

@@ -6,6 +6,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
+import com.maratang.jamjam.domain.gamePlay.dto.request.play.GameNextRoundReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.play.GamePlayReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.play.GameStartReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundCreateReq;
@@ -13,6 +14,7 @@ import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundUpdateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionCreateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionResultResetReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionResultUpdateReq;
+import com.maratang.jamjam.domain.gamePlay.dto.response.play.GameNextRoundRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundCreateRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundStationRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.session.GameSessionIdRes;
@@ -73,6 +75,13 @@ public class GamePlayController {
 		GameRoundStationRes res = gameRoundService.updateRoundRecord(gameRoundUpdateReq);
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.GAME_CENTER_UPDATE);
 	}
+
+	@MessageMapping("/game/round.next")
+	@Operation(summary = "✨ 다음 라운드로 이동", description = "다음 라운드로 넘어간다.")
+	public void nextRound(@Payload GameNextRoundReq gameNextRoundReq, UUID roomUUID) {
+        GameNextRoundRes res = gameRoundService.nextRound(gameNextRoundReq, roomUUID);
+        broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.GAME_NEXT_ROUND);
+    }
 
 	@MessageMapping("/game/session.station")
 	@Operation(summary = "✨ 게임 결과 반영", description = "모든 라운드가 끝나고 결정된 역을 모임 장소로 선택한다.")

@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
+import com.maratang.jamjam.domain.attendee.dto.response.AttendeeIsAllHasRes;
+import com.maratang.jamjam.domain.attendee.dto.response.AttendeeUpdateRes;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.member.entity.Member;
@@ -16,13 +18,13 @@ import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
-import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.map.station.SubwayDataLoader;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
+import com.maratang.jamjam.global.ws.BroadCastService;
+import com.maratang.jamjam.global.ws.BroadCastType;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,9 +33,9 @@ import lombok.RequiredArgsConstructor;
 public class AttendeeService {
 	private final AttendeeRepository attendeeRepository;
 	private final RoomRepository roomRepository;
-	private final RoomTokenProvider roomTokenProvider;
 	private final SubwayDataLoader subwayDataLoader;
 	private final MemberService memberService;
+	private final BroadCastService broadCastService;
 
 	@Transactional
 	public RoomJoinRes createAttendee(UUID roomUUID, AttendeeCreateReq attendeeCreateReq, String email) {
@@ -64,16 +66,24 @@ public class AttendeeService {
 	}
 
 	@Transactional
-	public void updateAttendee(AttendeeUpdateReq attendeeUpdateReq, String roomToken) {
-		Claims claims = roomTokenProvider.getTokenClaims(roomToken);
-
-		String attendeeUUIDString = (String) claims.get("attendeeUUID");
-
-		UUID attendeeUUID = UUID.fromString(attendeeUUIDString);
-
+	public AttendeeIsAllHasRes updateAttendee(AttendeeUpdateReq attendeeUpdateReq, UUID roomUUID, UUID attendeeUUID) {
  		Attendee attendee = attendeeRepository.findByAttendeeUUID(attendeeUUID)
 			.orElseThrow(()->new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
 		attendee.updateAttendeeLocation(attendeeUpdateReq);
+
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+				.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		boolean isAllHasDeparture = room.getAttendees().stream()
+			.allMatch(attendeeTmp -> attendeeTmp.getLat() != null && attendeeTmp.getLon() != null);
+		room.updateIsCenterExist(false);
+
+		broadCastService.broadcastToRoom(roomUUID, AttendeeUpdateRes.of(attendee, isAllHasDeparture, false), BroadCastType.DEPARTURE_UPDATE);
+
+		return AttendeeIsAllHasRes.builder()
+			.isAllHasDeparture(isAllHasDeparture)
+			.isCenterExist(room.isCenterExist())
+			.build();
 	}
 }

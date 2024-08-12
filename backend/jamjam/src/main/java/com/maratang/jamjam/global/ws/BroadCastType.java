@@ -20,7 +20,12 @@ public enum BroadCastType {
 	GAME_WINNER("게임 승자"),
 	GAME_RESET("게임 리셋"),
 	GAME_CENTER_UPDATE("라운드 역 선택"),
-	GAME_RESULT_APPLY("최종 역 선택");
+	GAME_RESULT_APPLY("최종 역 선택"),
+	ROOM_INFO_UPDATE("방 정보 변경"),
+	DEPARTURE_UPDATE("참여자 출발지 변경"),
+	ROOM_CENTER_UPDATE("중심역 변경"),
+	HOST_FIND_CENTER("중심역 찾는 중"),
+	GAME_NEXT_ROUND("다음 라운드");
 
 	private final String desc;
 }

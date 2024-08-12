@@ -1,4 +1,3 @@
-// NavBarLeft.jsx
 import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
@@ -16,9 +15,10 @@ import {
 } from "../../recoil/atoms/roomState";
 import useOpenVidu from "../../hooks/useOpenVidu";
 import { userInfoAtom } from "../../recoil/atoms/userState";
-import UserInfoModal from "./userInfoModal"; // Import the modal component
+import UserInfoModal from "./userInfoModal";
 import { userColor } from "../../utils/userColor";
-import ColorThief from "colorthief"; // Import ColorThief
+import ColorThief from "colorthief";
+import Spinner from "./Spinner";
 
 const bounceAnimation = keyframes`
   0%, 100% {
@@ -40,7 +40,7 @@ const Wrapper = styled.div`
   padding: 10px 0 0 0;
   border-right: 3px solid ${(props) => props.theme.accentColor};
   z-index: 10000;
-  position: relative; /* position to manage modal positioning */
+  position: relative;
 `;
 
 const Attendants = styled.div`
@@ -104,8 +104,9 @@ const Home = styled.img`
 function NavBarLeft() {
   const [isChatOn, setIsChatOn] = useState(false);
   const [bounce, setBounce] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null); // State for selected user
-  const [modalTop, setModalTop] = useState(0); // State for modal top position
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [modalTop, setModalTop] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState(false); // 이미지 로드 상태 관리
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const chatLogs = useRecoilValue(chatAtom);
@@ -115,6 +116,33 @@ function NavBarLeft() {
   const { toggleMic, isMicOn } = useOpenVidu();
   const navigate = useNavigate();
   const prevChatLogsLength = useRef(chatLogs.length);
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const loadImage = (src) =>
+        new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+
+      try {
+        await Promise.all([
+          loadImage(MicOn),
+          loadImage(HomeIcon),
+          loadImage(MicOff),
+          loadImage(ChatOn),
+          loadImage(ChatOff),
+        ]);
+        setImagesLoaded(true);
+      } catch (error) {
+        console.error("이미지 로드 실패:", error);
+      }
+    };
+
+    loadImages();
+  }, []);
 
   const handleChat = () => {
     setIsChatOn((prev) => !prev);
@@ -130,11 +158,6 @@ function NavBarLeft() {
       navigate("/");
       resetUserInfo();
       resetRoomInfo();
-      if (userInfo.isHost) {
-        console.log("방장임");
-      } else {
-        console.log("방장x임");
-      }
     }
   };
 
@@ -186,27 +209,33 @@ function NavBarLeft() {
   return (
     <>
       <Wrapper>
-        <Attendants>
-          {roomInfo.attendees.map((attendee, index) => (
-            <Avatar
-              key={attendee.attendeeUUID}
-              src={attendee.profileImageUrl}
-              isSpeaking={currentSpeakers.includes(attendee.attendeeUUID)}
-              onClick={() => handleAvatarClick(attendee, index)}
-            />
-          ))}
-        </Attendants>
-        <Btns>
-          <Btn onClick={handleChat} className={bounce ? "bounce" : ""}>
-            <Icon src={isChatOn ? ChatOn : ChatOff} />
-          </Btn>
-          <Btn onClick={handleMic}>
-            <Icon src={isMicOn ? MicOn : MicOff} />
-          </Btn>
-          <Btn onClick={handleHomeClick}>
-            <Home src={HomeIcon} />
-          </Btn>
-        </Btns>
+        {!imagesLoaded ? (
+          <Spinner /> // 이미지 로드가 완료되지 않은 경우 스피너를 표시
+        ) : (
+          <>
+            <Attendants>
+              {roomInfo.attendees.map((attendee, index) => (
+                <Avatar
+                  key={attendee.attendeeUUID}
+                  src={attendee.profileImageUrl}
+                  isSpeaking={currentSpeakers.includes(attendee.attendeeUUID)}
+                  onClick={() => handleAvatarClick(attendee, index)}
+                />
+              ))}
+            </Attendants>
+            <Btns>
+              <Btn onClick={handleChat} className={bounce ? "bounce" : ""}>
+                <Icon src={isChatOn ? ChatOn : ChatOff} />
+              </Btn>
+              <Btn onClick={handleMic}>
+                <Icon src={isMicOn ? MicOn : MicOff} />
+              </Btn>
+              <Btn onClick={handleHomeClick}>
+                <Home src={HomeIcon} />
+              </Btn>
+            </Btns>
+          </>
+        )}
         {selectedUser && (
           <UserInfoModal
             user={selectedUser}

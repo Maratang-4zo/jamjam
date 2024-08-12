@@ -44,7 +44,7 @@ export function axiosAttendRoom({ roomUUID, nickname }) {
   return axios.post(BASE_URL + `/api/rooms/${roomUUID}/join`, params);
 }
 
-// 방 정보(모임장소) 변경
+// 방 정보 변경
 export function axiosPatchRoomInfo({
   roomUUID,
   meetingDate,

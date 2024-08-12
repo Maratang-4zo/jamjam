@@ -1,16 +1,19 @@
 package com.maratang.jamjam.global.auth.Interceptor;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.util.WebUtils;
 
+import com.maratang.jamjam.global.auth.jwt.constant.TokenType;
 import com.maratang.jamjam.global.auth.jwt.manager.TokenManager;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
-import com.maratang.jamjam.global.auth.jwt.constant.TokenType;
 import com.maratang.jamjam.global.util.AuthorizationHeaderUtils;
+import com.maratang.jamjam.global.util.CookieUtils;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,34 +31,18 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		Exception {
 
 		// 1. Authorization Header 검증
-		String authorizationHeader;
-		try {
-			authorizationHeader = request.getHeader("Authorization");
-		}catch (Exception e) {
-			throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
-		}
+		String authorizationHeader = request.getHeader("Authorization");
 		AuthorizationHeaderUtils.validateAuthorization(authorizationHeader);
 
 		// 2. 토큰 검증
 		String accessToken = authorizationHeader.split(" ")[1];
+		String refreshToken = Objects.requireNonNull(WebUtils.getCookie(request, "refreshToken")).getValue();
+
 		Claims tokenClaims;
-
-		log.info("여기는 들림?"+accessToken);
-		Cookie[] cookies = request.getCookies();
-
-		String refreshToken = null;
-
-		if (cookies != null) {
-			for(Cookie cookie : cookies) {
-				if(cookie.getName().equals("refreshToken")) {
-					refreshToken = cookie.getValue();
-					break;
-				}
-			}
-		}
 
 		log.info("refresh"+refreshToken);
 		String newAccessToken = null;
+
 
 		if (!tokenManager.validateAccessToken(accessToken, request, response)) {
 			if(tokenManager.validateRefreshToken(refreshToken, request, response))
@@ -74,9 +61,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		}
 
 		if (newAccessToken != null) {
-			Cookie aceessTokenCookie = new Cookie("accessToken", accessToken);
-			aceessTokenCookie.setPath("/");
-			response.addCookie(aceessTokenCookie);
+			CookieUtils.createSessionCookie(response, "accessToken", accessToken);
 		}
 
 		request.setAttribute("email", tokenClaims.get("email"));

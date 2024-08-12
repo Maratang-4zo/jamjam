@@ -141,11 +141,11 @@ function CreateRoom() {
 
   const createRoomFn = async (data) => {
     try {
-      const response = await axiosCreateRoom(
-        data.purpose,
-        data.meetingDate.toISOString(),
-        data.nickname,
-      );
+      const response = await axiosCreateRoom({
+        purpose: data.purpose,
+        meetingDate: data.meetingDate.toISOString(),
+        nickname: data.nickname,
+      });
 
       const roomToken = getCookie("roomToken");
       const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
@@ -206,11 +206,16 @@ function CreateRoom() {
               <option value="" disabled hidden>
                 카테고리를 선택하세요
               </option>
-              <option value="sports">스포츠</option>
-              <option value="music">음악</option>
-              <option value="study">스터디</option>
-              <option value="travel">여행</option>
-              <option value="food">음식</option>
+              <option value="카페">카페</option>
+              <option value="호프">호프</option>
+              <option value="스터디룸">스터디룸</option>
+              <option value="헬스클럽">헬스클럽</option>
+              <option value="식당">식당</option>
+              <option value="도서관">도서관</option>
+              <option value="공원">공원</option>
+              <option value="미술관">미술관</option>
+              <option value="애견카페">애견카페</option>
+              <option value="셀프사진">셀프사진</option>
             </Select>
           </InputWrapper>
           <Button type="submit">

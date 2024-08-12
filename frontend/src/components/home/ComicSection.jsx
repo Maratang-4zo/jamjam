@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useEffect, useState, useRef } from "react";
+import styled, { keyframes } from "styled-components";
 import firstJam from "../../assets/intro/comic/firstJam.png";
 import secondJam from "../../assets/intro/comic/secondJam.png";
 import thirdJam from "../../assets/intro/comic/thirdJam.png";
@@ -28,16 +28,34 @@ const ScreenWrapper = styled.div`
   justify-content: center;
   width: 100%;
   height: 72%;
-  transform: scale(1.4); /* Adjust the scale to your needs */
-  transform-origin: center; /* Ensures the scaling happens from the center */
+  transform: scale(1.4);
+  transform-origin: center;
 `;
 
 const OverlapWrapper = styled.div`
   background-color: #ffe845;
   border: 3px solid;
   border-color: #000000;
-  height: 708px; /* Original dimensions */
-  width: 1344px; /* Original dimensions */
+  height: 708px;
+  width: 1344px;
+`;
+
+const slideInLeft = keyframes`
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+`;
+
+const slideInRight = keyframes`
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 `;
 
 const Overlap = styled.div`
@@ -54,6 +72,7 @@ const SecondCut = styled.div`
   position: absolute;
   top: 0;
   width: 835.1px;
+  animation: ${({ animate }) => (animate ? slideInRight : "none")} 1s forwards;
 `;
 
 const OverlapGroup = styled.div`
@@ -132,6 +151,7 @@ const FirstCut = styled.div`
   position: absolute;
   top: 66.5px;
   width: 517.3px;
+  animation: ${({ animate }) => (animate ? slideInLeft : "none")} 1s forwards;
 `;
 
 const Overlap2 = styled.div`
@@ -215,6 +235,7 @@ const ThirdCut = styled.div`
   position: absolute;
   top: 329.7px;
   width: 698.6px;
+  animation: ${({ animate }) => (animate ? slideInRight : "none")} 1s forwards;
 `;
 
 const Overlap3 = styled.div`
@@ -241,12 +262,37 @@ const ThirdChat = styled.div`
 `;
 
 export const Screen = () => {
+  const [animate, setAnimate] = useState(false);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          setAnimate(true);
+        }
+      },
+      { threshold: 0.5 }, // 화면에 50% 이상 보일 때 트리거
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <Section>
+    <Section ref={sectionRef}>
       <ScreenWrapper>
         <OverlapWrapper>
           <Overlap>
-            <SecondCut>
+            <SecondCut animate={animate}>
               <OverlapGroup>
                 <CutSecond alt="Cut second" src={CutSecondImg} />
                 <SecondJam alt="Second jam" src={secondJam} />
@@ -261,7 +307,7 @@ export const Screen = () => {
                 </SecondChat>
               </OverlapGroup>
             </SecondCut>
-            <FirstCut>
+            <FirstCut animate={animate}>
               <Overlap2>
                 <CutFirst alt="Cut first" src={CutFirstImg} />
                 <FirstJam alt="First jam" src={firstJam} />
@@ -273,7 +319,7 @@ export const Screen = () => {
                 </FirstChat>
               </Overlap2>
             </FirstCut>
-            <ThirdCut>
+            <ThirdCut animate={animate}>
               <Overlap3>
                 <CutThird alt="Cut Third" src={CutThirdImg} />
                 <ThirdJam alt="Third jam" src={thirdJam} />

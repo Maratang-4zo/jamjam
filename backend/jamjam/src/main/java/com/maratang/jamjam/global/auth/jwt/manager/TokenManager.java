@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.global.auth.jwt.constant.GrantType;
-import com.maratang.jamjam.global.auth.jwt.constant.TokenType;
-import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
+import com.maratang.jamjam.global.auth.jwt.constant.TokenType;
+import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
+import com.maratang.jamjam.global.util.CookieUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -104,7 +104,8 @@ public class TokenManager {
 			return false;
 		} catch (Exception e) {
 			log.info("유효하지 않은 인증", e);
-			expiredCookies(request, response);
+			CookieUtils.removeCookie(request, response, "refreshToken");
+			CookieUtils.removeCookie(request, response, "accessToken");
 			throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
 		}
 	}
@@ -116,11 +117,13 @@ public class TokenManager {
 			return true;
 		} catch (ExpiredJwtException e) {
 			log.info("refreshToken 만료", e);
-			expiredCookies(request, response);
+			CookieUtils.removeCookie(request, response, "refreshToken");
+			CookieUtils.removeCookie(request, response, "accessToken");
 			throw new AuthenticationException(ErrorCode.REFRESH_TOKEN_EXPIRED);
 		} catch (Exception e) {
 			log.info("유효하지 않은 인증", e);
-			expiredCookies(request, response);
+			CookieUtils.removeCookie(request, response, "refreshToken");
+			CookieUtils.removeCookie(request, response, "accessToken");
 			throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
 		}
 	}
@@ -146,25 +149,5 @@ public class TokenManager {
 		return claims;
 	}
 
-	private void expiredCookies(HttpServletRequest request, HttpServletResponse response) {
-		Cookie[] cookies = request.getCookies();
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals("refreshToken")) {
-				cookies[i].setMaxAge(0);
-				cookies[i].setValue(null);
-				cookies[i].setPath("/");
-				cookies[i].setHttpOnly(true);
-				cookies[i].setSecure(true);
-				response.addCookie(cookies[i]);
-			}
-			if (cookies[i].getName().equals("accessToken")) {
-				cookies[i].setMaxAge(0);
-				cookies[i].setValue(null);
-				cookies[i].setPath("/");
-				response.addCookie(cookies[i]);
-			}
-		}
-		log.info("쿠키 만료 완");
-	}
 
 }

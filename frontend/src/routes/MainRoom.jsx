@@ -19,7 +19,7 @@ import useOpenVidu from "../hooks/useOpenVidu";
 import Loading from "../components/fixed/Loading";
 import GameFinishButtons from "../components/mainroom/GameFinishButtons";
 import GameChoice from "../components/mainroom/GameChoice";
-import { selectedGameAtom } from "../recoil/atoms/playerState";
+import { selectedGameAtom } from "../recoil/atoms/gameState";
 import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
 
@@ -42,11 +42,14 @@ function Room() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
+  const [handleCopyClick, setHandleCopyClick] = useState(null);
+  const [handleKakaoClick, setHandleKakaoClick] = useState(null);
   const [modalTop, setModalTop] = useState("50px");
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const setRoomInfo = useSetRecoilState(roomAtom);
   const roomPage = useRecoilValue(roomPageAtom);
   const [joinLoading, setJoinLoading] = useState(false);
+  const [isDisabledOn, setIsDisalbedOn] = useState(false);
   const { connect, connected } = useWs();
   const { joinSession, joined } = useOpenVidu();
 
@@ -195,10 +198,19 @@ function Room() {
     setIsEditModalOpen(true);
   };
 
-  const handleOpenShareModal = (title, top) => {
+  const handleOpenShareModal = (
+    title,
+    top,
+    kakaoClickFn,
+    copyClickFn,
+    isDisabled,
+  ) => {
     setModalTitle(title);
     setModalTop(top);
+    setHandleKakaoClick(() => kakaoClickFn);
+    setHandleCopyClick(() => copyClickFn);
     setIsShareModalOpen(true);
+    setIsDisalbedOn(isDisabled);
   };
 
   const handleCloseShareModal = () => {
@@ -223,9 +235,11 @@ function Room() {
           title={modalTitle}
           top={modalTop}
           onClose={handleCloseShareModal}
+          onCopyClick={handleCopyClick}
+          onKakaoClick={handleKakaoClick}
+          isDisabled={isDisabledOn}
         />
       )}
-      {/* <Map /> */}
       {roomPage === "main" && (
         <>
           <MainButtons

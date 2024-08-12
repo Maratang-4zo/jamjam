@@ -18,7 +18,8 @@ import Loading from "../fixed/Loading";
 import FindDeparture from "./Departure";
 import { axiosGetMiddle } from "../../apis/mapApi";
 import useWs from "../../hooks/useWs";
-import { totalRoundAtom } from "../../recoil/atoms/playerState";
+import { totalRoundAtom } from "../../recoil/atoms/gameState";
+import { axiosGetKakaoCalendar } from "../../apis/loginApi";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -347,6 +348,8 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
       } else {
         setRoundSetting(false);
       }
+    } else {
+      alert("권한이 없습니다.");
     }
   };
 
@@ -365,20 +368,9 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
         roomUUID: roomState.roomUUID,
         finalStationName: roomState.centerPlace.name,
       });
+    } else {
+      alert("권한이 없습니다.");
     }
-    // try {
-    //   const res = await axiosCreateGameRecord({
-    //     roundCnt: round,
-    //     roomUUID: roomState.roomUUID,
-    //     finalStationName: roomState.centerPlace.name,
-    //   });
-    //   setTotalRound(round);
-    //   sendUpdatePage({
-    //     roomNextPage: "gamechoice",
-    //   });
-    // } catch (err) {
-    //   console.log("게임기록 생성 실패", err);
-    // }
   };
 
   const handleCancelAddress = () => {
@@ -400,6 +392,55 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
         "주소 검색을 위한 스크립트를 로드하는 중입니다. 잠시만 기다려 주세요.",
       );
     }
+  };
+
+  const handleInviteKakaoClick = () => {
+    // 없는 기능
+  };
+
+  const handleInviteCopyClick = () => {
+    const roomURL = `우리 모임장소 정해야지!!\n\nhttps://jjam.shop/room/${roomState.roomUUID}`;
+    navigator.clipboard
+      .writeText(roomURL)
+      .then(() => {
+        alert("초대 링크 복사 완료!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
+  const handleInfoKakaoClick = async () => {
+    try {
+      await axiosGetKakaoCalendar(roomState.roomUUID);
+    } catch (err) {
+      console.log("카카오톡 캘린더 연동 실패", err);
+      alert("연동 실패! 다시 시도해 주세요");
+    }
+  };
+
+  const handleInfoCopyClick = () => {
+    const date = new Date(roomState.meetingDate);
+
+    const formattedDate = new Intl.DateTimeFormat("ko", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+
+    const infoText = `${roomState.roomName} 모임 결과\n\n- 모임 장소: ${
+      roomState.centerPlace?.name
+        ? roomState.centerPlace.name
+        : "아직 모임장소를 찾지 않으셨어요 T.T"
+    }\n- 모임 목적: ${roomState.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
+    navigator.clipboard
+      .writeText(infoText)
+      .then(() => {
+        alert("모임 정보 복사 완료!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
   };
 
   return (
@@ -460,13 +501,29 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
           <SmallIcon src={userInfo.isHost ? updateIcon : alertIcon} />
         </SmallBtn>
         <SmallBtn
-          onClick={() => onOpenShareModal("초대 링크 공유", "50px")}
+          onClick={() =>
+            onOpenShareModal(
+              "초대 링크 공유",
+              "50px",
+              handleInviteKakaoClick,
+              handleInviteCopyClick,
+              true,
+            )
+          }
           isTutorialModalOpen={isTutorialModalOpen}
         >
           <SmallIcon src={inviteIcon} />
         </SmallBtn>
         <SmallBtn
-          onClick={() => onOpenShareModal("모임 정보 공유", "110px")}
+          onClick={() =>
+            onOpenShareModal(
+              "모임 정보 공유",
+              "110px",
+              handleInfoKakaoClick,
+              handleInfoCopyClick,
+              false,
+            )
+          }
           isTutorialModalOpen={isTutorialModalOpen}
         >
           <SmallIcon src={shareIcon} />

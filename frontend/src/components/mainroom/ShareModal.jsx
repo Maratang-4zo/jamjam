@@ -1,7 +1,10 @@
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import ShareModalSvg from "../../assets/ShareModal.svg";
 import copyIcon from "../../assets/icons/copyIcon.png";
 import kakaoIcon from "../../assets/icons/kakaoIcon.png";
+import { getCookie } from "../../utils/Cookies";
+import Spinner from "../fixed/Spinner";
 
 const Overlay = styled.div`
   position: fixed;
@@ -92,27 +95,65 @@ const BtnIcon = styled.img`
   height: 35px;
 `;
 
-function ShareModal({ title, onClose, top }) {
+function ShareModal({
+  title,
+  onClose,
+  top,
+  onKakaoClick,
+  onCopyClick,
+  isDisabled,
+}) {
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const isLogin = getCookie("accessToken") ? true : false;
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const loadImage = (src) =>
+        new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+
+      try {
+        await Promise.all([loadImage(copyIcon), loadImage(kakaoIcon)]);
+        setImagesLoaded(true);
+      } catch (error) {
+        console.error("이미지 로드 실패:", error);
+      }
+    };
+
+    loadImages();
+  }, []);
+
   return (
     <Overlay onClick={onClose}>
       <ModalWrapper top={top} onClick={(e) => e.stopPropagation()}>
-        <ContentDiv>
-          <Title>{title}</Title>
-          <BtnContainer>
-            <BtnDiv>
-              <ShareBtn>
-                <BtnIcon src={copyIcon} />
-              </ShareBtn>
-              <BtnSpan>복사하기</BtnSpan>
-            </BtnDiv>
-            <BtnDiv>
-              <ShareBtn>
-                <BtnIcon src={kakaoIcon} />
-              </ShareBtn>
-              <BtnSpan>카카오톡</BtnSpan>
-            </BtnDiv>
-          </BtnContainer>
-        </ContentDiv>
+        {!imagesLoaded ? (
+          <Spinner /> // 이미지 로드가 완료되지 않은 경우 스피너를 표시
+        ) : (
+          <ContentDiv>
+            <Title>{title}</Title>
+            <BtnContainer>
+              <BtnDiv>
+                <ShareBtn onClick={onCopyClick}>
+                  <BtnIcon src={copyIcon} />
+                </ShareBtn>
+                <BtnSpan>복사하기</BtnSpan>
+              </BtnDiv>
+              <BtnDiv>
+                <ShareBtn
+                  disabled={!isLogin | isDisabled}
+                  onClick={onKakaoClick}
+                >
+                  <BtnIcon src={kakaoIcon} />
+                </ShareBtn>
+                <BtnSpan>카카오톡</BtnSpan>
+              </BtnDiv>
+            </BtnContainer>
+          </ContentDiv>
+        )}
       </ModalWrapper>
     </Overlay>
   );

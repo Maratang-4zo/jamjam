@@ -79,10 +79,11 @@ public class RoomTokenProvider {
 			.compact();
 	}
 
-	public void validateToken(String token) {
+	public boolean validateToken(String token) {
 		try {
 			Jwts.parser().setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
 				.parseClaimsJws(token);
+			return true;
 		} catch (ExpiredJwtException e) {
 			log.info("token 만료", e);
 			throw new BusinessException(ErrorCode.AU_TOKEN_EXPIRED);

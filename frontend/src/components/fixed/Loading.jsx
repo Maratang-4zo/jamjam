@@ -3,11 +3,11 @@ import styled from "styled-components";
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
-  background-color: #0000007a;
+  background-color: #000000a6;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  z-index: 3000;
   position: fixed;
   top: 0;
   left: 0;
@@ -19,10 +19,11 @@ const Wrapper = styled.div`
   }
 `;
 
-function Loading({ message }) {
+function Loading({ message, estimatedForceCloseAt }) {
   return (
     <Wrapper>
       <h1>{message} 중...</h1>
+      {estimatedForceCloseAt ? `분 뒤에 방이 종료될 예정입니다.` : null}
     </Wrapper>
   );
 }

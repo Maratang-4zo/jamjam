@@ -20,7 +20,21 @@ export const roomAtom = atom({
 
 export const chatAtom = atom({
   key: "chat",
-  default: [],
+  default: [
+    {
+      type: "chat",
+      nickname: "김민경",
+      content: "이건 김민경 메시지야",
+      senderUUID: "1234abcd",
+      createdAt: "",
+    },
+    {
+      type: "alert",
+      alertType: "out",
+      nickname: "김민경",
+      attendeeUUID: "1234abcd",
+    },
+  ],
 });
 
 export const chatModalVisibleAtom = atom({

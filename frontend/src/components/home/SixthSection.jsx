@@ -7,6 +7,7 @@ import { loginModalState } from "../../recoil/atoms/loginState"; // loginModalSt
 
 const Section = styled.div`
   height: 100vh;
+  width: 100vw;
   scroll-snap-align: start;
   display: flex;
   justify-content: center;
@@ -14,7 +15,7 @@ const Section = styled.div`
   font-size: 2rem;
   font-family: "DungGeunMo";
   flex-direction: column;
-  background-color: #ffe845;
+  background-color: ${(props) => props.theme.bgColor};
 `;
 
 const fadeIn = keyframes`

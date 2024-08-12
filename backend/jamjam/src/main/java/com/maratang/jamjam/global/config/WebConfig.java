@@ -48,6 +48,7 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addInterceptor(roomAuthenticationInterceptor)
 			.addPathPatterns("/wr/**")
 			.addPathPatterns("/rooms/**")
+			.addPathPatterns("/attendees/**")
 			.excludePathPatterns(
 				"/rooms",
 				"/rooms/{roomUUID}/exists",

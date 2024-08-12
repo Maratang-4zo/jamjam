@@ -6,5 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class AttendeeIsAllHasRes {
-	Boolean isAllHasRes;
+	boolean isAllHasRes;
+	boolean isCenterExist;
 }

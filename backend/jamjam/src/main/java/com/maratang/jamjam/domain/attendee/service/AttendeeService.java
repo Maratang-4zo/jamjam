@@ -90,8 +90,11 @@ public class AttendeeService {
 
 		broadCastService.broadcastToRoom(roomUUID, AttendeeUpdateRes.of(attendee), BroadCastType.DEPARTURE_UPDATE);
 
+		room.updateIsCenterExist(false);
+
 		return AttendeeIsAllHasRes.builder()
 			.isAllHasRes(isAllHasDeparture)
+			.isCenterExist(room.isCenterExist())
 			.build();
 	}
 }

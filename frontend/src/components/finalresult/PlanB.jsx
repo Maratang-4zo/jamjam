@@ -5,8 +5,6 @@ import { gameRecordAtom } from "../../recoil/atoms/gameState";
 import { roomAtom } from "../../recoil/atoms/roomState";
 import { playerState } from "../../recoil/atoms/gameState";
 
-import subbg from "../../assets/subbg.jpg";
-import subway from "../../assets/subway.png";
 import car from "../../assets/final/car.png";
 
 import opencar from "../../assets/opencar.png";
@@ -14,6 +12,8 @@ import gang from "../../assets/ganggangg.png";
 import gwang from "../../assets/gwanggwang.png";
 import mingang from "../../assets/final/mingang.png";
 import practice from "../../assets/final/practice.jpg";
+
+// 라운드는 전역변수에서 api 만들어지면 가져올 예정
 
 const Container = styled.div`
   position: relative;
@@ -28,52 +28,52 @@ const BackgroundWrapper = styled.div`
   left: 0;
   width: 310%;
   height: 100%;
-  transition: transform ${(props) => props.speed}s linear;
+  transition: transform 0.033s linear; /* 3 times faster */
   transform: ${(props) => `translateX(-${props.offset}px)`};
-  z-index: 1; /* BackgroundWrapper가 위에 위치하도록 설정 */
 `;
 
 const BgImage = styled.img`
-  width: 100%;
+  width: 100%; /* Fill the entire width of the BackgroundWrapper */
   height: 100%;
-`;
-
-const SubwayImage = styled.img`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1; /* Subway가 가장 아래에 위치하도록 설정 */
 `;
 
 const CarContainer = styled.div`
   position: absolute;
   bottom: 0;
-  left: 0;
-  height: 260px;
+  left: 0; /* Positioned to touch the left screen */
+  height: 260px; /* Increased height to 260px (200px * 1.3) */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2; /* CarContainer가 BackgroundWrapper 위에 위치 */
+  transform: translateX(0%);
 `;
 
 const Car = styled.img`
-  height: 100%;
+  height: 100%; /* Ensures the car image fills the container */
 `;
 
 const Mingang = styled.img`
   position: absolute;
-  height: 30%;
-  top: 10%;
+  height: 30%; /* Reduced size to 30% of the CarContainer height */
+  top: 10%; /* Move the Mingang image up a bit */
   border-radius: 50%;
   overflow: hidden;
+`;
+
+const Pole = styled.div`
+  position: absolute;
+  top: -100%; /* Container의 위쪽까지 이어지도록 설정 */
+  width: 12px;
+  height: 110%; /* Banner의 상단에서 Container의 위쪽까지 */
+  background-color: gray;
+  border-radius: 6px;
 `;
 
 const Banner = styled.div`
   position: absolute;
   width: 180px;
   height: 96px;
+  /* background-color: #195433; */
   background-color: #4e7f1c;
   font-family: "hangil";
   color: #edeeea;
@@ -81,7 +81,6 @@ const Banner = styled.div`
   align-items: center;
   justify-content: center;
   border: 0.6px solid black;
-  z-index: 3;
   &::before,
   &::after {
     content: "";
@@ -103,39 +102,27 @@ const Banner = styled.div`
 const InnerRectangle = styled.div`
   width: 90%;
   height: 90%;
-  border: 2.4px solid #edeeea;
+  border: 2.4px solid #edeeea; /* Banner의 color와 같은 색 */
   background-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #edeeea;
+  color: #edeeea; /* 텍스트 색상을 Banner와 맞춤 */
 `;
 
 function Round3() {
   const [offset, setOffset] = useState(0);
-  const [speed, setSpeed] = useState(0.033); // 초기 속도 (3배 빠름)
   const [carPosition, setCarPosition] = useState(0);
-  const [isCarStopped, setIsCarStopped] = useState(false);
+  const [isCarStopped, setIsCarStopped] = useState(false); // 자동차가 멈췄는지 상태를 저장
 
   const gameRecord = useRecoilValue(gameRecordAtom);
   const roomInfo = useRecoilValue(roomAtom);
-  const players = useRecoilValue(playerState);
+  const players = useRecoilValue(playerState); // playerState를 players로 받음
 
   useEffect(() => {
     const interval = setInterval(() => {
       setOffset((prev) => {
-        const newOffset = prev + 30;
-
-        // Banner가 중앙에 올 때 속도 조절
-        const centralPosition = window.innerWidth / 2;
-        if (
-          newOffset >= centralPosition - 100 &&
-          newOffset <= centralPosition + 100
-        ) {
-          setSpeed(0.1); // 속도 느리게
-        } else {
-          setSpeed(0.033); // 원래 속도
-        }
+        const newOffset = prev + 30; // 3 times faster
 
         if (newOffset >= window.innerWidth * 2) {
           clearInterval(interval);
@@ -155,6 +142,7 @@ function Round3() {
         const newPosition = prev + 10;
 
         if (newPosition >= window.innerWidth - 600) {
+          // Adjust this value based on the car's width
           clearInterval(interval);
           setIsCarStopped(true);
         }
@@ -171,11 +159,11 @@ function Round3() {
       3: ["40%", "60%", "90%"],
     };
     const roundRecords = gameRecord[0]?.roundRecordList || [];
-    // const round = roundRecords.length;
-    const round = 1;
+    const round = roundRecords.length;
+
     if (positions[round] && roundRecords.length > 0) {
       return roundRecords.map((record, index) => {
-        const isLastBanner = index === roundRecords.length - 1 && isCarStopped;
+        const isLastBanner = index === roundRecords.length - 1 && isCarStopped; // 마지막 배너인지 확인
 
         return (
           <Banner
@@ -183,11 +171,11 @@ function Round3() {
             style={{
               top: "15%",
               left: positions[round][index],
-              backgroundColor: isLastBanner ? "#2046f6" : undefined,
+              backgroundColor: isLastBanner ? "#2046f6" : undefined, // 마지막 배너의 배경색 변경
             }}
           >
             <InnerRectangle>
-              {isLastBanner ? "안녕히 가십시오." : record.stationName}
+              {isLastBanner ? "안녕히 가십시오." : record.stationName}{" "}
             </InnerRectangle>
           </Banner>
         );
@@ -198,23 +186,34 @@ function Round3() {
 
   return (
     <Container>
-      <BackgroundWrapper offset={offset} speed={speed}>
-        <BgImage src={subbg} alt="Background" />
+      <BackgroundWrapper offset={offset}>
+        <BgImage src={practice} alt="Background" />
         <Banner style={{ top: "15%", left: "10%" }}>
           <InnerRectangle>{roomInfo.centerPlace.name}</InnerRectangle>
         </Banner>
         {renderBanners()}
       </BackgroundWrapper>
-      <SubwayImage src={subway} alt="Subway" />
       <CarContainer style={{ left: `${carPosition}px` }}>
+        {/* <Mingang
+          src={gang}
+          alt="Mingang"
+          style={{ left: "300px", top: "10px" }}
+        />
+        <Mingang
+          src={gwang}
+          alt="Mingang"
+          style={{ left: "250px", top: "10px" }}
+        /> */}
+        <Car src={car} alt="Car" />
+
         {players.map((player, index) => (
           <Mingang
             key={player.attendeeUUID}
             src={player.profileImageUrl}
             alt={player.nickname}
             style={{
-              left: `${index * 50}px`,
-              zIndex: 10 + index,
+              left: `${index * 50}px`, // 이미지를 차 위에 고르게 배치
+              zIndex: 10 + index, // 이미지가 겹칠 때 순서 정렬
             }}
           />
         ))}

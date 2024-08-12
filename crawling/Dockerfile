@@ -4,7 +4,11 @@ FROM python:3.11-slim
 RUN apt-get update \
     && apt-get install -y pkg-config \
     && apt-get install -y libmariadb-dev \
-    && apt-get install -y build-essential
+    && apt-get install -y build-essential \
+    && apt-get install -y tzdata # docker-compose에서 설정한 timezone 반영
+
+# 시간대 설정
+ENV TZ=Asia/Seoul
 
 WORKDIR /app
 COPY . .

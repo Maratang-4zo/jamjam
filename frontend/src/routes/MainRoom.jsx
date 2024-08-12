@@ -42,95 +42,98 @@ function Room() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
+  const [handleCopyClick, setHandleCopyClick] = useState(null);
+  const [handleKakaoClick, setHandleKakaoClick] = useState(null);
   const [modalTop, setModalTop] = useState("50px");
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const setRoomInfo = useSetRecoilState(roomAtom);
   const roomPage = useRecoilValue(roomPageAtom);
   const [joinLoading, setJoinLoading] = useState(false);
+  const [isDisabledOn, setIsDisalbedOn] = useState(false);
   const { connect, connected } = useWs();
   const { joinSession, joined } = useOpenVidu();
 
-  useEffect(() => {
-    const initializeRoom = async () => {
-      try {
-        // 방 유효성 검사
-        await axiosIsRoomValid({ roomUUID });
+  // useEffect(() => {
+  //   const initializeRoom = async () => {
+  //     try {
+  //       // 방 유효성 검사
+  //       await axiosIsRoomValid({ roomUUID });
 
-        // 방 정보 가져오기
-        const roomResponse = await axiosGetRoomInfo({ roomUUID });
-        const roomData = roomResponse.data;
+  //       // 방 정보 가져오기
+  //       const roomResponse = await axiosGetRoomInfo({ roomUUID });
+  //       const roomData = roomResponse.data;
 
-        const roomToken = getCookie("roomToken");
-        if (roomToken) {
-          const myUUID = jwtDecode(roomToken).attendeeUUID;
-          const myAttendeeInfo = roomData.attendees.find(
-            (attendee) => attendee.attendeeUUID === myUUID,
-          );
+  //       const roomToken = getCookie("roomToken");
+  //       if (roomToken) {
+  //         const myUUID = jwtDecode(roomToken).attendeeUUID;
+  //         const myAttendeeInfo = roomData.attendees.find(
+  //           (attendee) => attendee.attendeeUUID === myUUID,
+  //         );
 
-          if (
-            myAttendeeInfo &&
-            (!myAttendeeInfo.address ||
-              !myAttendeeInfo.lat ||
-              !myAttendeeInfo.lon)
-          ) {
-            setIsFindDepartureModalOpen(true);
-          }
+  //         if (
+  //           myAttendeeInfo &&
+  //           (!myAttendeeInfo.address ||
+  //             !myAttendeeInfo.lat ||
+  //             !myAttendeeInfo.lon)
+  //         ) {
+  //           setIsFindDepartureModalOpen(true);
+  //         }
 
-          setRoomInfo((prev) => ({
-            ...prev,
-            roomUUID,
-            isValid: true,
-            roomName: roomData.roomName,
-            meetingDate: roomData.roomTime,
-            centerPlace: roomData.roomStartCenter,
-            attendees: [...roomData.attendees],
-            roomPurpose: roomData.roomPurpose,
-            hostUUID: roomData.hostUUID,
-          }));
+  //         setRoomInfo((prev) => ({
+  //           ...prev,
+  //           roomUUID,
+  //           isValid: true,
+  //           roomName: roomData.roomName,
+  //           meetingDate: roomData.roomTime,
+  //           centerPlace: roomData.roomStartCenter,
+  //           attendees: [...roomData.attendees],
+  //           roomPurpose: roomData.roomPurpose,
+  //           hostUUID: roomData.hostUUID,
+  //         }));
 
-          setUserInfo((prev) => ({
-            ...prev,
-            isHost: roomData.isHost,
-            departure: {
-              addressText: myAttendeeInfo.address,
-              latitude: myAttendeeInfo.lat,
-              longitude: myAttendeeInfo.lon,
-            },
-            nickname: myAttendeeInfo.nickname,
-            duration: myAttendeeInfo.duration,
-            route: myAttendeeInfo.route,
-            myUUID,
-          }));
+  //         setUserInfo((prev) => ({
+  //           ...prev,
+  //           isHost: roomData.isHost,
+  //           departure: {
+  //             addressText: myAttendeeInfo.address,
+  //             latitude: myAttendeeInfo.lat,
+  //             longitude: myAttendeeInfo.lon,
+  //           },
+  //           nickname: myAttendeeInfo.nickname,
+  //           duration: myAttendeeInfo.duration,
+  //           route: myAttendeeInfo.route,
+  //           myUUID,
+  //         }));
 
-          if (!connected) {
-            await connect();
-          }
+  //         if (!connected) {
+  //           await connect();
+  //         }
 
-          if (!joined) {
-            await joinSession();
-          }
-        } else {
-          navigate(`/room/${roomUUID}/join`);
-        }
-      } catch (error) {
-        console.error("방 유효성 검사 실패:", error);
-        navigate("/invalid-room");
-      } finally {
-        setJoinLoading(false);
-      }
-    };
+  //         if (!joined) {
+  //           await joinSession();
+  //         }
+  //       } else {
+  //         navigate(`/room/${roomUUID}/join`);
+  //       }
+  //     } catch (error) {
+  //       console.error("방 유효성 검사 실패:", error);
+  //       navigate("/invalid-room");
+  //     } finally {
+  //       setJoinLoading(false);
+  //     }
+  //   };
 
-    initializeRoom();
-  }, [
-    roomUUID,
-    navigate,
-    setRoomInfo,
-    setUserInfo,
-    connect,
-    joinSession,
-    connected,
-    joined,
-  ]);
+  //   initializeRoom();
+  // }, [
+  //   roomUUID,
+  //   navigate,
+  //   setRoomInfo,
+  //   setUserInfo,
+  //   connect,
+  //   joinSession,
+  //   connected,
+  //   joined,
+  // ]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);
@@ -195,10 +198,19 @@ function Room() {
     setIsEditModalOpen(true);
   };
 
-  const handleOpenShareModal = (title, top) => {
+  const handleOpenShareModal = (
+    title,
+    top,
+    kakaoClickFn,
+    copyClickFn,
+    isDisabled,
+  ) => {
     setModalTitle(title);
     setModalTop(top);
+    setHandleKakaoClick(() => kakaoClickFn);
+    setHandleCopyClick(() => copyClickFn);
     setIsShareModalOpen(true);
+    setIsDisalbedOn(isDisabled);
   };
 
   const handleCloseShareModal = () => {
@@ -223,6 +235,9 @@ function Room() {
           title={modalTitle}
           top={modalTop}
           onClose={handleCloseShareModal}
+          onCopyClick={handleCopyClick}
+          onKakaoClick={handleKakaoClick}
+          isDisabled={isDisabledOn}
         />
       )}
       {roomPage === "main" && (

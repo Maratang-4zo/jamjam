@@ -4,7 +4,7 @@ export const roomAtom = atom({
   key: "roomState",
   default: {
     roomUUID: "",
-    roomName: "",
+    roomName: "어디서 볼래 사당빼고",
     meetingDate: "",
     roomPurpose: "",
     attendees: [],

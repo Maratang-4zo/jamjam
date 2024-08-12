@@ -1,5 +1,17 @@
 package com.maratang.jamjam.domain.room.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.maratang.jamjam.config.IntegrationTestConfig;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
@@ -13,30 +25,21 @@ import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.auth.room.constant.ProfileType;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.UUID;
 
 class RoomServiceTest extends IntegrationTestConfig {
     private final RoomService roomService;
     private final RoomRepository roomRepository;
     private final AttendeeService attendeeService;
     private final AttendeeRepository attendeeRepository;
+    private final RoomMapService roomMapService;
 
     @Autowired
-    public RoomServiceTest(RoomService roomService, RoomRepository roomRepository, AttendeeService attendeeService, AttendeeRepository attendeeRepository) {
+    public RoomServiceTest(RoomService roomService, RoomRepository roomRepository, AttendeeService attendeeService, AttendeeRepository attendeeRepository, RoomMapService roomMapService) {
         this.roomService = roomService;
         this.roomRepository = roomRepository;
         this.attendeeService = attendeeService;
         this.attendeeRepository = attendeeRepository;
+        this.roomMapService = roomMapService;
     }
 
     private Room room;
@@ -154,7 +157,7 @@ class RoomServiceTest extends IntegrationTestConfig {
             RoomMoveReq roomMoveReq = new RoomMoveReq(finalStation);
 
             //when
-            roomService.moveRoom(roomUUID, roomMoveReq);
+            roomMapService.moveRoom(roomUUID, roomMoveReq);
 
             //then
             SoftAssertions.assertSoftly(softAssertions -> {

@@ -66,20 +66,20 @@ public class TokenManager {
 	}
 
 	public String createAccessToken(String email, String nickname, Date expireTime) {
-		String accessToken = Jwts.builder()
+		return Jwts.builder()
 			.setSubject(TokenType.ACCESS.name())
 			.setIssuedAt(new Date())
 			.setExpiration(expireTime)
 			.claim("email", email)
 			.claim("nickname", nickname)
+
 			.signWith(SignatureAlgorithm.HS512, tokenSecret.getBytes(StandardCharsets.UTF_8))
 			.setHeaderParam("typ", "JWT")
 			.compact();
-		return accessToken;
 	}
 
 	public String createRefreshToken(String email, String nickname, Date expireTime) {
-		String refreshToken = Jwts.builder()
+		return Jwts.builder()
 			.setSubject(TokenType.REFRESH.name())
 			.setIssuedAt(new Date())
 			.setExpiration(expireTime)
@@ -88,7 +88,6 @@ public class TokenManager {
 			.signWith(SignatureAlgorithm.HS512, tokenSecret.getBytes(StandardCharsets.UTF_8))
 			.setHeaderParam("typ", "JWT")
 			.compact();
-		return refreshToken;
 	}
 
 	public boolean validateAccessToken(String token) {

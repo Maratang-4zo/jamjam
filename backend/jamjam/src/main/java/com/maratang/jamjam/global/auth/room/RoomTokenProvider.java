@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 public class RoomTokenProvider {
 
 	public static final String tokenName = "roomToken";
-	//public static final String AUTHORIZATION_HEADER = "Authorization";
 
 	@Value("${jwt.roomTokenExpiration:60000000000000}")
 	private String roomTokenExpirationTime;
@@ -69,7 +68,7 @@ public class RoomTokenProvider {
 
 
 	public String createRoomToken(RoomJwtTokenClaims roomJwtTokenClaims, Date expireTime) {
-		String roomToken = Jwts.builder()
+		return Jwts.builder()
 			.setSubject(TokenType.ROOM.name())
 			.setIssuedAt(new Date())
 			.setExpiration(expireTime)
@@ -78,7 +77,6 @@ public class RoomTokenProvider {
 			.signWith(SignatureAlgorithm.HS512, tokenSecret.getBytes(StandardCharsets.UTF_8))
 			.setHeaderParam("typ", "JWT")
 			.compact();
-		return roomToken;
 	}
 
 	public void validateToken(String token) {

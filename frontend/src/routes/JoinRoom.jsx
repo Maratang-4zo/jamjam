@@ -294,11 +294,15 @@ function JoinRoom() {
         nickname: data.nickname,
       });
 
+      console.log("Response:", response); // 응답 확인
+
       setUserInfo((prev) => ({
         ...prev,
         myUUID: response.data.attendeeUUID,
         nickname: data.nickname,
       }));
+
+      console.log("Navigating..."); // 네비게이트 호출 전 확인
       navigate(`/room/${roomUUID}`);
     } catch (error) {
       console.log(data);

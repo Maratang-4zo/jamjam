@@ -22,6 +22,7 @@ import GameChoice from "../components/mainroom/GameChoice";
 import { selectedGameAtom } from "../recoil/atoms/gameState";
 import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
+import { isHostOutAtom } from "../recoil/atoms/loadingState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -50,6 +51,7 @@ function Room() {
   const roomPage = useRecoilValue(roomPageAtom);
   const [joinLoading, setJoinLoading] = useState(false);
   const [isDisabledOn, setIsDisalbedOn] = useState(false);
+  const isHostOut = useRecoilValue(isHostOutAtom);
   const { connect, connected } = useWs();
   const { joinSession, joined } = useOpenVidu();
 
@@ -219,6 +221,7 @@ function Room() {
 
   return (
     <Wrapper>
+      {isHostOut ? <Loading message={"방장이 나가서 대기"} /> : null}
       <NavBarLeft />
       {joinLoading ? <Loading message={"접속"} /> : null}
       {isFindDepartureModalOpen && (

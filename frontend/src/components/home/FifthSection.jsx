@@ -4,10 +4,11 @@ import jamSmile from "../../assets/intro/jamSmile.PNG";
 
 const Section = styled.div`
   height: 100vh;
+  width: 100vw;
   scroll-snap-align: start;
   display: flex;
-  justify-content: flex-start; /* 왼쪽 정렬 */
   align-items: center;
+  justify-content: space-between;
   font-size: 100px;
   font-family: "DungGeunMo";
   position: relative;
@@ -17,7 +18,6 @@ const Section = styled.div`
 
 const Image = styled.img`
   position: relative;
-  left: -160px;
   height: 70%;
   object-fit: cover;
 `;
@@ -25,18 +25,17 @@ const Image = styled.img`
 const TextContainer = styled.div`
   margin-top: 20px;
   position: relative;
-  left: 100px; /* 이미지 오른쪽에 위치하도록 조정 */
-  text-align: right; /* 오른쪽 정렬 */
+  text-align: left;
 `;
 
 function FourthSection() {
   return (
     <Section>
-      <Image src={jamSmile} />
       <TextContainer>
         모두가 만족
         <br />할 수 있으니까!
       </TextContainer>
+      <Image src={jamSmile} />
     </Section>
   );
 }

@@ -5,6 +5,7 @@ import questionMark from "../../assets/intro/questionMark.PNG";
 
 const Section = styled.div`
   height: 100vh;
+  width: 100vw;
   scroll-snap-align: start;
   display: flex;
   justify-content: center;
@@ -16,16 +17,17 @@ const Section = styled.div`
 `;
 
 const OverlapGroup = styled.div`
-  position: relative;
+  position: absolute;
   height: 70%;
-  width: 70%;
+  width: 45%;
+  right: 0;
 `;
 
 const Img = styled.img`
-  position: relative;
+  position: absolute;
   height: 90%;
   top: 50%;
-  left: 160%;
+  left: 50%;
   transform: translate(-50%, -50%);
   object-fit: cover;
 `;
@@ -33,7 +35,7 @@ const Img = styled.img`
 const QuestionText = styled.div`
   position: absolute;
   top: 15%;
-  left: 165%;
+  right: 20%;
   transform: translateX(-50%);
   font-size: 3rem;
   font-weight: bold;
@@ -60,8 +62,9 @@ const IMG = styled.img`
 `;
 
 const TextContainer = styled.div`
+  width: 55%;
   position: absolute;
-  left: -75%;
+  left: 0;
   text-align: left;
   font-size: 90px;
   line-height: 1; /* 줄 사이 간격 줄이기 */
@@ -78,7 +81,7 @@ function SecondSection() {
         <br />
         고민되지 않았어?
       </TextContainer>
-      <OverlapGroup>
+      <OverlapGroup id="overlap">
         <QuestionText>WHERE?</QuestionText>
         <Img alt="Img" src={jamThinking} />
         <IMG
@@ -87,7 +90,7 @@ function SecondSection() {
           style={{
             height: "30%",
             top: "0%",
-            left: "180%",
+            right: "10%",
             transform: "rotate(-15deg)",
           }}
         />
@@ -97,7 +100,7 @@ function SecondSection() {
           style={{
             height: "20%",
             top: "30%",
-            left: "210%",
+            left: "0%",
             transform: "rotate(10deg)",
           }}
         />
@@ -107,7 +110,7 @@ function SecondSection() {
           style={{
             height: "25%",
             top: "60%",
-            left: "190%",
+            right: "0",
             transform: "rotate(5deg)",
           }}
         />
@@ -117,7 +120,7 @@ function SecondSection() {
           style={{
             height: "20%",
             top: "5%",
-            left: "100%",
+            left: "20%",
             transform: "rotate(20deg)",
           }}
         />
@@ -127,7 +130,7 @@ function SecondSection() {
           style={{
             height: "22%",
             top: "60%",
-            left: "90%",
+            left: "10%",
             transform: "rotate(-10deg)",
           }}
         />

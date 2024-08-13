@@ -40,7 +40,7 @@ public class RoomMapService {
 	private final GeometryUtils geometryUtils;
 	private final SubwayDataLoader subwayDataLoader;
 	private final HaversineDistance haversineDistance;
-	private final OTPUserClient oTPUserClient;
+	private final OTPUserClient otpUserClient;
 	private final RoomRepository roomRepository;
 	private final BroadCastService broadCastService;
 

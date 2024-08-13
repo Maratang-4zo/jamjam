@@ -19,6 +19,7 @@ import UserInfoModal from "./userInfoModal";
 import { userColor } from "../../utils/userColor";
 import ColorThief from "colorthief";
 import Spinner from "./Spinner";
+import useWs from "../../hooks/useWs";
 
 const bounceAnimation = keyframes`
   0%, 100% {
@@ -116,6 +117,8 @@ function NavBarLeft() {
   const { toggleMic, isMicOn } = useOpenVidu();
   const navigate = useNavigate();
   const prevChatLogsLength = useRef(chatLogs.length);
+  const { leaveSession } = useOpenVidu();
+  const { disconnect } = useWs();
 
   useEffect(() => {
     const loadImages = async () => {
@@ -158,6 +161,8 @@ function NavBarLeft() {
       navigate("/");
       resetUserInfo();
       resetRoomInfo();
+      disconnect();
+      leaveSession();
     }
   };
 

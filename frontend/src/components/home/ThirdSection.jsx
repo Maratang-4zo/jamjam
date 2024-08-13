@@ -4,6 +4,7 @@ import JamMap from "../../assets/intro/JamMap.PNG";
 
 const Section = styled.div`
   height: 100vh;
+  width: 100vw;
   scroll-snap-align: start;
   display: flex;
   justify-content: flex-start; /* 왼쪽 정렬 */
@@ -17,7 +18,7 @@ const Section = styled.div`
 
 const Image = styled.img`
   position: relative;
-  left: -50px;
+  left: 0;
   height: 70%;
   object-fit: cover;
 `;
@@ -25,7 +26,7 @@ const Image = styled.img`
 const TextContainer = styled.div`
   margin-top: 20px;
   position: relative;
-  left: 0px; /* 이미지 오른쪽에 위치하도록 조정 */
+  right: 0; /* 이미지 오른쪽에 위치하도록 조정 */
   text-align: right; /* 오른쪽 정렬 */
 `;
 

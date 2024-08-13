@@ -39,6 +39,9 @@ const Container = styled.div`
   overflow-y: scroll;
   scroll-snap-type: y mandatory; /* 스크롤 시 각 섹션으로 바로 전환되게 설정 */
   overflow-x: hidden; /* 가로 스크롤 방지 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Section = styled.div`
@@ -60,8 +63,8 @@ const FirstSection = styled(Section)`
 `;
 
 const Image = styled.img`
-  max-width: 80%; /* 이미지 크기 조정 */
-  max-height: 80%;
+  max-width: 90%; /* 이미지 크기 조정 */
+  max-height: 90%;
   position: absolute; /* 이미지가 항상 중앙에 위치하도록 설정 */
   top: 50%;
   left: 50%;

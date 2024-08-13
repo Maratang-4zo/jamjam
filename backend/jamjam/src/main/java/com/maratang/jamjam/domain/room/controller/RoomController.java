@@ -113,7 +113,7 @@ public class RoomController {
 
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(RoomJwtTokenClaims.of(roomJoinRes));
 
-		CookieUtils.createSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
+		CookieUtils.createSecureSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(roomJoinRes);
 	}

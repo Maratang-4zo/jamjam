@@ -19,6 +19,7 @@ public class AttendeeInfo {
 	private Double lon;
 	private AttendeeStatus attendeeStatus;
 	private Long roomId;
+	private String address;
 
 	public static AttendeeInfo of(Attendee attendee){
 		return AttendeeInfo.builder()
@@ -29,6 +30,7 @@ public class AttendeeInfo {
                 .lon(attendee.getLon())
                 .attendeeStatus(attendee.getAttendeeStatus())
 				.roomId(attendee.getRoom().getRoomId())
+				.address(attendee.getAddress())
                 .build();
 	}
 

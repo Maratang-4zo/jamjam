@@ -19,6 +19,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
+import com.maratang.jamjam.domain.room.dto.response.RootLeaveRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
@@ -161,7 +162,7 @@ public class RoomService {
 		if(room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
 			room.updateForceClose(LocalDateTime.now().plusMinutes(5));
 			roomRepository.save(room);
-			broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ROOT_LEAVE);
+			broadCastService.broadcastToRoom(roomUUID, RootLeaveRes.of(room, attendee), BroadCastType.ROOM_ROOT_LEAVE);
 		}
 	}
 

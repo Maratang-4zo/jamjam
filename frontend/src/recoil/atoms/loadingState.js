@@ -36,3 +36,9 @@ export const isHostOutAtom = atom({
   key: "isHostOut",
   default: false,
 });
+
+// 방에 입장했을 때 게임중인지
+export const isPlayingGameAtom = atom({
+  key: "isPlayingGame",
+  default: false,
+});

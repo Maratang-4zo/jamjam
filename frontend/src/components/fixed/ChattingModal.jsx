@@ -203,8 +203,6 @@ function ChattingModal({ isVisible, toggleModal }) {
     setChatContent(""); // 입력창 초기화
     sendChat({
       content: chatContent,
-      roomUUID: roomInfo.roomUUID,
-      attendeeUUID: userInfo.myUUID,
     });
   };
 

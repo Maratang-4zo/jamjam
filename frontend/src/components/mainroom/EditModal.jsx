@@ -140,7 +140,7 @@ function EditModal({ isOpen, onClose }) {
     defaultValues: {
       roomName: roomInfo.roomName,
       roomPurpose: roomInfo.roomPurpose,
-      meetingDate: new Date(roomInfo.meetingDate),
+      meetingDate: roomInfo.meetingDate ? new Date(roomInfo.meetingDate) : null,
     },
   });
 
@@ -167,7 +167,8 @@ function EditModal({ isOpen, onClose }) {
 
   useEffect(() => {
     if (roomInfo && roomInfo.meetingDate) {
-      setValue("meetingDate", new Date(roomInfo.meetingDate));
+      const date = new Date(roomInfo.meetingDate);
+      setValue("meetingDate", !isNaN(date) ? date : null);
     }
   }, [roomInfo, setValue]);
 
@@ -236,10 +237,7 @@ function EditModal({ isOpen, onClose }) {
             </Btns>
           </ModalContentForm>
         ) : (
-          <ModalContent
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={handleSubmit(onSubmit)}
-          >
+          <ModalContent onClick={(e) => e.stopPropagation()}>
             <InfoP>
               방 이름
               <span>{roomInfo.roomName}</span>

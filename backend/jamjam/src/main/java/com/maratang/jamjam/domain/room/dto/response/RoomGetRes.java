@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
+import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
@@ -23,7 +23,7 @@ public class RoomGetRes {
     LocalDateTime roomTime;
     String roomPurpose;
     UUID hostUUID;
-    List<AttendeeDTO> attendees;
+    List<AttendeeInfo> attendees;
     RoomStatus roomStatus;
 
     public static RoomGetRes of(Room room, UUID attendeeUUID, SubwayInfo roomCenterStart){
@@ -36,7 +36,7 @@ public class RoomGetRes {
                .roomTime(room.getMeetingDate())
                .roomPurpose(room.getPurpose())
                .hostUUID(room.getRoomUUID())
-               .attendees(AttendeeDTO.of(room.getAttendees()))
+               .attendees(AttendeeInfo.of(room.getAttendees()))
                 .roomStatus(room.getRoomStatus())
                .build();
     }

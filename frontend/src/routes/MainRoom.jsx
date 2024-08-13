@@ -112,7 +112,7 @@ function Room() {
           setUserInfo((prev) => ({
             ...prev,
             myUUID,
-            isHost: roomData.hostUUID === myUUID ? true : false,
+            isHost: roomData.isHost,
             departure: {
               address: myAttendeeInfo.address,
               lat: myAttendeeInfo.lat,

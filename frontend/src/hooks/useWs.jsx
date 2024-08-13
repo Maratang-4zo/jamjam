@@ -132,7 +132,7 @@ const useWs = () => {
   }, []);
 
   const handleMessage = useCallback((message) => {
-    console.log(message.type);
+    console.log(message);
     switch (message.type) {
       case "CHAT_RECEIVED":
         handleChatLogs(message);
@@ -509,6 +509,7 @@ const useWs = () => {
   const handleGameCenterUpdate = ({ roundCenterStation }) => {
     setRoundCenter(roundCenterStation);
     setIsNextMiddleExist(true);
+    setGameState("before");
   };
 
   const handleRoomCenterUpdate = ({ roomCenterStart, attendees }) => {
@@ -520,6 +521,7 @@ const useWs = () => {
     }));
     setRoundCenter(roomCenterStart);
     setIsFindCenterLoading(false);
+    setGameState("before");
   };
 
   const handleDepartureUpdate = ({

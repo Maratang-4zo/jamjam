@@ -33,6 +33,7 @@ import com.maratang.jamjam.global.map.station.SubwayInfo;
 import com.maratang.jamjam.global.util.CookieUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,8 +57,8 @@ public class RoomController {
 
 	@GetMapping("/{roomUUID}/exists")
 	@Operation(summary = "✨ 방 존재 유무 확인", description = "방이 존재하지 않거나, 중단, 종료 된 방은 404 에러 처리한다.")
-	public ResponseEntity<?> isRoomExist(@PathVariable UUID roomUUID){
-		RoomRes roomGetRes = roomService.isRoomExist(roomUUID);
+	public ResponseEntity<?> isRoomExist(@PathVariable UUID roomUUID, HttpServletRequest request){
+		RoomRes roomGetRes = roomService.isRoomExist(roomUUID, request);
 		return ResponseEntity.status(HttpStatus.OK).body(roomGetRes);
 	}
 

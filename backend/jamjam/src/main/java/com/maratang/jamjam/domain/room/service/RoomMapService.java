@@ -44,7 +44,7 @@ public class RoomMapService {
 	private final GeometryUtils geometryUtils;
 	private final SubwayDataLoader subwayDataLoader;
 	private final HaversineDistance haversineDistance;
-	private final OTPUserClient oTPUserClient;
+	private final OTPUserClient otpUserClient;
 	private final RoomRepository roomRepository;
 	private final BroadCastService broadCastService;
 
@@ -70,7 +70,7 @@ public class RoomMapService {
 			String toPlace = selectedStation.getLatitude() + "," + selectedStation.getLongitude();
 
 			// Call Feign Client to get OTPUserRes
-			OTPUserRes otpUserRes = oTPUserClient.getFixedOTPUser(fromPlace, toPlace);
+			OTPUserRes otpUserRes = otpUserClient.getFixedOTPUser(fromPlace, toPlace);
 
 			if (otpUserRes != null && otpUserRes.getPlan() != null) {
 				List<OTPUserRes.Plan.Itinerary> itineraries = otpUserRes.getPlan().getItineraries();

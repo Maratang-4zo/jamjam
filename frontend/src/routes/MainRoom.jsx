@@ -76,70 +76,63 @@ function Room() {
         } else if (res.roomStatus === "RESERVED") {
           setIsHostOut(true);
         }
-        if (
-          res.roomStatus === "ONGOING" ||
-          res.roomStatus === "PLAYING" ||
-          res.roomStatus === "RESERVED" ||
-          res.roomStatus === "CREATED"
-        ) {
-          // 방 정보 가져오기
-          const roomResponse = await axiosGetRoomInfo({ roomUUID });
-          const roomData = roomResponse.data;
+        // 방 정보 가져오기
+        const roomResponse = await axiosGetRoomInfo({ roomUUID });
+        const roomData = roomResponse.data;
 
-          console.log(roomData);
+        console.log(roomData);
 
-          const roomToken = getCookie("roomToken");
-          if (roomToken) {
-            const myUUID = jwtDecode(roomToken).attendeeUUID;
-            const myAttendeeInfo = roomData.attendees.find(
-              (attendee) => attendee.attendeeUUID === myUUID,
-            );
+        const roomToken = getCookie("roomToken");
+        if (roomToken) {
+          const myUUID = jwtDecode(roomToken).attendeeUUID;
+          const myAttendeeInfo = roomData.attendees.find(
+            (attendee) => attendee.attendeeUUID === myUUID,
+          );
 
-            if (
-              !myAttendeeInfo ||
-              !myAttendeeInfo.address ||
-              !myAttendeeInfo.lat ||
-              !myAttendeeInfo.lon
-            ) {
-              setIsFindDepartureModalOpen(true);
-            }
-
-            setRoomInfo((prev) => ({
-              ...prev,
-              roomUUID,
-              isValid: true,
-              roomName: roomData.roomName,
-              meetingDate: roomData.roomTime,
-              centerPlace: roomData.roomStartCenter,
-              attendees: [...roomData.attendees],
-              roomPurpose: roomData.roomPurpose,
-              hostUUID: roomData.hostUUID,
-            }));
-
-            setUserInfo((prev) => ({
-              ...prev,
-              isHost: roomData.isHost,
-              departure: {
-                addressText: myAttendeeInfo.address,
-                latitude: myAttendeeInfo.lat,
-                longitude: myAttendeeInfo.lon,
-              },
-              nickname: myAttendeeInfo.nickname,
-              duration: myAttendeeInfo.duration,
-              route: myAttendeeInfo.route,
-              myUUID,
-            }));
-
-            if (!connected) {
-              await connect(roomUUID);
-            }
-
-            if (!joined) {
-              await joinSession();
-            }
-          } else {
-            navigate(`/room/${roomUUID}/join`);
+          if (
+            !myAttendeeInfo ||
+            !myAttendeeInfo.address ||
+            !myAttendeeInfo.lat ||
+            !myAttendeeInfo.lon
+          ) {
+            setIsFindDepartureModalOpen(true);
           }
+
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID,
+            roomName: roomData.roomName,
+            meetingDate: roomData.roomTime,
+            centerPlace: roomData.roomCenterStart,
+            attendees: [...roomData.attendees],
+            roomPurpose: roomData.roomPurpose,
+            hostUUID: roomData.hostUUID,
+          }));
+
+          setUserInfo((prev) => ({
+            ...prev,
+            myUUID,
+            isHost: roomData.hostUUID === myUUID ? true : false,
+            departure: {
+              address: myAttendeeInfo.address,
+              lat: myAttendeeInfo.lat,
+              lon: myAttendeeInfo.lon,
+            },
+            nickname: myAttendeeInfo.nickname,
+            duration: myAttendeeInfo.duration,
+            route: myAttendeeInfo.route,
+            profileImageUrl: myAttendeeInfo.profileImageUrl,
+          }));
+
+          if (!connected) {
+            await connect(roomUUID);
+          }
+
+          if (!joined) {
+            await joinSession();
+          }
+        } else {
+          navigate(`/room/${roomUUID}/join`);
         }
       } catch (error) {
         console.error("방 유효성 검사 실패:", error);
@@ -151,16 +144,7 @@ function Room() {
     };
 
     initializeRoom();
-  }, [
-    roomUUID,
-    navigate,
-    setRoomInfo,
-    setUserInfo,
-    connect,
-    joinSession,
-    connected,
-    joined,
-  ]);
+  }, [roomUUID, navigate, setRoomInfo, setUserInfo]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);

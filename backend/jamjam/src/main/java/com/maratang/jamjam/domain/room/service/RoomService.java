@@ -73,13 +73,17 @@ public class RoomService {
 
 		boolean hasToken = false;
 		// todo: fix.....
-		String token = roomTokenProvider.resolveToken(request);
-		if(token != null){
-			Claims claims = roomTokenProvider.getTokenClaims(token);
-			if(roomUUID.toString().equals(claims.get("roomUUID"))){
-				hasToken = true;
+		try{
+			String token = roomTokenProvider.resolveToken(request);
+			if(token != null){
+				Claims claims = roomTokenProvider.getTokenClaims(token);
+				if(roomUUID.toString().equals(claims.get("roomUUID"))){
+					hasToken = true;
+				}
 			}
+		} catch (Exception ignored){
 		}
+
 
 		return RoomRes.of(room, hasToken);
 	}

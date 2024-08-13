@@ -289,7 +289,10 @@ function JoinRoom() {
 
   const attendRoomFn = async (data) => {
     try {
-      const response = await axiosAttendRoom(roomUUID, data.nickname);
+      const response = await axiosAttendRoom({
+        roomUUID,
+        nickname: data.nickname,
+      });
 
       setUserInfo((prev) => ({
         ...prev,

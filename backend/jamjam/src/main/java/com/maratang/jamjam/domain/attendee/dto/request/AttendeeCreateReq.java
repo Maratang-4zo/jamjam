@@ -2,14 +2,12 @@ package com.maratang.jamjam.domain.attendee.dto.request;
 
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 public class AttendeeCreateReq {
-	@NotBlank
 	private String nickname;
 
 	public Attendee toEntity() {

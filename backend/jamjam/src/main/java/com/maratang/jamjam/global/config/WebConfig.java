@@ -51,8 +51,7 @@ public class WebConfig implements WebMvcConfigurer {
 			.addPathPatterns("/attendees/**")
 			.excludePathPatterns(
 				"/rooms",
-				"/rooms/{roomUUID}/exists",
-				"/rooms/{roomUUID}/join"
+				"/rooms/{roomUUID}/exists"
 			);
 	}
 

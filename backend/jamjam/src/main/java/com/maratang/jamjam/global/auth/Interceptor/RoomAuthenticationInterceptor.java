@@ -26,6 +26,11 @@ public class RoomAuthenticationInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
+		if(request.getRequestURI().endsWith("/join")){
+			checkLoginToken(request, response);
+			return true;
+		}
+
 		String token = roomTokenProvider.resolveToken(request);
 
 		if(!roomTokenProvider.validateToken(token)){
@@ -43,9 +48,11 @@ public class RoomAuthenticationInterceptor implements HandlerInterceptor {
 	}
 
 	public void checkLoginToken(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String email = null;
+		String email = "";
 		Cookie access = WebUtils.getCookie(request, "accessToken");
 		Cookie refresh = WebUtils.getCookie(request, "refreshToken");
+
+		request.setAttribute("email", email);
 
 		if(access != null && refresh != null) {
 			String accessToken = access.getValue();
@@ -70,7 +77,7 @@ public class RoomAuthenticationInterceptor implements HandlerInterceptor {
 			}catch (Exception e) {
 				throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
 			}
-			request.setAttribute("email", email);
 		}
+		request.setAttribute("email", email);
 	}
 }

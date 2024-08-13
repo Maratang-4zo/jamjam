@@ -296,7 +296,6 @@ function JoinRoom() {
         myUUID: response.data.attendeeUUID,
         nickname: data.nickname,
       }));
-
       navigate(`/room/${roomUUID}`);
     } catch (error) {
       console.log(data);
@@ -336,12 +335,15 @@ function JoinRoom() {
           )}
           <Form onSubmit={handleSubmit(attendRoomFn)} isLoggedIn={isLoggedIn}>
             <NicknameInput>
-              <label> 닉네임: </label>
-              <input
-                {...register("nickname", { maxLength: maxChars })}
-                type="text"
-                maxLength={maxChars}
-              />
+              <label>
+                {" "}
+                닉네임:
+                <input
+                  {...register("nickname", { maxLength: maxChars })}
+                  type="text"
+                  maxLength={maxChars}
+                />
+              </label>
               <CharCount>
                 {nicknameValue.length}/{maxChars}
               </CharCount>

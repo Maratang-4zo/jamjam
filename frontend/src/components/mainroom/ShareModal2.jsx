@@ -2,6 +2,7 @@ import styled from "styled-components";
 import ShareModalSvg from "../../assets/ShareModal.svg";
 import copyIcon from "../../assets/icons/copyIcon.png";
 import kakaoIcon from "../../assets/icons/kakaoIcon.png";
+import modalBg from "../../assets/final/finalModalBg.svg";
 
 const Overlay = styled.div`
   position: fixed;
@@ -16,12 +17,13 @@ const Overlay = styled.div`
 `;
 
 const ModalWrapper = styled.div`
-  position: absolute;
-  right: 30px;
-  top: ${(props) => props.top || "50px"};
+  position: fixed;
+  bottom: ${(props) => props.bottom}; // 화면의 크기와 관계없이 버튼에 맞게 위치
+  left: 50%;
+  transform: translateX(-50%);
   width: 250px;
   height: 110px;
-  background-image: url(${ShareModalSvg});
+  background-image: url(${modalBg});
   background-size: contain;
   background-repeat: no-repeat;
   display: flex;
@@ -52,7 +54,6 @@ const Title = styled.p`
   margin-bottom: 3px;
 `;
 
-// 기존 BtnContainer 스타일 유지
 const BtnContainer = styled.div`
   width: 170px;
   display: flex;
@@ -93,10 +94,10 @@ const BtnIcon = styled.img`
   height: 35px;
 `;
 
-function ShareModal({ title, onClose, top }) {
+function ShareModal2({ title, onClose, bottom }) {
   return (
     <Overlay onClick={onClose}>
-      <ModalWrapper top={top} onClick={(e) => e.stopPropagation()}>
+      <ModalWrapper bottom={bottom} onClick={(e) => e.stopPropagation()}>
         <ContentDiv>
           <Title>{title}</Title>
           <BtnContainer>
@@ -119,4 +120,4 @@ function ShareModal({ title, onClose, top }) {
   );
 }
 
-export default ShareModal;
+export default ShareModal2;

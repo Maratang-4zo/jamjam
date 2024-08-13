@@ -274,6 +274,7 @@ const ModalOverlay = styled.div`
 
 function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const [isTutorialModalOpen, setIsTutorialModalOpen] = useState(false);
+
   const [currentTutorialPage, setCurrentTutorialPage] = useState(1);
   const [roundSetting, setRoundSetting] = useState(false);
   const [round, setRound] = useState(1);

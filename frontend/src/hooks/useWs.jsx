@@ -436,14 +436,14 @@ const useWs = () => {
     }
   }, []);
 
-  useEffect(() => {
-    connect().catch((error) => {
-      console.error("WebSocket connection failed:", error);
-    });
-    return () => {
-      disconnect();
-    };
-  }, []);
+  // useEffect(() => {
+  //   connect().catch((error) => {
+  //     console.error("WebSocket connection failed:", error);
+  //   });
+  //   return () => {
+  //     disconnect();
+  //   };
+  // }, []);
 
   return {
     connected,

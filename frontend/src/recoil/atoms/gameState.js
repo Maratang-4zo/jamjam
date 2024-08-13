@@ -60,16 +60,13 @@ export const gameRecordAtom = atom({
           round: 1,
           stationName: "이수역",
           attendeeUUID: "김수현uuid",
+          subwayLines: ["LINE_4"],
         },
         {
           round: 2,
           stationName: "안국역",
           attendeeUUID: "김수현",
-        },
-        {
-          round: 3,
-          stationName: "강남역",
-          attendeeUUID: "김수현",
+          subwayLines: ["LINE_3"],
         },
       ],
     },

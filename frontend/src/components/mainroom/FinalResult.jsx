@@ -13,7 +13,7 @@ import {
 import { isMainConnectingAtom } from "../../recoil/atoms/loadingState";
 import Loading from "../fixed/Loading";
 import modalBg from "../../assets/final/finalModalBg.svg";
-
+import { axiosGetKakaoCalendar } from "../../apis/loginApi";
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: ${(props) => props.theme.wrapperWidth};
@@ -171,38 +171,38 @@ function FinalResult() {
     setShowShareModal(false);
   };
 
-  // const handleInfoCopyClick = () => {
-  //   const date = new Date(roomState.meetingDate);
+  const handleInfoCopyClick = () => {
+    const date = new Date(roomAtom.meetingDate);
 
-  //   const formattedDate = new Intl.DateTimeFormat("ko", {
-  //     year: "numeric",
-  //     month: "long",
-  //     day: "numeric",
-  //   }).format(date);
+    const formattedDate = new Intl.DateTimeFormat("ko", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
 
-  //   const infoText = `${roomState.roomName} 모임 결과\n\n- 모임 장소: ${
-  //     roomState.centerPlace?.name
-  //       ? roomState.centerPlace.name
-  //       : "아직 모임장소를 찾지 않으셨어요 T.T"
-  //   }\n- 모임 목적: ${roomState.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
-  //   navigator.clipboard
-  //     .writeText(infoText)
-  //     .then(() => {
-  //       alert("모임 정보 복사 완료!");
-  //     })
-  //     .catch((err) => {
-  //       console.error("Failed to copy text: ", err);
-  //     });
-  // };
+    const infoText = `${roomAtom.roomName} 모임 결과\n\n- 모임 장소: ${
+      roomAtom.centerPlace?.name
+        ? roomAtom.centerPlace.name
+        : "아직 모임장소를 찾지 않으셨어요 T.T"
+    }\n- 모임 목적: ${roomAtom.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
+    navigator.clipboard
+      .writeText(infoText)
+      .then(() => {
+        alert("모임 정보 복사 완료!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
 
-  // const handleInfoKakaoClick = async () => {
-  //   try {
-  //     await axiosGetKakaoCalendar(roomState.roomUUID);
-  //   } catch (err) {
-  //     console.log("카카오톡 캘린더 연동 실패", err);
-  //     alert("연동 실패! 다시 시도해 주세요");
-  //   }
-  // };
+  const handleInfoKakaoClick = async () => {
+    try {
+      await axiosGetKakaoCalendar(roomAtom.roomUUID);
+    } catch (err) {
+      console.log("카카오톡 캘린더 연동 실패", err);
+      alert("연동 실패! 다시 시도해 주세요");
+    }
+  };
 
   const handleExitBtn = async () => {
     if (userInfo.isHost) {
@@ -265,10 +265,10 @@ function FinalResult() {
             onClick={(e) => e.stopPropagation()}
           >
             <ModalContent>
-              <ModalButton>복사하기</ModalButton>
-              <ModalButton>카카오톡</ModalButton>
-              {/* <ModalButton onClick={handleInfoCopyClick}>복사하기</ModalButton>
-              <ModalButton onClick={handleInfoKakaoClick}>카카오톡</ModalButton> */}
+              {/* <ModalButton>복사하기</ModalButton>
+              <ModalButton>카카오톡</ModalButton> */}
+              <ModalButton onClick={handleInfoCopyClick}>복사하기</ModalButton>
+              <ModalButton onClick={handleInfoKakaoClick}>카카오톡</ModalButton>
             </ModalContent>
           </ModalWrapper>
         </>

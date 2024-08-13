@@ -16,13 +16,15 @@ public class RoomRes {
 	LocalDateTime meetingDate;
 	String purpose;
 	RoomStatus roomStatus;
+	boolean hasToken;
 
-	public static RoomRes of(Room room) {
+	public static RoomRes of(Room room, boolean hasToken) {
 		return RoomRes.builder()
                 .roomUUID(room.getRoomUUID())
                 .meetingDate(room.getMeetingDate())
                 .purpose(room.getPurpose())
 				.roomStatus(room.getRoomStatus())
+			.hasToken(hasToken)
                 .build();
 	}
 }

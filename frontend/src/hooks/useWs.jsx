@@ -542,10 +542,12 @@ const useWs = () => {
     });
   };
 
-  const handleRoomInfoUpdate = ({ meetingDate }) => {
+  const handleRoomInfoUpdate = ({ meetingDate, name, purpose }) => {
     setRoomInfo((prev) => ({
       ...prev,
       meetingDate,
+      roomName: name,
+      roomPurpose: purpose,
     }));
   };
 

@@ -105,6 +105,7 @@ function Game() {
               };
             }),
           );
+          setAroundStations(aroundStationsData);
         } catch (error) {
           console.log("역 주변 상권정보 가져오기 실패", error);
         }

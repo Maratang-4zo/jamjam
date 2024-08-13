@@ -317,7 +317,8 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const handleFindCenter = async () => {
     setIsMiddleLoading(true);
     try {
-      const data = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
+      const res = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
+      const data = res.data;
       setRoomState((prev) => ({
         ...prev,
         centerPlace: data.roomCenterStart,

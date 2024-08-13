@@ -66,8 +66,8 @@ function Room() {
     const initializeRoom = async () => {
       try {
         // 방 유효성 검사
-        const res = await axiosIsRoomValid({ roomUUID });
-
+        const response = await axiosIsRoomValid({ roomUUID });
+        const res = response.data;
         if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
           navigate("/");
           alert("종료된 방입니다.");
@@ -79,7 +79,8 @@ function Room() {
         if (
           res.roomStatus === "ONGOING" ||
           res.roomStatus === "PLAYING" ||
-          res.roomStatus === "RESERVED"
+          res.roomStatus === "RESERVED" ||
+          res.roomStatus === "CREATED"
         ) {
           // 방 정보 가져오기
           const roomResponse = await axiosGetRoomInfo({ roomUUID });
@@ -93,10 +94,10 @@ function Room() {
             );
 
             if (
-              myAttendeeInfo &&
-              (!myAttendeeInfo.address ||
-                !myAttendeeInfo.lat ||
-                !myAttendeeInfo.lon)
+              !myAttendeeInfo ||
+              !myAttendeeInfo.address ||
+              !myAttendeeInfo.lat ||
+              !myAttendeeInfo.lon
             ) {
               setIsFindDepartureModalOpen(true);
             }

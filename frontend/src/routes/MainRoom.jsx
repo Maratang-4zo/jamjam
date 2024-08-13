@@ -90,44 +90,44 @@ function Room() {
             (attendee) => attendee.attendeeUUID === myUUID,
           );
 
-  //         if (
-  //           !myAttendeeInfo ||
-  //           !myAttendeeInfo.address ||
-  //           !myAttendeeInfo.lat ||
-  //           !myAttendeeInfo.lon
-  //         ) {
-  //           setIsFindDepartureModalOpen(true);
-  //         }
+          if (
+            !myAttendeeInfo ||
+            !myAttendeeInfo.address ||
+            !myAttendeeInfo.lat ||
+            !myAttendeeInfo.lon
+          ) {
+            setIsFindDepartureModalOpen(true);
+          }
 
-  //         setRoomInfo((prev) => ({
-  //           ...prev,
-  //           roomUUID,
-  //           roomName: roomData.roomName,
-  //           meetingDate: roomData.roomTime,
-  //           centerPlace: roomData.roomCenterStart,
-  //           attendees: [...roomData.attendees],
-  //           roomPurpose: roomData.roomPurpose,
-  //           hostUUID: roomData.hostUUID,
-  //         }));
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID,
+            roomName: roomData.roomName,
+            meetingDate: roomData.roomTime,
+            centerPlace: roomData.roomCenterStart,
+            attendees: [...roomData.attendees],
+            roomPurpose: roomData.roomPurpose,
+            hostUUID: roomData.hostUUID,
+          }));
 
-  //         setUserInfo((prev) => ({
-  //           ...prev,
-  //           myUUID,
-  //           isHost: roomData.isHost,
-  //           departure: {
-  //             address: myAttendeeInfo.address,
-  //             lat: myAttendeeInfo.lat,
-  //             lon: myAttendeeInfo.lon,
-  //           },
-  //           nickname: myAttendeeInfo.nickname,
-  //           duration: myAttendeeInfo.duration,
-  //           route: myAttendeeInfo.route,
-  //           profileImageUrl: myAttendeeInfo.profileImageUrl,
-  //         }));
+          setUserInfo((prev) => ({
+            ...prev,
+            myUUID,
+            isHost: roomData.isHost,
+            departure: {
+              address: myAttendeeInfo.address,
+              lat: myAttendeeInfo.lat,
+              lon: myAttendeeInfo.lon,
+            },
+            nickname: myAttendeeInfo.nickname,
+            duration: myAttendeeInfo.duration,
+            route: myAttendeeInfo.route,
+            profileImageUrl: myAttendeeInfo.profileImageUrl,
+          }));
 
-  //         if (!connected) {
-  //           await connect(roomUUID);
-  //         }
+          if (!connected) {
+            await connect(roomUUID);
+          }
 
           if (!joined) {
             await joinSession();
@@ -142,8 +142,8 @@ function Room() {
       }
     };
 
-  //   initializeRoom();
-  // }, [roomUUID, navigate, setRoomInfo, setUserInfo]);
+    initializeRoom();
+  }, [roomUUID, navigate, setRoomInfo, setUserInfo]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);

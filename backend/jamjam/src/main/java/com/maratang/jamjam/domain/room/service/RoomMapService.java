@@ -58,7 +58,7 @@ public class RoomMapService {
 		String fromPlace = attendee.getLat() + "," + attendee.getLon();
 		String toPlace = selectedStation.getLatitude() + "," + selectedStation.getLongitude();
 
-		OTPUserRes otpUserRes = oTPUserClient.getFixedOTPUser(fromPlace, toPlace);
+		OTPUserRes otpUserRes = otpUserClient.getFixedOTPUser(fromPlace, toPlace);
 
 		if (otpUserRes != null && otpUserRes.getPlan() != null) {
 			long totalDuration = 0;

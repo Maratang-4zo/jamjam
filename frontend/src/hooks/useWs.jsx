@@ -83,6 +83,9 @@ const useWs = () => {
           console.log("Already connected");
           return resolve();
         }
+        if (client.current) {
+          client.current.deactivate(); // 이전 연결이 있다면 비활성화
+        }
         client.current = new Client({
           webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
           debug: (str) => {
@@ -250,7 +253,15 @@ const useWs = () => {
   }, []);
 
   const handleRoomEnter = (message) => {
-    const { attendeeUUID, address, nickname, lat, lon, isRoot } = message;
+    const {
+      attendeeUUID,
+      address,
+      nickname,
+      lat,
+      lon,
+      isRoot,
+      profileImageUrl,
+    } = message;
 
     const newAttendee = {
       address,
@@ -258,6 +269,7 @@ const useWs = () => {
       lon,
       attendeeUUID,
       nickname,
+      profileImageUrl,
     };
 
     if (isRoot) {

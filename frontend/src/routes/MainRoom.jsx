@@ -119,13 +119,13 @@ function Room() {
             myUUID,
             isHost: roomData.isHost,
             departure: {
-              address: myAttendeeInfo.address,
-              lat: myAttendeeInfo.lat,
-              lon: myAttendeeInfo.lon,
+              address: myAttendeeInfo?.address,
+              lat: myAttendeeInfo?.lat,
+              lon: myAttendeeInfo?.lon,
             },
             nickname: myAttendeeInfo.nickname,
-            duration: myAttendeeInfo.duration,
-            route: myAttendeeInfo.route,
+            duration: myAttendeeInfo?.duration,
+            route: myAttendeeInfo?.route,
             profileImageUrl: myAttendeeInfo.profileImageUrl,
           }));
 

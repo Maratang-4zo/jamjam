@@ -1,9 +1,8 @@
 package com.maratang.jamjam.domain.gamePlay.dto.response.round;
 
-import java.util.List;
-
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.gamePlay.entity.GameRound;
+import com.maratang.jamjam.global.map.station.SubwayInfo;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -12,20 +11,17 @@ import lombok.Getter;
 @Builder
 public class GameRoundResultRes {
 	private Integer round;
-	private Attendee winnerAttendee;
+	private Attendee attendeeUUID;
 	private String stationName;
+	private SubwayInfo subwayInfo;
 
-	public static GameRoundResultRes of(GameRound gameRound) {
+	public static GameRoundResultRes of(GameRound gameRound, SubwayInfo subwayInfo) {
 		return GameRoundResultRes.builder()
 			.round(gameRound.getRound())
-            .winnerAttendee(gameRound.getWinnderAttendee())
+            .attendeeUUID(gameRound.getWinnderAttendee())
             .stationName(gameRound.getStationName())
+			.subwayInfo(subwayInfo)
             .build();
 	}
 
-	public static List<GameRoundResultRes> of(List<GameRound> gameRounds) {
-		return gameRounds.stream()
-			.map(GameRoundResultRes::of)
-			.toList();
-	}
 }

@@ -27,7 +27,8 @@ public enum BroadCastType {
 	HOST_FIND_CENTER("중심역 찾는 중"),
 	GAME_NEXT_ROUND("다음 라운드"),
 	ROOM_ROOT_LEAVE("방장 떠남"),
-	ROOM_ROOT_REENTRY("방장 재입장");
+	ROOM_ROOT_REENTRY("방장 재입장"),
+	CENTER_HISTORY("중심역 이동 기록");
 
 	private final String desc;
 }

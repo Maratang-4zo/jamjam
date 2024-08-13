@@ -1,6 +1,7 @@
 package com.maratang.jamjam.domain.gamePlay.dto.response.round;
 
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,11 +9,13 @@ import lombok.Getter;
 @Getter
 @Builder
 public class GameRoundResultListRes {
-    List<GameRoundResultRes> gameRoundResultResList;
+    UUID gameSessionUUID;
+    List<GameRoundResultRes> roundRecordList;
 
-    public static GameRoundResultListRes of(List<GameRoundResultRes> gameRoundResultResList) {
+    public static GameRoundResultListRes of(List<GameRoundResultRes> gameRoundResultResList, UUID gameSessionUUID) {
         return GameRoundResultListRes.builder()
-               .gameRoundResultResList(gameRoundResultResList)
+                .gameSessionUUID(gameSessionUUID)
+               .roundRecordList(gameRoundResultResList)
                .build();
     }
 }

@@ -299,6 +299,7 @@ function JoinRoom() {
 
       navigate(`/room/${roomUUID}`);
     } catch (error) {
+      console.log(data);
       console.log("방 참여 실패", error);
     }
   };
@@ -345,7 +346,7 @@ function JoinRoom() {
                 {nicknameValue.length}/{maxChars}
               </CharCount>
             </NicknameInput>
-            <EnterButton>
+            <EnterButton type="submit">
               <p>접속</p>
             </EnterButton>
           </Form>

@@ -185,7 +185,7 @@ function MyMap() {
       disableTwoFingerTapZoom={true}
     >
       {attendeeDepartures
-        .filter((departure) => departure.lat && departure.lon)
+        ?.filter((departure) => departure.lat && departure.lon)
         .map((departure, index) => (
           <React.Fragment key={index}>
             <Marker

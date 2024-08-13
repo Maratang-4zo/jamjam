@@ -71,6 +71,7 @@ const BtnDiv = styled.div`
 `;
 
 const ShareBtn = styled.button`
+  position: relative;
   border-radius: 50%;
   background-color: ${(props) => props.theme.infoColor};
   width: 45px;
@@ -80,9 +81,21 @@ const ShareBtn = styled.button`
   justify-content: center;
   align-items: center;
   &:hover {
-    background-color: ${(props) => props.theme.relaxColor};
+    background-color: ${(props) =>
+      props.disabled ? "none" : props.theme.relaxColor};
     transition: 0.2s;
   }
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+`;
+
+const NotAllowed = styled.div`
+  border-radius: 50%;
+  background-color: #00000087;
+  width: 45px;
+  height: 45px;
+  position: absolute;
+  top: 0;
+  right: 0;
 `;
 
 const BtnSpan = styled.span`
@@ -144,10 +157,11 @@ function ShareModal({
               </BtnDiv>
               <BtnDiv>
                 <ShareBtn
-                  disabled={!isLogin | isDisabled}
+                  disabled={!isLogin || isDisabled}
                   onClick={onKakaoClick}
                 >
-                  <BtnIcon src={kakaoIcon} />
+                  {isDisabled || !isLogin ? <NotAllowed /> : null}
+                  <BtnIcon src={kakaoIcon} disabled={!isLogin || isDisabled} />
                 </ShareBtn>
                 <BtnSpan>카카오톡</BtnSpan>
               </BtnDiv>

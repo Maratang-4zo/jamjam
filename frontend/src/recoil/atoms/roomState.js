@@ -14,6 +14,7 @@ export const roomAtom = atom({
     isCenterExist: false,
     isAllReadyToGame: false,
     centerPlace: {},
+    isValid: false,
   },
 });
 

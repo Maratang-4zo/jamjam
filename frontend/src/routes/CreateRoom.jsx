@@ -149,8 +149,7 @@ function CreateRoom() {
         nickname: data.nickname,
       });
 
-      const roomToken = getCookie("roomToken");
-      const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
+      const { roomUUID, attendeeUUID } = response.data;
 
       await createSession();
       setUserInfo((prev) => ({

@@ -68,23 +68,24 @@ function Room() {
         // 방 유효성 검사
         const response = await axiosIsRoomValid({ roomUUID });
         const res = response.data;
-        if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
-          navigate("/");
-          alert("종료된 방입니다.");
-        } else if (res.roomStatus === "PLAYING") {
-          setIsPlayingGame(true);
-        } else if (res.roomStatus === "RESERVED") {
-          setIsHostOut(true);
-        }
-        // 방 정보 가져오기
-        const roomResponse = await axiosGetRoomInfo({ roomUUID });
-        const roomData = roomResponse.data;
+        if (!res.hasToken) {
+          navigate(`/room/${roomUUID}/join`);
+        } else {
+          if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
+            navigate("/");
+            alert("종료된 방입니다.");
+          } else if (res.roomStatus === "PLAYING") {
+            setIsPlayingGame(true);
+          } else if (res.roomStatus === "RESERVED") {
+            setIsHostOut(true);
+          }
+          // 방 정보 가져오기
+          const roomResponse = await axiosGetRoomInfo({ roomUUID });
+          const roomData = roomResponse.data;
 
-        console.log(roomData);
+          console.log(roomData);
 
-        const roomToken = getCookie("roomToken");
-        if (roomToken) {
-          const myUUID = jwtDecode(roomToken).attendeeUUID;
+          const { myUUID } = userInfo;
           const myAttendeeInfo = roomData.attendees.find(
             (attendee) => attendee.attendeeUUID === myUUID,
           );
@@ -131,8 +132,6 @@ function Room() {
           if (!joined) {
             await joinSession();
           }
-        } else {
-          navigate(`/room/${roomUUID}/join`);
         }
       } catch (error) {
         console.error("방 유효성 검사 실패:", error);

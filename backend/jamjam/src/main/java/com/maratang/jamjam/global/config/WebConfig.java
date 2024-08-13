@@ -52,7 +52,7 @@ public class WebConfig implements WebMvcConfigurer {
 			.excludePathPatterns(
 				"/rooms",
 				"/rooms/{roomUUID}/exists",
-				"/{roomUUID}/join"
+				"/rooms/{roomUUID}/join"
 			);
 	}
 

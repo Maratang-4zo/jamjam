@@ -69,9 +69,10 @@ public class GameRoundService {
             .orElseThrow(()->new BusinessException(ErrorCode.GR_NOT_FOUND));
 
         List<GameRound> gameRounds = gameRoundRepository.findAllByGameSessionId(gameSession.getGameSessionId());
-        List<GameRoundResultRes> gameRoundResultResList = GameRoundResultRes.of(gameRounds);
 
-        return GameRoundResultListRes.of(gameRoundResultResList);
+        List<GameRoundResultRes> gameRoundResultResList = gameRounds.stream().map(r -> GameRoundResultRes.of(r, subwayDataLoader.getSubwayInfo(r.getStationName()))).toList();
+
+        return GameRoundResultListRes.of(gameRoundResultResList, gameRoundReq.getGameSessionUUID());
     }
 
     public GameNextRoundRes nextRound(GameNextRoundReq req, UUID roomUUID) {

@@ -67,7 +67,7 @@ public class RoomController {
 		RoomJwtTokenClaims roomJwtTokenClaims = roomService.createRoom(roomCreateReq);
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims);
 
-		CookieUtils.createSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
+		CookieUtils.createSecureSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(roomJwtTokenClaims);
 	}

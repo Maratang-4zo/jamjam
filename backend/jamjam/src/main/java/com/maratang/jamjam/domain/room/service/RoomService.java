@@ -1,5 +1,6 @@
 package com.maratang.jamjam.domain.room.service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -14,11 +15,11 @@ import com.maratang.jamjam.domain.randomName.entity.Name;
 import com.maratang.jamjam.domain.randomName.entity.Nick;
 import com.maratang.jamjam.domain.randomName.repository.NameRepository;
 import com.maratang.jamjam.domain.randomName.repository.NickRepository;
-import com.maratang.jamjam.domain.room.dto.request.RoomCloseReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
+import com.maratang.jamjam.domain.room.dto.response.RootLeaveRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
@@ -119,13 +120,21 @@ public class RoomService {
 		// 1. 활성화된 방인지, 유효한 유저인지, 방-유저 매칭이 되는지
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		if (room.getRoomStatus() == RoomStatus.ABORTED || room.getRoomStatus() == RoomStatus.FINISHED) {
+		if (room.isRoomClosed()) {
 			throw new BusinessException(ErrorCode.ROOM_CANNOT_ENTER);
 		}
 
 		// 2. 참여자 유효성 검사
 		Attendee attendee = attendeeRepository.findByAttendeeUUIDAndRoom(attendeeUUID, room)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
+
+		// 1-1. 나갔다 온 방장이니?
+		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){
+			room.updateStatus(RoomStatus.ONGOING);
+			roomRepository.save(room);
+			broadCastService.broadcastToRoom(roomUUID, "도망간 노예를 잡아왔다!!", BroadCastType.ROOM_ROOT_REENTRY);
+		}
+
 		attendee.updateStatus(AttendeeStatus.ENTERED);
 		attendeeRepository.save(attendee);
 
@@ -149,13 +158,17 @@ public class RoomService {
 		// 3. 방장
 		// 3-1. 모임 결정 완료) 다른 사람들도 DONE 표시하고 로비로 모셔다드리기
 		// 3-2. 모임 결정 미완료) 다른 사람들을 내쫓기
-		// Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		// if(room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
-		// 	closeRoom(roomUUID, attendeeUUID, null);
-		// }
+		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		if(room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
+			room.updateForceClose(LocalDateTime.now().plusMinutes(5));
+			roomRepository.save(room);
+			broadCastService.broadcastToRoom(roomUUID, RootLeaveRes.of(room, attendee), BroadCastType.ROOM_ROOT_LEAVE);
+		}
 	}
 
-	public void closeRoom(UUID roomUUID, UUID attendeeUUID, RoomCloseReq roomCloseReq) {
+	@Transactional
+	public void closeRoom(UUID roomUUID, UUID attendeeUUID) {
+		// 정상 종료
 		// 1. DB 상태 변경
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
@@ -166,9 +179,6 @@ public class RoomService {
 
 		// 2. 남은 참여자 쫓아내기
 		room.updateStatus(RoomStatus.FINISHED);
-		if (roomCloseReq != null) {
-			room.updateStation(roomCloseReq.getStation());
-		}
 		roomRepository.save(room);
 
 		broadCastService.broadcastToRoom(roomUUID, "쫓겨나랏!!", BroadCastType.ROOM_CLOSE);

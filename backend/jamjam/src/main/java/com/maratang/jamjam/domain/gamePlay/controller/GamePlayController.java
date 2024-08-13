@@ -10,12 +10,14 @@ import com.maratang.jamjam.domain.gamePlay.dto.request.play.GameNextRoundReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.play.GamePlayReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.play.GameStartReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundCreateReq;
+import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundUpdateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionCreateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionResultResetReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.session.GameSessionResultUpdateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.response.play.GameNextRoundRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundCreateRes;
+import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundResultListRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundStationRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.session.GameSessionIdRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.session.GameSessionRes;
@@ -64,7 +66,7 @@ public class GamePlayController {
 
 	// 게임 답 입력
 	@MessageMapping("/game/round.play")
-	@Operation(summary = "🚗 구현 중")
+	@Operation(summary = "✨ 게임을 진행한다")
     public void playGame(@Payload GamePlayReq gamePlayReq, UUID roomUUID, UUID attendeeUUID) {
         gamePlayService.playGame(gamePlayReq, roomUUID, attendeeUUID);
     }
@@ -82,6 +84,13 @@ public class GamePlayController {
         GameNextRoundRes res = gameRoundService.nextRound(gameNextRoundReq, roomUUID);
         broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.GAME_NEXT_ROUND);
     }
+
+	@MessageMapping("/game/session.end")
+	@Operation(summary = "✨ 게임 승자 이력 조회", description = "모든 게임이 끝나고 각 라운드별 승자 및 역 정보 조회")
+	public void endSession(@Payload GameRoundReq gameRoundReq, UUID roomUUID){
+		GameRoundResultListRes res = gameRoundService.getRoundRecord(gameRoundReq);
+		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.CENTER_HISTORY);
+	}
 
 	@MessageMapping("/game/session.station")
 	@Operation(summary = "✨ 게임 결과 반영", description = "모든 라운드가 끝나고 결정된 역을 모임 장소로 선택한다.")

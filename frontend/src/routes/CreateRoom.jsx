@@ -12,6 +12,7 @@ import { getCookie } from "../utils/Cookies";
 import useOpenVidu from "../hooks/useOpenVidu";
 import { useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
+import { roomAtom } from "../recoil/atoms/roomState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -131,6 +132,7 @@ const ErrorBox = styled.div`
 function CreateRoom() {
   const navigate = useNavigate();
   const setUserInfo = useSetRecoilState(userInfoAtom);
+  const setRoomInfo = useSetRecoilState(roomAtom);
   const { createSession } = useOpenVidu();
   const {
     register,
@@ -155,6 +157,12 @@ function CreateRoom() {
         ...prev,
         myUUID: attendeeUUID,
         isHost: true,
+      }));
+
+      setRoomInfo((prev) => ({
+        ...prev,
+        roomUUID: roomUUID,
+        hostUUID: attendeeUUID,
       }));
 
       navigate(`/room/${roomUUID}`);

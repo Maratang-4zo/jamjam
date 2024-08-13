@@ -76,39 +76,42 @@ const useWs = () => {
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
   const { leaveSession } = useOpenVidu();
 
-  const connect = useCallback(() => {
-    return new Promise((resolve, reject) => {
-      if (connected) {
-        console.log("Already connected");
-        return resolve();
-      }
-      client.current = new Client({
-        webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
-        debug: (str) => {
-          console.log(str);
-        },
-        reconnectDelay: 5000,
-        heartbeatIncoming: 20000,
-        heartbeatOutgoing: 20000,
-        onConnect: () => {
-          console.log("Connected");
-          setConnected(true);
-          subscribe();
-          resolve();
-        },
-        onStompError: (frame) => {
-          console.error(frame);
-          setConnected(false);
-          reject(frame);
-        },
+  const connect = useCallback(
+    (roomUUID) => {
+      return new Promise((resolve, reject) => {
+        if (connected) {
+          console.log("Already connected");
+          return resolve();
+        }
+        client.current = new Client({
+          webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
+          debug: (str) => {
+            console.log(str);
+          },
+          reconnectDelay: 5000,
+          heartbeatIncoming: 20000,
+          heartbeatOutgoing: 20000,
+          onConnect: () => {
+            console.log("Connected");
+            setConnected(true);
+            subscribe(roomUUID);
+            resolve();
+          },
+          onStompError: (frame) => {
+            console.error(frame);
+            setConnected(false);
+            reject(frame);
+          },
+        });
+        client.current.activate();
       });
-      client.current.activate();
-    });
-  }, [connected]);
+    },
+    [connected],
+  );
 
-  const subscribe = () => {
+  const subscribe = (roomUUID) => {
     client.current.subscribe(
-      `/sub/rooms/${roomInfo.roomUUID}`,
+      `/sub/rooms/${roomUUID}`,
       (message) => {
         handleMessage(message);
       },

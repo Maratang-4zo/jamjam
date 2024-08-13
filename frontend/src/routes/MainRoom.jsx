@@ -86,6 +86,8 @@ function Room() {
           const roomResponse = await axiosGetRoomInfo({ roomUUID });
           const roomData = roomResponse.data;
 
+          console.log(roomData);
+
           const roomToken = getCookie("roomToken");
           if (roomToken) {
             const myUUID = jwtDecode(roomToken).attendeeUUID;
@@ -129,7 +131,7 @@ function Room() {
             }));
 
             if (!connected) {
-              await connect();
+              await connect(roomUUID);
             }
 
             if (!joined) {

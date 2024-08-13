@@ -137,8 +137,12 @@ class AttendeeServiceTest extends IntegrationTestConfig {
 			Claims claims = roomTokenProvider.getTokenClaims(roomToken);
 
 			//when
-			attendeeService.updateAttendee(attendeeUpdateReq, (UUID)claims.get("roomUUID"),
-				(UUID)claims.get("attendeeUUID"));
+			attendeeService.updateAttendee(
+				attendeeUpdateReq,
+				UUID.fromString((String) claims.get("roomUUID")),
+				UUID.fromString((String) claims.get("attendeeUUID"))
+			);
+
 
 			//then
 			SoftAssertions.assertSoftly(softAssertions -> {

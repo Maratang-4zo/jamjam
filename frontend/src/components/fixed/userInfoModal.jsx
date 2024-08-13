@@ -136,7 +136,9 @@ function UserInfoModal({ user, top, onClose }) {
           <Profile src={user.profileImageUrl} />
           <ModalBody>
             <Nickname>{user.nickname}</Nickname>
-            <Departure>{user.address}</Departure>
+            <Departure>
+              {user.address ? user.address : "출발지가 없습니다"}
+            </Departure>
           </ModalBody>
         </ModalOverlay>
       )}

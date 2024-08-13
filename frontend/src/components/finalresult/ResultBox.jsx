@@ -6,7 +6,7 @@ const round = 3;
 const Container = styled.div`
   background-color: ${(props) => props.theme.subBgColor};
   width: 100%;
-  height: 600px;
+  height: 80%;
   margin-top: 80px;
   outline: 3px solid black; /* 3px outline 추가 */
 `;

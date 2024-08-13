@@ -39,7 +39,6 @@ export function axiosAttendRoom({ roomUUID, nickname }) {
     roomUUID,
     nickname,
   };
-  console.log("야야아아ㅏ아양아아야아야아야아야앙", { params });
   return axios.post(BASE_URL + `/api/rooms/${roomUUID}/join`, params);
 }
 

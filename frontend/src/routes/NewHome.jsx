@@ -64,7 +64,7 @@ const Container = styled.div`
   overflow-y: scroll;
   overflow-x: hidden;
   &::-webkit-scrollbar {
-    display: none;
+    /* display: none; */
   }
 `;
 
@@ -94,14 +94,15 @@ const FirstSection = styled.div`
   box-sizing: border-box;
   background-color: none;
   position: relative;
+  background-color: aliceblue;
 `;
 
 const Image = styled.img`
-  width: 50%;
-  height: 30%;
+  width: 40%;
+  height: 40%;
   position: sticky;
   top: 50%;
-  transform: translateY(-50%); /* 이미지의 중간을 기준으로 중앙 정렬 */
+  transform: translateY(-50%);
   left: 50%;
   transform: translate(-50%, -50%);
   transition: position 0.3s ease, top 0.3s ease, left 0.3s ease,
@@ -115,9 +116,10 @@ const FirstCut = styled.div`
   width: 50%;
   height: 630px;
   flex-shrink: 0;
-  top: ${(props) => (props.animate ? "5%" : "100%")};
+  top: 5%;
   left: 0%;
   z-index: 300;
+  opacity: ${(props) => (props.animate ? 1 : 0)};
   animation: ${(props) => (props.animate ? slideInLeft : "none")} 0.8s forwards;
 `;
 
@@ -126,10 +128,11 @@ const RightCut = styled.div`
   width: 50%;
   height: 680px;
   flex-shrink: 0;
-  top: 10%;
+  top: ${(props) => (props.isSticky ? "10%" : "auto")};
   animation: ${(props) => (props.animate ? slideInRight : "none")} 0.8s forwards;
-  right: 5%;
-  left: 50%;
+  right: 10%;
+  left: 45%;
+  opacity: ${(props) => (props.animate ? 1 : 0)};
 `;
 
 const SecondCut = styled.div`
@@ -156,7 +159,7 @@ const ThirdCut = styled.div`
 
 const ComicSection = styled.div`
   position: relative;
-  height: 300vh;
+  height: 250vh;
 `;
 
 function NewHome() {
@@ -165,10 +168,20 @@ function NewHome() {
     firstCut: false,
     secondThirdCut: false,
   });
+
+  const defaultAnimate = {
+    firstCut: false,
+    secondThirdCut: false,
+  };
   const [isSticky, setIsSticky] = useState({
     firstCut: false,
     secondThirdCut: false,
   });
+
+  const defaultSticky = {
+    firstCut: false,
+    secondThirdCut: false,
+  };
   const [visibleSections, setVisibleSections] = useState({
     section1: false,
     section2: false,
@@ -190,6 +203,15 @@ function NewHome() {
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const initialState = {
+    section1: false,
+    section2: false,
+    section3: false,
+    section4: false,
+    section5: false,
+    section6: false,
+  };
+
   const sectionRefs = useRef([]);
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -197,34 +219,46 @@ function NewHome() {
         entries.forEach((entry) => {
           const sectionId = entry.target.id;
           if (sectionId === "section1") {
-            const rect = entry.intersectionRect;
             if (
               entry.intersectionRatio >= 0.1 &&
-              entry.intersectionRatio < 0.3
+              entry.intersectionRatio < 0.35
             ) {
               console.log("first");
               setAnimate((prev) => ({
                 ...prev,
                 firstCut: true,
               }));
+              setTimeout(() => {
+                setIsSticky((prev) => ({
+                  ...prev,
+                  firstCut: true,
+                }));
+              }, 500);
             }
-            if (entry.intersectionRatio >= 0.3) {
+            if (entry.intersectionRatio >= 0.35) {
               console.log("second");
-              console.log(rect.bottom);
               setAnimate((prev) => ({
                 ...prev,
                 secondThirdCut: true,
               }));
+              setTimeout(() => {
+                setIsSticky((prev) => ({
+                  ...prev,
+                  secondThirdCut: true,
+                }));
+              }, 500);
             }
           } else if (entry.intersectionRatio >= 0.5) {
-            setVisibleSections((prev) => ({
-              ...prev,
+            setVisibleSections({
+              ...initialState,
               [sectionId]: true,
-            }));
+            });
+            setAnimate(defaultAnimate);
+            setIsSticky(defaultSticky);
           }
         });
       },
-      { threshold: [0.1, 0.3, 0.5] },
+      { threshold: [0.1, 0.35, 0.5] },
     );
 
     sectionRefs.current.forEach((section) => {

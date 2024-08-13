@@ -34,5 +34,5 @@ export const isMainConnectingAtom = atom({
 // 방장이 나갔을 때
 export const isHostOutAtom = atom({
   key: "isHostOut",
-  default: true,
+  default: false,
 });

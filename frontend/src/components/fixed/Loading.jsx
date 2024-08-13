@@ -1,10 +1,13 @@
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
+  font-family: "DungGeunMo";
   width: 100%;
   height: 100%;
   background-color: #000000a6;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 3000;
@@ -17,13 +20,47 @@ const Wrapper = styled.div`
     color: ${(props) => props.theme.bgColor};
     font-size: 40px;
   }
+  p {
+    color: ${(props) => props.theme.subaccentColor};
+    font-size: 20px;
+    margin-top: 10px;
+  }
 `;
 
 function Loading({ message, estimatedForceCloseAt }) {
+  const [timeLeft, setTimeLeft] = useState("");
+
+  useEffect(() => {
+    if (!estimatedForceCloseAt) return;
+
+    const updateRemainingTime = () => {
+      const now = new Date();
+      const estimatedTime = new Date(estimatedForceCloseAt);
+      const difference = estimatedTime - now;
+
+      if (difference > 0) {
+        const minutes = Math.floor(difference / 1000 / 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        setTimeLeft(`${minutes}분 ${seconds}초 남았습니다.`);
+      } else {
+        setTimeLeft("방이 종료되었습니다.");
+      }
+    };
+
+    // 초기 호출
+    updateRemainingTime();
+
+    // 매 초마다 남은 시간을 업데이트
+    const timerId = setInterval(updateRemainingTime, 1000);
+
+    // 컴포넌트 언마운트 시 타이머 클리어
+    return () => clearInterval(timerId);
+  }, [estimatedForceCloseAt]);
+
   return (
     <Wrapper>
       <h1>{message} 중...</h1>
-      {estimatedForceCloseAt ? `분 뒤에 방이 종료될 예정입니다.` : null}
+      {timeLeft && <p>{timeLeft}</p>}
     </Wrapper>
   );
 }

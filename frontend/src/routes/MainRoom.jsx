@@ -8,7 +8,11 @@ import MainButtons from "../components/mainroom/MainButtons";
 import ShareModal from "../components/mainroom/ShareModal";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
-import { roomAtom, roomPageAtom } from "../recoil/atoms/roomState";
+import {
+  estimatedForceCloseAtAtom,
+  roomAtom,
+  roomPageAtom,
+} from "../recoil/atoms/roomState";
 import { axiosUpdateUserInfo } from "../apis/mapApi";
 import { useNavigate, useParams } from "react-router-dom";
 import { axiosIsRoomValid, axiosGetRoomInfo } from "../apis/roomApi";
@@ -22,7 +26,8 @@ import GameChoice from "../components/mainroom/GameChoice";
 import { selectedGameAtom } from "../recoil/atoms/gameState";
 import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
-import { isHostOutAtom } from "../recoil/atoms/loadingState";
+import Watching from "../components/fixed/Watching";
+import { isHostOutAtom, isPlayingGameAtom } from "../recoil/atoms/loadingState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -51,91 +56,108 @@ function Room() {
   const roomPage = useRecoilValue(roomPageAtom);
   const [joinLoading, setJoinLoading] = useState(false);
   const [isDisabledOn, setIsDisalbedOn] = useState(false);
-  const isHostOut = useRecoilValue(isHostOutAtom);
+  const [isHostOut, setIsHostOut] = useRecoilState(isHostOutAtom);
+  const [isPlayingGame, setIsPlayingGame] = useRecoilState(isPlayingGameAtom);
+  const estimatedClosedAt = useRecoilValue(estimatedForceCloseAtAtom);
   const { connect, connected } = useWs();
   const { joinSession, joined } = useOpenVidu();
 
-  // useEffect(() => {
-  //   const initializeRoom = async () => {
-  //     try {
-  //       // 방 유효성 검사
-  //       await axiosIsRoomValid({ roomUUID });
+  useEffect(() => {
+    const initializeRoom = async () => {
+      try {
+        // 방 유효성 검사
+        const res = await axiosIsRoomValid({ roomUUID });
 
-  //       // 방 정보 가져오기
-  //       const roomResponse = await axiosGetRoomInfo({ roomUUID });
-  //       const roomData = roomResponse.data;
+        if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
+          navigate("/");
+          alert("종료된 방입니다.");
+        } else if (res.roomStatus === "PLAYING") {
+          setIsPlayingGame(true);
+        } else if (res.roomStatus === "RESERVED") {
+          setIsHostOut(true);
+        }
+        if (
+          res.roomStatus === "ONGOING" ||
+          res.roomStatus === "PLAYING" ||
+          res.roomStatus === "RESERVED"
+        ) {
+          // 방 정보 가져오기
+          const roomResponse = await axiosGetRoomInfo({ roomUUID });
+          const roomData = roomResponse.data;
 
-  //       const roomToken = getCookie("roomToken");
-  //       if (roomToken) {
-  //         const myUUID = jwtDecode(roomToken).attendeeUUID;
-  //         const myAttendeeInfo = roomData.attendees.find(
-  //           (attendee) => attendee.attendeeUUID === myUUID,
-  //         );
+          const roomToken = getCookie("roomToken");
+          if (roomToken) {
+            const myUUID = jwtDecode(roomToken).attendeeUUID;
+            const myAttendeeInfo = roomData.attendees.find(
+              (attendee) => attendee.attendeeUUID === myUUID,
+            );
 
-  //         if (
-  //           myAttendeeInfo &&
-  //           (!myAttendeeInfo.address ||
-  //             !myAttendeeInfo.lat ||
-  //             !myAttendeeInfo.lon)
-  //         ) {
-  //           setIsFindDepartureModalOpen(true);
-  //         }
+            if (
+              myAttendeeInfo &&
+              (!myAttendeeInfo.address ||
+                !myAttendeeInfo.lat ||
+                !myAttendeeInfo.lon)
+            ) {
+              setIsFindDepartureModalOpen(true);
+            }
 
-  //         setRoomInfo((prev) => ({
-  //           ...prev,
-  //           roomUUID,
-  //           isValid: true,
-  //           roomName: roomData.roomName,
-  //           meetingDate: roomData.roomTime,
-  //           centerPlace: roomData.roomStartCenter,
-  //           attendees: [...roomData.attendees],
-  //           roomPurpose: roomData.roomPurpose,
-  //           hostUUID: roomData.hostUUID,
-  //         }));
+            setRoomInfo((prev) => ({
+              ...prev,
+              roomUUID,
+              isValid: true,
+              roomName: roomData.roomName,
+              meetingDate: roomData.roomTime,
+              centerPlace: roomData.roomStartCenter,
+              attendees: [...roomData.attendees],
+              roomPurpose: roomData.roomPurpose,
+              hostUUID: roomData.hostUUID,
+            }));
 
-  //         setUserInfo((prev) => ({
-  //           ...prev,
-  //           isHost: roomData.isHost,
-  //           departure: {
-  //             addressText: myAttendeeInfo.address,
-  //             latitude: myAttendeeInfo.lat,
-  //             longitude: myAttendeeInfo.lon,
-  //           },
-  //           nickname: myAttendeeInfo.nickname,
-  //           duration: myAttendeeInfo.duration,
-  //           route: myAttendeeInfo.route,
-  //           myUUID,
-  //         }));
+            setUserInfo((prev) => ({
+              ...prev,
+              isHost: roomData.isHost,
+              departure: {
+                addressText: myAttendeeInfo.address,
+                latitude: myAttendeeInfo.lat,
+                longitude: myAttendeeInfo.lon,
+              },
+              nickname: myAttendeeInfo.nickname,
+              duration: myAttendeeInfo.duration,
+              route: myAttendeeInfo.route,
+              myUUID,
+            }));
 
-  //         if (!connected) {
-  //           await connect();
-  //         }
+            if (!connected) {
+              await connect();
+            }
 
-  //         if (!joined) {
-  //           await joinSession();
-  //         }
-  //       } else {
-  //         navigate(`/room/${roomUUID}/join`);
-  //       }
-  //     } catch (error) {
-  //       console.error("방 유효성 검사 실패:", error);
-  //       navigate("/invalid-room");
-  //     } finally {
-  //       setJoinLoading(false);
-  //     }
-  //   };
+            if (!joined) {
+              await joinSession();
+            }
+          } else {
+            navigate(`/room/${roomUUID}/join`);
+          }
+        }
+      } catch (error) {
+        console.error("방 유효성 검사 실패:", error);
+        alert("존재하지 않는 방입니다.");
+        navigate("/invalid-room");
+      } finally {
+        setJoinLoading(false);
+      }
+    };
 
-  //   initializeRoom();
-  // }, [
-  //   roomUUID,
-  //   navigate,
-  //   setRoomInfo,
-  //   setUserInfo,
-  //   connect,
-  //   joinSession,
-  //   connected,
-  //   joined,
-  // ]);
+    initializeRoom();
+  }, [
+    roomUUID,
+    navigate,
+    setRoomInfo,
+    setUserInfo,
+    connect,
+    joinSession,
+    connected,
+    joined,
+  ]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);
@@ -221,7 +243,13 @@ function Room() {
 
   return (
     <Wrapper>
-      {isHostOut ? <Loading message={"방장이 나가서 대기"} /> : null}
+      {isPlayingGame ? <Watching /> : null}
+      {isHostOut ? (
+        <Loading
+          message={"방장이 나가서 대기"}
+          estimatedForceCloseAt={estimatedClosedAt}
+        />
+      ) : null}
       <NavBarLeft />
       {joinLoading ? <Loading message={"접속"} /> : null}
       {isFindDepartureModalOpen && (

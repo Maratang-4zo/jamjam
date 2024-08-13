@@ -5,6 +5,8 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   aroundStationsAtom,
   chatAtom,
+  estimatedForceCloseAtAtom,
+  isNextMiddleExistAtom,
   roomAtom,
   roomPageAtom,
 } from "../recoil/atoms/roomState";
@@ -32,6 +34,7 @@ import {
   isHistoryLoadingAtom,
   isHostOutAtom,
   isMainConnectingAtom,
+  isPlayingGameAtom,
   isThreeStationLoadingAtom,
 } from "../recoil/atoms/loadingState";
 import useOpenVidu from "./useOpenVidu";
@@ -68,6 +71,9 @@ const useWs = () => {
   const setIsHistoryLoading = useSetRecoilState(isHistoryLoadingAtom);
   const setIsMainConnecting = useSetRecoilState(isMainConnectingAtom);
   const setIsHostOut = useSetRecoilState(isHostOutAtom);
+  const setIsPlayingGame = useSetRecoilState(isPlayingGameAtom);
+  const setEstimatedForceCloseAt = useSetRecoilState(estimatedForceCloseAtAtom);
+  const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
   const { leaveSession } = useOpenVidu();
 
   const connect = useCallback(() => {
@@ -143,9 +149,6 @@ const useWs = () => {
       case "ROOM_CENTER_UPDATE":
         handleRoomCenterUpdate(message);
         break;
-      case "ROOM_PAGE_UPDATE":
-        handleRoomPageUpdate(message);
-        break;
       case "GAME_CENTER_UPDATE":
         handleGameCenterUpdate(message);
         break;
@@ -219,6 +222,11 @@ const useWs = () => {
       nickname,
     };
 
+    if (isRoot) {
+      setIsHostOut(false);
+      setEstimatedForceCloseAt(null);
+    }
+
     // 현재 유저의 정보 업데이트
     if (userInfo.myUUID === attendeeUUID) {
       setUserInfo((prev) => ({
@@ -283,6 +291,8 @@ const useWs = () => {
       ),
     }));
 
+    setEstimatedForceCloseAt(estimatedForceCloseAt);
+
     const newChatLog = {
       type: "alert",
       alertType: "out",
@@ -309,6 +319,7 @@ const useWs = () => {
 
   const handleHostGoMain = ({ isMainConnecting }) => {
     setIsMainConnecting(isMainConnecting);
+    setIsPlayingGame(false);
   };
 
   const handleWinnerNextPage = ({ isThreeStationLoading }) => {
@@ -322,6 +333,13 @@ const useWs = () => {
     });
   };
 
+  const sendGoResult = ({ gameSessionUUID }) => {
+    client.current.publish({
+      destination: `/pub/game/session.end`,
+      body: JSON.stringify({ gameSessionUUID }),
+    });
+  };
+
   const handleNextRound = ({ next }) => {
     if (next === "nextRound") {
       setCurrentRound((prev) => (prev += 1));
@@ -329,6 +347,7 @@ const useWs = () => {
       setCurrentRound(1);
     }
     setRoomPage(next);
+    setIsNextMiddleExist(false);
   };
 
   const handleHostFindCenter = ({ isFindCenterLoading }) => {
@@ -338,7 +357,7 @@ const useWs = () => {
   // 최종 장소 리셋
   const sendReset = ({ gameSessionUUID }) => {
     client.current.publish({
-      destination: `/pub/game/session.station`,
+      destination: `/pub/game/session.reset`,
       body: JSON.stringify({ gameSessionUUID }),
     });
   };
@@ -388,7 +407,6 @@ const useWs = () => {
       destination: `/pub/game/session.station`,
       body: JSON.stringify({ gameSessionUUID, finalStationName }),
     });
-    console.log("hi");
   };
 
   const handleGameStart = ({ gameRoundUUID }) => {
@@ -427,7 +445,9 @@ const useWs = () => {
 
   const handleCenterHistory = ({ gameSessionUUID, roundRecordList }) => {
     setGameRecord(roundRecordList);
+    setRoomPage("finalresult");
     setIsHistoryLoading(false);
+    setIsNextMiddleExist(false);
   };
 
   const handleGameSessionReady = ({ gameSessionUUID, roundCnt }) => {
@@ -485,11 +505,7 @@ const useWs = () => {
 
   const handleGameCenterUpdate = ({ roundCenterStation }) => {
     setRoundCenter(roundCenterStation);
-  };
-
-  const handleRoomPageUpdate = ({ roomNextPage, gameId }) => {
-    setSelectedGame(gameId);
-    setRoomPage(roomNextPage);
+    setIsNextMiddleExist(true);
   };
 
   const handleRoomCenterUpdate = ({ roomCenterStart, attendees }) => {
@@ -613,6 +629,7 @@ const useWs = () => {
     sendFinalStation,
     sendReset,
     sendNextRound,
+    sendGoResult,
   };
 };
 

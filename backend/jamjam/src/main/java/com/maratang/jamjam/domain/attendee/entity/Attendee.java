@@ -90,6 +90,7 @@ public class Attendee extends BaseTimeEntity {
 	protected void onCreate() {
 		this.attendeeUUID = UUID.randomUUID();
 		this.profileImageUrl = ProfileType.values()[new Random().nextInt(ProfileType.values().length)];
+		this.attendeeStatus = AttendeeStatus.CREATED;
 	}
 
 	public void updateAttendeeLocation(AttendeeUpdateReq attendeeUpdateReq) {

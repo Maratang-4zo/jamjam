@@ -85,6 +85,7 @@ public class Room extends BaseTimeEntity {
 	protected void onCreate() {
 		this.roomUUID = UUID.randomUUID();
 		this.attendees = new ArrayList<>();
+		this.roomStatus = RoomStatus.CREATED;
 	}
 
 	public void updateAttendee(Attendee attendee) {

@@ -13,6 +13,8 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
+import com.maratang.jamjam.global.error.ErrorCode;
+import com.maratang.jamjam.global.error.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,6 +57,16 @@ public class StompHandler implements ChannelInterceptor {
 		// 1. UUID 정보 추출
 		UUID attendeeUUID = (UUID)accessor.getSessionAttributes().get("attendeeUUID");
 		UUID roomUUID = (UUID)accessor.getSessionAttributes().get("roomUUID");
+
+		if(accessor.getDestination() == null){
+			throw new BusinessException(ErrorCode.INVALID_ROOM_UUID);
+		}
+
+		if(accessor.getDestination().startsWith("/sub/rooms/")){
+			if(!roomUUID.toString().equals(accessor.getDestination().substring("/sub/rooms/".length()))){
+				throw new BusinessException(ErrorCode.INVALID_ROOM_UUID);
+			}
+		}
 
 		// 2. 유효한 방이면 입장 요청
 		roomService.enterRoom(roomUUID, attendeeUUID);

@@ -10,18 +10,17 @@ export function axiosCreateRoom({ purpose, meetingDate, nickname }) {
     nickname,
   };
 
-  return axios
-    .post(BASE_URL + "/api/rooms", params, {
-      withCredentials: true, // 자격 증명을 포함하도록 설정
-    })
-    .then((res) => {
-      console.log("방 생성 완료");
-      console.log(res);
-    })
-    .catch((err) => {
-      console.error("방 생성 실패");
-      console.log(err);
-    });
+  return axios.post(BASE_URL + "/api/rooms", params, {
+    withCredentials: true, // 자격 증명을 포함하도록 설정
+  });
+  // .then((res) => {
+  //   console.log("방 생성 완료");
+  //   console.log(res);
+  // })
+  // .catch((err) => {
+  //   console.error("방 생성 실패");
+  //   console.log(err);
+  // });
 }
 
 // 방 유효성 검사
@@ -57,5 +56,5 @@ export function axiosPatchRoomInfo({
     purpose: roomPurpose,
   };
 
-  return axios.patch(BASE_URL + `api/rooms/${roomUUID}/`, params);
+  return axios.patch(BASE_URL + `/api/rooms/${roomUUID}/`, params);
 }

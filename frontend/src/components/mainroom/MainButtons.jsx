@@ -19,6 +19,7 @@ import FindDeparture from "./Departure";
 import { axiosGetMiddle } from "../../apis/mapApi";
 import useWs from "../../hooks/useWs";
 import { totalRoundAtom } from "../../recoil/atoms/gameState";
+import { axiosGetKakaoCalendar } from "../../apis/loginApi";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -317,7 +318,8 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const handleFindCenter = async () => {
     setIsMiddleLoading(true);
     try {
-      const data = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
+      const res = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
+      const data = res.data;
       setRoomState((prev) => ({
         ...prev,
         centerPlace: data.roomCenterStart,
@@ -394,6 +396,55 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
     }
   };
 
+  const handleInviteKakaoClick = () => {
+    // 없는 기능
+  };
+
+  const handleInviteCopyClick = () => {
+    const roomURL = `우리 모임장소 정해야지!!\n\nhttps://jjam.shop/room/${roomState.roomUUID}`;
+    navigator.clipboard
+      .writeText(roomURL)
+      .then(() => {
+        alert("초대 링크 복사 완료!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
+  const handleInfoKakaoClick = async () => {
+    try {
+      await axiosGetKakaoCalendar(roomState.roomUUID);
+    } catch (err) {
+      console.log("카카오톡 캘린더 연동 실패", err);
+      alert("연동 실패! 다시 시도해 주세요");
+    }
+  };
+
+  const handleInfoCopyClick = () => {
+    const date = new Date(roomState.meetingDate);
+
+    const formattedDate = new Intl.DateTimeFormat("ko", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+
+    const infoText = `${roomState.roomName} 모임 결과\n\n- 모임 장소: ${
+      roomState.centerPlace?.name
+        ? roomState.centerPlace.name
+        : "아직 모임장소를 찾지 않으셨어요 T.T"
+    }\n- 모임 목적: ${roomState.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
+    navigator.clipboard
+      .writeText(infoText)
+      .then(() => {
+        alert("모임 정보 복사 완료!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   return (
     <div style={{ zIndex: "100" }}>
       {isMiddleLoading ? <Loading message={"모임장소 찾는"} /> : null}
@@ -452,13 +503,29 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
           <SmallIcon src={userInfo.isHost ? updateIcon : alertIcon} />
         </SmallBtn>
         <SmallBtn
-          onClick={() => onOpenShareModal("초대 링크 공유", "50px")}
+          onClick={() =>
+            onOpenShareModal(
+              "초대 링크 공유",
+              "50px",
+              handleInviteKakaoClick,
+              handleInviteCopyClick,
+              true,
+            )
+          }
           isTutorialModalOpen={isTutorialModalOpen}
         >
           <SmallIcon src={inviteIcon} />
         </SmallBtn>
         <SmallBtn
-          onClick={() => onOpenShareModal("모임 정보 공유", "110px")}
+          onClick={() =>
+            onOpenShareModal(
+              "모임 정보 공유",
+              "110px",
+              handleInfoKakaoClick,
+              handleInfoCopyClick,
+              false,
+            )
+          }
           isTutorialModalOpen={isTutorialModalOpen}
         >
           <SmallIcon src={shareIcon} />

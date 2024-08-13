@@ -66,6 +66,9 @@ public enum ErrorCode {
 	ROOM_CANNOT_ENTER(HttpStatus.BAD_REQUEST, "RM002", "미팅룸에 참여할 수 없습니다."),
 	ROOM_NOT_OPEN_FOUND(HttpStatus.NOT_FOUND, "RM003", "미팅룸이 종료되었습니다."),
 
+	// room ws
+	INVALID_ROOM_UUID(HttpStatus.FORBIDDEN, "RM004", "방UUID가 일치하지 않습니다."),
+
 	// middle
 	MIDDLE_SOMEONE_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI001","위치를 선택안한 사람이 존재합니다."),
 	MIDDLE_EVERY_EMPTY_LOCATION(HttpStatus.NOT_FOUND, "MI002","아무도 위치를 선택하지 않았습니다."),

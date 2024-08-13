@@ -50,6 +50,8 @@ public class Room extends BaseTimeEntity {
 
 	private LocalDateTime endedAt;
 
+	private LocalDateTime estimatedForceCloseAt;
+
 	@OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Attendee> attendees;
 
@@ -63,7 +65,7 @@ public class Room extends BaseTimeEntity {
 
 	@Builder
 	public Room(Long roomId, String name, String purpose, String startStation, String finalStation ,LocalDateTime meetingDate,
-		RoomStatus roomStatus, LocalDateTime endedAt, List<Attendee> attendees, UUID roomUUID, Attendee root, boolean isCenterExist) {
+		RoomStatus roomStatus, LocalDateTime endedAt, LocalDateTime estimatedForceCloseAt, List<Attendee> attendees, UUID roomUUID, Attendee root, boolean isCenterExist) {
 		this.roomId = roomId;
 		this.name = name;
 		this.purpose = purpose;
@@ -72,6 +74,7 @@ public class Room extends BaseTimeEntity {
 		this.meetingDate = meetingDate;
 		this.roomStatus = roomStatus;
 		this.endedAt = endedAt;
+		this.estimatedForceCloseAt = estimatedForceCloseAt;
 		this.attendees = attendees;
 		this.roomUUID = roomUUID;
 		this.root = root;
@@ -98,12 +101,12 @@ public class Room extends BaseTimeEntity {
 		this.roomStatus = newStatus;
 	}
 
-	public void updateStation(String station){
-		this.startStation = station;
-	}
-
 	public void updateStartStation(String startStation){
 		this.startStation = startStation;
+	}
+
+	public void updateFinalStation(String finalStation){
+		this.finalStation = finalStation;
 	}
 
 	public void updateName(String name){
@@ -114,12 +117,13 @@ public class Room extends BaseTimeEntity {
 		return this.roomStatus == RoomStatus.FINISHED || this.roomStatus == RoomStatus.ABORTED;
 	}
 
-	public void updateRoot(Attendee attendee){
-		this.root = attendee;
-	}
-
 	public void updateIsCenterExist(boolean isCenterExist){
 		this.isCenterExist = isCenterExist;
+	}
+
+	public void updateForceClose(LocalDateTime forceClose){
+		this.estimatedForceCloseAt = forceClose;
+		this.roomStatus = RoomStatus.RESERVED;
 	}
 }
 

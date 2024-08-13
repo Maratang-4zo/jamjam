@@ -14,6 +14,7 @@ import com.maratang.jamjam.domain.gamePlay.entity.GameSession;
 import com.maratang.jamjam.domain.gamePlay.entity.GameSessionStatus;
 import com.maratang.jamjam.domain.gamePlay.repository.GameSessionRepository;
 import com.maratang.jamjam.domain.room.entity.Room;
+import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -36,7 +37,8 @@ public class GameSessionService {
 		GameSession gameSession = gameSessionCreateReq.toEntity(room);
 
 		GameSession gameSessionSaved = gameSessionRepository.save(gameSession);
-
+		room.updateStatus(RoomStatus.PLAYING);
+		roomRepository.save(room);
 		return GameSessionRes.of(gameSessionSaved);
 	}
 

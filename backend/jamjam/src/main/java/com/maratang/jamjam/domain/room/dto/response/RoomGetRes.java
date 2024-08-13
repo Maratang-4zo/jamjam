@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.room.entity.Room;
+import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
 
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class RoomGetRes {
     String roomPurpose;
     UUID hostUUID;
     List<AttendeeDTO> attendees;
+    RoomStatus roomStatus;
 
     public static RoomGetRes of(Room room, UUID attendeeUUID, SubwayInfo roomCenterStart){
         return RoomGetRes.builder()
@@ -35,6 +37,7 @@ public class RoomGetRes {
                .roomPurpose(room.getPurpose())
                .hostUUID(room.getRoomUUID())
                .attendees(AttendeeDTO.of(room.getAttendees()))
+                .roomStatus(room.getRoomStatus())
                .build();
     }
 }

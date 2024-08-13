@@ -30,7 +30,7 @@ public class AttendeeDTO {
             .duration(attendee.getDuration())
             .route(attendee.getRoute())
             .attendeeUUID(attendee.getAttendeeUUID())
-            .profileImageUrl(attendee.getProfileImageUrl().toString())
+            .profileImageUrl(attendee.getProfileImageUrl().getType())
             .build();
     }
 

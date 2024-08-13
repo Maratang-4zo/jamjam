@@ -1,17 +1,12 @@
 package com.maratang.jamjam.domain.room.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.maratang.jamjam.backup.board.dto.request.AttendeeUpdateReq;
-import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
@@ -20,35 +15,22 @@ import com.maratang.jamjam.domain.randomName.entity.Name;
 import com.maratang.jamjam.domain.randomName.entity.Nick;
 import com.maratang.jamjam.domain.randomName.repository.NameRepository;
 import com.maratang.jamjam.domain.randomName.repository.NickRepository;
-import com.maratang.jamjam.domain.room.dto.request.RoomCloseReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomCreateReq;
-import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.request.RoomUpdateReq;
-import com.maratang.jamjam.domain.room.dto.response.CenterLoadingDto;
 import com.maratang.jamjam.domain.room.dto.response.RoomGetRes;
-import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
-import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
+import com.maratang.jamjam.domain.room.dto.response.RootLeaveRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
-import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.map.middle.GeometryUtils;
-import com.maratang.jamjam.global.map.middle.GrahamScan;
-import com.maratang.jamjam.global.map.middle.HaversineDistance;
-import com.maratang.jamjam.global.map.middle.PolylineUtils;
-import com.maratang.jamjam.global.map.middle.client.OTPUserClient;
-import com.maratang.jamjam.global.map.middle.dto.OTPUserRes;
-import com.maratang.jamjam.global.map.station.Point;
 import com.maratang.jamjam.global.map.station.SubwayDataLoader;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -58,15 +40,36 @@ public class RoomService {
 	private final BroadCastService broadCastService;
 	private final RoomRepository roomRepository;
 	private final AttendeeRepository attendeeRepository;
-	private final GrahamScan grahamScan;
-	private final GeometryUtils geometryUtils;
-	private final SubwayDataLoader subwayDataLoader;
-	private final RoomTokenProvider roomTokenProvider;
-	private final HaversineDistance haversineDistance;
-	private final OTPUserClient oTPUserClient;
 	private final NickRepository nickRepository;
 	private final NameRepository nameRepository;
+	private final SubwayDataLoader subwayDataLoader;
 
+	// 방 정보 받기
+	public RoomGetRes findRoom(UUID roomUUID, UUID attendeeUUID) {
+		Room room = roomRepository.findByRoomUUID(roomUUID)
+			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+
+		if (room.isRoomClosed()) {
+			throw new BusinessException(ErrorCode.ROOM_NOT_OPEN_FOUND);
+		}
+
+		room.getAttendees().stream()
+			.filter(a -> a.getAttendeeUUID().equals(attendeeUUID))
+			.findFirst()
+			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
+
+		SubwayInfo roomCenterStart = subwayDataLoader.getSubwayInfo(room.getStartStation());
+
+		return RoomGetRes.of(room, attendeeUUID, roomCenterStart);
+	}
+
+	// 방 존재 유무 확인
+	public RoomRes isRoomExist(UUID roomUUID){
+		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		return RoomRes.of(room);
+	}
+
+	// 방 만들기
 	@Transactional
 	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq) {
 		Room room = roomCreateReq.toEntity();
@@ -76,7 +79,7 @@ public class RoomService {
 
 		String roomName = attendee.getNickname();
 
-		if (roomName == null || roomName.isEmpty()){
+		if (roomName == null || roomName.isBlank()){
 			//todo 여기서 nick 테이블에 잇는 모든 value 중에 랜덤 값으로 정하기
 			Nick nick = nickRepository.findRandomNick();
 			Name name = nameRepository.findRandomName();
@@ -95,6 +98,7 @@ public class RoomService {
 		return RoomJwtTokenClaims.of(room, attendee);
 	}
 
+	// 방 정보 변경
 	@Transactional
 	public void updateRoom(UUID roomUUID, RoomUpdateReq roomUpdateReq) {
 		// 1. DB 상태 변경
@@ -107,49 +111,8 @@ public class RoomService {
 		broadCastService.broadcastToRoom(roomUUID, roomUpdateReq, BroadCastType.ROOM_INFO_UPDATE);
 	}
 
-	@Transactional
-	public RoomMiddleRes getMiddleStation(UUID roomUUID) {
-		Room room = roomRepository.findByRoomUUID(roomUUID)
-			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
-		broadCastService.broadcastToRoom(roomUUID, CenterLoadingDto.of(true), BroadCastType.HOST_FIND_CENTER);
-		// Transforming attendees' coordinates into Point instances, skipping null values
-		List<Point> points = room.getAttendees().stream()
-			.filter(attendee -> attendee.getLat() != null && attendee.getLon() != null)
-			.map(attendee -> new Point(attendee.getLat(), attendee.getLon()))
-			.collect(Collectors.toList());
-
-		List<Point> grahamPoints = grahamScan.convexHull(points);
-
-		Point centroid = geometryUtils.calculateCentroid(grahamPoints);
-
-		Map<String, SubwayInfo> subwayMap = subwayDataLoader.getSubwayInfoMap();
-
-		double searchRadius = 5.0; // 5km
-
-		if (!room.getPurpose().equals("스터디룸") && !room.getPurpose().equals("식당") && !room.getPurpose().equals("카페") ){
-			throw new BusinessException(ErrorCode.MIDDLE_NOT_FOUND_PURPOSE_LOCATION);
-		}
-
-		SubwayInfo selectedStation = haversineDistance.selectStation(subwayMap, centroid.getX(),
-			centroid.getY(), searchRadius, room.getPurpose());
-
-		if (selectedStation == null) {
-			throw new BusinessException(ErrorCode.MIDDLE_NOT_FOUND_STATION_LOCATION);
-		}
-
-		saveOptimalRoutesForUsersInRoomToDatabase(room, selectedStation);
-
-		room.updateStartStation(selectedStation.getName());
-
-		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
-		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
-
-		RoomMiddleRes res = RoomMiddleRes.of(selectedStation, attendeeList);
-		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.ROOM_CENTER_UPDATE);
-		return res;
-	}
-
+	// 방 입장
 	@Transactional
 	public void enterRoom(UUID roomUUID, UUID attendeeUUID) {
 		// 정원 초과는 아직 고려 안 함
@@ -157,13 +120,21 @@ public class RoomService {
 		// 1. 활성화된 방인지, 유효한 유저인지, 방-유저 매칭이 되는지
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		if (room.getRoomStatus() == RoomStatus.ABORTED || room.getRoomStatus() == RoomStatus.FINISHED) {
+		if (room.isRoomClosed()) {
 			throw new BusinessException(ErrorCode.ROOM_CANNOT_ENTER);
 		}
 
 		// 2. 참여자 유효성 검사
 		Attendee attendee = attendeeRepository.findByAttendeeUUIDAndRoom(attendeeUUID, room)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
+
+		// 1-1. 나갔다 온 방장이니?
+		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){
+			room.updateStatus(RoomStatus.ONGOING);
+			roomRepository.save(room);
+			broadCastService.broadcastToRoom(roomUUID, "도망간 노예를 잡아왔다!!", BroadCastType.ROOM_ROOT_REENTRY);
+		}
+
 		attendee.updateStatus(AttendeeStatus.ENTERED);
 		attendeeRepository.save(attendee);
 
@@ -187,13 +158,17 @@ public class RoomService {
 		// 3. 방장
 		// 3-1. 모임 결정 완료) 다른 사람들도 DONE 표시하고 로비로 모셔다드리기
 		// 3-2. 모임 결정 미완료) 다른 사람들을 내쫓기
-		// Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		// if(room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
-		// 	closeRoom(roomUUID, attendeeUUID, null);
-		// }
+		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
+		if(room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
+			room.updateForceClose(LocalDateTime.now().plusMinutes(5));
+			roomRepository.save(room);
+			broadCastService.broadcastToRoom(roomUUID, RootLeaveRes.of(room, attendee), BroadCastType.ROOM_ROOT_LEAVE);
+		}
 	}
 
-	public void closeRoom(UUID roomUUID, UUID attendeeUUID, RoomCloseReq roomCloseReq) {
+	@Transactional
+	public void closeRoom(UUID roomUUID, UUID attendeeUUID) {
+		// 정상 종료
 		// 1. DB 상태 변경
 		Room room = roomRepository.findByRoomUUID(roomUUID)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
@@ -204,9 +179,6 @@ public class RoomService {
 
 		// 2. 남은 참여자 쫓아내기
 		room.updateStatus(RoomStatus.FINISHED);
-		if (roomCloseReq != null) {
-			room.updateStation(roomCloseReq.getStation());
-		}
 		roomRepository.save(room);
 
 		broadCastService.broadcastToRoom(roomUUID, "쫓겨나랏!!", BroadCastType.ROOM_CLOSE);
@@ -218,134 +190,7 @@ public class RoomService {
 		broadCastService.broadcastToRoom(roomUUID, "", BroadCastType.ATTENDEE_UPDATE);
 	}
 
-	public RoomRes isRoomExist(UUID roomUUID){
-		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		return RoomRes.of(room);
-	}
 
-	public RoomGetRes findRoom(UUID roomUUID, String roomToken) {
-		Room room = roomRepository.findByRoomUUID(roomUUID)
-			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-
-		if (room.getRoomStatus() == RoomStatus.FINISHED || room.getRoomStatus() == RoomStatus.ABORTED) {
-			throw new BusinessException(ErrorCode.ROOM_NOT_OPEN_FOUND);
-		}
-
-		// roomToken
-		Claims claims = roomTokenProvider.getTokenClaims(roomToken);
-
-		String attendeeUUIDString = (String)claims.get("attendeeUUID");
-
-		UUID attendeeUUID = UUID.fromString(attendeeUUIDString);
-
-		room.getAttendees().stream()
-			.filter(a -> a.getAttendeeUUID().equals(attendeeUUID))
-			.findFirst()
-			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
-
-		//roomToken end
-
-		SubwayInfo roomCenterStart = subwayDataLoader.getSubwayInfo(room.getStartStation());
-
-		return RoomGetRes.of(room, attendeeUUID, roomCenterStart);
-	}
-
-	private void saveOptimalRoutesForUsersInRoomToDatabase(Room room, SubwayInfo selectedStation) {
-		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
-		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
-
-		List<Map<String, Object>> attendeeDetails = attendeeList.stream()
-			.map(attendeeDTO -> {
-				Map<String, Object> details = new HashMap<>();
-				details.put("attendeeUUID", attendeeDTO.getAttendeeUUID());
-				details.put("lat", attendeeDTO.getLat());
-				details.put("lon", attendeeDTO.getLon());
-				return details;
-			})
-			.toList();
-
-		for (Map<String, Object> attendeeMap : attendeeDetails) {
-			// fromPlace: latitude and longitude of attendee
-			String fromPlace = attendeeMap.get("lat") + "," + attendeeMap.get("lon");
-
-			// toPlace: latitude and longitude of selectedStation
-			String toPlace = selectedStation.getLatitude() + "," + selectedStation.getLongitude();
-
-			// Call Feign Client to get OTPUserRes
-			OTPUserRes otpUserRes = oTPUserClient.getFixedOTPUser(fromPlace, toPlace);
-
-			if (otpUserRes != null && otpUserRes.getPlan() != null) {
-				List<OTPUserRes.Plan.Itinerary> itineraries = otpUserRes.getPlan().getItineraries();
-				long totalDuration = 0;
-				List<double[]> combinedPoints = new ArrayList<>();
-
-				for (OTPUserRes.Plan.Itinerary itinerary : itineraries) {
-					totalDuration += itinerary.getDuration();  // Sum durations
-
-					for (OTPUserRes.Plan.Itinerary.Leg leg : itinerary.getLegs()) {
-						List<double[]> decodedPoints = PolylineUtils.decode(leg.getLegGeometry().getPoints());
-						combinedPoints.addAll(decodedPoints);  // Combine points
-					}
-				}
-
-				// Encode combined points into a single polyline
-				String combinedPolyline = PolylineUtils.encode(combinedPoints);
-
-				Attendee attendee = attendeeRepository.findByAttendeeUUID((UUID) attendeeMap.get("attendeeUUID"))
-					.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
-
-				attendee.updateRoute(combinedPolyline);
-				attendee.updateDuration(totalDuration);
-			}
-		}
-		room.updateIsCenterExist(true);
-
-		attendeeRepository.saveAll(attendees);
-	}
-
-	public List<SubwayInfo> getAroundStation(UUID roomUUID) {
-		Room room = roomRepository.findByRoomUUID(roomUUID)
-			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-
-		String startStation = room.getStartStation();
-
-		if (startStation == null){
-			throw new BusinessException(ErrorCode.MIDDLE_NOT_SET_START_LOCATION);
-		}
-
-		Map<String, SubwayInfo> subwayMap = subwayDataLoader.getSubwayInfoMap();
-
-		double searchRadius = 5.0; // 5km
-
-		SubwayInfo point = subwayMap.get(startStation);
-
-		List<SubwayInfo> aroundStations = haversineDistance.aroundStation(subwayMap, point.getLatitude(), point.getLongitude(), searchRadius, room.getPurpose());
-
-		if (aroundStations == null || aroundStations.isEmpty()) {
-			throw new BusinessException(ErrorCode.MIDDLE_NOT_FOUND_STATION_LOCATION);
-		}
-
-		return aroundStations;
-	}
-
-	@Transactional
-	public RoomMoveRes moveRoom(UUID roomUUID, RoomMoveReq roomMoveReq) {
-		Room room = roomRepository.findByRoomUUID(roomUUID)
-			.orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-
-		room.updateStartStation(roomMoveReq.getStartStation());
-
-		SubwayInfo selectedStation = subwayDataLoader.getSubwayInfo(roomMoveReq.getStartStation());
-
-		saveOptimalRoutesForUsersInRoomToDatabase(room, selectedStation);
-
-		room.updateStartStation(selectedStation.getName());
-
-		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
-		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
-
-		return RoomMoveRes.of(selectedStation, attendeeList);
-	}
 
 }
 

@@ -30,3 +30,15 @@ export const isMainConnectingAtom = atom({
   key: "isMainConnecting",
   default: false,
 });
+
+// 방장이 나갔을 때
+export const isHostOutAtom = atom({
+  key: "isHostOut",
+  default: false,
+});
+
+// 방에 입장했을 때 게임중인지
+export const isPlayingGameAtom = atom({
+  key: "isPlayingGame",
+  default: false,
+});

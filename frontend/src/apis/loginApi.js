@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import { useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../utils/Cookies";
 
 // 쿠키에서 accessToken을 가져오는 함수
 const getAccessTokenFromCookie = () => {
@@ -97,3 +98,12 @@ export const axiosGetMeetingHistory = async () => {
     console.error("모임 기록 가져오기 실패");
   }
 };
+
+export function axiosGetKakaoCalendar(roomUUID) {
+  const Token = getCookie("accessToken");
+  return axios.get(`api/summary/kakaoCalendar/${roomUUID}`, {
+    headers: {
+      Token,
+    },
+  });
+}

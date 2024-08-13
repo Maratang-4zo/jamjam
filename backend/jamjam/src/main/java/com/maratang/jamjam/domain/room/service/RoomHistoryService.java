@@ -67,15 +67,16 @@ public class RoomHistoryService {
 		String kakaoAccessToken = member.getKakaoAccessToken();
 		RoomHistoryRes roomHistoryRes = getRoomSummary(roomUUID);
 
-		String date = dateTimeUtils.formatMeetingDate(roomHistoryRes.getMeetingDate());
+		String startDate = dateTimeUtils.formatMeetingDate(roomHistoryRes.getMeetingDate());
+		String endDate = dateTimeUtils.formatMeetingDate(roomHistoryRes.getMeetingDate().plusDays(1));
 
 		RoomHistoryDTO eventDetails = RoomHistoryDTO.builder()
 			.title(roomHistoryRes.getName())
 			.description(roomHistoryRes.getPurpose())
 			.time(RoomHistoryDTO.Time.builder()
-				.startAt(date)
-				.endAt(date)
-				.allDay(true)
+				.start_at(startDate)
+				.end_at(endDate)
+				.all_day(true)
 				.build())
 			.location(RoomHistoryDTO.Location.builder()
 				.name(roomHistoryRes.getFinalStation())
@@ -85,6 +86,7 @@ public class RoomHistoryService {
 		String eventJson;
 		try {
 			eventJson = objectMapper.writeValueAsString(eventDetails);
+			log.info("Event JSON: {}", eventJson);
 		} catch (JsonProcessingException e) {
 			throw new BusinessException(ErrorCode.INVALID_JSON);
 		}
@@ -125,7 +127,6 @@ public class RoomHistoryService {
 				log.info("여기까진 나왔니...");
 			}
 		} else {
-
 			throw new AuthenticationException(ErrorCode.KAKAO_RESPONSE_ERROR);
 		}
 	}

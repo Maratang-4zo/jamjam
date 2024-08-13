@@ -12,6 +12,7 @@ import { getCookie } from "../utils/Cookies";
 import useOpenVidu from "../hooks/useOpenVidu";
 import { useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
+import { roomAtom } from "../recoil/atoms/roomState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -21,6 +22,8 @@ const Wrapper = styled.div`
   border: 3px solid ${(props) => props.theme.accentColor};
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 `;
 
@@ -29,7 +32,8 @@ const Content = styled.div`
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  width: ${(props) => props.theme.wrapperWidth};
+  height: 60%;
+  width: 65%;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -41,6 +45,7 @@ const FormWrapper = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: end;
   gap: 20px;
 `;
 
@@ -55,6 +60,7 @@ const Label = styled.label`
   color: white;
   font-weight: bold;
   min-width: 100px; /* 라벨의 최소 너비 설정 */
+  font-family: "DungGeunMo";
 `;
 
 const DatePickerWrapper = styled.div`
@@ -63,15 +69,17 @@ const DatePickerWrapper = styled.div`
 `;
 
 const DatePickerStyled = styled(DatePicker)`
+  border-radius: 15px;
   padding: 10px;
   font-size: 16px;
   width: 100%; /* 수정 */
   box-sizing: border-box;
-  border: 3px solid ${(props) => props.theme.textColor};
+  border: 3px solid ${(props) => props.theme.subaccentColor};
   &:focus {
-    outline: none;
-    border: 3px solid ${(props) => props.theme.bgColor};
+    border: 3px solid ${(props) => props.theme.accentColor};
+    outline: 3px solid ${(props) => props.theme.bgColor};
   }
+  font-family: "DungGeunMo";
 `;
 
 const Select = styled.select`
@@ -79,23 +87,27 @@ const Select = styled.select`
   font-size: 16px;
   width: 200px;
   box-sizing: border-box;
-  border: 3px solid ${(props) => props.theme.textColor};
+  border: 3px solid ${(props) => props.theme.subaccentColor};
+  border-radius: 15px;
   &:focus {
-    outline: none;
-    border: 3px solid ${(props) => props.theme.bgColor};
+    border: 3px solid ${(props) => props.theme.accentColor};
+    outline: 3px solid ${(props) => props.theme.bgColor};
   }
+  font-family: "DungGeunMo";
 `;
 
 const Input = styled.input`
+  border-radius: 15px;
   padding: 10px;
   font-size: 16px;
   width: 200px;
   box-sizing: border-box;
-  border: 3px solid ${(props) => props.theme.textColor};
+  border: 3px solid ${(props) => props.theme.subaccentColor};
   &:focus {
-    border: 3px solid ${(props) => props.theme.bgColor};
-    outline: none;
+    border: 3px solid ${(props) => props.theme.accentColor};
+    outline: 3px solid ${(props) => props.theme.bgColor};
   }
+  font-family: "DungGeunMo";
 `;
 
 const Button = styled.button`
@@ -123,14 +135,16 @@ const ButtonText = styled.p`
 
 const ErrorBox = styled.div`
   width: 200px;
-  height: 50px;
+  height: 30px;
   margin-top: 10px;
   text-align: center;
+  font-family: "DungGeunMo";
 `;
 
 function CreateRoom() {
   const navigate = useNavigate();
   const setUserInfo = useSetRecoilState(userInfoAtom);
+  const setRoomInfo = useSetRecoilState(roomAtom);
   const { createSession } = useOpenVidu();
   const {
     register,
@@ -141,20 +155,26 @@ function CreateRoom() {
 
   const createRoomFn = async (data) => {
     try {
-      const response = await axiosCreateRoom(
-        data.purpose,
-        data.meetingDate.toISOString(),
-        data.nickname,
-      );
+      const response = await axiosCreateRoom({
+        purpose: data.purpose,
+        meetingDate: data.meetingDate.toISOString(),
+        nickname: data.nickname,
+      });
 
-      const roomToken = getCookie("roomToken");
-      const { roomUUID, attendeeUUID } = jwtDecode(roomToken);
+      const { roomUUID, attendeeUUID } = response.data;
+      console.log(response);
 
       await createSession();
       setUserInfo((prev) => ({
         ...prev,
         myUUID: attendeeUUID,
         isHost: true,
+      }));
+
+      setRoomInfo((prev) => ({
+        ...prev,
+        roomUUID: roomUUID,
+        hostUUID: attendeeUUID,
       }));
 
       navigate(`/room/${roomUUID}`);
@@ -167,6 +187,11 @@ function CreateRoom() {
     <Wrapper>
       <NavBarUp />
       <Content>
+        <ErrorBox>
+          {errors.meetingDate && (
+            <p style={{ color: "red" }}>{errors.meetingDate.message}</p>
+          )}
+        </ErrorBox>
         <FormWrapper onSubmit={handleSubmit(createRoomFn)}>
           <InputWrapper>
             <Label>닉네임:</Label>
@@ -206,22 +231,22 @@ function CreateRoom() {
               <option value="" disabled hidden>
                 카테고리를 선택하세요
               </option>
-              <option value="sports">스포츠</option>
-              <option value="music">음악</option>
-              <option value="study">스터디</option>
-              <option value="travel">여행</option>
-              <option value="food">음식</option>
+              <option value="카페">카페</option>
+              <option value="호프">호프</option>
+              <option value="스터디룸">스터디룸</option>
+              <option value="헬스클럽">헬스클럽</option>
+              <option value="식당">식당</option>
+              <option value="도서관">도서관</option>
+              <option value="공원">공원</option>
+              <option value="미술관">미술관</option>
+              <option value="애견카페">애견카페</option>
+              <option value="셀프사진">셀프사진</option>
             </Select>
           </InputWrapper>
           <Button type="submit">
             <ButtonText>생성</ButtonText>
           </Button>
         </FormWrapper>
-        <ErrorBox>
-          {errors.meetingDate && (
-            <p style={{ color: "red" }}>{errors.meetingDate.message}</p>
-          )}
-        </ErrorBox>
       </Content>
     </Wrapper>
   );

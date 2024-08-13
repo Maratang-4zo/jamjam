@@ -28,6 +28,7 @@ import {
   isHistoryLoadingAtom,
   isThreeStationLoadingAtom,
 } from "../../recoil/atoms/loadingState";
+import { getCookie } from "../../utils/Cookies";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -163,7 +164,7 @@ function GameFinishButtons() {
   const [isFinalLoading, setIsFinalLoading] =
     useRecoilState(isHistoryLoadingAtom);
   const [isWinner, setIsWinner] = useRecoilState(isWinnerAtom);
-  const { sendNextRound } = useWs();
+  const { sendNextRound, sendGoResult } = useWs();
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
   const gameRoundUUID = useRecoilValue(currentRoundUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);
@@ -191,7 +192,7 @@ function GameFinishButtons() {
   };
 
   const handleFinalResultBtnClick = async () => {
-    sendNextRound({ gameRoundUUID, currentRound, totalRound });
+    sendGoResult({ gameSessionUUID });
     setSelectedStation(null);
     setIsNextMiddleExist(false);
     setIsFinalLoading(true);

@@ -51,10 +51,9 @@ const ChatMessages = styled.div`
   flex-direction: column;
   gap: 10px;
 
-  /* Webkit 기반 브라우저에서 스크롤바 스타일 */
   &::-webkit-scrollbar {
     width: 6px;
-    border-radius: 10px; /* 스크롤바 자체를 둥글게 */
+    border-radius: 10px;
   }
 
   &::-webkit-scrollbar-track {
@@ -65,7 +64,6 @@ const ChatMessages = styled.div`
   &::-webkit-scrollbar-thumb {
     background-color: ${(props) => props.theme.infoColor + 80};
     border-radius: 10px;
-    /* border: 2px solid #282828; */
   }
 
   &::-webkit-scrollbar-thumb:hover {
@@ -166,6 +164,16 @@ const ChatContentLine = styled.p`
   font-size: 20px;
 `;
 
+const AlertMessage = styled.div`
+  padding: 10px;
+  background-color: #333;
+  border-radius: 10px;
+  color: #ff8c00;
+  text-align: center;
+  font-family: "NewGalmuriBold";
+  font-size: 18px;
+`;
+
 function ChattingModal({ isVisible, toggleModal }) {
   const { sendChat } = useWs();
   const roomInfo = useRecoilValue(roomAtom);
@@ -195,8 +203,6 @@ function ChattingModal({ isVisible, toggleModal }) {
     setChatContent(""); // 입력창 초기화
     sendChat({
       content: chatContent,
-      roomUUID: roomInfo.roomUUID,
-      attendeeUUID: userInfo.myUUID,
     });
   };
 
@@ -207,40 +213,6 @@ function ChattingModal({ isVisible, toggleModal }) {
     return `${hours}:${minutes}`;
   };
 
-  const groupMessages = () => {
-    const grouped = [];
-    let currentGroup = { user: null, nickname: null, time: null, messages: [] };
-
-    chatLogs.forEach((chat, index) => {
-      const chatTimeFormatted = formatTime(chat.createdAt);
-
-      if (
-        currentGroup.user === chat.senderUUID &&
-        currentGroup.time === chatTimeFormatted
-      ) {
-        currentGroup.messages.push(chat.content);
-      } else {
-        if (currentGroup.user) {
-          grouped.push(currentGroup);
-        }
-        currentGroup = {
-          user: chat.senderUUID,
-          nickname: chat.nickname,
-          time: chatTimeFormatted,
-          messages: [chat.content],
-        };
-      }
-
-      if (index === chatLogs.length - 1) {
-        grouped.push(currentGroup);
-      }
-    });
-
-    return grouped;
-  };
-
-  const groupedMessages = groupMessages();
-
   return (
     <SideModal isVisible={isVisible}>
       <ChatHeader>
@@ -248,18 +220,27 @@ function ChattingModal({ isVisible, toggleModal }) {
         <CloseButton onClick={toggleModal}>X</CloseButton>
       </ChatHeader>
       <ChatMessages ref={chatMessagesRef}>
-        {groupedMessages.map((group, index) => (
-          <ChatBox key={index}>
-            <ChatInfoBox>
-              <ChatInfoUser>{group.nickname}</ChatInfoUser>
-              <ChatInfoTime>{group.time}</ChatInfoTime>
-            </ChatInfoBox>
-            <ChatContentBox>
-              {group.messages.map((message, idx) => (
-                <ChatContentLine key={idx}>{message}</ChatContentLine>
-              ))}
-            </ChatContentBox>
-          </ChatBox>
+        {chatLogs.map((chat, index) => (
+          <React.Fragment key={index}>
+            {chat.type === "chat" ? (
+              <ChatBox>
+                <ChatInfoBox>
+                  <ChatInfoUser>{chat.nickname}</ChatInfoUser>
+                  <ChatInfoTime>{formatTime(chat.createdAt)}</ChatInfoTime>
+                </ChatInfoBox>
+                <ChatContentBox>
+                  <ChatContentLine>{chat.content}</ChatContentLine>
+                </ChatContentBox>
+              </ChatBox>
+            ) : (
+              <AlertMessage>
+                {chat.nickname}님이{" "}
+                {chat.alertType === "out"
+                  ? "퇴장하셨습니다."
+                  : "입장하셨습니다."}
+              </AlertMessage>
+            )}
+          </React.Fragment>
         ))}
       </ChatMessages>
       <ChatInputWrapper onSubmit={handleSubmit}>

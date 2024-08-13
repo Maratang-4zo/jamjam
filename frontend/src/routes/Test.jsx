@@ -89,7 +89,7 @@ const Div = styled.div`
 function App() {
   return (
     <Div>
-      <WavyButton>PLAY</WavyButton>
+      <WavyButton>카카오톡으로 로그인</WavyButton>
     </Div>
   );
 }

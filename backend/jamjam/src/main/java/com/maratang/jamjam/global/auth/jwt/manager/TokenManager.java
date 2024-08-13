@@ -13,11 +13,14 @@ import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.auth.jwt.constant.TokenType;
 import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
+import com.maratang.jamjam.global.util.CookieUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -91,7 +94,7 @@ public class TokenManager {
 		return refreshToken;
 	}
 
-	public boolean validateAccessToken(String token) {
+	public boolean validateAccessToken(String token, HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Jwts.parser().setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
 				.parseClaimsJws(token);
@@ -101,26 +104,33 @@ public class TokenManager {
 			return false;
 		} catch (Exception e) {
 			log.info("유효하지 않은 인증", e);
+			CookieUtils.removeCookie(request, response, "refreshToken");
+			CookieUtils.removeCookie(request, response, "accessToken");
 			throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
 		}
 	}
 
-	public boolean validateRefreshToken(String token) {
+	public boolean validateRefreshToken(String token, HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Jwts.parser().setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
 				.parseClaimsJws(token);
 			return true;
 		} catch (ExpiredJwtException e) {
 			log.info("refreshToken 만료", e);
+			CookieUtils.removeCookie(request, response, "refreshToken");
+			CookieUtils.removeCookie(request, response, "accessToken");
 			throw new AuthenticationException(ErrorCode.REFRESH_TOKEN_EXPIRED);
 		} catch (Exception e) {
 			log.info("유효하지 않은 인증", e);
+			CookieUtils.removeCookie(request, response, "refreshToken");
+			CookieUtils.removeCookie(request, response, "accessToken");
 			throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
 		}
 	}
 
 	public String reissueToken(String refreshToken) {
 		Member member = memberService.findMemberByRefreshToken(refreshToken);
+		log.info("재발급이다 이놈아");
 		String newToken = createAccessToken(member.getEmail(), member.getNickname(), createAccessTokenExpireTime());
 		return newToken;
 	}
@@ -138,5 +148,6 @@ public class TokenManager {
 		}
 		return claims;
 	}
+
 
 }

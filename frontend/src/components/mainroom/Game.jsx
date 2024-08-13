@@ -51,6 +51,7 @@ const ContentWrapper = styled.div`
   height: 100%;
 `;
 const StyledButton = styled.button`
+  font-family: "OldGalmuri";
   background-color: ${(props) =>
     props.disabled ? "gray" : props.theme.bgColor};
   border: 3px solid #000000;
@@ -105,6 +106,7 @@ function Game() {
               };
             }),
           );
+          setAroundStations(aroundStationsData);
         } catch (error) {
           console.log("역 주변 상권정보 가져오기 실패", error);
         }

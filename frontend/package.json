@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "apexcharts": "^3.50.0",
     "axios": "^1.7.2",
+    "bezier-easing": "^2.1.0",
     "bootstrap": "^5.3.3",
     "colorthief": "^2.4.0",
     "dotenv": "^16.4.5",

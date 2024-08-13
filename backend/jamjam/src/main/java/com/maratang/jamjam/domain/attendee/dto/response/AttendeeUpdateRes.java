@@ -14,13 +14,17 @@ public class AttendeeUpdateRes {
 	private String address;
 	private Double lat;
 	private Double lon;
+	private boolean isAllHasDeparture;
+	private boolean isCenterExist;
 
-	public static AttendeeUpdateRes of(Attendee attendee) {
+	public static AttendeeUpdateRes of(Attendee attendee, boolean isAllHasDeparture, boolean isCenterExist) {
 		return AttendeeUpdateRes.builder()
                 .attendeeUUID(attendee.getAttendeeUUID())
                 .address(attendee.getAddress())
                 .lat(attendee.getLat())
                 .lon(attendee.getLon())
+				.isAllHasDeparture(isAllHasDeparture)
+				.isCenterExist(isCenterExist)
                 .build();
 	}
 }

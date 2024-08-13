@@ -16,14 +16,11 @@ import {
 import { axiosUpdateUserInfo } from "../apis/mapApi";
 import { useNavigate, useParams } from "react-router-dom";
 import { axiosIsRoomValid, axiosGetRoomInfo } from "../apis/roomApi";
-import { getCookie } from "../utils/Cookies";
-import { jwtDecode } from "jwt-decode";
 import useWs from "../hooks/useWs";
 import useOpenVidu from "../hooks/useOpenVidu";
 import Loading from "../components/fixed/Loading";
 import GameFinishButtons from "../components/mainroom/GameFinishButtons";
 import GameChoice from "../components/mainroom/GameChoice";
-import { selectedGameAtom } from "../recoil/atoms/gameState";
 import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
 import Watching from "../components/fixed/Watching";

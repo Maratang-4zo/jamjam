@@ -4,7 +4,7 @@ export const roomAtom = atom({
   key: "roomState",
   default: {
     roomUUID: "",
-    roomName: "어디서 볼래 사당빼고",
+    roomName: "",
     meetingDate: "",
     roomPurpose: "",
     attendees: [],
@@ -14,7 +14,6 @@ export const roomAtom = atom({
     isCenterExist: false,
     isAllReadyToGame: false,
     centerPlace: {},
-    isValid: false,
   },
 });
 
@@ -51,4 +50,9 @@ export const currentSpeakersAtom = atom({
 export const roomPageAtom = atom({
   key: "roomPage",
   default: "main", // main, gamechoice, game, gamefinish, result
+});
+
+export const estimatedForceCloseAtAtom = atom({
+  key: "estimatedForceCloseAt",
+  default: null,
 });

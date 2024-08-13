@@ -22,6 +22,8 @@ const Wrapper = styled.div`
   border: 3px solid ${(props) => props.theme.accentColor};
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 `;
 
@@ -30,7 +32,8 @@ const Content = styled.div`
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  width: ${(props) => props.theme.wrapperWidth};
+  height: 60%;
+  width: 65%;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -42,6 +45,7 @@ const FormWrapper = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: end;
   gap: 20px;
 `;
 
@@ -56,6 +60,7 @@ const Label = styled.label`
   color: white;
   font-weight: bold;
   min-width: 100px; /* 라벨의 최소 너비 설정 */
+  font-family: "DungGeunMo";
 `;
 
 const DatePickerWrapper = styled.div`
@@ -64,15 +69,17 @@ const DatePickerWrapper = styled.div`
 `;
 
 const DatePickerStyled = styled(DatePicker)`
+  border-radius: 15px;
   padding: 10px;
   font-size: 16px;
   width: 100%; /* 수정 */
   box-sizing: border-box;
-  border: 3px solid ${(props) => props.theme.textColor};
+  border: 3px solid ${(props) => props.theme.subaccentColor};
   &:focus {
-    outline: none;
-    border: 3px solid ${(props) => props.theme.bgColor};
+    border: 3px solid ${(props) => props.theme.accentColor};
+    outline: 3px solid ${(props) => props.theme.bgColor};
   }
+  font-family: "DungGeunMo";
 `;
 
 const Select = styled.select`
@@ -80,23 +87,27 @@ const Select = styled.select`
   font-size: 16px;
   width: 200px;
   box-sizing: border-box;
-  border: 3px solid ${(props) => props.theme.textColor};
+  border: 3px solid ${(props) => props.theme.subaccentColor};
+  border-radius: 15px;
   &:focus {
-    outline: none;
-    border: 3px solid ${(props) => props.theme.bgColor};
+    border: 3px solid ${(props) => props.theme.accentColor};
+    outline: 3px solid ${(props) => props.theme.bgColor};
   }
+  font-family: "DungGeunMo";
 `;
 
 const Input = styled.input`
+  border-radius: 15px;
   padding: 10px;
   font-size: 16px;
   width: 200px;
   box-sizing: border-box;
-  border: 3px solid ${(props) => props.theme.textColor};
+  border: 3px solid ${(props) => props.theme.subaccentColor};
   &:focus {
-    border: 3px solid ${(props) => props.theme.bgColor};
-    outline: none;
+    border: 3px solid ${(props) => props.theme.accentColor};
+    outline: 3px solid ${(props) => props.theme.bgColor};
   }
+  font-family: "DungGeunMo";
 `;
 
 const Button = styled.button`
@@ -124,9 +135,10 @@ const ButtonText = styled.p`
 
 const ErrorBox = styled.div`
   width: 200px;
-  height: 50px;
+  height: 30px;
   margin-top: 10px;
   text-align: center;
+  font-family: "DungGeunMo";
 `;
 
 function CreateRoom() {
@@ -174,6 +186,11 @@ function CreateRoom() {
     <Wrapper>
       <NavBarUp />
       <Content>
+        <ErrorBox>
+          {errors.meetingDate && (
+            <p style={{ color: "red" }}>{errors.meetingDate.message}</p>
+          )}
+        </ErrorBox>
         <FormWrapper onSubmit={handleSubmit(createRoomFn)}>
           <InputWrapper>
             <Label>닉네임:</Label>
@@ -229,11 +246,6 @@ function CreateRoom() {
             <ButtonText>생성</ButtonText>
           </Button>
         </FormWrapper>
-        <ErrorBox>
-          {errors.meetingDate && (
-            <p style={{ color: "red" }}>{errors.meetingDate.message}</p>
-          )}
-        </ErrorBox>
       </Content>
     </Wrapper>
   );

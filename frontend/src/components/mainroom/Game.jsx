@@ -51,6 +51,7 @@ const ContentWrapper = styled.div`
   height: 100%;
 `;
 const StyledButton = styled.button`
+  font-family: "OldGalmuri";
   background-color: ${(props) =>
     props.disabled ? "gray" : props.theme.bgColor};
   border: 3px solid #000000;

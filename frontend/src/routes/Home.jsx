@@ -60,7 +60,7 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 70px);
   overflow-y: scroll;
   overflow-x: hidden;
   &::-webkit-scrollbar {
@@ -70,7 +70,7 @@ const Container = styled.div`
 
 const Section = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 95vh;
   scroll-snap-align: start;
   display: flex;
   justify-content: center;

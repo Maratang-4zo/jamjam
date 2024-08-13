@@ -101,6 +101,13 @@ const useWs = () => {
             console.error(frame);
             setConnected(false);
             reject(frame);
+            handleStompError(frame);
+          },
+          onWebSocketError: (evt) => {
+            handleWebSocketError(evt);
+          },
+          onWebSocketClose: (evt) => {
+            handleWebSocketClose(evt);
           },
         });
         client.current.activate();
@@ -108,6 +115,33 @@ const useWs = () => {
     },
     [connected],
   );
+
+  const handleStompError = (frame) => {
+    if (frame.headers && frame.headers["message"]) {
+      alert(`Handshake 실패: ${frame.headers["message"]}`);
+    } else {
+      alert("Handshake 실패: 알 수 없는 오류");
+    }
+    // 재연결 시도 중지
+    client.current.deactivate();
+  };
+
+  const handleWebSocketClose = (event) => {
+    if (event.code === 1006) {
+      // 비정상적인 종료 코드
+      alert("WebSocket 연결이 비정상적으로 종료되었습니다.");
+      // 재연결 시도 중지
+      client.current.deactivate();
+    }
+    alert(event.code);
+    client.current.deactivate();
+  };
+
+  const handleWebSocketError = (error) => {
+    alert("WebSocket 연결에 실패했습니다.");
+    // 재연결 시도 중지
+    client.current.deactivate();
+  };
 
   const subscribe = (roomUUID) => {
     client.current.subscribe(

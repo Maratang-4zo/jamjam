@@ -62,89 +62,89 @@ function Room() {
   const { connect, connected } = useWs();
   const { joinSession, joined } = useOpenVidu();
 
-  useEffect(() => {
-    const initializeRoom = async () => {
-      try {
-        // 방 유효성 검사
-        const response = await axiosIsRoomValid({ roomUUID });
-        const res = response.data;
-        if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
-          navigate("/");
-          alert("종료된 방입니다.");
-        } else if (res.roomStatus === "PLAYING") {
-          setIsPlayingGame(true);
-        } else if (res.roomStatus === "RESERVED") {
-          setIsHostOut(true);
-        }
-        // 방 정보 가져오기
-        const roomResponse = await axiosGetRoomInfo({ roomUUID });
-        const roomData = roomResponse.data;
+  // useEffect(() => {
+  //   const initializeRoom = async () => {
+  //     try {
+  //       // 방 유효성 검사
+  //       const response = await axiosIsRoomValid({ roomUUID });
+  //       const res = response.data;
+  //       if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
+  //         navigate("/");
+  //         alert("종료된 방입니다.");
+  //       } else if (res.roomStatus === "PLAYING") {
+  //         setIsPlayingGame(true);
+  //       } else if (res.roomStatus === "RESERVED") {
+  //         setIsHostOut(true);
+  //       }
+  //       // 방 정보 가져오기
+  //       const roomResponse = await axiosGetRoomInfo({ roomUUID });
+  //       const roomData = roomResponse.data;
 
-        console.log(roomData);
+  //       console.log(roomData);
 
-        const roomToken = getCookie("roomToken");
-        if (roomToken) {
-          const myUUID = jwtDecode(roomToken).attendeeUUID;
-          const myAttendeeInfo = roomData.attendees.find(
-            (attendee) => attendee.attendeeUUID === myUUID,
-          );
+  //       const roomToken = getCookie("roomToken");
+  //       if (roomToken) {
+  //         const myUUID = jwtDecode(roomToken).attendeeUUID;
+  //         const myAttendeeInfo = roomData.attendees.find(
+  //           (attendee) => attendee.attendeeUUID === myUUID,
+  //         );
 
-          if (
-            !myAttendeeInfo ||
-            !myAttendeeInfo.address ||
-            !myAttendeeInfo.lat ||
-            !myAttendeeInfo.lon
-          ) {
-            setIsFindDepartureModalOpen(true);
-          }
+  //         if (
+  //           !myAttendeeInfo ||
+  //           !myAttendeeInfo.address ||
+  //           !myAttendeeInfo.lat ||
+  //           !myAttendeeInfo.lon
+  //         ) {
+  //           setIsFindDepartureModalOpen(true);
+  //         }
 
-          setRoomInfo((prev) => ({
-            ...prev,
-            roomUUID,
-            roomName: roomData.roomName,
-            meetingDate: roomData.roomTime,
-            centerPlace: roomData.roomCenterStart,
-            attendees: [...roomData.attendees],
-            roomPurpose: roomData.roomPurpose,
-            hostUUID: roomData.hostUUID,
-          }));
+  //         setRoomInfo((prev) => ({
+  //           ...prev,
+  //           roomUUID,
+  //           roomName: roomData.roomName,
+  //           meetingDate: roomData.roomTime,
+  //           centerPlace: roomData.roomCenterStart,
+  //           attendees: [...roomData.attendees],
+  //           roomPurpose: roomData.roomPurpose,
+  //           hostUUID: roomData.hostUUID,
+  //         }));
 
-          setUserInfo((prev) => ({
-            ...prev,
-            myUUID,
-            isHost: roomData.isHost,
-            departure: {
-              address: myAttendeeInfo.address,
-              lat: myAttendeeInfo.lat,
-              lon: myAttendeeInfo.lon,
-            },
-            nickname: myAttendeeInfo.nickname,
-            duration: myAttendeeInfo.duration,
-            route: myAttendeeInfo.route,
-            profileImageUrl: myAttendeeInfo.profileImageUrl,
-          }));
+  //         setUserInfo((prev) => ({
+  //           ...prev,
+  //           myUUID,
+  //           isHost: roomData.isHost,
+  //           departure: {
+  //             address: myAttendeeInfo.address,
+  //             lat: myAttendeeInfo.lat,
+  //             lon: myAttendeeInfo.lon,
+  //           },
+  //           nickname: myAttendeeInfo.nickname,
+  //           duration: myAttendeeInfo.duration,
+  //           route: myAttendeeInfo.route,
+  //           profileImageUrl: myAttendeeInfo.profileImageUrl,
+  //         }));
 
-          if (!connected) {
-            await connect(roomUUID);
-          }
+  //         if (!connected) {
+  //           await connect(roomUUID);
+  //         }
 
-          if (!joined) {
-            await joinSession();
-          }
-        } else {
-          navigate(`/room/${roomUUID}/join`);
-        }
-      } catch (error) {
-        console.error("방 유효성 검사 실패:", error);
-        alert("존재하지 않는 방입니다.");
-        navigate("/invalid-room");
-      } finally {
-        setJoinLoading(false);
-      }
-    };
+  //         if (!joined) {
+  //           await joinSession();
+  //         }
+  //       } else {
+  //         navigate(`/room/${roomUUID}/join`);
+  //       }
+  //     } catch (error) {
+  //       console.error("방 유효성 검사 실패:", error);
+  //       alert("존재하지 않는 방입니다.");
+  //       navigate("/invalid-room");
+  //     } finally {
+  //       setJoinLoading(false);
+  //     }
+  //   };
 
-    initializeRoom();
-  }, [roomUUID, navigate, setRoomInfo, setUserInfo]);
+  //   initializeRoom();
+  // }, [roomUUID, navigate, setRoomInfo, setUserInfo]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);

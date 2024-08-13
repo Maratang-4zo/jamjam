@@ -7,8 +7,8 @@ const Section = styled.div`
   width: 100vw;
   scroll-snap-align: start;
   display: flex;
-  justify-content: flex-start; /* 왼쪽 정렬 */
   align-items: center;
+  justify-content: space-between;
   font-size: 100px;
   font-family: "DungGeunMo";
   position: relative;
@@ -18,7 +18,6 @@ const Section = styled.div`
 
 const Image = styled.img`
   position: relative;
-  right: -40px;
   height: 70%;
   object-fit: cover;
 `;
@@ -26,7 +25,6 @@ const Image = styled.img`
 const TextContainer = styled.div`
   margin-top: 20px;
   position: relative;
-  left: 0;
   text-align: left;
 `;
 

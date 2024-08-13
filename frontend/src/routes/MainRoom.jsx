@@ -69,6 +69,13 @@ function Room() {
         const response = await axiosIsRoomValid({ roomUUID });
         const res = response.data;
         if (!res.hasToken) {
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID: res.roomUUID,
+            roomName: res.roomName,
+            meetingDate: res.meetingDate,
+            roomPurpose: res.purpose,
+          }));
           navigate(`/room/${roomUUID}/join`);
         } else {
           if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {

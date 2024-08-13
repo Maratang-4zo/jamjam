@@ -5,13 +5,9 @@ import Room from "./routes/MainRoom";
 import CreateRoom from "./routes/CreateRoom";
 import JoinRoom from "./routes/JoinRoom";
 import Reconnect from "./routes/Reconnect";
-import Ws from "./routes/ws";
-import ConnectOpenVidu from "./routes/OpenVidu";
 import InvalidRoom from "./routes/InvalidRoom";
 import Han from "./routes/Han";
-import Test from "./routes/Test";
 import NewHome from "./routes/NewHome";
-import ComicSection from "./components/home/ComicSection";
 
 function Router() {
   return (
@@ -24,9 +20,7 @@ function Router() {
         <Route path="/room/:roomUUID/join" element={<JoinRoom />} />
         <Route path="/room/:roomUUID/reconnect" element={<Reconnect />} />
         <Route path="/invalid-room" element={<InvalidRoom />} />
-        <Route path="/test" element={<Test />} />
         <Route path="/newhome" element={<NewHome />} />
-        {/* <Route path="/oauth/kakao/callback" element={<Auth />} /> */}
         <Route path="/han" element={<Han />} />
       </Routes>
     </BrowserRouter>

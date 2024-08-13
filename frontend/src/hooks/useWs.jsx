@@ -167,81 +167,82 @@ const useWs = () => {
 
   const handleMessage = useCallback((message) => {
     console.log(message);
-    switch (message.type) {
+    const messageBody = JSON.parse(message.body);
+    switch (message.headers.type) {
       case "CHAT_RECEIVED":
-        handleChatLogs(message);
+        handleChatLogs(messageBody);
         break;
       case "ROOM_UPDATE":
-        updateRoomStatus(message);
+        updateRoomStatus(messageBody);
         break;
       case "AVATAR_POSITION":
-        handleAvatarPosition(message);
+        handleAvatarPosition(messageBody);
         break;
       case "ROOM_INFO_UPDATE":
-        handleRoomInfoUpdate(message);
+        handleRoomInfoUpdate(messageBody);
         break;
       case "DEPARTURE_UPDATE":
-        handleDepartureUpdate(message);
+        handleDepartureUpdate(messageBody);
         break;
       case "ROOM_CENTER_UPDATE":
-        handleRoomCenterUpdate(message);
+        handleRoomCenterUpdate(messageBody);
         break;
       case "GAME_CENTER_UPDATE":
-        handleGameCenterUpdate(message);
+        handleGameCenterUpdate(messageBody);
         break;
       case "AROUND_STATIONS":
-        handleGetAroundStations(message);
+        handleGetAroundStations(messageBody);
         break;
       case "GAME_SESSION_READY":
-        handleGameSessionReady(message);
+        handleGameSessionReady(messageBody);
         break;
       case "CENTER_HISTORY":
-        handleCenterHistory(message);
+        handleCenterHistory(messageBody);
         break;
       case "GAME_READY":
-        handleGameReady(message);
+        handleGameReady(messageBody);
         break;
       case "GAME_END":
-        handleGameEnd(message);
+        handleGameEnd(messageBody);
         break;
       case "GAME_WINNER":
-        handleGameWinner(message);
+        handleGameWinner(messageBody);
         break;
       case "GAME_COUNTDOWN":
-        handleGameCountdown(message);
+        handleGameCountdown(messageBody);
         break;
       case "GAME_START":
-        handleGameStart(message);
+        handleGameStart(messageBody);
         break;
       case "GAME_RESULT_APPLY":
-        handleGameResultApply(message);
+        handleGameResultApply(messageBody);
         break;
       case "GAME_RESET":
-        handleGameReset(message);
+        handleGameReset(messageBody);
         break;
       case "HOST_FIND_CENTER":
-        handleHostFindCenter(message);
+        handleHostFindCenter(messageBody);
         break;
       case "GAME_NEXT_ROUND":
-        handleNextRound(message);
+        handleNextRound(messageBody);
         break;
       case "WINNER_NEXT_PAGE":
-        handleWinnerNextPage(message);
+        handleWinnerNextPage(messageBody);
         break;
       case "HOST_GO_MAIN":
-        handleHostGoMain(message);
+        handleHostGoMain(messageBody);
         break;
       case "ROOM_ROOT_LEAVE":
-        handleRoomRootLeave(message);
+        handleRoomRootLeave(messageBody);
         break;
       case "ROOM_LEAVE":
-        handleRoomLeave(message);
+        handleRoomLeave(messageBody);
         break;
       case "ROOM_ENTER":
-        handleRoomEnter(message);
+        handleRoomEnter(messageBody);
         break;
       case "ROOM_FORCE_EXIT":
-        handleRoomExit(message);
+        handleRoomExit(messageBody);
         break;
       default:
         console.error("Unknown message type:", message.type);

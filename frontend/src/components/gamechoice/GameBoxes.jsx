@@ -220,7 +220,6 @@ function GameBoxes({ selectedGame, setSelectedGame }) {
       </GameCard1>
       <GameCard2 disabled={!isHost}>
         <Middle2 className="middle2">Coming Soon!</Middle2>
-
         <GameName>
           <OverlapGroup>
             <TextWrapper>COFFEE</TextWrapper>

@@ -22,3 +22,8 @@
   font-family: "pixel";
   src: url("./fonts/pixelroborobo.otf");
 }
+
+@font-face {
+  font-family: "hangil";
+  src: url("./fonts/hangil.ttf");
+}

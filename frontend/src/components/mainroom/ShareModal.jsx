@@ -55,6 +55,7 @@ const Title = styled.p`
   margin-bottom: 3px;
 `;
 
+// 기존 BtnContainer 스타일 유지
 const BtnContainer = styled.div`
   width: 170px;
   display: flex;

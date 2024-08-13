@@ -13,7 +13,13 @@ export const roomAtom = atom({
     isAllHasDeparture: false, // 모두가 출발지 입력을 함
     isCenterExist: false,
     isAllReadyToGame: false,
-    centerPlace: {},
+    centerPlace: {
+      name: "사당역",
+      latitude: 37.476559992,
+      longitude: 126.98163857,
+      region: "CAPITAL",
+      subwayLines: ["LINE_2", "LINE_4"],
+    },
     isValid: false,
   },
 });
@@ -50,7 +56,7 @@ export const currentSpeakersAtom = atom({
 
 export const roomPageAtom = atom({
   key: "roomPage",
-  default: "main", // main, gamechoice, game, gamefinish, result
+  default: "result", // main, gamechoice, game, gamefinish, result
 });
 
 export const estimatedForceCloseAtAtom = atom({

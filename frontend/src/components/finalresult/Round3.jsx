@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
-import car from "../../assets/final/car.png";
-import mingang from "../../assets/final/mingang.png";
-import practice from "../../assets/final/practice.jpg";
+import { useRecoilValue } from "recoil";
+import { gameRecordAtom } from "../../recoil/atoms/gameState";
+import { roomAtom } from "../../recoil/atoms/roomState";
+import { playerState } from "../../recoil/atoms/gameState";
+import { lineColor } from "../../utils/lineColor";
 
-// 라운드는 전역변수에서 api 만들어지면 가져올 예정
-const round = 2;
+import profileBg from "../../assets/final/profileBg.PNG";
+import subwaybg from "../../assets/sbBG.jpg";
+import subway from "../../assets/subway.png";
 
 const Container = styled.div`
   position: relative;
@@ -18,126 +21,183 @@ const BackgroundWrapper = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 310%;
+  width: 600%; /* 배경 이미지의 실제 너비 */
   height: 100%;
-  transition: transform 0.033s linear; /* 3 times faster */
   transform: ${(props) => `translateX(-${props.offset}px)`};
+  transition: transform ${(props) => props.speed}s linear;
+  z-index: 1;
 `;
 
 const BgImage = styled.img`
-  width: 100%; /* Fill the entire width of the BackgroundWrapper */
+  width: 100%;
   height: 100%;
+`;
+
+const SubwayImage = styled.img`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 `;
 
 const CarContainer = styled.div`
   position: absolute;
   bottom: 0;
-  left: 0; /* Positioned to touch the left screen */
-  height: 260px; /* Increased height to 260px (200px * 1.3) */
+  top: 60%;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateX(0%);
+  z-index: 2;
 `;
 
-const Car = styled.img`
-  height: 100%; /* Ensures the car image fills the container */
+const ProfileWrapper = styled.div`
+  position: relative;
+  width: 100px; /* 너비와 높이를 고정하거나 필요에 따라 조정 */
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 20px; /* 각 프로필 사이의 간격 */
 `;
 
-const Mingang = styled.img`
+const ProfileBG = styled.img`
   position: absolute;
-  height: 30%; /* Reduced size to 30% of the CarContainer height */
-  top: 10%; /* Move the Mingang image up a bit */
+  width: 140%;
+  height: 140%;
+  top: -17%;
+  left: -22%;
+  z-index: 1;
+`;
+
+const Profile = styled.img`
+  position: relative;
+  height: 80px; /* 프로필 이미지의 고정된 높이 */
+  width: 80px; /* 프로필 이미지의 고정된 너비 */
   border-radius: 50%;
-  overflow: hidden;
+  z-index: 2;
 `;
 
 const Banner = styled.div`
+  margin-top: 100px;
   position: absolute;
-  width: 100px;
-  height: 50px;
-  background-color: rgba(
-    255,
-    255,
-    255,
-    0.5
-  ); /* Semi-transparent white background */
+  width: 600px;
+  height: 120px;
+  border-radius: 30px;
+  background-color: white;
+  font-family: "hangil";
+  color: black;
+  font-size: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid black;
+  border: 0.6px solid black;
+  z-index: 3;
+  text-align: center;
 `;
 
-function Round3() {
+const Round3 = () => {
   const [offset, setOffset] = useState(0);
-  const [carPosition, setCarPosition] = useState(0);
+  const [speed, setSpeed] = useState(0.3);
+  const [isLastBannerVisible, setIsLastBannerVisible] = useState(false);
+  const backgroundRef = useRef(null);
+
+  const gameRecord = useRecoilValue(gameRecordAtom);
+  const roomInfo = useRecoilValue(roomAtom);
+  const players = useRecoilValue(playerState);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setOffset((prev) => {
-        const newOffset = prev + 30; // 3 times faster
+    let animationFrameId;
 
-        if (newOffset >= window.innerWidth * 2) {
-          clearInterval(interval);
-          moveCarToEnd();
+    const updateOffset = () => {
+      setOffset((prev) => {
+        const newOffset = prev + 10; // 전체적으로 속도를 줄임
+
+        if (
+          backgroundRef.current &&
+          newOffset >= backgroundRef.current.scrollWidth - window.innerWidth
+        ) {
+          setIsLastBannerVisible(true);
+          return prev; // 마지막 배너가 보이면 멈춤
         }
 
         return newOffset;
       });
-    }, 100);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  const moveCarToEnd = () => {
-    const interval = setInterval(() => {
-      setCarPosition((prev) => {
-        const newPosition = prev + 10;
-
-        if (newPosition >= window.innerWidth - 600) {
-          // Adjust this value based on the car's width
-          clearInterval(interval);
-        }
-
-        return newPosition;
-      });
-    }, 100);
-  };
-
-  const renderBanners = () => {
-    const banners = [];
-    const positions = {
-      1: ["10%", "90%"],
-      2: ["10%", "52.5%", "90%"],
-      3: ["10%", "40%", "60%", "90%"],
+      if (!isLastBannerVisible) {
+        animationFrameId = requestAnimationFrame(updateOffset);
+      }
     };
 
-    // 여기에서 변경됐던 지하철역 history 배열 만들어서 배열 이름만 바꾸면 될듯
-    if (positions[round]) {
-      positions[round].forEach((pos, index) => {
-        banners.push(
-          <Banner key={index} style={{ top: "15%", left: pos }}>
-            Banner {index + 1}
-          </Banner>,
+    updateOffset();
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isLastBannerVisible]);
+
+  const renderBanners = () => {
+    const positions = {
+      1: ["87%"],
+      2: ["40%", "87%"],
+      3: ["30%", "60%", "87%"],
+    };
+    const roundRecords = gameRecord[0]?.roundRecordList || [];
+    const round = roundRecords.length;
+
+    if (positions[round] && roundRecords.length > 0) {
+      return roundRecords.map((record, index) => {
+        const isLastBanner = index === roundRecords.length - 1;
+        const positionInPx = parseFloat(positions[round][index]);
+
+        return (
+          <Banner
+            key={index}
+            ref={isLastBanner ? backgroundRef : null}
+            style={{
+              top: "15%",
+              left: `${positionInPx}%`,
+              border: `6px solid ${lineColor[record.subwayLines[0]]}`,
+            }}
+          >
+            {record.stationName}
+          </Banner>
         );
       });
     }
-
-    return banners;
+    return null;
   };
 
   return (
     <Container>
-      <BackgroundWrapper offset={offset}>
-        <BgImage src={practice} alt="Background" />
+      <BackgroundWrapper ref={backgroundRef} offset={offset} speed={speed}>
+        <BgImage src={subwaybg} alt="Background" />
+        <Banner
+          style={{
+            top: "15%",
+            left: "10%",
+            border: `6px solid ${
+              lineColor[roomInfo.centerPlace.subwayLines[0]]
+            }`, // Use lineColor here
+          }}
+        >
+          {roomInfo.centerPlace.name}
+        </Banner>
         {renderBanners()}
       </BackgroundWrapper>
-      <CarContainer style={{ left: `${carPosition}px` }}>
-        <Car src={car} alt="Car" />
-        <Mingang src={mingang} alt="Mingang" />
+      <SubwayImage src={subway} alt="Subway" />
+      <CarContainer>
+        {players.map((player, index) => (
+          <ProfileWrapper key={player.attendeeUUID}>
+            <ProfileBG src={profileBg} alt="Profile Background" />
+            <Profile src={player.profileImageUrl} alt={player.nickname} />
+          </ProfileWrapper>
+        ))}
       </CarContainer>
     </Container>
   );
-}
+};
 
 export default Round3;

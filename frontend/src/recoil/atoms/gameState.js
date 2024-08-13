@@ -2,7 +2,22 @@ import { atom } from "recoil";
 
 export const playerState = atom({
   key: "playerState",
-  default: [],
+  default: [
+    {
+      nickname: "김수현",
+      attendeeUUID: 123213,
+      profileImageUrl:
+        " https://github.com/user-attachments/assets/9ab979f9-50a9-4b79-a755-d135a8772048",
+      bottom: 0,
+    },
+    {
+      nickname: "김민경",
+      attendeeUUID: 123213,
+      profileImageUrl:
+        "https://github.com/user-attachments/assets/28991fc0-1e74-4c56-908b-6a133946a39a",
+      bottom: 0,
+    },
+  ],
 });
 
 // 어떤 게임을 선택했는지
@@ -37,7 +52,25 @@ export const gameSessionUUIDAtom = atom({
 // 중심역 히스토리
 export const gameRecordAtom = atom({
   key: "gameRecord",
-  default: [],
+  default: [
+    {
+      gameSessionUUID: "gamesession uuid",
+      roundRecordList: [
+        {
+          round: 1,
+          stationName: "이수역",
+          attendeeUUID: "김수현uuid",
+          subwayLines: ["LINE_4"],
+        },
+        {
+          round: 2,
+          stationName: "안국역",
+          attendeeUUID: "김수현",
+          subwayLines: ["LINE_3"],
+        },
+      ],
+    },
+  ],
 });
 
 // 전체 몇 라운드로 설정?

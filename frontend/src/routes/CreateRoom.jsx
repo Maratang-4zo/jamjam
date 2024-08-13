@@ -162,6 +162,7 @@ function CreateRoom() {
       });
 
       const { roomUUID, attendeeUUID } = response.data;
+      console.log(response);
 
       await createSession();
       setUserInfo((prev) => ({

@@ -170,7 +170,7 @@ export const WebSocketProvider = ({ children }) => {
     handleData();
   }, [roomInfo]);
 
-  const handleMessage = useCallback((message) => {
+  const handleMessage = (message) => {
     console.log(message);
     const messageBody = JSON.parse(message.body);
     switch (message.headers.type) {
@@ -252,7 +252,7 @@ export const WebSocketProvider = ({ children }) => {
       default:
         console.error("Unknown message type:", message.type);
     }
-  }, []);
+  };
 
   const handleRoomEnter = (message) => {
     const {

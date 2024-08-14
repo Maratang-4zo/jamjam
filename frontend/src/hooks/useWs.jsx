@@ -38,13 +38,27 @@ import {
   isThreeStationLoadingAtom,
 } from "../recoil/atoms/loadingState";
 import useOpenVidu from "./useOpenVidu";
-import { WebSocketContext, useWebSocket } from "../context/WebsocketContext";
+import { WebSocketContext, useWebSocket } from "../context/WebsocketContext.js";
 
 const API_BASE_URL = "https://jjam.shop";
 
 const useWs = () => {
-  const { client, setClient, connected, setConnected } =
-    useContext(WebSocketContext);
+  const {
+    client,
+    connected,
+    connect,
+    disconnect,
+    sendChat,
+    sendGame,
+    sendGameRound,
+    sendRoundInfo,
+    sendNextRoundCenter,
+    sendFinalStation,
+    sendReset,
+    sendNextRound,
+    sendGoResult,
+    sendGameStart,
+  } = useWebSocket();
 
   const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);
@@ -78,91 +92,18 @@ const useWs = () => {
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
   const { leaveSession } = useOpenVidu();
 
-  const connect = useCallback((roomUUID) => {
-    return new Promise((resolve, reject) => {
-      if (connected) {
-        console.log("Already connected");
-        return resolve();
-      }
-      if (client) {
-        client.deactivate(); // 이전 연결이 있다면 비활성화
-      }
-      const newClient = new Client({
-        webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
-        debug: (str) => {
-          console.log(str);
-        },
-        reconnectDelay: 5000,
-        heartbeatIncoming: 20000,
-        heartbeatOutgoing: 20000,
-        onConnect: () => {
-          console.log("Connected");
-          setConnected(true);
-          setClient(newClient);
-          subscribe(roomUUID);
-          resolve();
-        },
-        onStompError: (frame) => {
-          console.error(frame);
-          setConnected(false);
-          reject(frame);
-          handleStompError(frame);
-        },
-        onWebSocketError: (evt) => {
-          handleWebSocketError(evt);
-        },
-        onWebSocketClose: (evt) => {
-          handleWebSocketClose(evt);
-        },
-      });
-      newClient.activate();
-    });
-  }, []);
-
-  const handleStompError = (frame) => {
-    if (frame.headers && frame.headers["message"]) {
-      alert(`Handshake 실패: ${frame.headers["message"]}`);
-    } else {
-      alert("Handshake 실패: 알 수 없는 오류");
-    }
-    if (client) client.deactivate();
-  };
-
-  const handleWebSocketClose = (event) => {
-    if (event.code === 1006) {
-      alert("WebSocket 연결이 비정상적으로 종료되었습니다.");
-      if (client) client.deactivate();
-    }
-    alert(event.code);
-    if (client) client.deactivate();
-  };
-
-  const handleWebSocketError = (error) => {
-    alert("WebSocket 연결에 실패했습니다.");
-    if (client) client.deactivate();
-  };
-
-  const subscribe = (roomUUID) => {
-    if (client) {
-      client.subscribe(
+  const subscribe = useCallback((roomUUID) => {
+    if (client.current) {
+      client.current.subscribe(
         `/sub/rooms/${roomUUID}`,
-        (message) => {
-          handleMessage(message);
-        },
+        (message) => handleMessage(message),
         null,
         {},
       );
 
-      client.subscribe(`/user/sub/errors`, (message) => {
+      client.current.subscribe(`/user/sub/errors`, (message) => {
         alert(message.body);
       });
-    }
-  };
-
-  const disconnect = useCallback(() => {
-    if (client) {
-      client.deactivate();
-      setConnected(false);
     }
   }, []);
 
@@ -374,20 +315,6 @@ const useWs = () => {
     setIsThreeStationLoading(isThreeStationLoading);
   };
 
-  const sendNextRound = ({ gameRoundUUID, currentRound, totalRound }) => {
-    client.current.publish({
-      destination: `/pub/game/round.next`,
-      body: JSON.stringify({ gameRoundUUID, currentRound, totalRound }),
-    });
-  };
-
-  const sendGoResult = ({ gameSessionUUID }) => {
-    client.current.publish({
-      destination: `/pub/game/session.end`,
-      body: JSON.stringify({ gameSessionUUID }),
-    });
-  };
-
   const handleNextRound = ({ next }) => {
     if (next === "nextRound") {
       setCurrentRound((prev) => (prev += 1));
@@ -400,14 +327,6 @@ const useWs = () => {
 
   const handleHostFindCenter = ({ isFindCenterLoading }) => {
     setIsFindCenterLoading(isFindCenterLoading);
-  };
-
-  // 최종 장소 리셋
-  const sendReset = ({ gameSessionUUID }) => {
-    client.current.publish({
-      destination: `/pub/game/session.reset`,
-      body: JSON.stringify({ gameSessionUUID }),
-    });
   };
 
   const handleGameReset = ({ gameSessionUUID }) => {
@@ -449,14 +368,6 @@ const useWs = () => {
     }));
   };
 
-  // 최종 장소 기록에 반영
-  const sendFinalStation = ({ finalStationName }) => {
-    client.current.publish({
-      destination: `/pub/game/session.station`,
-      body: JSON.stringify({ gameSessionUUID, finalStationName }),
-    });
-  };
-
   const handleGameStart = ({ gameRoundUUID }) => {
     setGameCount(0);
     setGameState("ing");
@@ -464,13 +375,6 @@ const useWs = () => {
 
   const handleGameCountdown = ({ gameRoundUUID, countdown }) => {
     setGameCount(countdown);
-  };
-
-  const sendGameStart = (gameRoundUUID) => {
-    client.current.publish({
-      destination: `/pub/game/round.start`,
-      body: JSON.stringify({ gameRoundUUID }),
-    });
   };
 
   const handleGameEnd = ({ gameRoundUUID }) => {
@@ -484,13 +388,6 @@ const useWs = () => {
     sendGameStart(gameRoundUUID);
   };
 
-  const sendRoundInfo = ({ round, gameId, gameSessionUUID, stationName }) => {
-    client.current.publish({
-      destination: `/pub/game/round.setting`,
-      body: JSON.stringify({ round, gameId, gameSessionUUID, stationName }),
-    });
-  };
-
   const handleCenterHistory = ({ gameSessionUUID, roundRecordList }) => {
     setGameRecord(roundRecordList);
     setRoomPage("finalresult");
@@ -501,18 +398,6 @@ const useWs = () => {
   const handleGameSessionReady = ({ gameSessionUUID, roundCnt }) => {
     setTotalRound(roundCnt);
     setGameSessionUUID(gameSessionUUID);
-  };
-
-  // 게임 라운드 설정
-  const sendGameRound = ({ roundCnt, roomUUID, finalStationName }) => {
-    client.current.publish({
-      destination: `/pub/game/session.setting`,
-      body: JSON.stringify({
-        roundCnt,
-        roomUUID,
-        finalStationName,
-      }),
-    });
   };
 
   const handleGetAroundStations = ({ aroundStations }) => {
@@ -539,16 +424,6 @@ const useWs = () => {
     if (userInfo.myUUID === attendeeUUID) {
       setIsWinner(true);
     }
-  };
-
-  const sendNextRoundCenter = ({ roundStationName }) => {
-    client.current.publish({
-      destination: `/pub/game/round.station`,
-      body: JSON.stringify({
-        gameRoundUUID: currentRoundUUID,
-        roundStationName,
-      }),
-    });
   };
 
   const handleGameCenterUpdate = ({ roundCenterStation }) => {
@@ -601,15 +476,6 @@ const useWs = () => {
     }));
   };
 
-  const sendChat = useCallback(({ content }) => {
-    if (client.current) {
-      client.current.publish({
-        destination: `/pub/chat/send`,
-        body: JSON.stringify({ content }),
-      });
-    }
-  }, []);
-
   const handleChatLogs = useCallback(
     (message) => {
       const { attendeeUUID, content, createdAt } = message;
@@ -648,31 +514,11 @@ const useWs = () => {
     [setPlayers],
   );
 
-  const sendGame = useCallback(({ newBottom }) => {
-    if (client.current) {
-      client.current.publish({
-        destination: `/pub/game/updatePosition`,
-        body: JSON.stringify({ bottom: newBottom }),
-      });
-    }
-  }, []);
-
-  // useEffect(() => {
-  //   connect().catch((error) => {
-  //     console.error("WebSocket connection failed:", error);
-  //   });
-  //   return () => {
-  //     disconnect();
-  //   };
-  // }, []);
-
   return {
-    connected,
-    chatLogs,
     connect,
-    subscribe,
+    connected,
     disconnect,
-    handleMessage,
+    subscribe,
     sendChat,
     sendGame,
     sendGameRound,

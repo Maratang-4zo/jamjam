@@ -164,7 +164,7 @@ function GameFinishButtons() {
   const [isFinalLoading, setIsFinalLoading] =
     useRecoilState(isHistoryLoadingAtom);
   const [isWinner, setIsWinner] = useRecoilState(isWinnerAtom);
-  const { sendNextRound, sendGoResult } = useWs();
+  const { sendNextRound, sendGoResult, sendNextRoundCenter } = useWs();
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
   const gameRoundUUID = useRecoilValue(currentRoundUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);
@@ -172,11 +172,15 @@ function GameFinishButtons() {
   const setWinnerNicknameUUID = useSetRecoilState(winnerNicknameAtom);
 
   const handleStationClick = (station) => {
-    setSelectedStation(station);
+    setSelectedStation(station.name);
   };
 
   const handleDecision = async () => {
     if (selectedStation) {
+      sendNextRoundCenter({
+        gameRoundUUID,
+        roundStationName: selectedStation,
+      });
     } else {
       alert("역을 선택해주세요");
     }

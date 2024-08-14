@@ -143,6 +143,7 @@ function FinalResult() {
         startStation: roomInfo.centerPlace.name,
       });
       sendFinalStation({
+        gameSessionUUID,
         finalStationName: roundCenter.name,
       });
       setShowMainModal(false);

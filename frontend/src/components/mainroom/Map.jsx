@@ -80,7 +80,7 @@ function MyMap() {
     };
 
     fetchuserColors();
-  }, [roomInfo.attendees, decodePath]);
+  }, [roomInfo.attendees]);
 
   useEffect(() => {
     if (roomInfo.isCenterExist) {

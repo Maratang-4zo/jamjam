@@ -16,3 +16,8 @@ export const userInfoAtom = atom({
     meetingHistory: [],
   },
 });
+
+export const isMicOnAtom = atom({
+  key: "isMicOn",
+  default: true,
+});

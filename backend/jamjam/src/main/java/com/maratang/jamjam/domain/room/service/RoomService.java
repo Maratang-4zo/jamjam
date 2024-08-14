@@ -99,7 +99,6 @@ public class RoomService {
 		String roomName = attendee.getNickname();
 
 		if (roomName == null || roomName.isBlank()){
-			//todo 여기서 nick 테이블에 잇는 모든 value 중에 랜덤 값으로 정하기
 			Nick nick = nickRepository.findRandomNick();
 			Name name = nameRepository.findRandomName();
 			roomName = nick.getNick() + name.getName();
@@ -148,12 +147,17 @@ public class RoomService {
 			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
 
-		attendee.updateStatus(AttendeeStatus.ENTERED);
+		if(room.getRoomStatus() == RoomStatus.PLAYING){
+			attendee.updateStatus(AttendeeStatus.WAITING);
+		} else {
+			attendee.updateStatus(AttendeeStatus.ENTERED);
+		}
 		attendeeRepository.save(attendee);
 
 		// 3. 기존 인원들에게 알림
 		AttendeeInfo attendeeInfo = AttendeeInfo.of(attendee);
 		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ENTER);
+		System.out.println("해볼게용");
 
 		// 1-1. 나갔다 온 방장이니?
 		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){

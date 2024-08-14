@@ -63,6 +63,7 @@ public class GameSession {
 	@PrePersist
 	protected void onCreate() {
 		this.gameSessionUUID = UUID.randomUUID();
+		this.gameSessionStatus = GameSessionStatus.PLAYING;
 	}
 
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import { getCookie, setCookie } from "../utils/Cookies";
 import { useRecoilState } from "recoil";
 import { currentSpeakersAtom } from "../recoil/atoms/roomState";
+import { isMicOnAtom } from "../recoil/atoms/userState";
 
 const APPLICATION_SERVER_URL = "https://jjam.shop/";
 
@@ -14,7 +15,7 @@ const useOpenVidu = () => {
   const [connected, setConnected] = useState(false);
   const [currentSpeakers, setCurrentSpeakers] =
     useRecoilState(currentSpeakersAtom);
-  const [isMicOn, setIsMicOn] = useState(true); // 마이크 상태를 관리하는 상태 추가
+  const [isMicOn, setIsMicOn] = useRecoilState(isMicOnAtom); // 마이크 상태를 관리하는 상태 추가
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
@@ -132,7 +133,6 @@ const useOpenVidu = () => {
     createSession,
     createToken,
     toggleMic, // 마이크 토글 함수 반환
-    isMicOn, // 마이크 상태 반환
   };
 };
 

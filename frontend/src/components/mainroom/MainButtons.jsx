@@ -317,13 +317,14 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const handleFindCenter = async () => {
     setIsMiddleLoading(true);
     try {
-      const res = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
-      const data = res.data;
+      const res = await axiosGetMiddle({ roomUUID: roomState.roomUUID });
+      const resData = res.data;
+      console.log(resData);
       setRoomState((prev) => ({
         ...prev,
-        centerPlace: data.roomCenterStart,
+        centerPlace: resData.roomCenterStart,
         isCenterExist: true,
-        attendees: data.attendees,
+        attendees: resData.attendees,
       }));
     } catch (error) {
       console.error("중심찾기 실패!!!", error);
@@ -421,7 +422,13 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   const handleInfoCopyClick = () => {
-    const date = new Date(roomState.meetingDate);
+    if (!roomState.meetingDate || isNaN(Date.parse(roomState.meetingDate))) {
+      console.error("Invalid meetingDate:", roomState.meetingDate);
+      alert("유효하지 않은 모임 날짜입니다.");
+      return;
+    }
+
+    const date = new Date(Date.parse(roomState.meetingDate));
 
     const formattedDate = new Intl.DateTimeFormat("ko", {
       year: "numeric",
@@ -434,6 +441,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
         ? roomState.centerPlace.name
         : "아직 모임장소를 찾지 않으셨어요 T.T"
     }\n- 모임 목적: ${roomState.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
+
     navigator.clipboard
       .writeText(infoText)
       .then(() => {

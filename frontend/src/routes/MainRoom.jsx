@@ -94,6 +94,10 @@ function Room() {
             (attendee) => attendee.attendeeUUID === myUUID,
           );
 
+          const nowAttendees = roomData.attendees.filter(
+            (attendee) => attendee.attendeeStatus !== "EXITED",
+          );
+
           if (
             !myAttendeeInfo ||
             !myAttendeeInfo.address ||
@@ -109,7 +113,7 @@ function Room() {
             roomName: roomData.roomName,
             meetingDate: roomData.roomTime,
             centerPlace: roomData.roomCenterStart,
-            attendees: [...roomData.attendees],
+            attendees: [...nowAttendees],
             roomPurpose: roomData.roomPurpose,
             hostUUID: roomData.hostUUID,
           }));

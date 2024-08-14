@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
+import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class AttendeeDTO {
     private String route;
     private UUID attendeeUUID;
     private String profileImageUrl;
+    private AttendeeStatus status;
 
 
     public static AttendeeDTO of(Attendee attendee) {
@@ -31,6 +33,7 @@ public class AttendeeDTO {
             .route(attendee.getRoute())
             .attendeeUUID(attendee.getAttendeeUUID())
             .profileImageUrl(attendee.getProfileImageUrl().getType())
+            .status(attendee.getAttendeeStatus())
             .build();
     }
 

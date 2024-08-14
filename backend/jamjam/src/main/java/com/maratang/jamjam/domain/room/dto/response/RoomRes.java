@@ -16,6 +16,7 @@ public class RoomRes {
 	LocalDateTime meetingDate;
 	String purpose;
 	RoomStatus roomStatus;
+	String roomName;
 	boolean hasToken;
 
 	public static RoomRes of(Room room, boolean hasToken) {
@@ -24,7 +25,8 @@ public class RoomRes {
                 .meetingDate(room.getMeetingDate())
                 .purpose(room.getPurpose())
 				.roomStatus(room.getRoomStatus())
-			.hasToken(hasToken)
+				.roomName(room.getName())
+				.hasToken(hasToken)
                 .build();
 	}
 }

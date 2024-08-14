@@ -1,8 +1,10 @@
 package com.maratang.jamjam.global.error;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.HibernateException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -49,6 +51,25 @@ public class GlobalExceptionHandler {
 		ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_PARAMETER, errors);
 
 		return ResponseEntity.status(ErrorCode.INVALID_PARAMETER.getStatus()).body(response);
+	}
+
+	@ExceptionHandler(NullPointerException.class)
+	public ResponseEntity<ErrorResponse> handleException(NullPointerException e) {
+		// 디버깅용
+		ErrorResponse response = ErrorResponse.of(ErrorCode.NULL_POINTER_EXCEPTION);
+		return ResponseEntity.status(ErrorCode.NULL_POINTER_EXCEPTION.getStatus()).body(response);
+	}
+
+	@ExceptionHandler(SQLException.class)
+	public ResponseEntity<ErrorResponse> handleException(SQLException e) {
+		ErrorResponse response = ErrorResponse.of(ErrorCode.SQL_EXCEPTION);
+		return ResponseEntity.status(ErrorCode.SQL_EXCEPTION.getStatus()).body(response);
+	}
+
+	@ExceptionHandler(HibernateException.class)
+	public ResponseEntity<ErrorResponse> handleException(HibernateException e) {
+		ErrorResponse response = ErrorResponse.of(ErrorCode.HIBERNATE_EXCEPTION);
+		return ResponseEntity.status(ErrorCode.HIBERNATE_EXCEPTION.getStatus()).body(response);
 	}
 
 	@ExceptionHandler(Exception.class)

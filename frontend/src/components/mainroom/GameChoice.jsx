@@ -65,14 +65,6 @@ function GameChoice() {
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
 
   useEffect(() => {
-    //   const initialPlayers = roomInfo.attendees.map((attendee) => ({
-    //     nickname: attendee.nickname,
-    //     attendeeUUID: attendee.attendeeUUID,
-    //     profileImageUrl: attendee.profileImageUrl,
-    //     bottom: 0,
-    //   }));
-    //   setPlayerState(initialPlayers);
-    // }, [roomInfo, userInfo, setPlayerState]);
     const initialPlayers = roomInfo.attendees
       .filter((attendee) => attendee.attendeeStatus === "ENTERED")
       .map((attendee) => ({

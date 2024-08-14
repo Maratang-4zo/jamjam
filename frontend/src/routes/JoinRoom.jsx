@@ -12,6 +12,7 @@ import useWs from "../hooks/useWs";
 import useOpenVidu from "../hooks/useOpenVidu";
 import axios from "axios";
 import Cookies from "js-cookie";
+import jamjami from "../assets/jamShakingArm.gif";
 // import Jam from "../assets/JoinRoomJam.gif";
 
 const LeftSection = styled.div`
@@ -41,15 +42,23 @@ const RoomInfo = styled.div`
 `;
 
 const ImageContainer = styled.div`
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
+  position: fixed; /* 화면에 고정 */
+  bottom: 0; /* 화면의 하단에 위치 */
+  left: 0; /* 화면의 왼쪽에 위치 */
+  display: flex;
+  align-items: flex-end;
+  text-align: left;
   width: 100px;
   height: 100px;
-  border: 2px solid ${(props) => props.theme.accentColor};
+  /* border: 2px solid ${(props) => props.theme.accentColor}; */
   /* 이미지가 들어갈 위치 설정 */
 `;
-
+const HiText = styled.div`
+  font-family: "DungGeunMo", Helvetica;
+  font-size: 16px;
+  color: ${(props) => props.theme.textColor};
+  margin-bottom: 5px; /* 이미지와 텍스트 사이 간격 */
+`;
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: ${(props) => props.theme.wrapperWidth};
@@ -322,7 +331,10 @@ function JoinRoom() {
           </RoomInfo>
           {/* 이미지 공간 */}
         </LeftSection>
-        <ImageContainer>손 흔들고 있는 잼잼이 들어올 예정</ImageContainer>
+        <ImageContainer>
+          {/* <HiText>Hi!</HiText> */}
+          <img src={jamjami} alt="jamjam" />
+        </ImageContainer>
         <EnterForm>
           {!isLoggedIn && (
             <>

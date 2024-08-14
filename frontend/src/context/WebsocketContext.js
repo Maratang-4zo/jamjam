@@ -1,4 +1,11 @@
-import { createContext, useContext, useMemo, useRef, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useRef,
+  useCallback,
+  useEffect,
+} from "react";
 import React from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
@@ -154,6 +161,14 @@ export const WebSocketProvider = ({ children }) => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    const handleData = () => {
+      console.log("최신", roomInfo);
+    };
+
+    handleData();
+  }, [roomInfo]);
 
   const handleMessage = useCallback((message) => {
     console.log(message);

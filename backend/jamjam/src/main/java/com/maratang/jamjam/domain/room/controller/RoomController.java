@@ -80,7 +80,7 @@ public class RoomController {
 		RoomJwtTokenClaims roomJwtTokenClaims = roomService.createRoom(roomCreateReq, email);
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims);
 
-		CookieUtils.createSecureSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
+		CookieUtils.createSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(roomJwtTokenClaims);
 	}
@@ -124,7 +124,7 @@ public class RoomController {
 		RoomJoinRes roomJoinRes = attendeeService.createAttendee(roomUUID, attendeeCreateReq, email);
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(RoomJwtTokenClaims.of(roomJoinRes));
 
-		CookieUtils.createSecureSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
+		CookieUtils.createSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(roomJoinRes);
 	}

@@ -78,8 +78,8 @@ public class LoginController {
 
 		Cookie cookie = new Cookie("refreshToken", loginRes.getRefreshToken());
 		cookie.setPath("/");
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
+		// cookie.setHttpOnly(true);
+		// cookie.setSecure(true);
 
 		Cookie aceessTokenCookie = new Cookie("accessToken", loginRes.getAccessToken());
 		aceessTokenCookie.setPath("/");

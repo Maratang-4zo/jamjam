@@ -26,6 +26,7 @@ function Han() {
     const [chatLogs, setChatLogs] = useState([]);
     const [gameLogs, setGameLogs] = useState([]);
     const client = useRef({});
+    const [at, setAt] = useState(null);
 
     const leaveSession = useCallback(() => {
         if (sessionRef.current) {
@@ -438,9 +439,9 @@ function Han() {
                     type="text"
                     value={inputSessionId}
                     onChange={handleInputChange}
-                    placeholder="참여할 세션 ID 입력"
+                    placeholder="룸UUID 입력"
                 />
-                <button type="submit">기존 방 참여하기</button>
+                <button type="submit">룸UUID 바꿔서 들어가기</button>
             </form>
             {roomUUID.current && <p>현재 세션 ID: {roomUUID.current}</p>}
             <div id="session">
@@ -454,6 +455,16 @@ function Han() {
                         <h3>OTHERS</h3>
                     </div>
                 </div>
+            </div>
+            <div>
+                당신을 위한 쿠키를 세팅해주겠다.
+                <input
+                    type="text"
+                    value={at}
+                    onChange={(e) => setAt(e.target.value)}
+                    placeholder="attendeeId 입력"
+                />
+                <button onClick={cookietest}>attendee PK로 토큰 생성해보즈아</button>
             </div>
             <div>
                 <div>

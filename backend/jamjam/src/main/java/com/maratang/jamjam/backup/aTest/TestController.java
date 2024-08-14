@@ -16,7 +16,10 @@ import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenDto;
+import com.maratang.jamjam.global.util.CookieUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,6 +30,12 @@ public class TestController {
 	private final RoomTokenProvider roomTokenProvider;
 	private final AttendeeRepository attendeeRepository;
 	private final TestService testService;
+
+	@GetMapping("/cookietest")
+	public ResponseEntity<?> cookietest(HttpServletRequest request, HttpServletResponse response){
+		CookieUtils.createSessionCookie(response, "test", "hi");
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
 
 	@GetMapping("/attendees")
 	public ResponseEntity<?> getAllAttendee(){
@@ -40,7 +49,7 @@ public class TestController {
 	}
 
 	@GetMapping("/attendees/{attendeeId}")
-	public ResponseEntity<?> getToken(@PathVariable Long attendeeId){
+	public ResponseEntity<?> getToken(@PathVariable Long attendeeId, HttpServletResponse response){
 		Attendee attendee = attendeeRepository.findById(attendeeId).orElseThrow();
 		UUID attendeeUUID = attendee.getAttendeeUUID();
 		UUID roomUUID = attendee.getRoom().getRoomUUID();
@@ -50,6 +59,8 @@ public class TestController {
 			.attendeeUUID(attendeeUUID)
 			.build();
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims);
+		CookieUtils.createSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
+		CookieUtils.createSessionCookie(response, "roomUUID", roomUUID.toString());
 		return ResponseEntity.status(HttpStatus.OK).body(roomJwtTokenDto);
 	}
 

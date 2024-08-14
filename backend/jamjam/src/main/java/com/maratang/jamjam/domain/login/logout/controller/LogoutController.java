@@ -41,8 +41,8 @@ public class LogoutController {
 				cookie[i].setMaxAge(0);
 				cookie[i].setValue(null);
 				cookie[i].setPath("/");
-				cookie[i].setHttpOnly(true);
-				cookie[i].setSecure(true);
+				// cookie[i].setHttpOnly(true);
+				// cookie[i].setSecure(true);
 				httpServletResponse.addCookie(cookie[i]);
 			}
 			if (cookie[i].getName().equals("accessToken")) {

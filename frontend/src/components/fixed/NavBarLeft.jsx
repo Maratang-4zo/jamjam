@@ -10,11 +10,12 @@ import ChattingModal from "./ChattingModal";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import {
   chatAtom,
+  isMicOnAtom,
   currentSpeakersAtom,
   roomAtom,
 } from "../../recoil/atoms/roomState";
 import useOpenVidu from "../../hooks/useOpenVidu";
-import { isMicOnAtom, userInfoAtom } from "../../recoil/atoms/userState";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 import UserInfoModal from "./userInfoModal";
 import { userColor } from "../../utils/userColor";
 import ColorThief from "colorthief";
@@ -118,7 +119,6 @@ function NavBarLeft() {
   const navigate = useNavigate();
   const isMicOn = useRecoilValue(isMicOnAtom);
   const prevChatLogsLength = useRef(chatLogs.length);
-  // const { leaveSession } = useOpenVidu();
   const { disconnect } = useWs();
   //
 

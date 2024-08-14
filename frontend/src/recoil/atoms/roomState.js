@@ -87,3 +87,8 @@ export const OVPublisherAtom = atom({
   key: "OVPublisher",
   default: null,
 });
+
+export const isMicOnAtom = atom({
+  key: "isMicOn",
+  default: true,
+});

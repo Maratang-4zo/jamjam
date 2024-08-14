@@ -11,6 +11,8 @@ import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
+import com.maratang.jamjam.domain.member.entity.Member;
+import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.domain.randomName.entity.Name;
 import com.maratang.jamjam.domain.randomName.entity.Nick;
 import com.maratang.jamjam.domain.randomName.repository.NameRepository;
@@ -47,6 +49,7 @@ public class RoomService {
 	private final NameRepository nameRepository;
 	private final SubwayDataLoader subwayDataLoader;
 	private final RoomTokenProvider roomTokenProvider;
+	private final MemberService memberService;
 
 	// 방 정보 받기
 	public RoomGetRes findRoom(UUID roomUUID, UUID attendeeUUID) {
@@ -90,7 +93,7 @@ public class RoomService {
 
 	// 방 만들기
 	@Transactional
-	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq) {
+	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq, String email) {
 		Room room = roomCreateReq.toEntity();
 		Attendee attendee = Attendee.builder().nickname(roomCreateReq.getNickname()).build();
 
@@ -107,6 +110,11 @@ public class RoomService {
 		roomName = roomName + "님의 방";
 
 		room.updateName(roomName);
+
+		if(!email.isEmpty()){
+			Member member = memberService.findMemberByEmail(email);
+			attendee.updateMember(member);
+		}
 
 		attendee.updateRoom(room);
 

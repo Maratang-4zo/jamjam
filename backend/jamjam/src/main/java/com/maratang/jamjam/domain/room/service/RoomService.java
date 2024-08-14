@@ -147,12 +147,6 @@ public class RoomService {
 		Attendee attendee = attendeeRepository.findByAttendeeUUIDAndRoom(attendeeUUID, room)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
-		// 1-1. 나갔다 온 방장이니?
-		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){
-			room.updateStatus(RoomStatus.ONGOING);
-			roomRepository.save(room);
-			broadCastService.broadcastToRoom(roomUUID, "도망간 노예를 잡아왔다!!", BroadCastType.ROOM_ROOT_REENTRY);
-		}
 
 		attendee.updateStatus(AttendeeStatus.ENTERED);
 		attendeeRepository.save(attendee);
@@ -160,6 +154,13 @@ public class RoomService {
 		// 3. 기존 인원들에게 알림
 		AttendeeInfo attendeeInfo = AttendeeInfo.of(attendee);
 		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ENTER);
+
+		// 1-1. 나갔다 온 방장이니?
+		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){
+			room.updateStatus(RoomStatus.ONGOING);
+			roomRepository.save(room);
+			broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ROOT_REENTRY);
+		}
 	}
 
 	@Transactional

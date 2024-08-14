@@ -89,7 +89,7 @@ const useWs = () => {
       if (client) {
         client.deactivate(); // 이전 연결이 있다면 비활성화
       }
-      const nowClient = new Client({
+      const newClient = new Client({
         webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
         debug: (str) => {
           console.log(str);
@@ -100,7 +100,7 @@ const useWs = () => {
         onConnect: () => {
           console.log("Connected");
           setConnected(true);
-          setClient(nowClient); // 클라이언트 저장
+          setClient(newClient); // 클라이언트 저장
           resolve();
         },
         onStompError: (frame) => {
@@ -116,9 +116,9 @@ const useWs = () => {
           handleWebSocketClose(evt);
         },
       });
-      nowClient.activate();
+      newClient.activate();
     });
-  }, [connected, client]);
+  }, []);
 
   useEffect(() => {
     // 구독이 이미 되었는지 체크하고, 되지 않았다면 구독
@@ -126,7 +126,7 @@ const useWs = () => {
       subscribe();
       setIsSubscribed(true); // 구독 완료로 상태 변경
     }
-  }, [client, connected, isSubscribed]);
+  }, [connected]);
 
   const subscribe = () => {
     if (client && roomInfo.roomUUID) {

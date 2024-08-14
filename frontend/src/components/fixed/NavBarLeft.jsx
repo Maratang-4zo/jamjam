@@ -114,13 +114,18 @@ function NavBarLeft() {
   const resetUserInfo = useResetRecoilState(userInfoAtom);
   const resetRoomInfo = useResetRecoilState(roomAtom);
   const currentSpeakers = useRecoilValue(currentSpeakersAtom);
-  const { toggleMic, isMicOn } = useOpenVidu();
+  const { toggleMic, isMicOn, leaveSession } = useOpenVidu();
   const navigate = useNavigate();
   const prevChatLogsLength = useRef(chatLogs.length);
-  const { leaveSession } = useOpenVidu();
+  // const { leaveSession } = useOpenVidu();
   const { disconnect } = useWs();
+  //
 
+  //
   useEffect(() => {
+    //
+    console.log("Attendees:", roomInfo.attendees);
+    //
     const loadImages = async () => {
       const loadImage = (src) =>
         new Promise((resolve, reject) => {
@@ -145,7 +150,7 @@ function NavBarLeft() {
     };
 
     loadImages();
-  }, []);
+  }, [roomInfo.attendees]);
 
   const handleChat = () => {
     setIsChatOn((prev) => !prev);
@@ -219,14 +224,27 @@ function NavBarLeft() {
         ) : (
           <>
             <Attendants>
-              {roomInfo.attendees.map((attendee, index) => (
+              {roomInfo.attendees.map((attendee, index) => {
+                const key = attendee.attendeeUUID; // key 값 할당
+                console.log(`Rendering Avatar with key: ${key}`); // key 값 출력
+
+                return (
+                  <Avatar
+                    key={key}
+                    src={attendee.profileImageUrl}
+                    isSpeaking={currentSpeakers.includes(attendee.attendeeUUID)}
+                    onClick={() => handleAvatarClick(attendee, index)}
+                  />
+                );
+              })}
+              {/* {roomInfo.attendees.map((attendee, index) => (
                 <Avatar
                   key={attendee.attendeeUUID}
                   src={attendee.profileImageUrl}
                   isSpeaking={currentSpeakers.includes(attendee.attendeeUUID)}
                   onClick={() => handleAvatarClick(attendee, index)}
                 />
-              ))}
+              ))} */}
             </Attendants>
             <Btns>
               <Btn onClick={handleChat} className={bounce ? "bounce" : ""}>

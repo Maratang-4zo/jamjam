@@ -114,6 +114,10 @@ const RoundSetting = styled.div`
   border: 3px solid #000;
   border-bottom: none;
   background-color: ${(props) => props.theme.bgColor};
+  span {
+    font-family: "DungGeunMo";
+    font-size: 30px;
+  }
 `;
 
 const RoundBtn = styled.button`
@@ -128,6 +132,8 @@ const RoundBtn = styled.button`
   background-color: ${(props) => props.theme.bgColor};
   color: black;
   font-size: 24px;
+  font-family: "DungGeunMo";
+  font-size: 30px;
   &:hover {
     background-color: black;
     color: ${(props) => props.theme.bgColor};
@@ -168,6 +174,8 @@ const OkBtn = styled.button`
   padding: 7px 17px;
   justify-content: center;
   align-items: center;
+  font-family: "DungGeunMo";
+  font-size: 30px;
   gap: 8.229px;
   flex-shrink: 0;
   border-radius: 0 0 15px 15px;

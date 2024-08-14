@@ -4,7 +4,7 @@ export const userInfoAtom = atom({
   key: "userInfo",
   default: {
     myUUID: "",
-    isHost: false,
+    isHost: true,
     isLogin: false,
     departure: {},
     duration: null, //소요시간

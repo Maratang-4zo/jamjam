@@ -11,6 +11,8 @@ import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
+import com.maratang.jamjam.domain.member.entity.Member;
+import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.domain.randomName.entity.Name;
 import com.maratang.jamjam.domain.randomName.entity.Nick;
 import com.maratang.jamjam.domain.randomName.repository.NameRepository;
@@ -47,6 +49,7 @@ public class RoomService {
 	private final NameRepository nameRepository;
 	private final SubwayDataLoader subwayDataLoader;
 	private final RoomTokenProvider roomTokenProvider;
+	private final MemberService memberService;
 
 	// 방 정보 받기
 	public RoomGetRes findRoom(UUID roomUUID, UUID attendeeUUID) {
@@ -90,7 +93,7 @@ public class RoomService {
 
 	// 방 만들기
 	@Transactional
-	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq) {
+	public RoomJwtTokenClaims createRoom(RoomCreateReq roomCreateReq, String email) {
 		Room room = roomCreateReq.toEntity();
 		Attendee attendee = Attendee.builder().nickname(roomCreateReq.getNickname()).build();
 
@@ -99,7 +102,6 @@ public class RoomService {
 		String roomName = attendee.getNickname();
 
 		if (roomName == null || roomName.isBlank()){
-			//todo 여기서 nick 테이블에 잇는 모든 value 중에 랜덤 값으로 정하기
 			Nick nick = nickRepository.findRandomNick();
 			Name name = nameRepository.findRandomName();
 			roomName = nick.getNick() + name.getName();
@@ -108,6 +110,11 @@ public class RoomService {
 		roomName = roomName + "님의 방";
 
 		room.updateName(roomName);
+
+		if(!email.isEmpty()){
+			Member member = memberService.findMemberByEmail(email);
+			attendee.updateMember(member);
+		}
 
 		attendee.updateRoom(room);
 
@@ -148,12 +155,17 @@ public class RoomService {
 			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
 
-		attendee.updateStatus(AttendeeStatus.ENTERED);
+		if(room.getRoomStatus() == RoomStatus.PLAYING){
+			attendee.updateStatus(AttendeeStatus.WAITING);
+		} else {
+			attendee.updateStatus(AttendeeStatus.ENTERED);
+		}
 		attendeeRepository.save(attendee);
 
 		// 3. 기존 인원들에게 알림
 		AttendeeInfo attendeeInfo = AttendeeInfo.of(attendee);
 		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ENTER);
+		System.out.println("해볼게용");
 
 		// 1-1. 나갔다 온 방장이니?
 		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){

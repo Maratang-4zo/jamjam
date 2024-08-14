@@ -8,11 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
+import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.response.CenterLoadingDto;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
+import com.maratang.jamjam.domain.room.dto.response.ThreeLoadingRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
@@ -48,7 +50,11 @@ public class RoomMapService {
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
 		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
 
-		attendeeList.forEach(attendee -> processAttendeeRoute(attendee, selectedStation));
+		List<AttendeeDTO> attendeesEntered = attendeeList.stream()
+			.filter(attendee -> attendee.getStatus() == AttendeeStatus.ENTERED)
+			.toList();
+
+		attendeesEntered.forEach(attendee -> processAttendeeRoute(attendee, selectedStation));
 
 		room.updateIsCenterExist(true);
 		attendeeRepository.saveAll(attendees);
@@ -83,6 +89,7 @@ public class RoomMapService {
 
 	public List<SubwayInfo> getAroundStation(UUID roomUUID) {
 		Room room = findRoomByUUID(roomUUID);
+		broadCastService.broadcastToRoom(roomUUID, ThreeLoadingRes.of(true), BroadCastType.WINNER_NEXT_PAGE);
 		validateStartStation(room);
 
 		SubwayInfo point = subwayDataLoader.getSubwayInfoMap().get(room.getStartStation());

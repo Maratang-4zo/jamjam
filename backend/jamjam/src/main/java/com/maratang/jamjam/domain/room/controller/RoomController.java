@@ -1,6 +1,7 @@
 package com.maratang.jamjam.domain.room.controller;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.WebUtils;
 
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeCreateReq;
 import com.maratang.jamjam.domain.attendee.service.AttendeeService;
@@ -26,6 +28,7 @@ import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
 import com.maratang.jamjam.domain.room.service.RoomMapService;
 import com.maratang.jamjam.domain.room.service.RoomService;
+import com.maratang.jamjam.global.auth.jwt.manager.TokenManager;
 import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenDto;
@@ -46,6 +49,7 @@ public class RoomController {
 	private final RoomTokenProvider roomTokenProvider;
 	private final AttendeeService attendeeService;
 	private final RoomMapService roomMapService;
+	private final TokenManager tokenManager;
 
 	@GetMapping("/{roomUUID}")
 	@Operation(summary = "✨ 방 정보 받기", description = "방에 대한 정보를 받습니다.")
@@ -64,8 +68,16 @@ public class RoomController {
 
 	@PostMapping
 	@Operation(summary = "✨ 방 만들기", description = "방을 만들며, 방장을 설정하고, cookie(roomToken)을 준다, 해당 방에 참여자를 추가한다.")
-	public ResponseEntity<?> createRoom(@RequestBody @Valid final RoomCreateReq roomCreateReq, HttpServletResponse response) {
-		RoomJwtTokenClaims roomJwtTokenClaims = roomService.createRoom(roomCreateReq);
+	public ResponseEntity<?> createRoom(@RequestBody @Valid final RoomCreateReq roomCreateReq, HttpServletResponse response, HttpServletRequest request) {
+		String email;
+		try {
+			String accessToken = Objects.requireNonNull(WebUtils.getCookie(request, "accessToken")).getValue();
+			email = tokenManager.getTokenClaims(accessToken).get("email").toString();
+		}catch (Exception e){
+			email = "";
+		}
+
+		RoomJwtTokenClaims roomJwtTokenClaims = roomService.createRoom(roomCreateReq, email);
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims);
 
 		CookieUtils.createSecureSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
@@ -108,7 +120,15 @@ public class RoomController {
 
 	@PostMapping("/{roomUUID}/join")
 	@Operation(summary = "✨ 참여자가 방에 입장한다.", description = "사용자가 방에 입장한다. cookie(roomToken)을 준다, 해당 방에 참여자를 추가한다.")
-	public ResponseEntity<?> joinRoom(@PathVariable UUID roomUUID, @RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response, @RequestAttribute String email){
+	public ResponseEntity<?> joinRoom(@PathVariable UUID roomUUID, @RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response, HttpServletRequest request){
+		String email;
+		try {
+			String accessToken = Objects.requireNonNull(WebUtils.getCookie(request, "accessToken")).getValue();
+			email = tokenManager.getTokenClaims(accessToken).get("email").toString();
+		}catch (Exception e){
+			email = "";
+		}
+
 		RoomJoinRes roomJoinRes = attendeeService.createAttendee(roomUUID, attendeeCreateReq, email);
 
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(RoomJwtTokenClaims.of(roomJoinRes));

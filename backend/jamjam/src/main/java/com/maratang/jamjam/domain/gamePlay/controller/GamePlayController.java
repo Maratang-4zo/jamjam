@@ -25,6 +25,7 @@ import com.maratang.jamjam.domain.gamePlay.dto.response.session.GameSessionUpdat
 import com.maratang.jamjam.domain.gamePlay.service.GamePlayService;
 import com.maratang.jamjam.domain.gamePlay.service.GameRoundService;
 import com.maratang.jamjam.domain.gamePlay.service.GameSessionService;
+import com.maratang.jamjam.domain.room.dto.response.MainConnectingRes;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
 
@@ -88,7 +89,8 @@ public class GamePlayController {
 	@MessageMapping("/game/session.end")
 	@Operation(summary = "✨ 게임 승자 이력 조회", description = "모든 게임이 끝나고 각 라운드별 승자 및 역 정보 조회")
 	public void endSession(@Payload GameRoundReq gameRoundReq, UUID roomUUID){
-		GameRoundResultListRes res = gameRoundService.getRoundRecord(gameRoundReq);
+		GameRoundResultListRes res = gameSessionService.closeSession(gameRoundReq, roomUUID);
+		System.out.println(res);
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.CENTER_HISTORY);
 	}
 
@@ -97,6 +99,7 @@ public class GamePlayController {
 	public void updateSessionStation(@Payload GameSessionResultUpdateReq gameSessionResultUpdateReq, UUID roomUUID){
 		GameSessionUpdateRes res = gameSessionService.updateGameSession(gameSessionResultUpdateReq);
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.GAME_RESULT_APPLY);
+		broadCastService.broadcastToRoom(roomUUID, MainConnectingRes.of(true), BroadCastType.HOST_GO_MAIN);
 	}
 
 	@MessageMapping("/game/session.reset")

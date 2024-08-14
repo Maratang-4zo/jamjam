@@ -55,21 +55,13 @@ def update_database(new_data_df, existing_data_df):
         return
 
     # id를 기준으로 교집합, 차집합 찾기
-    common_ids = existing_data_df.merge(new_data_df, on='id')['id']  # 합집합
-    to_delete = existing_data_df[~existing_data_df['id'].isin(common_ids)]  # 차집합: old-new
-    to_insert = new_data_df[~new_data_df['id'].isin(existing_data_df['id'])]  # 차집합: new-old
-    to_update = new_data_df[new_data_df['id'].isin(existing_data_df['id'])]  # 교집합
+    to_delete = existing_data_df[~existing_data_df['id'].isin(new_data_df['id'])] # 차집합
+    to_insert = new_data_df[~new_data_df['id'].isin(existing_data_df['id'])] # 차집합
+    to_update = pd.merge(existing_data_df, new_data_df, on='id', how='inner') # 교집합
 
-    # 삭제 필드 업데이트
-    LocalInfo.bulk_delete(to_delete['id'].tolist())
-
-    # 새로운 데이터 삽입
-    LocalInfo.bulk_insert(to_insert.to_dict(orient='records'))
-
-    # 교집합 부분 업데이트
-    for _, row in to_update.iterrows():
-        LocalInfo.update_place(row['id'], row.to_dict())
-
+    LocalInfo.bulk_delete(to_delete.to_dict(orient='records')) # 삭제 필드 업데이트
+    LocalInfo.bulk_insert(to_insert.to_dict(orient='records')) # 새로운 데이터 삽입
+    LocalInfo.bulk_update(to_update.to_dict(orient='records')) # 교집합 부분 업데이트
 
 # 스케줄러 시작 함수
 def start_scheduler():
@@ -85,7 +77,8 @@ def start_scheduler():
 
     # 추가하고 싶은 작업을 add_job 매서드를 통해 설정한다.
     # 작업을 매주 월요일 3:00 AM에 실행하도록 설정한다.
-    schedule.add_job(scheduler_add_data, 'cron', day_of_week='mon', hour=3, minute=0)
+    schedule.add_job(scheduler_add_data, 'cron', hour='13', minute='51')
+    # schedule.add_job(scheduler_add_data, 'cron', day_of_week='mon', hour='3', minute='0')
 
     # 스케줄을 start()로 호출한다
     logging.info("Scheduler Start Soon!")

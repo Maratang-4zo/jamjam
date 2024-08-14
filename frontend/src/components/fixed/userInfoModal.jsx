@@ -16,7 +16,7 @@ const slideIn = keyframes`
 const ModalOverlay = styled.div`
   display: flex;
   width: 150px;
-  height: 150px;
+  /* height: 170px; */
   flex-direction: column;
   align-items: flex-start;
   border-radius: 20px;
@@ -30,7 +30,7 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalHeader = styled.div`
-  height: 60px;
+  height: 50px;
   flex-shrink: 0;
   align-self: stretch;
   background: ${(props) => props.bgColor};
@@ -41,6 +41,7 @@ const ModalBody = styled.div`
   padding: 10px;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 5px;
   flex: 1 0 0;
   align-self: stretch;
@@ -72,7 +73,7 @@ const Profile = styled.img`
   width: 50px;
   height: 50px;
   position: absolute;
-  top: 35px;
+  top: 30px;
   left: 10px;
   border-radius: 30%;
 `;

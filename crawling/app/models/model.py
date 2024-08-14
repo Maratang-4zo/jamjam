@@ -1,5 +1,7 @@
+from sqlalchemy.exc import SQLAlchemyError
+
 from app import db
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class LocalInfo(db.Model):
@@ -29,23 +31,43 @@ class LocalInfo(db.Model):
         return [place.to_dict() for place in LocalInfo.query.filter_by(is_deleted=False).all()]
 
     @staticmethod
-    def bulk_insert(place_data_list):
-        db.session.bulk_insert_mappings(LocalInfo, place_data_list)
+    def bulk_insert(insert_data_list):
+        db.session.bulk_insert_mappings(LocalInfo, insert_data_list)
         db.session.commit()
 
     @staticmethod
-    def update_place(place_id, update_data):
-        place = LocalInfo.query.get(place_id)
-        if place:
-            for key, value in update_data.items():
-                setattr(place, key, value)
-            place.updated_at = datetime.utcnow()
-            db.session.commit()
+    def bulk_update(update_data_list):
+
+        current_time = datetime.utcnow() + timedelta(hours=9) # 한국 시간: UTC + 9 시간
+        for data in update_data_list:
+            data['updated_at'] = current_time
+
+        batch_size = 1000 # 데이터가 너무 많아지지 않도록 배치로 나누어 처리
+        for i in range(0, len(update_data_list), batch_size):
+            batch = update_data_list[i:i + batch_size]
+            try:
+                db.session.bulk_update_mappings(LocalInfo, batch)
+                db.session.commit()
+            except SQLAlchemyError as e:
+                db.session.rollback()
+                print(f"@@@@@ An error occurred: {e}")
 
     @staticmethod
-    def bulk_delete(ids):
-        LocalInfo.query.filter(LocalInfo.local_info_id.in_(ids)).update({'is_deleted': True})
-        db.session.commit()
+    def bulk_delete(delete_data_list):
+        current_time = datetime.utcnow() + timedelta(hours=9) # 한국 시간: UTC + 9 시간
+        for data in delete_data_list:
+            data['updated_at'] = current_time
+            data['is_deleted'] = True
+
+        batch_size = 1000 # 데이터가 너무 많아지지 않도록 배치로 나누어 처리
+        for i in range(0, len(delete_data_list), batch_size):
+            batch = delete_data_list[i:i + batch_size]
+            try:
+                db.session.bulk_update_mappings(LocalInfo, batch)
+                db.session.commit()
+            except SQLAlchemyError as e:
+                db.session.rollback()
+                print(f"@@@@@ An error occurred: {e}")
 
     def to_dict(self):
         """Convert model instance to dictionary."""

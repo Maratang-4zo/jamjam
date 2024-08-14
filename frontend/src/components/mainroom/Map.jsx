@@ -93,8 +93,6 @@ function MyMap() {
 
   useEffect(() => {
     if (map) {
-      console.log("attendee", attendeeDepartures);
-      console.log("room attendee", roomInfo.attendees);
       const bounds = new navermaps.LatLngBounds();
       let hasValidLocation = false;
 
@@ -208,7 +206,7 @@ function MyMap() {
                     </span>
                   </div>
                 `,
-                anchor: new navermaps.Point(20, 20), // 마커 중심점을 이미지 중앙으로 조정
+                anchor: new navermaps.Point(20, 20),
               }}
             />
             {roomPage === "main" &&
@@ -255,7 +253,7 @@ function MyMap() {
         </span>
       </div>
     `,
-                      anchor: new navermaps.Point(35, 10), // 마커 중심점을 이미지 중앙으로 조정
+                      anchor: new navermaps.Point(35, 10),
                     }}
                   />
                 </>
@@ -266,7 +264,7 @@ function MyMap() {
         <Marker
           position={
             new navermaps.LatLng(
-              roomInfo.centerPlace.latitude + 0.007,
+              roomInfo.centerPlace.latitude,
               roomInfo.centerPlace.longitude,
             )
           }
@@ -299,10 +297,7 @@ function MyMap() {
       {roundCenter && roomPage === "gamefinish" ? (
         <Marker
           position={
-            new navermaps.LatLng(
-              roundCenter.latitude + 0.007,
-              roundCenter.longitude,
-            )
+            new navermaps.LatLng(roundCenter.latitude, roundCenter.longitude)
           }
           icon={{
             content: `

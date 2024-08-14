@@ -114,6 +114,10 @@ const RoundSetting = styled.div`
   border: 3px solid #000;
   border-bottom: none;
   background-color: ${(props) => props.theme.bgColor};
+  span {
+    font-family: "DungGeunMo";
+    font-size: 30px;
+  }
 `;
 
 const RoundBtn = styled.button`
@@ -128,6 +132,8 @@ const RoundBtn = styled.button`
   background-color: ${(props) => props.theme.bgColor};
   color: black;
   font-size: 24px;
+  font-family: "DungGeunMo";
+  font-size: 30px;
   &:hover {
     background-color: black;
     color: ${(props) => props.theme.bgColor};
@@ -168,6 +174,8 @@ const OkBtn = styled.button`
   padding: 7px 17px;
   justify-content: center;
   align-items: center;
+  font-family: "DungGeunMo";
+  font-size: 30px;
   gap: 8.229px;
   flex-shrink: 0;
   border-radius: 0 0 15px 15px;
@@ -317,13 +325,14 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const handleFindCenter = async () => {
     setIsMiddleLoading(true);
     try {
-      const res = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
-      const data = res.data;
+      const res = await axiosGetMiddle({ roomUUID: roomState.roomUUID });
+      const resData = res.data;
+      console.log(resData);
       setRoomState((prev) => ({
         ...prev,
-        centerPlace: data.roomCenterStart,
+        centerPlace: resData.roomCenterStart,
         isCenterExist: true,
-        attendees: data.attendees,
+        attendees: resData.attendees,
       }));
     } catch (error) {
       console.error("중심찾기 실패!!!", error);
@@ -363,6 +372,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   const handleConfirmGame = () => {
+    console.log("round", round);
     if (userInfo.isHost) {
       sendGameRound({
         roundCnt: round,
@@ -421,7 +431,13 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   const handleInfoCopyClick = () => {
-    const date = new Date(roomState.meetingDate);
+    if (!roomState.meetingDate || isNaN(Date.parse(roomState.meetingDate))) {
+      console.error("Invalid meetingDate:", roomState.meetingDate);
+      alert("유효하지 않은 모임 날짜입니다.");
+      return;
+    }
+
+    const date = new Date(Date.parse(roomState.meetingDate));
 
     const formattedDate = new Intl.DateTimeFormat("ko", {
       year: "numeric",
@@ -434,6 +450,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
         ? roomState.centerPlace.name
         : "아직 모임장소를 찾지 않으셨어요 T.T"
     }\n- 모임 목적: ${roomState.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
+
     navigator.clipboard
       .writeText(infoText)
       .then(() => {

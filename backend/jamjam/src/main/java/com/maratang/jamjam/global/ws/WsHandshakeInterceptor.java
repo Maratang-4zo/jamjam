@@ -29,6 +29,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
 
 			if(token == null){
 				response.setStatusCode(HttpStatus.UNAUTHORIZED);
+				System.out.println("handshake fail: unauthorized");
 				return false;
 			}
 			attributes.put("roomToken", token.getValue());

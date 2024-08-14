@@ -55,5 +55,5 @@ export function axiosPatchRoomInfo({
     purpose: roomPurpose,
   };
 
-  return axios.patch(BASE_URL + `/api/rooms/${roomUUID}/`, params);
+  return axios.patch(BASE_URL + `/api/rooms/${roomUUID}`, params);
 }

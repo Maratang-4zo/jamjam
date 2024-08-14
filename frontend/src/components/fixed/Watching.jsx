@@ -20,7 +20,7 @@ const Wrapper = styled.div`
   }
 `;
 
-function Loading({ message, estimatedForceCloseAt }) {
+function Watching() {
   return (
     <Wrapper>
       <h1>게임 중! 관전 모드 입니다.</h1>
@@ -28,4 +28,4 @@ function Loading({ message, estimatedForceCloseAt }) {
   );
 }
 
-export default Loading;
+export default Watching;

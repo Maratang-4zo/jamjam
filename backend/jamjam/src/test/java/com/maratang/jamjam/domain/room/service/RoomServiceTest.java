@@ -103,11 +103,12 @@ class RoomServiceTest extends IntegrationTestConfig {
             String purpose = "스터디룸";
             LocalDateTime meetingDate = LocalDateTime.parse("2024-08-11T05:14:01.290");
             String nickName = "씩씩한 호랑이";
+            String email="";
 
             RoomCreateReq roomCreateReq = new RoomCreateReq(purpose, meetingDate, nickName);
 
             //when
-            RoomJwtTokenClaims roomJwtTokenClaims = roomService.createRoom(roomCreateReq);
+            RoomJwtTokenClaims roomJwtTokenClaims = roomService.createRoom(roomCreateReq, email);
 
             // then
             SoftAssertions.assertSoftly(softAssertions -> {

@@ -14,6 +14,7 @@ import { isMainConnectingAtom } from "../../recoil/atoms/loadingState";
 import Loading from "../fixed/Loading";
 import modalBg from "../../assets/final/finalModalBg.svg";
 import { axiosGetKakaoCalendar } from "../../apis/loginApi";
+
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   width: ${(props) => props.theme.wrapperWidth};

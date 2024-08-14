@@ -32,7 +32,7 @@ const ButtonContainer = styled.div`
   display: flex;
   gap: 40px;
   margin-top: 20px;
-  animation: ${fadeIn} 2s ease-in-out;
+  animation: ${fadeIn} 3s ease-in-out;
 `;
 
 const AnimatedButton = styled.button`

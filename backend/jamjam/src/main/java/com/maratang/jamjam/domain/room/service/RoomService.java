@@ -99,7 +99,6 @@ public class RoomService {
 		String roomName = attendee.getNickname();
 
 		if (roomName == null || roomName.isBlank()){
-			//todo 여기서 nick 테이블에 잇는 모든 value 중에 랜덤 값으로 정하기
 			Nick nick = nickRepository.findRandomNick();
 			Name name = nameRepository.findRandomName();
 			roomName = nick.getNick() + name.getName();

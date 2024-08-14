@@ -120,17 +120,8 @@ public class RoomController {
 
 	@PostMapping("/{roomUUID}/join")
 	@Operation(summary = "✨ 참여자가 방에 입장한다.", description = "사용자가 방에 입장한다. cookie(roomToken)을 준다, 해당 방에 참여자를 추가한다.")
-	public ResponseEntity<?> joinRoom(@PathVariable UUID roomUUID, @RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response, HttpServletRequest request){
-		String email;
-		try {
-			String accessToken = Objects.requireNonNull(WebUtils.getCookie(request, "accessToken")).getValue();
-			email = tokenManager.getTokenClaims(accessToken).get("email").toString();
-		}catch (Exception e){
-			email = "";
-		}
-
+	public ResponseEntity<?> joinRoom(@PathVariable UUID roomUUID, @RequestBody AttendeeCreateReq attendeeCreateReq, HttpServletResponse response, @RequestAttribute String email){
 		RoomJoinRes roomJoinRes = attendeeService.createAttendee(roomUUID, attendeeCreateReq, email);
-
 		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(RoomJwtTokenClaims.of(roomJoinRes));
 
 		CookieUtils.createSecureSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());

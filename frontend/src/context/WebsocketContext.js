@@ -551,7 +551,7 @@ export const WebSocketProvider = ({ children }) => {
     ({ snapshot }) =>
       async (message) => {
         const { attendeeUUID, content, createdAt } = message;
-        const currentRoomInfo = await snapshot.getPromise(roomInfoAtom);
+        const currentRoomInfo = await snapshot.getPromise(roomAtom);
         const attendant = currentRoomInfo.attendees.find(
           (attendee) => attendee.attendeeUUID === attendeeUUID,
         );

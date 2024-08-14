@@ -9,7 +9,6 @@ import {
 } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
-import questionIcon from "../../assets/icons/questionMark.PNG";
 import inviteIcon from "../../assets/icons/inviteIcon.png";
 import shareIcon from "../../assets/icons/shareIcon.png";
 import updateIcon from "../../assets/icons/updateIcon.png";

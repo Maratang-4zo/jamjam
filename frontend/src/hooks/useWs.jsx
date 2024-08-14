@@ -46,8 +46,9 @@ const useWs = () => {
   const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);
   const [connected, setConnected] = useRecoilState(isWsConnectedAtom);
-  const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const [client, setClient] = useRecoilState(wsClientAtom); // 초기화 null로 변경
+
+  const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const [players, setPlayers] = useRecoilState(playerState);
   const setSelectedGame = useSetRecoilState(selectedGameAtom);
@@ -128,7 +129,7 @@ const useWs = () => {
       alert("Handshake 실패: 알 수 없는 오류");
     }
     // 재연결 시도 중지
-    client.current.deactivate();
+    client.deactivate();
   };
 
   const handleWebSocketClose = (event) => {
@@ -136,20 +137,20 @@ const useWs = () => {
       // 비정상적인 종료 코드
       alert("WebSocket 연결이 비정상적으로 종료되었습니다.");
       // 재연결 시도 중지
-      client.current.deactivate();
+      client.deactivate();
     }
     alert(event.code);
-    client.current.deactivate();
+    client.deactivate();
   };
 
   const handleWebSocketError = (error) => {
     alert("WebSocket 연결에 실패했습니다.");
     // 재연결 시도 중지
-    client.current.deactivate();
+    client.deactivate();
   };
 
   const subscribe = (roomUUID) => {
-    client.current.subscribe(
+    client.subscribe(
       `/sub/rooms/${roomUUID}`,
       (message) => {
         handleMessage(message);
@@ -158,14 +159,14 @@ const useWs = () => {
       {},
     );
 
-    client.current.subscribe(`/user/sub/errors`, (message) => {
+    client.subscribe(`/user/sub/errors`, (message) => {
       alert(message.body);
     });
   };
 
   const disconnect = useCallback(() => {
-    if (client.current) {
-      client.current.deactivate();
+    if (client) {
+      client.deactivate();
       setConnected(false);
     }
   }, []);
@@ -386,14 +387,14 @@ const useWs = () => {
   };
 
   const sendNextRound = ({ gameRoundUUID, currentRound, totalRound }) => {
-    client.current.publish({
+    client.publish({
       destination: `/pub/game/round.next`,
       body: JSON.stringify({ gameRoundUUID, currentRound, totalRound }),
     });
   };
 
   const sendGoResult = ({ gameSessionUUID }) => {
-    client.current.publish({
+    client.publish({
       destination: `/pub/game/session.end`,
       body: JSON.stringify({ gameSessionUUID }),
     });
@@ -415,7 +416,7 @@ const useWs = () => {
 
   // 최종 장소 리셋
   const sendReset = ({ gameSessionUUID }) => {
-    client.current.publish({
+    client.publish({
       destination: `/pub/game/session.reset`,
       body: JSON.stringify({ gameSessionUUID }),
     });
@@ -512,7 +513,7 @@ const useWs = () => {
 
   // 최종 장소 기록에 반영
   const sendFinalStation = ({ finalStationName }) => {
-    client.current.publish({
+    client.publish({
       destination: `/pub/game/session.station`,
       body: JSON.stringify({ gameSessionUUID, finalStationName }),
     });
@@ -528,7 +529,7 @@ const useWs = () => {
   };
 
   const sendGameStart = (gameRoundUUID) => {
-    client.current.publish({
+    client.publish({
       destination: `/pub/game/round.start`,
       body: JSON.stringify({ gameRoundUUID }),
     });
@@ -546,7 +547,7 @@ const useWs = () => {
   };
 
   const sendRoundInfo = ({ round, gameId, gameSessionUUID, stationName }) => {
-    client.current.publish({
+    client.publish({
       destination: `/pub/game/round.setting`,
       body: JSON.stringify({ round, gameId, gameSessionUUID, stationName }),
     });
@@ -571,7 +572,7 @@ const useWs = () => {
       roomUUID,
       finalStationName,
     });
-    client.current.publish({
+    client.publish({
       destination: `/pub/game/session.setting`,
       body: JSON.stringify({
         roundCnt,
@@ -608,7 +609,7 @@ const useWs = () => {
   };
 
   const sendNextRoundCenter = ({ roundStationName }) => {
-    client.current.publish({
+    client.publish({
       destination: `/pub/game/round.station`,
       body: JSON.stringify({
         gameRoundUUID: currentRoundUUID,
@@ -668,8 +669,8 @@ const useWs = () => {
   };
 
   const sendChat = ({ content }) => {
-    if (client.current) {
-      client.current.publish({
+    if (client) {
+      client.publish({
         destination: `/pub/chat/send`,
         body: JSON.stringify({ content }),
       });
@@ -712,8 +713,8 @@ const useWs = () => {
   );
 
   const sendGame = useCallback(({ newBottom }) => {
-    if (client.current) {
-      client.current.publish({
+    if (client) {
+      client.publish({
         destination: `/pub/game/updatePosition`,
         body: JSON.stringify({ bottom: newBottom }),
       });

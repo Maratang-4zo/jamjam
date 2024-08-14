@@ -81,7 +81,11 @@ const Section = styled.div`
   box-sizing: border-box;
   overflow-x: hidden;
   opacity: ${(props) => (props.isVisible ? 1 : 0)};
-  transition: opacity 0.5s ease-in-out;
+  /* transition: opacity 0.1s ease-in-out; */
+  transition: ${(props) =>
+    props.id === "section6" && props.isVisible
+      ? "opacity 0.7s ease-in-out"
+      : "none"};
 `;
 
 const FirstSection = styled.div`

@@ -62,7 +62,7 @@ function Room() {
   const estimatedClosedAt = useRecoilValue(estimatedForceCloseAtAtom);
   const { connect, connected } = useWebSocket();
   const { joinSession } = useOpenVidu();
-  const { subscribe } = useWs();
+  // const { subscribe } = useWs();
   const joined = useRecoilValue(isOVConnectedAtom);
 
   useEffect(() => {
@@ -94,7 +94,7 @@ function Room() {
           const roomData = roomResponse.data;
 
           console.log(roomData);
-          subscribe();
+          // subscribe();
 
           const { myUUID } = userInfo;
           const myAttendeeInfo = roomData.attendees.find(

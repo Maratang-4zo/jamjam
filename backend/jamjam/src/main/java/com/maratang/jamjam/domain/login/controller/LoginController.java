@@ -51,7 +51,7 @@ public class LoginController {
 	public void redirectToKakao(@RequestParam("redirectUri") String clientRedirectUri, HttpServletRequest request, HttpServletResponse httpServletResponse) throws IOException {
 		String authorizeUrl = "https://kauth.kakao.com/oauth/authorize"
 			+ "?response_type=code"
-			+ "&scope=talk_calendar, account_email, talk_calendar, profile_image, profile_nickname"
+			+ "&scope= account_email, talk_calendar, profile_image, profile_nickname"
 			+ "&client_id=" + clientId
 			+ "&redirect_uri=" + redirectUri;
 

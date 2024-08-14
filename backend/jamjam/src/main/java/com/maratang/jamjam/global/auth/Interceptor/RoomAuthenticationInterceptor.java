@@ -58,6 +58,16 @@ public class RoomAuthenticationInterceptor implements HandlerInterceptor {
 			String accessToken = access.getValue();
 			String refreshToken = refresh.getValue();
 			try {
+				String newAccessToken = null;
+				if (!tokenManager.validateAccessToken(accessToken, request, response)) {
+					if(tokenManager.validateRefreshToken(refreshToken, request, response))
+						newAccessToken = tokenManager.reissueToken(refreshToken);
+				}
+
+				if (newAccessToken != null) {
+					accessToken = newAccessToken;
+				}
+
 				Claims claims = tokenManager.getTokenClaims(accessToken);
 				email = claims.get("email").toString();
 			} catch (ExpiredJwtException e){

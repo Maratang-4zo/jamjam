@@ -65,104 +65,104 @@ function Room() {
   // const { subscribe } = useWs();
   const joined = useRecoilValue(isOVConnectedAtom);
 
-  // useEffect(() => {
-  //   const initializeRoom = async () => {
-  //     try {
-  //       // 방 유효성 검사
-  //       const response = await axiosIsRoomValid({ roomUUID });
-  //       const res = response.data;
-  //       if (!res.hasToken) {
-  //         setRoomInfo((prev) => ({
-  //           ...prev,
-  //           roomUUID: res.roomUUID,
-  //           roomName: res.roomName,
-  //           meetingDate: res.meetingDate,
-  //           roomPurpose: res.purpose,
-  //         }));
-  //         navigate(`/room/${roomUUID}/join`);
-  //       } else {
-  //         if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
-  //           navigate("/");
-  //           alert("종료된 방입니다.");
-  //         } else if (res.roomStatus === "PLAYING") {
-  //           setIsPlayingGame(true);
-  //         } else if (res.roomStatus === "RESERVED") {
-  //           setIsHostOut(true);
-  //         }
-  //         // 방 정보 가져오기
-  //         const roomResponse = await axiosGetRoomInfo({ roomUUID });
-  //         const roomData = roomResponse.data;
+  useEffect(() => {
+    const initializeRoom = async () => {
+      try {
+        // 방 유효성 검사
+        const response = await axiosIsRoomValid({ roomUUID });
+        const res = response.data;
+        if (!res.hasToken) {
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID: res.roomUUID,
+            roomName: res.roomName,
+            meetingDate: res.meetingDate,
+            roomPurpose: res.purpose,
+          }));
+          navigate(`/room/${roomUUID}/join`);
+        } else {
+          if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
+            navigate("/");
+            alert("종료된 방입니다.");
+          } else if (res.roomStatus === "PLAYING") {
+            setIsPlayingGame(true);
+          } else if (res.roomStatus === "RESERVED") {
+            setIsHostOut(true);
+          }
+          // 방 정보 가져오기
+          const roomResponse = await axiosGetRoomInfo({ roomUUID });
+          const roomData = roomResponse.data;
 
-  //         console.log(roomData);
-  //         console.log("연결?", connected);
+          console.log(roomData);
+          console.log("연결?", connected);
 
-  //         const { myUUID } = userInfo;
-  //         const myAttendeeInfo = roomData.attendees.find(
-  //           (attendee) => attendee.attendeeUUID === myUUID,
-  //         );
+          const { myUUID } = userInfo;
+          const myAttendeeInfo = roomData.attendees.find(
+            (attendee) => attendee.attendeeUUID === myUUID,
+          );
 
-  //         const nowAttendees = roomData.attendees.filter(
-  //           (attendee) => attendee.attendeeStatus !== "EXITED",
-  //         );
+          const nowAttendees = roomData.attendees.filter(
+            (attendee) => attendee.attendeeStatus !== "EXITED",
+          );
 
-  //         if (
-  //           !myAttendeeInfo ||
-  //           !myAttendeeInfo.address ||
-  //           !myAttendeeInfo.lat ||
-  //           !myAttendeeInfo.lon
-  //         ) {
-  //           setIsFindDepartureModalOpen(true);
-  //         }
+          if (
+            !myAttendeeInfo ||
+            !myAttendeeInfo.address ||
+            !myAttendeeInfo.lat ||
+            !myAttendeeInfo.lon
+          ) {
+            setIsFindDepartureModalOpen(true);
+          }
 
-  //         setRoomInfo((prev) => ({
-  //           ...prev,
-  //           roomUUID,
-  //           roomName: roomData.roomName,
-  //           meetingDate: roomData.roomTime,
-  //           centerPlace: roomData.roomCenterStart,
-  //           attendees: [...nowAttendees],
-  //           roomPurpose: roomData.roomPurpose,
-  //           hostUUID: roomData.hostUUID,
-  //         }));
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID,
+            roomName: roomData.roomName,
+            meetingDate: roomData.roomTime,
+            centerPlace: roomData.roomCenterStart,
+            attendees: [...nowAttendees],
+            roomPurpose: roomData.roomPurpose,
+            hostUUID: roomData.hostUUID,
+          }));
 
-  //         setUserInfo((prev) => ({
-  //           ...prev,
-  //           myUUID,
-  //           isHost: roomData.isHost,
-  //           departure: {
-  //             address: myAttendeeInfo?.address || "",
-  //             lat: myAttendeeInfo?.lat || null,
-  //             lon: myAttendeeInfo?.lon || null,
-  //           },
-  //           nickname: myAttendeeInfo?.nickname || "",
-  //           duration: myAttendeeInfo?.duration || null,
-  //           route: myAttendeeInfo?.route || null,
-  //           profileImageUrl: myAttendeeInfo?.profileImageUrl || "",
-  //         }));
+          setUserInfo((prev) => ({
+            ...prev,
+            myUUID,
+            isHost: roomData.isHost,
+            departure: {
+              address: myAttendeeInfo?.address || "",
+              lat: myAttendeeInfo?.lat || null,
+              lon: myAttendeeInfo?.lon || null,
+            },
+            nickname: myAttendeeInfo?.nickname || "",
+            duration: myAttendeeInfo?.duration || null,
+            route: myAttendeeInfo?.route || null,
+            profileImageUrl: myAttendeeInfo?.profileImageUrl || "",
+          }));
 
-  //         if (!connected) {
-  //           try {
-  //             await connect(roomUUID); // roomUUID를 인자로 전달
-  //           } catch (error) {
-  //             console.error("WebSocket 연결 실패:", error);
-  //           }
-  //         }
+          if (!connected) {
+            try {
+              await connect(roomUUID); // roomUUID를 인자로 전달
+            } catch (error) {
+              console.error("WebSocket 연결 실패:", error);
+            }
+          }
 
-  //         if (!joined) {
-  //           await joinSession();
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error("방 유효성 검사 실패:", error);
-  //       alert("존재하지 않는 방입니다.");
-  //       navigate("/invalid-room");
-  //     } finally {
-  //       setJoinLoading(false);
-  //     }
-  //   };
+          if (!joined) {
+            await joinSession();
+          }
+        }
+      } catch (error) {
+        console.error("방 유효성 검사 실패:", error);
+        alert("존재하지 않는 방입니다.");
+        navigate("/invalid-room");
+      } finally {
+        setJoinLoading(false);
+      }
+    };
 
-  //   initializeRoom();
-  // }, [roomUUID, navigate, setRoomInfo, setUserInfo]);
+    initializeRoom();
+  }, [roomUUID, navigate, setRoomInfo, setUserInfo]);
 
   const handleCloseFindDepartureModal = () => {
     setIsFindDepartureModalOpen(false);

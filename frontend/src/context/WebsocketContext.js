@@ -38,7 +38,7 @@ import {
 } from "../recoil/atoms/loadingState";
 import useOpenVidu from "../hooks/useOpenVidu";
 
-const WebSocketContext = createContext({
+const WebSocketContext = React.createContext({
   connect: () => {},
   connected: false,
   disconnect: () => {},

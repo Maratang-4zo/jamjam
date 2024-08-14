@@ -547,25 +547,27 @@ export const WebSocketProvider = ({ children }) => {
     return `${adjustedHours.toString().padStart(2, "0")}:${minutes}`;
   };
 
-  const handleChatLogs = (message) => {
-    const { attendeeUUID, content, createdAt } = message;
-    const attendant = roomInfo.attendees.find(
-      (attendee) => attendee.attendeeUUID === attendeeUUID,
-    );
+  const handleChatLogs = useCallback(
+    (message) => {
+      const { attendeeUUID, content, createdAt } = message;
+      const attendant = roomInfo.attendees.find(
+        (attendee) => attendee.attendeeUUID === attendeeUUID,
+      );
 
-    console.log("메시지받는곳", message, attendant, roomInfo);
-    // const localTime = formatTime(createdAt);
+      console.log("메시지받는곳", message, attendant, roomInfo);
 
-    const nickname = attendant ? attendant.nickname : "Unknown";
-    const newChatLog = {
-      type: "chat",
-      attendeeUUID,
-      nickname,
-      content,
-      createdAt,
-    };
-    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
-  };
+      const nickname = attendant ? attendant.nickname : "Unknown";
+      const newChatLog = {
+        type: "chat",
+        attendeeUUID,
+        nickname,
+        content,
+        createdAt,
+      };
+      setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+    },
+    [roomInfo, setChatLogs],
+  );
 
   const updateRoomStatus = (message) => {
     console.log("Room status updated:", message);

@@ -121,12 +121,19 @@ const useWs = () => {
   }, []);
 
   useEffect(() => {
-    // 구독이 이미 되었는지 체크하고, 되지 않았다면 구독
     if (client && connected && !isSubscribed) {
+      console.log("subscribe", client);
       subscribe();
-      setIsSubscribed(true); // 구독 완료로 상태 변경
+      setIsSubscribed(true);
     }
-  }, [connected]);
+
+    return () => {
+      if (client) {
+        client.unsubscribe(`/sub/rooms/${roomInfo.roomUUID}`);
+        setIsSubscribed(false);
+      }
+    };
+  }, [client, connected, isSubscribed]);
 
   const subscribe = () => {
     if (client && roomInfo.roomUUID) {

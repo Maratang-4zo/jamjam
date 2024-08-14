@@ -410,7 +410,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   const handleInviteCopyClick = () => {
-    const roomURL = `우리 모임장소 정해야지!!\n\nhttps://jjam.shop/room/${roomState.roomUUID}`;
+    const roomURL = `https://jjam.shop/room/${roomState.roomUUID}`;
     navigator.clipboard
       .writeText(roomURL)
       .then(() => {

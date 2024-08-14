@@ -289,7 +289,12 @@ function JoinRoom() {
 
   const attendRoomFn = async (data) => {
     try {
-      const response = await axiosAttendRoom(roomUUID, data.nickname);
+      const response = await axiosAttendRoom({
+        roomUUID,
+        nickname: data.nickname,
+      });
+
+      console.log("Response:", response); // 응답 확인
 
       setUserInfo((prev) => ({
         ...prev,
@@ -297,8 +302,10 @@ function JoinRoom() {
         nickname: data.nickname,
       }));
 
+      console.log("Navigating..."); // 네비게이트 호출 전 확인
       navigate(`/room/${roomUUID}`);
     } catch (error) {
+      console.log(data);
       console.log("방 참여 실패", error);
     }
   };
@@ -335,17 +342,20 @@ function JoinRoom() {
           )}
           <Form onSubmit={handleSubmit(attendRoomFn)} isLoggedIn={isLoggedIn}>
             <NicknameInput>
-              <label> 닉네임: </label>
-              <input
-                {...register("nickname", { maxLength: maxChars })}
-                type="text"
-                maxLength={maxChars}
-              />
+              <label>
+                {" "}
+                닉네임:
+                <input
+                  {...register("nickname", { maxLength: maxChars })}
+                  type="text"
+                  maxLength={maxChars}
+                />
+              </label>
               <CharCount>
                 {nicknameValue.length}/{maxChars}
               </CharCount>
             </NicknameInput>
-            <EnterButton>
+            <EnterButton type="submit">
               <p>접속</p>
             </EnterButton>
           </Form>

@@ -19,7 +19,11 @@ public class AttendeeInfo {
 	private Double lon;
 	private AttendeeStatus attendeeStatus;
 	private Long roomId;
+	private Long duration;
+	private String route;
 	private String address;
+	private String profileImageUrl;
+	private boolean isRoot;
 
 	public static AttendeeInfo of(Attendee attendee){
 		return AttendeeInfo.builder()
@@ -31,6 +35,10 @@ public class AttendeeInfo {
                 .attendeeStatus(attendee.getAttendeeStatus())
 				.roomId(attendee.getRoom().getRoomId())
 				.address(attendee.getAddress())
+				.profileImageUrl(attendee.getProfileImageUrl() == null ? null: attendee.getProfileImageUrl().getType())
+				.duration(attendee.getDuration())
+				.route(attendee.getRoute())
+				.isRoot(attendee.equals(attendee.getRoom().getRoot()))
                 .build();
 	}
 

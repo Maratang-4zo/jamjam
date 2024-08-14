@@ -28,6 +28,7 @@ public enum ErrorCode {
 	REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AT006", "해당 refresh token은 만료되었습니다."),
 	NOT_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "AT007", "해당 토큰은 access token이 아닙니다."),
 	ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AT008", "access token이 존재하지 않습니다."),
+	ACCESS_TOKEN_NOT_FOUND_SEND_ERROR(HttpStatus.UNAUTHORIZED,"AT009", "응답이 올바르지 않습니다."),
 	// FORBIDDEN_ADMIN(HttpStatus.FORBIDDEN, "AT009", "관리자 ROLE이 아닙니다."),
 
 	// MemberAnalysis

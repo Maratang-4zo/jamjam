@@ -9,7 +9,6 @@ import {
 } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
-import questionIcon from "../../assets/icons/questionMark.PNG";
 import inviteIcon from "../../assets/icons/inviteIcon.png";
 import shareIcon from "../../assets/icons/shareIcon.png";
 import updateIcon from "../../assets/icons/updateIcon.png";
@@ -275,6 +274,7 @@ const ModalOverlay = styled.div`
 
 function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const [isTutorialModalOpen, setIsTutorialModalOpen] = useState(false);
+
   const [currentTutorialPage, setCurrentTutorialPage] = useState(1);
   const [roundSetting, setRoundSetting] = useState(false);
   const [round, setRound] = useState(1);
@@ -421,7 +421,13 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   const handleInfoCopyClick = () => {
-    const date = new Date(roomState.meetingDate);
+    if (!roomState.meetingDate || isNaN(Date.parse(roomState.meetingDate))) {
+      console.error("Invalid meetingDate:", roomState.meetingDate);
+      alert("유효하지 않은 모임 날짜입니다.");
+      return;
+    }
+
+    const date = new Date(Date.parse(roomState.meetingDate));
 
     const formattedDate = new Intl.DateTimeFormat("ko", {
       year: "numeric",
@@ -434,6 +440,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
         ? roomState.centerPlace.name
         : "아직 모임장소를 찾지 않으셨어요 T.T"
     }\n- 모임 목적: ${roomState.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
+
     navigator.clipboard
       .writeText(infoText)
       .then(() => {

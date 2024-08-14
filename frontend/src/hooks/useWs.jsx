@@ -27,7 +27,6 @@ import {
 } from "../recoil/atoms/gameState";
 import { useNavigate } from "react-router-dom";
 import { userInfoAtom } from "../recoil/atoms/userState";
-import { axiosPatchNextMiddle } from "../apis/mapApi";
 import {
   isCenterMoveLoadingAtom,
   isFindCenterLoadingAtom,
@@ -83,6 +82,9 @@ const useWs = () => {
           console.log("Already connected");
           return resolve();
         }
+        if (client.current) {
+          client.current.deactivate(); // 이전 연결이 있다면 비활성화
+        }
         client.current = new Client({
           webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
           debug: (str) => {
@@ -101,6 +103,13 @@ const useWs = () => {
             console.error(frame);
             setConnected(false);
             reject(frame);
+            handleStompError(frame);
+          },
+          onWebSocketError: (evt) => {
+            handleWebSocketError(evt);
+          },
+          onWebSocketClose: (evt) => {
+            handleWebSocketClose(evt);
           },
         });
         client.current.activate();
@@ -108,6 +117,33 @@ const useWs = () => {
     },
     [connected],
   );
+
+  const handleStompError = (frame) => {
+    if (frame.headers && frame.headers["message"]) {
+      alert(`Handshake 실패: ${frame.headers["message"]}`);
+    } else {
+      alert("Handshake 실패: 알 수 없는 오류");
+    }
+    // 재연결 시도 중지
+    client.current.deactivate();
+  };
+
+  const handleWebSocketClose = (event) => {
+    if (event.code === 1006) {
+      // 비정상적인 종료 코드
+      alert("WebSocket 연결이 비정상적으로 종료되었습니다.");
+      // 재연결 시도 중지
+      client.current.deactivate();
+    }
+    alert(event.code);
+    client.current.deactivate();
+  };
+
+  const handleWebSocketError = (error) => {
+    alert("WebSocket 연결에 실패했습니다.");
+    // 재연결 시도 중지
+    client.current.deactivate();
+  };
 
   const subscribe = (roomUUID) => {
     client.current.subscribe(
@@ -132,82 +168,83 @@ const useWs = () => {
   }, []);
 
   const handleMessage = useCallback((message) => {
-    console.log(message.type);
-    switch (message.type) {
+    console.log("Received message:", message);
+    const messageBody = JSON.parse(message.body);
+    switch (message.headers.type) {
       case "CHAT_RECEIVED":
-        handleChatLogs(message);
+        handleChatLogs(messageBody);
         break;
       case "ROOM_UPDATE":
-        updateRoomStatus(message);
+        updateRoomStatus(messageBody);
         break;
       case "AVATAR_POSITION":
-        handleAvatarPosition(message);
+        handleAvatarPosition(messageBody);
         break;
       case "ROOM_INFO_UPDATE":
-        handleRoomInfoUpdate(message);
+        handleRoomInfoUpdate(messageBody);
         break;
       case "DEPARTURE_UPDATE":
-        handleDepartureUpdate(message);
+        handleDepartureUpdate(messageBody);
         break;
       case "ROOM_CENTER_UPDATE":
-        handleRoomCenterUpdate(message);
+        handleRoomCenterUpdate(messageBody);
         break;
       case "GAME_CENTER_UPDATE":
-        handleGameCenterUpdate(message);
+        handleGameCenterUpdate(messageBody);
         break;
       case "AROUND_STATIONS":
-        handleGetAroundStations(message);
+        handleGetAroundStations(messageBody);
         break;
       case "GAME_SESSION_READY":
-        handleGameSessionReady(message);
+        handleGameSessionReady(messageBody);
         break;
       case "CENTER_HISTORY":
-        handleCenterHistory(message);
+        handleCenterHistory(messageBody);
         break;
       case "GAME_READY":
-        handleGameReady(message);
+        handleGameReady(messageBody);
         break;
       case "GAME_END":
-        handleGameEnd(message);
+        handleGameEnd(messageBody);
         break;
       case "GAME_WINNER":
-        handleGameWinner(message);
+        handleGameWinner(messageBody);
         break;
       case "GAME_COUNTDOWN":
-        handleGameCountdown(message);
+        handleGameCountdown(messageBody);
         break;
       case "GAME_START":
-        handleGameStart(message);
+        handleGameStart(messageBody);
         break;
       case "GAME_RESULT_APPLY":
-        handleGameResultApply(message);
+        handleGameResultApply(messageBody);
         break;
       case "GAME_RESET":
-        handleGameReset(message);
+        handleGameReset(messageBody);
         break;
       case "HOST_FIND_CENTER":
-        handleHostFindCenter(message);
+        handleHostFindCenter(messageBody);
         break;
       case "GAME_NEXT_ROUND":
-        handleNextRound(message);
+        handleNextRound(messageBody);
         break;
       case "WINNER_NEXT_PAGE":
-        handleWinnerNextPage(message);
+        handleWinnerNextPage(messageBody);
         break;
       case "HOST_GO_MAIN":
-        handleHostGoMain(message);
+        handleHostGoMain(messageBody);
         break;
       case "ROOM_ROOT_LEAVE":
-        handleRoomRootLeave(message);
+        handleRoomRootLeave(messageBody);
         break;
       case "ROOM_LEAVE":
-        handleRoomLeave(message);
+        handleRoomLeave(messageBody);
         break;
       case "ROOM_ENTER":
-        handleRoomEnter(message);
+        handleRoomEnter(messageBody);
         break;
       case "ROOM_FORCE_EXIT":
-        handleRoomExit(message);
+        handleRoomExit(messageBody);
         break;
       default:
         console.error("Unknown message type:", message.type);
@@ -215,7 +252,15 @@ const useWs = () => {
   }, []);
 
   const handleRoomEnter = (message) => {
-    const { attendeeUUID, address, nickname, lat, lon, isRoot } = message;
+    const {
+      attendeeUUID,
+      address,
+      nickname,
+      lat,
+      lon,
+      isRoot,
+      profileImageUrl,
+    } = message;
 
     const newAttendee = {
       address,
@@ -223,6 +268,7 @@ const useWs = () => {
       lon,
       attendeeUUID,
       nickname,
+      profileImageUrl,
     };
 
     if (isRoot) {
@@ -509,6 +555,7 @@ const useWs = () => {
   const handleGameCenterUpdate = ({ roundCenterStation }) => {
     setRoundCenter(roundCenterStation);
     setIsNextMiddleExist(true);
+    setGameState("before");
   };
 
   const handleRoomCenterUpdate = ({ roomCenterStart, attendees }) => {
@@ -520,6 +567,7 @@ const useWs = () => {
     }));
     setRoundCenter(roomCenterStart);
     setIsFindCenterLoading(false);
+    setGameState("before");
   };
 
   const handleDepartureUpdate = ({
@@ -527,8 +575,8 @@ const useWs = () => {
     address,
     lat,
     lon,
-    isAllHasDeparture,
-    isCenterExist,
+    allHasDeparture,
+    centerExist,
   }) => {
     setRoomInfo((prevRoomInfo) => {
       const updatedAttendees = prevRoomInfo.attendees.map((attendee) =>
@@ -539,8 +587,8 @@ const useWs = () => {
       return {
         ...prevRoomInfo,
         attendees: updatedAttendees,
-        isAllHasDeparture,
-        isCenterExist,
+        isAllHasDeparture: allHasDeparture,
+        isCenterExist: centerExist,
       };
     });
   };
@@ -563,25 +611,22 @@ const useWs = () => {
     }
   }, []);
 
-  const handleChatLogs = useCallback(
-    (message) => {
-      const { attendeeUUID, content, createdAt } = message;
-      const attendant = roomInfo.attendees.find(
-        (attendee) => attendee.attendeeUUID === attendeeUUID,
-      );
-      const nickname = attendant ? attendant.nickname : "Unknown";
-      const newChatLog = {
-        type: "chat",
-        attendeeUUID,
-        nickname,
-        content,
-        createdAt,
-      };
-      setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
-      console.log(message);
-    },
-    [roomInfo.attendees, setChatLogs],
-  );
+  const handleChatLogs = useCallback((message) => {
+    const { attendeeUUID, content, createdAt } = message;
+    const attendant = roomInfo.attendees.find(
+      (attendee) => attendee.attendeeUUID === attendeeUUID,
+    );
+    const nickname = attendant ? attendant.nickname : "Unknown";
+    const newChatLog = {
+      type: "chat",
+      attendeeUUID,
+      nickname,
+      content,
+      createdAt,
+    };
+    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+    console.log(message);
+  }, []);
 
   const updateRoomStatus = useCallback((message) => {
     console.log("Room status updated:", message);

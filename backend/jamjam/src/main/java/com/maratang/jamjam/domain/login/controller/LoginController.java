@@ -51,7 +51,7 @@ public class LoginController {
 	public void redirectToKakao(@RequestParam("redirectUri") String clientRedirectUri, HttpServletRequest request, HttpServletResponse httpServletResponse) throws IOException {
 		String authorizeUrl = "https://kauth.kakao.com/oauth/authorize"
 			+ "?response_type=code"
-			+ "&scope=talk_calendar"
+			+ "&scope=talk_calendar, account_email, talk_calendar, profile_image, profile_nickname"
 			+ "&client_id=" + clientId
 			+ "&redirect_uri=" + redirectUri;
 
@@ -111,7 +111,6 @@ public class LoginController {
 		params.add("code", code);
 		params.add("client_secret", clientSecret);
 
-
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -127,9 +126,11 @@ public class LoginController {
 				log.info("scope:"+responseBody.get("scope"));
 				return tokens;
 			} else {
-				throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
+				log.info("여기 에러임"+response.getStatusCode().toString());
+				throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND_SEND_ERROR);
 			}
 		} catch (Exception e) {
+			log.info("아님 여기임"+e.getMessage());
 			throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
 		}
 	}

@@ -170,7 +170,7 @@ function EditModal({ isOpen, onClose }) {
       const date = new Date(roomInfo.meetingDate);
       setValue("meetingDate", !isNaN(date) ? date : null);
     }
-  }, [roomInfo, setValue]);
+  }, [roomInfo.meetingDate, setValue]);
 
   if (!isOpen) {
     return null;

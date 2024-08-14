@@ -394,6 +394,14 @@ function Han() {
     const setCenterHistory = (body) => {
         setGameLogs(prev => [...prev, "centerHistory: "+body])
     }
+    const gameRoundHistory = () => {
+        client.current.publish({
+            destination: `/pub/game/session.end`,
+            body: JSON.stringify({
+                gameSessionUUID: gameSessionUUID.current
+            })
+        })
+    }
     const gamesessionStation = () => {
         client.current.publish({
             destination: `/pub/game/session.station`,
@@ -454,6 +462,7 @@ function Han() {
                     <button onClick={gameStart}>게임시작</button>
                     <button onClick={gamePlay}>게임플레이</button>
                     <button onClick={gameRoundStation}>중심역이동</button>
+                    <button onClick={gameRoundHistory}>게임기록확인</button>
                     <button onClick={gamesessionStation}>최종게임기록반영</button>
                     <button onClick={gameReset}>게임리셋</button>
                     <div>

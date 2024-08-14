@@ -54,6 +54,10 @@ public class StompHandler implements ChannelInterceptor {
 
 
 	public void handleSubscribeCommand(StompHeaderAccessor accessor){
+		if("/user/sub/errors".equals(accessor.getDestination())){
+			return;
+		}
+
 		// 1. UUID 정보 추출
 		UUID attendeeUUID = (UUID)accessor.getSessionAttributes().get("attendeeUUID");
 		UUID roomUUID = (UUID)accessor.getSessionAttributes().get("roomUUID");

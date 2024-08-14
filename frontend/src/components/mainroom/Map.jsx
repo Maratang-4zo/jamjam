@@ -80,7 +80,7 @@ function MyMap() {
     };
 
     fetchuserColors();
-  }, [roomInfo.attendees, decodePath]);
+  }, [roomInfo.attendees]);
 
   useEffect(() => {
     if (roomInfo.isCenterExist) {
@@ -93,6 +93,8 @@ function MyMap() {
 
   useEffect(() => {
     if (map) {
+      console.log("attendee", attendeeDepartures);
+      console.log("room attendee", roomInfo.attendees);
       const bounds = new navermaps.LatLngBounds();
       let hasValidLocation = false;
 
@@ -107,7 +109,7 @@ function MyMap() {
           bounds.extend(new navermaps.LatLng(store.latitude, store.longitude));
         });
         map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
-      } else {
+      } else if (roomPage === "main") {
         attendeeDepartures.forEach((departure) => {
           if (departure.lat && departure.lon) {
             bounds.extend(new navermaps.LatLng(departure.lat, departure.lon));
@@ -185,7 +187,7 @@ function MyMap() {
       disableTwoFingerTapZoom={true}
     >
       {attendeeDepartures
-        .filter((departure) => departure.lat && departure.lon)
+        ?.filter((departure) => departure.lat && departure.lon)
         .map((departure, index) => (
           <React.Fragment key={index}>
             <Marker

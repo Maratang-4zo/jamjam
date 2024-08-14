@@ -23,6 +23,7 @@ import com.maratang.jamjam.domain.room.dto.response.RootLeaveRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
+import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -31,6 +32,8 @@ import com.maratang.jamjam.global.map.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
 
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -43,6 +46,7 @@ public class RoomService {
 	private final NickRepository nickRepository;
 	private final NameRepository nameRepository;
 	private final SubwayDataLoader subwayDataLoader;
+	private final RoomTokenProvider roomTokenProvider;
 
 	// 방 정보 받기
 	public RoomGetRes findRoom(UUID roomUUID, UUID attendeeUUID) {
@@ -64,9 +68,24 @@ public class RoomService {
 	}
 
 	// 방 존재 유무 확인
-	public RoomRes isRoomExist(UUID roomUUID){
+	public RoomRes isRoomExist(UUID roomUUID, HttpServletRequest request){
 		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
-		return RoomRes.of(room);
+
+		boolean hasToken = false;
+		// todo: fix.....
+		try{
+			String token = roomTokenProvider.resolveToken(request);
+			if(token != null){
+				Claims claims = roomTokenProvider.getTokenClaims(token);
+				if(roomUUID.toString().equals(claims.get("roomUUID"))){
+					hasToken = true;
+				}
+			}
+		} catch (Exception ignored){
+		}
+
+
+		return RoomRes.of(room, hasToken);
 	}
 
 	// 방 만들기
@@ -128,12 +147,6 @@ public class RoomService {
 		Attendee attendee = attendeeRepository.findByAttendeeUUIDAndRoom(attendeeUUID, room)
 			.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
-		// 1-1. 나갔다 온 방장이니?
-		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){
-			room.updateStatus(RoomStatus.ONGOING);
-			roomRepository.save(room);
-			broadCastService.broadcastToRoom(roomUUID, "도망간 노예를 잡아왔다!!", BroadCastType.ROOM_ROOT_REENTRY);
-		}
 
 		attendee.updateStatus(AttendeeStatus.ENTERED);
 		attendeeRepository.save(attendee);
@@ -141,6 +154,13 @@ public class RoomService {
 		// 3. 기존 인원들에게 알림
 		AttendeeInfo attendeeInfo = AttendeeInfo.of(attendee);
 		broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ENTER);
+
+		// 1-1. 나갔다 온 방장이니?
+		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){
+			room.updateStatus(RoomStatus.ONGOING);
+			roomRepository.save(room);
+			broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ROOT_REENTRY);
+		}
 	}
 
 	@Transactional

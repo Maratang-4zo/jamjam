@@ -16,14 +16,11 @@ import {
 import { axiosUpdateUserInfo } from "../apis/mapApi";
 import { useNavigate, useParams } from "react-router-dom";
 import { axiosIsRoomValid, axiosGetRoomInfo } from "../apis/roomApi";
-import { getCookie } from "../utils/Cookies";
-import { jwtDecode } from "jwt-decode";
 import useWs from "../hooks/useWs";
 import useOpenVidu from "../hooks/useOpenVidu";
 import Loading from "../components/fixed/Loading";
 import GameFinishButtons from "../components/mainroom/GameFinishButtons";
 import GameChoice from "../components/mainroom/GameChoice";
-import { selectedGameAtom } from "../recoil/atoms/gameState";
 import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
 import Watching from "../components/fixed/Watching";
@@ -68,23 +65,31 @@ function Room() {
         // 방 유효성 검사
         const response = await axiosIsRoomValid({ roomUUID });
         const res = response.data;
-        if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
-          navigate("/");
-          alert("종료된 방입니다.");
-        } else if (res.roomStatus === "PLAYING") {
-          setIsPlayingGame(true);
-        } else if (res.roomStatus === "RESERVED") {
-          setIsHostOut(true);
-        }
-        // 방 정보 가져오기
-        const roomResponse = await axiosGetRoomInfo({ roomUUID });
-        const roomData = roomResponse.data;
+        if (!res.hasToken) {
+          setRoomInfo((prev) => ({
+            ...prev,
+            roomUUID: res.roomUUID,
+            roomName: res.roomName,
+            meetingDate: res.meetingDate,
+            roomPurpose: res.purpose,
+          }));
+          navigate(`/room/${roomUUID}/join`);
+        } else {
+          if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
+            navigate("/");
+            alert("종료된 방입니다.");
+          } else if (res.roomStatus === "PLAYING") {
+            setIsPlayingGame(true);
+          } else if (res.roomStatus === "RESERVED") {
+            setIsHostOut(true);
+          }
+          // 방 정보 가져오기
+          const roomResponse = await axiosGetRoomInfo({ roomUUID });
+          const roomData = roomResponse.data;
 
-        console.log(roomData);
+          console.log(roomData);
 
-        const roomToken = getCookie("roomToken");
-        if (roomToken) {
-          const myUUID = jwtDecode(roomToken).attendeeUUID;
+          const { myUUID } = userInfo;
           const myAttendeeInfo = roomData.attendees.find(
             (attendee) => attendee.attendeeUUID === myUUID,
           );
@@ -112,16 +117,16 @@ function Room() {
           setUserInfo((prev) => ({
             ...prev,
             myUUID,
-            isHost: roomData.hostUUID === myUUID ? true : false,
+            isHost: roomData.isHost,
             departure: {
-              address: myAttendeeInfo.address,
-              lat: myAttendeeInfo.lat,
-              lon: myAttendeeInfo.lon,
+              address: myAttendeeInfo?.address || "",
+              lat: myAttendeeInfo?.lat || null,
+              lon: myAttendeeInfo?.lon || null,
             },
-            nickname: myAttendeeInfo.nickname,
-            duration: myAttendeeInfo.duration,
-            route: myAttendeeInfo.route,
-            profileImageUrl: myAttendeeInfo.profileImageUrl,
+            nickname: myAttendeeInfo?.nickname || "",
+            duration: myAttendeeInfo?.duration || null,
+            route: myAttendeeInfo?.route || null,
+            profileImageUrl: myAttendeeInfo?.profileImageUrl || "",
           }));
 
           if (!connected) {
@@ -131,8 +136,6 @@ function Room() {
           if (!joined) {
             await joinSession();
           }
-        } else {
-          navigate(`/room/${roomUUID}/join`);
         }
       } catch (error) {
         console.error("방 유효성 검사 실패:", error);

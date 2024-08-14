@@ -10,7 +10,7 @@ import React from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilCallback, useRecoilState, useSetRecoilState } from "recoil";
 import {
   aroundStationsAtom,
   chatAtom,
@@ -547,26 +547,28 @@ export const WebSocketProvider = ({ children }) => {
     return `${adjustedHours.toString().padStart(2, "0")}:${minutes}`;
   };
 
-  const handleChatLogs = useCallback(
-    (message) => {
-      const { attendeeUUID, content, createdAt } = message;
-      const attendant = roomInfo.attendees.find(
-        (attendee) => attendee.attendeeUUID === attendeeUUID,
-      );
+  const handleChatLogs = useRecoilCallback(
+    ({ snapshot }) =>
+      async (message) => {
+        const { attendeeUUID, content, createdAt } = message;
+        const currentRoomInfo = await snapshot.getPromise(roomInfoAtom);
+        const attendant = currentRoomInfo.attendees.find(
+          (attendee) => attendee.attendeeUUID === attendeeUUID,
+        );
 
-      console.log("메시지받는곳", message, attendant, roomInfo);
+        console.log("메시지받는곳", message, attendant, currentRoomInfo);
 
-      const nickname = attendant ? attendant.nickname : "Unknown";
-      const newChatLog = {
-        type: "chat",
-        attendeeUUID,
-        nickname,
-        content,
-        createdAt,
-      };
-      setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
-    },
-    [roomInfo, setChatLogs],
+        const nickname = attendant ? attendant.nickname : "Unknown";
+        const newChatLog = {
+          type: "chat",
+          attendeeUUID,
+          nickname,
+          content,
+          createdAt,
+        };
+        setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+      },
+    [],
   );
 
   const updateRoomStatus = (message) => {

@@ -539,6 +539,7 @@ export const WebSocketProvider = ({ children }) => {
         (attendee) => attendee.attendeeUUID === attendeeUUID,
       );
 
+      console.log("메시지받는곳", message, attendant, roomInfo);
       // const localTime = formatTime(createdAt);
 
       const nickname = attendant ? attendant.nickname : "Unknown";

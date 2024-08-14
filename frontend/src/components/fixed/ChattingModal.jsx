@@ -221,7 +221,7 @@ function ChattingModal({ isVisible, toggleModal }) {
     if (chat.type === "chat") {
       if (
         currentGroup &&
-        currentGroup.nickname === chat.nickname &&
+        currentGroup.attendeeUUID === chat.attendeeUUID && // attendeeUUID로 그룹화
         formatTime(currentGroup.createdAt) === formatTime(chat.createdAt)
       ) {
         currentGroup.messages.push(chat.content);
@@ -230,6 +230,7 @@ function ChattingModal({ isVisible, toggleModal }) {
           groupedChatLogs.push(currentGroup);
         }
         currentGroup = {
+          attendeeUUID: chat.attendeeUUID,
           nickname: chat.nickname,
           createdAt: chat.createdAt,
           messages: [chat.content],

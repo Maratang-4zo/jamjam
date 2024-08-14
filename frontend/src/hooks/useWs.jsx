@@ -271,6 +271,13 @@ const useWs = () => {
       profileImageUrl,
     };
 
+    if (!address || !lat || !lon) {
+      setRoomInfo((prev) => ({
+        ...prev,
+        isAllHasDeparture: false,
+      }));
+    }
+
     if (isRoot) {
       setIsHostOut(false);
       setEstimatedForceCloseAt(null);

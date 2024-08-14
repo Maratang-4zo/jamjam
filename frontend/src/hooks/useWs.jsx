@@ -609,16 +609,16 @@ const useWs = () => {
     }));
   };
 
-  const sendChat = useCallback(({ content }) => {
+  const sendChat = ({ content }) => {
     if (client.current) {
       client.current.publish({
         destination: `/pub/chat/send`,
         body: JSON.stringify({ content }),
       });
     }
-  }, []);
+  };
 
-  const handleChatLogs = useCallback((message) => {
+  const handleChatLogs = (message) => {
     const { attendeeUUID, content, createdAt } = message;
     const attendant = roomInfo.attendees.find(
       (attendee) => attendee.attendeeUUID === attendeeUUID,
@@ -633,7 +633,7 @@ const useWs = () => {
     };
     setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
     console.log(message);
-  }, []);
+  };
 
   const updateRoomStatus = useCallback((message) => {
     console.log("Room status updated:", message);

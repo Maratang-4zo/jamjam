@@ -16,7 +16,7 @@ const slideIn = keyframes`
 const ModalOverlay = styled.div`
   display: flex;
   width: 150px;
-  height: 150px;
+  height: 170px;
   flex-direction: column;
   align-items: flex-start;
   border-radius: 20px;
@@ -41,6 +41,7 @@ const ModalBody = styled.div`
   padding: 10px;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 5px;
   flex: 1 0 0;
   align-self: stretch;

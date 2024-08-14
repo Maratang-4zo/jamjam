@@ -94,7 +94,7 @@ function Room() {
             (attendee) => attendee.attendeeUUID === myUUID,
           );
 
-          const nowAttendees = roomData.attendees.find(
+          const nowAttendees = roomData.attendees.filter(
             (attendee) => attendee.attendeeStatus !== "EXITED",
           );
 

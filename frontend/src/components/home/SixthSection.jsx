@@ -16,6 +16,7 @@ const Section = styled.div`
   font-family: "DungGeunMo";
   flex-direction: column;
   background-color: ${(props) => props.theme.bgColor};
+  z-index: 1;
 `;
 
 const fadeIn = keyframes`

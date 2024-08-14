@@ -1,6 +1,5 @@
 package com.maratang.jamjam.domain.gamePlay.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -10,12 +9,9 @@ import com.maratang.jamjam.domain.game.entity.Game;
 import com.maratang.jamjam.domain.game.repository.GameRepository;
 import com.maratang.jamjam.domain.gamePlay.dto.request.play.GameNextRoundReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundCreateReq;
-import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundReq;
 import com.maratang.jamjam.domain.gamePlay.dto.request.round.GameRoundUpdateReq;
 import com.maratang.jamjam.domain.gamePlay.dto.response.play.GameNextRoundRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundCreateRes;
-import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundResultListRes;
-import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundResultRes;
 import com.maratang.jamjam.domain.gamePlay.dto.response.round.GameRoundStationRes;
 import com.maratang.jamjam.domain.gamePlay.entity.GameRound;
 import com.maratang.jamjam.domain.gamePlay.entity.GameSession;
@@ -64,16 +60,7 @@ public class GameRoundService {
         return GameRoundStationRes.of(req.getGameRoundUUID(), selectedStation);
     }
 
-    public GameRoundResultListRes getRoundRecord(GameRoundReq gameRoundReq) {
-        GameSession gameSession = gameSessionRepository.findByGameSessionUUID(gameRoundReq.getGameSessionUUID())
-            .orElseThrow(()->new BusinessException(ErrorCode.GR_NOT_FOUND));
 
-        List<GameRound> gameRounds = gameRoundRepository.findAllByGameSessionId(gameSession.getGameSessionId());
-
-        List<GameRoundResultRes> gameRoundResultResList = gameRounds.stream().map(r -> GameRoundResultRes.of(r, subwayDataLoader.getSubwayInfo(r.getStationName()))).toList();
-
-        return GameRoundResultListRes.of(gameRoundResultResList, gameRoundReq.getGameSessionUUID());
-    }
 
     public GameNextRoundRes nextRound(GameNextRoundReq req, UUID roomUUID) {
         // fixme

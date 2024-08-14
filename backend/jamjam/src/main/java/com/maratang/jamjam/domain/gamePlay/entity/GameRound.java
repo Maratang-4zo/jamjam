@@ -9,6 +9,8 @@ import com.maratang.jamjam.global.auditing.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -53,11 +55,13 @@ public class GameRound extends BaseTimeEntity {
 	private Attendee winnderAttendee;
 
 	private LocalDateTime endedAt;
-	private GameSessionStatus status;
+
+	@Enumerated(EnumType.STRING)
+	private GameRoundStatus gameRoundStatus;
 
 	@Builder
 	public GameRound(Long gameRoundId, Integer round, String stationName, Game game, GameSession gameSession,
-		Attendee winnderAttendee, LocalDateTime endedAt, GameSessionStatus status) {
+		Attendee winnderAttendee, LocalDateTime endedAt, GameRoundStatus gameRoundStatus) {
 		this.gameRoundId = gameRoundId;
 		this.round = round;
 		this.stationName = stationName;
@@ -65,29 +69,22 @@ public class GameRound extends BaseTimeEntity {
 		this.gameSession = gameSession;
 		this.winnderAttendee = winnderAttendee;
 		this.endedAt = endedAt;
-		this.status = status;
+		this.gameRoundStatus = gameRoundStatus;
 	}
 
 	@PrePersist
 	protected void onCreate() {
 		this.gameRoundUUID = UUID.randomUUID();
+		this.gameRoundStatus = GameRoundStatus.PLAYING;
 	}
 
 	public void updateStationName(String stationName){
 		this.stationName = stationName;
 	}
 
-	public void updateGame(Game game){
-		this.game = game;
-	}
-
 	public void updateWinner(Attendee attendee){
 		this.winnderAttendee = attendee;
-		this.status = GameSessionStatus.SUCCESS;
+		this.gameRoundStatus = GameRoundStatus.SUCCESS;
 		this.endedAt = LocalDateTime.now();
 	}
-	public void updateGameRecord(GameSession gameSession){
-		this.gameSession = gameSession;
-	}
-
 }

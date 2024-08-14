@@ -50,6 +50,7 @@ public class StompHandler implements ChannelInterceptor {
 		attributes.put("roomUUID", claims.getRoomUUID());
 		attributes.put("attendeeUUID", claims.getAttendeeUUID());
 		accessor.setSessionAttributes(attributes);
+		System.out.println("connect");
 	}
 
 
@@ -78,6 +79,7 @@ public class StompHandler implements ChannelInterceptor {
 		Map<String ,Object> attributes =  accessor.getSessionAttributes();
 		attributes.put("status", "entered");
 		accessor.setSessionAttributes(attributes);
+		System.out.println("subscribe");
 	}
 
 	public void handleDisconnectCommand(StompHeaderAccessor accessor){
@@ -93,7 +95,7 @@ public class StompHandler implements ChannelInterceptor {
 			attributes.put("status", "leaved");
 			accessor.setSessionAttributes(attributes);
 		}
-
+		System.out.println("disconnect or unsubscribe");
 	}
 
 

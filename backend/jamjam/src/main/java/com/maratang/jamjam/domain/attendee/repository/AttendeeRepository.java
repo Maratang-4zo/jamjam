@@ -27,4 +27,9 @@ public interface AttendeeRepository extends JpaRepository<Attendee, Long> {
 	@Modifying
 	@Query("update Attendee set attendeeStatus = 'ENTERED' where room.roomId = :roomId")
 	void resetAttendees(Long roomId);
+
+	@Modifying
+	@Query("update Attendee set attendeeStatus = 'ENTERED' where room.roomId = :roomId and attendeeStatus = 'WAITING'")
+	void updateWaitingAttendeeToEntered(Long roomId);
+
 }

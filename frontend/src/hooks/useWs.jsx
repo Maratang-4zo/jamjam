@@ -563,6 +563,11 @@ const useWs = () => {
 
   // 게임 라운드 설정
   const sendGameRound = ({ roundCnt, roomUUID, finalStationName }) => {
+    console.log("useWs의 sendGameRound", {
+      roundCnt,
+      roomUUID,
+      finalStationName,
+    });
     client.current.publish({
       destination: `/pub/game/session.setting`,
       body: JSON.stringify({

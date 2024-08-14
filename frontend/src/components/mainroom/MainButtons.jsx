@@ -372,6 +372,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   };
 
   const handleConfirmGame = () => {
+    console.log("round", round);
     if (userInfo.isHost) {
       sendGameRound({
         roundCnt: round,

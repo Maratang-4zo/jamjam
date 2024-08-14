@@ -92,7 +92,7 @@ export const WebSocketProvider = ({ children }) => {
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
   const { leaveSession } = useOpenVidu();
 
-  const connect = useCallback((roomUUID) => {
+  const connect = (roomUUID) => {
     return new Promise((resolve, reject) => {
       if (connected.current) {
         console.log("Already connected");
@@ -129,7 +129,7 @@ export const WebSocketProvider = ({ children }) => {
       });
       client.current.activate();
     });
-  }, []);
+  };
 
   const disconnect = () => {
     if (client.current) {

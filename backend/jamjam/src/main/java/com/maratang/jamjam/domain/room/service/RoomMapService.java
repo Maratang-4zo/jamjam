@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
+import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.response.CenterLoadingDto;
@@ -48,7 +49,11 @@ public class RoomMapService {
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
 		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
 
-		attendeeList.forEach(attendee -> processAttendeeRoute(attendee, selectedStation));
+		List<AttendeeDTO> attendeesEntered = attendeeList.stream()
+			.filter(attendee -> attendee.getStatus() == AttendeeStatus.ENTERED)
+			.toList();
+
+		attendeesEntered.forEach(attendee -> processAttendeeRoute(attendee, selectedStation));
 
 		room.updateIsCenterExist(true);
 		attendeeRepository.saveAll(attendees);

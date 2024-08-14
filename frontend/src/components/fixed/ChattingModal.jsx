@@ -208,9 +208,10 @@ function ChattingModal({ isVisible, toggleModal }) {
 
   const formatTime = (createdAt) => {
     const chatTime = new Date(createdAt);
-    const hours = chatTime.getHours().toString().padStart(2, "0");
-    const minutes = chatTime.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
+    const hours = chatTime.getUTCHours() + 9; // UTC 시간에 9시간 더하기
+    const adjustedHours = hours % 24; // 24시간 형식으로 변환
+    const minutes = chatTime.getUTCMinutes().toString().padStart(2, "0");
+    return `${adjustedHours.toString().padStart(2, "0")}:${minutes}`;
   };
 
   return (

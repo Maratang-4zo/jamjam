@@ -15,6 +15,8 @@ import com.maratang.jamjam.domain.gamePlay.entity.GameRound;
 import com.maratang.jamjam.domain.gamePlay.gameEngine.GameEngine;
 import com.maratang.jamjam.domain.gamePlay.gameEngine.GameFactory;
 import com.maratang.jamjam.domain.gamePlay.repository.GameRoundRepository;
+import com.maratang.jamjam.global.error.ErrorCode;
+import com.maratang.jamjam.global.error.exception.BusinessException;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
 
@@ -37,6 +39,11 @@ public class GamePlayService {
 
 	public void startNewGame(GameStartReq gameStartReq, UUID roomUUID){
 		GameEngine game = gameFactory.getGame(gameStartReq.getGameRoundUUID());
+
+		if(game == null){
+			throw new BusinessException(ErrorCode.INVALID_GAME_ROUND);
+		}
+
 		game.startGame();
 
 		for (int i = 3; i > 0; i--) {
@@ -52,6 +59,11 @@ public class GamePlayService {
 
 	public void playGame(GamePlayReq req, UUID roomUUID, UUID attendeeUUID){
 		GameEngine game = gameFactory.getGame(req.getGameRoundUUID());
+
+		if(game == null){
+			throw new BusinessException(ErrorCode.INVALID_GAME_ROUND);
+		}
+
 		GamePlayRes result = game.play(req, attendeeUUID);
 
 		broadCastService.broadcastToRoom(roomUUID, result, BroadCastType.GAME_PLAY);
@@ -65,10 +77,13 @@ public class GamePlayService {
 	@Transactional
 	public void endGame(UUID roomUUID, GamePlayRes res){
 		GameEngine game = gameFactory.getGame(res.getGameRoundUUID());
+		if(game == null){
+			throw new BusinessException(ErrorCode.INVALID_GAME_ROUND);
+		}
 		game.endGame(roomUUID, res.getWinnerUUID());
 
-		GameRound gameRound = gameRoundRepository.findByGameRoundUUID(res.getGameRoundUUID()).orElseThrow();
-		Attendee winner = attendeeRepository.findByAttendeeUUID(res.getWinnerUUID()).orElseThrow();
+		GameRound gameRound = gameRoundRepository.findByGameRoundUUID(res.getGameRoundUUID()).orElseThrow(() -> new BusinessException(ErrorCode.GAME_ROUND_NOT_FOUND));
+		Attendee winner = attendeeRepository.findByAttendeeUUID(res.getWinnerUUID()).orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 		gameRound.updateWinner(winner);
 		gameRoundRepository.save(gameRound);
 

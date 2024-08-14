@@ -88,7 +88,8 @@ public class GamePlayController {
 	@MessageMapping("/game/session.end")
 	@Operation(summary = "✨ 게임 승자 이력 조회", description = "모든 게임이 끝나고 각 라운드별 승자 및 역 정보 조회")
 	public void endSession(@Payload GameRoundReq gameRoundReq, UUID roomUUID){
-		GameRoundResultListRes res = gameRoundService.getRoundRecord(gameRoundReq);
+		GameRoundResultListRes res = gameSessionService.closeSession(gameRoundReq, roomUUID);
+		System.out.println(res);
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.CENTER_HISTORY);
 	}
 

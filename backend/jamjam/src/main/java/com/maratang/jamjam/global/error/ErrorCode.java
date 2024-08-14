@@ -13,6 +13,9 @@ public enum ErrorCode {
 	BAD_REQUEST(HttpStatus.BAD_REQUEST, "CM001", "잘못된 요청입니다."),
 	INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "CM002", "잘못된 요청 데이터 입니다."),
 	UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "CM003", "데이터 타입이 올바르지 않습니다"),
+	NULL_POINTER_EXCEPTION(HttpStatus.BAD_REQUEST, "CM004", "ERROR: CM004"),
+	SQL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "CM005", "ERROR: CM005"),
+	HIBERNATE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "CM006", "ERROR: CM006"),
 
 	// auth
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AT001", "인증 토큰이 올바르지 않습니다."),
@@ -85,6 +88,8 @@ public enum ErrorCode {
 
 	// game
 	GAME_NOT_FOUND(HttpStatus.NOT_FOUND,"GA001","게임을 찾을 수 없습니다."),
+	GAME_ROUND_NOT_FOUND(HttpStatus.NOT_FOUND, "GA002", "게임 라운드를 찾을 수 없습니다."),
+	INVALID_GAME_ROUND(HttpStatus.BAD_REQUEST, "GA003", "진행 가능한 게임 라운드가 아닙니다."),
 
 	// gameRecord
 	GR_NOT_FOUND(HttpStatus.NOT_FOUND,"GR001","게임 레코드 기록을 찾을 수 없습니다."),

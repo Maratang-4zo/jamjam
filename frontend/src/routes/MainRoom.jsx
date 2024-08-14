@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import NavBarLeft from "../components/fixed/NavBarLeft";
 import Map from "../components/mainroom/Map";
@@ -28,6 +28,7 @@ import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
 import Watching from "../components/fixed/Watching";
 import { isHostOutAtom, isPlayingGameAtom } from "../recoil/atoms/loadingState";
+import { useWebSocket } from "../context/WebsocketContext";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -59,11 +60,11 @@ function Room() {
   const [isHostOut, setIsHostOut] = useRecoilState(isHostOutAtom);
   const [isPlayingGame, setIsPlayingGame] = useRecoilState(isPlayingGameAtom);
   const estimatedClosedAt = useRecoilValue(estimatedForceCloseAtAtom);
-  const { connect, subscribe } = useWs();
+  const { connect } = useWs();
   const { joinSession } = useOpenVidu();
-  const connected = useRecoilValue(isWsConnectedAtom);
   const joined = useRecoilValue(isOVConnectedAtom);
-  const subscribed = useRecoilValue(isWsSubscribedAtom);
+
+  const { connected } = useContext(useWebSocket);
 
   useEffect(() => {
     const initializeRoom = async () => {
@@ -141,10 +142,6 @@ function Room() {
 
           if (!connected) {
             await connect();
-          }
-
-          if (!subscribed) {
-            await subscribe();
           }
 
           if (!joined) {

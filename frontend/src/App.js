@@ -75,15 +75,14 @@ function App() {
         <RecoilRoot>
           <SnapshotDebugger />
           <CookiesProvider>
-            <GlobalStyle />
-            <Router>
-              <NavermapsProvider
-                ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
-                submodules={["geocoder"]}
-              >
-                {/* <ReactQueryDevtools initialIsOpen={true} /> */}
-              </NavermapsProvider>
-            </Router>
+            <NavermapsProvider
+              ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
+              submodules={["geocoder"]}
+            >
+              <GlobalStyle />
+              <Router />
+              {/* <ReactQueryDevtools initialIsOpen={true} /> */}
+            </NavermapsProvider>
           </CookiesProvider>
         </RecoilRoot>
       </ThemeProvider>

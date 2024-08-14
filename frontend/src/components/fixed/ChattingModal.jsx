@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import useWs from "../../hooks/useWs";
 import { useRecoilValue } from "recoil";
 import { chatAtom, roomAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
@@ -127,7 +126,7 @@ const ChatBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 15px;
+  gap: 10px;
   align-self: stretch;
   padding: 10px;
   background-color: none;
@@ -208,12 +207,47 @@ function ChattingModal({ isVisible, toggleModal }) {
   };
 
   const formatTime = (createdAt) => {
-    const chatTime = new Date(createdAt);
-    const hours = chatTime.getUTCHours() + 9; // UTC 시간에 9시간 더하기
-    const adjustedHours = hours % 24; // 24시간 형식으로 변환
-    const minutes = chatTime.getUTCMinutes().toString().padStart(2, "0");
-    return `${adjustedHours.toString().padStart(2, "0")}:${minutes}`;
+    // Ensure the time string is interpreted as UTC
+    const chatTime = new Date(createdAt + "Z");
+    const hours = chatTime.getHours().toString().padStart(2, "0");
+    const minutes = chatTime.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
   };
+
+  const groupedChatLogs = [];
+  let currentGroup = null;
+
+  chatLogs.forEach((chat) => {
+    if (chat.type === "chat") {
+      if (
+        currentGroup &&
+        currentGroup.nickname === chat.nickname &&
+        formatTime(currentGroup.createdAt) === formatTime(chat.createdAt)
+      ) {
+        currentGroup.messages.push(chat.content);
+      } else {
+        if (currentGroup) {
+          groupedChatLogs.push(currentGroup);
+        }
+        currentGroup = {
+          nickname: chat.nickname,
+          createdAt: chat.createdAt,
+          messages: [chat.content],
+          type: "chat",
+        };
+      }
+    } else {
+      if (currentGroup) {
+        groupedChatLogs.push(currentGroup);
+        currentGroup = null;
+      }
+      groupedChatLogs.push(chat);
+    }
+  });
+
+  if (currentGroup) {
+    groupedChatLogs.push(currentGroup);
+  }
 
   return (
     <SideModal isVisible={isVisible}>
@@ -222,7 +256,7 @@ function ChattingModal({ isVisible, toggleModal }) {
         <CloseButton onClick={toggleModal}>X</CloseButton>
       </ChatHeader>
       <ChatMessages ref={chatMessagesRef}>
-        {chatLogs.map((chat, index) => (
+        {groupedChatLogs.map((chat, index) => (
           <React.Fragment key={index}>
             {chat.type === "chat" ? (
               <ChatBox>
@@ -231,15 +265,15 @@ function ChattingModal({ isVisible, toggleModal }) {
                   <ChatInfoTime>{formatTime(chat.createdAt)}</ChatInfoTime>
                 </ChatInfoBox>
                 <ChatContentBox>
-                  <ChatContentLine>{chat.content}</ChatContentLine>
+                  {chat.messages.map((message, idx) => (
+                    <ChatContentLine key={idx}>{message}</ChatContentLine>
+                  ))}
                 </ChatContentBox>
               </ChatBox>
             ) : (
               <AlertMessage>
                 {chat.nickname}님이{" "}
-                {chat.alertType === "out"
-                  ? "퇴장하셨습니다."
-                  : "입장하셨습니다."}
+                {chat.type === "out" ? "퇴장하셨습니다." : "입장하셨습니다."}
               </AlertMessage>
             )}
           </React.Fragment>

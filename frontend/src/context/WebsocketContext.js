@@ -497,8 +497,8 @@ export const WebSocketProvider = ({ children }) => {
     address,
     lat,
     lon,
-    isAllHasDeparture,
-    isCenterExist,
+    allHasDeparture,
+    centerExist,
   }) => {
     setRoomInfo((prevRoomInfo) => {
       const updatedAttendees = prevRoomInfo.attendees.map((attendee) =>
@@ -509,8 +509,8 @@ export const WebSocketProvider = ({ children }) => {
       return {
         ...prevRoomInfo,
         attendees: updatedAttendees,
-        isAllHasDeparture,
-        isCenterExist,
+        isAllHasDeparture: allHasDeparture,
+        isCenterExist: centerExist,
       };
     });
   };
@@ -524,12 +524,23 @@ export const WebSocketProvider = ({ children }) => {
     }));
   };
 
+  const formatTime = (createdAt) => {
+    const chatTime = new Date(createdAt);
+    const hours = chatTime.getUTCHours() + 9; // UTC 시간에 9시간 더하기
+    const adjustedHours = hours % 24; // 24시간 형식으로 변환
+    const minutes = chatTime.getUTCMinutes().toString().padStart(2, "0");
+    return `${adjustedHours.toString().padStart(2, "0")}:${minutes}`;
+  };
+
   const handleChatLogs = useCallback(
     (message) => {
       const { attendeeUUID, content, createdAt } = message;
       const attendant = roomInfo.attendees.find(
         (attendee) => attendee.attendeeUUID === attendeeUUID,
       );
+
+      // const localTime = formatTime(createdAt);
+
       const nickname = attendant ? attendant.nickname : "Unknown";
       const newChatLog = {
         type: "chat",
@@ -539,7 +550,6 @@ export const WebSocketProvider = ({ children }) => {
         createdAt,
       };
       setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
-      console.log(message);
     },
     [roomInfo.attendees, setChatLogs],
   );

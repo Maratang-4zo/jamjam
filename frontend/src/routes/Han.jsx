@@ -112,7 +112,7 @@ function Han() {
 
     const joinExistingSession = async (event) => {
         event.preventDefault();
-            attendeeUUID.current = inputSessionId;
+            roomUUID.current = inputSessionId;
             await joinSession(roomUUID.current);
             setInputSessionId(""); // 입력 필드 초기화
 

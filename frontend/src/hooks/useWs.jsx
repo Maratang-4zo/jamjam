@@ -1,17 +1,14 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useContext } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   aroundStationsAtom,
   chatAtom,
   estimatedForceCloseAtAtom,
   isNextMiddleExistAtom,
-  isWsConnectedAtom,
-  isWsSubscribedAtom,
   roomAtom,
   roomPageAtom,
-  wsClientAtom,
 } from "../recoil/atoms/roomState";
 import {
   currentRoundAtom,
@@ -30,6 +27,7 @@ import {
 } from "../recoil/atoms/gameState";
 import { useNavigate } from "react-router-dom";
 import { userInfoAtom } from "../recoil/atoms/userState";
+import { axiosPatchNextMiddle } from "../apis/mapApi";
 import {
   isCenterMoveLoadingAtom,
   isFindCenterLoadingAtom,
@@ -40,15 +38,16 @@ import {
   isThreeStationLoadingAtom,
 } from "../recoil/atoms/loadingState";
 import useOpenVidu from "./useOpenVidu";
+import { useWebSocket } from "../context/WebsocketContext";
 
 const API_BASE_URL = "https://jjam.shop";
 
 const useWs = () => {
+  const { client, setClient, connected, setConnected } =
+    useContext(useWebSocket);
+
   const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);
-  const [connected, setConnected] = useRecoilState(isWsConnectedAtom);
-  const [client, setClient] = useRecoilState(wsClientAtom);
-
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const [players, setPlayers] = useRecoilState(playerState);
@@ -77,85 +76,48 @@ const useWs = () => {
   const setIsPlayingGame = useSetRecoilState(isPlayingGameAtom);
   const setEstimatedForceCloseAt = useSetRecoilState(estimatedForceCloseAtAtom);
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
-  const [isSubscribed, setIsSubscribed] = useRecoilState(isWsSubscribedAtom);
   const { leaveSession } = useOpenVidu();
 
-  const connect = useCallback(
-    (roomUUID) => {
-      return new Promise((resolve, reject) => {
-        if (connected) {
-          console.log("Already connected");
-          return resolve();
-        }
-        if (client) {
-          client.deactivate(); // 이전 연결이 있다면 비활성화
-        }
-        const newClient = new Client({
-          webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
-          debug: (str) => {
-            console.log(str);
-          },
-          reconnectDelay: 5000,
-          heartbeatIncoming: 20000,
-          heartbeatOutgoing: 20000,
-          onConnect: () => {
-            console.log("Connected");
-            setConnected(true);
-            setClient(newClient);
-            if (!isSubscribed && client) {
-              subscribe(roomUUID);
-            }
-            resolve();
-          },
-          onStompError: (frame) => {
-            console.error(frame);
-            setConnected(false);
-            reject(frame);
-            handleStompError(frame);
-          },
-          onWebSocketError: (evt) => {
-            handleWebSocketError(evt);
-          },
-          onWebSocketClose: (evt) => {
-            handleWebSocketClose(evt);
-          },
-        });
-        newClient.activate();
+  const connect = useCallback((roomUUID) => {
+    return new Promise((resolve, reject) => {
+      if (connected) {
+        console.log("Already connected");
+        return resolve();
+      }
+      if (client) {
+        client.deactivate(); // 이전 연결이 있다면 비활성화
+      }
+      const newClient = new Client({
+        webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
+        debug: (str) => {
+          console.log(str);
+        },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 20000,
+        heartbeatOutgoing: 20000,
+        onConnect: () => {
+          console.log("Connected");
+          setConnected(true);
+          setClient(newClient);
+          subscribe(roomUUID);
+          resolve();
+        },
+        onStompError: (frame) => {
+          console.error(frame);
+          setConnected(false);
+          reject(frame);
+          handleStompError(frame);
+        },
+        onWebSocketError: (evt) => {
+          handleWebSocketError(evt);
+        },
+        onWebSocketClose: (evt) => {
+          handleWebSocketClose(evt);
+        },
       });
-    },
-    [connected, client, isSubscribed],
-  );
-
-  useEffect(() => {
-    if (client && !isSubscribed) {
-      subscribe(roomInfo.roomUUID);
-    }
-  }, [client]);
-
-  const subscribe = (roomUUID) => {
-    client.subscribe(
-      `/sub/rooms/${roomUUID}`,
-      (message) => {
-        handleMessage(message);
-      },
-      null,
-      {},
-    );
-
-    client.subscribe(`/user/sub/errors`, (message) => {
-      alert(message.body);
+      newClient.activate();
     });
-
-    setIsSubscribed(true);
-  };
-
-  const disconnect = useCallback(() => {
-    if (client) {
-      client.deactivate();
-      setConnected(false);
-      setIsSubscribed(false);
-    }
-  }, [client]);
+  }, []);
 
   const handleStompError = (frame) => {
     if (frame.headers && frame.headers["message"]) {
@@ -163,37 +125,49 @@ const useWs = () => {
     } else {
       alert("Handshake 실패: 알 수 없는 오류");
     }
-    // 재연결 시도 중지
-    if (client) {
-      client.deactivate();
-    }
+    if (client) client.deactivate();
   };
 
   const handleWebSocketClose = (event) => {
     if (event.code === 1006) {
-      // 비정상적인 종료 코드
       alert("WebSocket 연결이 비정상적으로 종료되었습니다.");
-      // 재연결 시도 중지
-      if (client) {
-        client.deactivate();
-      }
+      if (client) client.deactivate();
     }
     alert(event.code);
-    if (client) {
-      client.deactivate();
-    }
+    if (client) client.deactivate();
   };
 
   const handleWebSocketError = (error) => {
     alert("WebSocket 연결에 실패했습니다.");
-    // 재연결 시도 중지
+    if (client) client.deactivate();
+  };
+
+  const subscribe = (roomUUID) => {
     if (client) {
-      client.deactivate();
+      client.subscribe(
+        `/sub/rooms/${roomUUID}`,
+        (message) => {
+          handleMessage(message);
+        },
+        null,
+        {},
+      );
+
+      client.subscribe(`/user/sub/errors`, (message) => {
+        alert(message.body);
+      });
     }
   };
 
+  const disconnect = useCallback(() => {
+    if (client) {
+      client.deactivate();
+      setConnected(false);
+    }
+  }, []);
+
   const handleMessage = useCallback((message) => {
-    console.log("Received message:", message);
+    console.log(message);
     const messageBody = JSON.parse(message.body);
     switch (message.headers.type) {
       case "CHAT_RECEIVED":
@@ -295,13 +269,6 @@ const useWs = () => {
       nickname,
       profileImageUrl,
     };
-
-    if (!address || !lat || !lon) {
-      setRoomInfo((prev) => ({
-        ...prev,
-        isAllHasDeparture: false,
-      }));
-    }
 
     if (isRoot) {
       setIsHostOut(false);
@@ -408,14 +375,14 @@ const useWs = () => {
   };
 
   const sendNextRound = ({ gameRoundUUID, currentRound, totalRound }) => {
-    client.publish({
+    client.current.publish({
       destination: `/pub/game/round.next`,
       body: JSON.stringify({ gameRoundUUID, currentRound, totalRound }),
     });
   };
 
   const sendGoResult = ({ gameSessionUUID }) => {
-    client.publish({
+    client.current.publish({
       destination: `/pub/game/session.end`,
       body: JSON.stringify({ gameSessionUUID }),
     });
@@ -437,7 +404,7 @@ const useWs = () => {
 
   // 최종 장소 리셋
   const sendReset = ({ gameSessionUUID }) => {
-    client.publish({
+    client.current.publish({
       destination: `/pub/game/session.reset`,
       body: JSON.stringify({ gameSessionUUID }),
     });
@@ -456,32 +423,12 @@ const useWs = () => {
     setSelectedGame(0);
     setPlayers([]);
     setIsMainConnecting(false);
-
-    // 기존의 roomInfo.attendees를 업데이트
-    setRoomInfo((prev) => {
-      const updatedAttendees = prev.attendees.map((attendee) => {
-        // 기존에 WAITING 상태였던 참가자의 상태를 ENTERED로 변경
-        if (attendee.attendeeStatus === "WAITING") {
-          return {
-            ...attendee,
-            attendeeStatus: "ENTERED",
-          };
-        }
-        // 나머지 참여자는 그대로 유지
-        return attendee;
-      });
-
-      return {
-        ...prev,
-        attendees: updatedAttendees, // 업데이트된 attendees 배열로 설정
-      };
-    });
   };
 
   const handleGameResultApply = ({
     gameSessionUUID,
     roomCenterStart,
-    attendees, // 게임에 참여한 사람들의 정보
+    attendees,
   }) => {
     setIsMainConnecting(false);
     setRoomPage("main");
@@ -495,46 +442,16 @@ const useWs = () => {
     setIsWinner(false);
     setSelectedGame(0);
     setPlayers([]);
-
-    // 기존의 roomInfo.attendees를 업데이트
-    setRoomInfo((prev) => {
-      // 기존의 attendees에서 게임에 참여하지 않은 사람들만 필터링
-      const updatedAttendees = prev.attendees.map((existingAttendee) => {
-        const updatedAttendee = attendees.find(
-          (attendee) => attendee.attendeeUUID === existingAttendee.attendeeUUID,
-        );
-
-        // 만약 현재 존재하는 attendee가 게임에 참여한 사람이라면
-        if (updatedAttendee) {
-          return {
-            ...updatedAttendee, // 새로 받은 정보로 업데이트
-            attendeeStatus: "ENTERED", // 상태를 ENTERED로 바꿔줌
-          };
-        }
-
-        // 게임에 참여하지 않았던 사람은 그대로 유지, 상태만 변경
-        if (existingAttendee.attendeeStatus === "WAITING") {
-          return {
-            ...existingAttendee,
-            attendeeStatus: "ENTERED",
-          };
-        }
-
-        // 그렇지 않은 경우는 그대로 유지
-        return existingAttendee;
-      });
-
-      return {
-        ...prev,
-        centerPlace: roomCenterStart, // 새로운 centerPlace로 업데이트
-        attendees: updatedAttendees, // 업데이트된 attendees 배열로 설정
-      };
-    });
+    setRoomInfo((prev) => ({
+      ...prev,
+      centerPlace: roomCenterStart,
+      attendees,
+    }));
   };
 
   // 최종 장소 기록에 반영
   const sendFinalStation = ({ finalStationName }) => {
-    client.publish({
+    client.current.publish({
       destination: `/pub/game/session.station`,
       body: JSON.stringify({ gameSessionUUID, finalStationName }),
     });
@@ -550,7 +467,7 @@ const useWs = () => {
   };
 
   const sendGameStart = (gameRoundUUID) => {
-    client.publish({
+    client.current.publish({
       destination: `/pub/game/round.start`,
       body: JSON.stringify({ gameRoundUUID }),
     });
@@ -568,7 +485,7 @@ const useWs = () => {
   };
 
   const sendRoundInfo = ({ round, gameId, gameSessionUUID, stationName }) => {
-    client.publish({
+    client.current.publish({
       destination: `/pub/game/round.setting`,
       body: JSON.stringify({ round, gameId, gameSessionUUID, stationName }),
     });
@@ -588,12 +505,7 @@ const useWs = () => {
 
   // 게임 라운드 설정
   const sendGameRound = ({ roundCnt, roomUUID, finalStationName }) => {
-    console.log("useWs의 sendGameRound", {
-      roundCnt,
-      roomUUID,
-      finalStationName,
-    });
-    client.publish({
+    client.current.publish({
       destination: `/pub/game/session.setting`,
       body: JSON.stringify({
         roundCnt,
@@ -630,7 +542,7 @@ const useWs = () => {
   };
 
   const sendNextRoundCenter = ({ roundStationName }) => {
-    client.publish({
+    client.current.publish({
       destination: `/pub/game/round.station`,
       body: JSON.stringify({
         gameRoundUUID: currentRoundUUID,
@@ -662,8 +574,8 @@ const useWs = () => {
     address,
     lat,
     lon,
-    allHasDeparture,
-    centerExist,
+    isAllHasDeparture,
+    isCenterExist,
   }) => {
     setRoomInfo((prevRoomInfo) => {
       const updatedAttendees = prevRoomInfo.attendees.map((attendee) =>
@@ -674,8 +586,8 @@ const useWs = () => {
       return {
         ...prevRoomInfo,
         attendees: updatedAttendees,
-        isAllHasDeparture: allHasDeparture,
-        isCenterExist: centerExist,
+        isAllHasDeparture,
+        isCenterExist,
       };
     });
   };
@@ -689,31 +601,34 @@ const useWs = () => {
     }));
   };
 
-  const sendChat = ({ content }) => {
-    if (client) {
-      client.publish({
+  const sendChat = useCallback(({ content }) => {
+    if (client.current) {
+      client.current.publish({
         destination: `/pub/chat/send`,
         body: JSON.stringify({ content }),
       });
     }
-  };
+  }, []);
 
-  const handleChatLogs = (message) => {
-    const { attendeeUUID, content, createdAt } = message;
-    const attendant = roomInfo.attendees.find(
-      (attendee) => attendee.attendeeUUID === attendeeUUID,
-    );
-    const nickname = attendant ? attendant.nickname : "Unknown";
-    const newChatLog = {
-      type: "chat",
-      attendeeUUID,
-      nickname,
-      content,
-      createdAt,
-    };
-    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
-    console.log(message);
-  };
+  const handleChatLogs = useCallback(
+    (message) => {
+      const { attendeeUUID, content, createdAt } = message;
+      const attendant = roomInfo.attendees.find(
+        (attendee) => attendee.attendeeUUID === attendeeUUID,
+      );
+      const nickname = attendant ? attendant.nickname : "Unknown";
+      const newChatLog = {
+        type: "chat",
+        attendeeUUID,
+        nickname,
+        content,
+        createdAt,
+      };
+      setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+      console.log(message);
+    },
+    [roomInfo.attendees, setChatLogs],
+  );
 
   const updateRoomStatus = useCallback((message) => {
     console.log("Room status updated:", message);
@@ -734,18 +649,29 @@ const useWs = () => {
   );
 
   const sendGame = useCallback(({ newBottom }) => {
-    if (client) {
-      client.publish({
+    if (client.current) {
+      client.current.publish({
         destination: `/pub/game/updatePosition`,
         body: JSON.stringify({ bottom: newBottom }),
       });
     }
   }, []);
 
+  // useEffect(() => {
+  //   connect().catch((error) => {
+  //     console.error("WebSocket connection failed:", error);
+  //   });
+  //   return () => {
+  //     disconnect();
+  //   };
+  // }, []);
+
   return {
+    connected,
+    chatLogs,
     connect,
-    disconnect,
     subscribe,
+    disconnect,
     handleMessage,
     sendChat,
     sendGame,

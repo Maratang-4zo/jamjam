@@ -4,6 +4,8 @@ import App from "./App";
 import { RecoilRoot } from "recoil";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { QueryClient, QueryClientProvider } from "react-query";
+
+import { WebSocketProvider } from "./context/WebsocketContext";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -13,7 +15,9 @@ root.render(
   <React.StrictMode>
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <WebSocketProvider>
+          <App />
+        </WebSocketProvider>
       </QueryClientProvider>
     </RecoilRoot>
   </React.StrictMode>,

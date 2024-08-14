@@ -9,6 +9,7 @@ export const useWebSocket = () => useContext(WebSocketContext);
 export const WebSocketProvider = ({ children }) => {
   const client = useRef(null);
   const connected = useRef(false);
+  const subscribed = useRef(false);
 
   const connect = () => {
     return new Promise((resolve, reject) => {
@@ -155,6 +156,7 @@ export const WebSocketProvider = ({ children }) => {
     () => ({
       connect,
       connected,
+      subscribed,
       disconnect,
       sendChat,
       sendGame,

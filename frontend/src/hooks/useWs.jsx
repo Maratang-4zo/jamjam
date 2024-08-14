@@ -46,6 +46,7 @@ const useWs = () => {
   const {
     client,
     connected,
+    subscribed,
     connect,
     disconnect,
     sendChat,
@@ -518,6 +519,7 @@ const useWs = () => {
     connect,
     connected,
     disconnect,
+    subscribed,
     subscribe,
     sendChat,
     sendGame,

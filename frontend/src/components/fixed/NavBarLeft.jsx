@@ -15,7 +15,7 @@ import {
 } from "../../recoil/atoms/roomState";
 import useOpenVidu from "../../hooks/useOpenVidu";
 import { isMicOnAtom, userInfoAtom } from "../../recoil/atoms/userState";
-import UserInfoModal from "./UserInfoModal";
+import UserInfoModal from "./userInfoModal";
 import { userColor } from "../../utils/userColor";
 import ColorThief from "colorthief";
 import Spinner from "./Spinner";

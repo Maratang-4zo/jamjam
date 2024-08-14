@@ -575,8 +575,8 @@ const useWs = () => {
     address,
     lat,
     lon,
-    isAllHasDeparture,
-    isCenterExist,
+    allHasDeparture,
+    centerExist,
   }) => {
     setRoomInfo((prevRoomInfo) => {
       const updatedAttendees = prevRoomInfo.attendees.map((attendee) =>
@@ -587,8 +587,8 @@ const useWs = () => {
       return {
         ...prevRoomInfo,
         attendees: updatedAttendees,
-        isAllHasDeparture,
-        isCenterExist,
+        isAllHasDeparture: allHasDeparture,
+        isCenterExist: centerExist,
       };
     });
   };

@@ -24,6 +24,7 @@ public class AttendeeInfo {
 	private String address;
 	private String profileImageUrl;
 	private boolean isRoot;
+	private AttendeeStatus status;
 
 	public static AttendeeInfo of(Attendee attendee){
 		return AttendeeInfo.builder()
@@ -39,6 +40,7 @@ public class AttendeeInfo {
 				.duration(attendee.getDuration())
 				.route(attendee.getRoute())
 				.isRoot(attendee.equals(attendee.getRoom().getRoot()))
+				.status(attendee.getAttendeeStatus())
                 .build();
 	}
 

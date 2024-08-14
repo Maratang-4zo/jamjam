@@ -76,7 +76,6 @@ function App() {
           <SnapshotDebugger />
           <CookiesProvider>
             <GlobalStyle />
-            {/* <WebSocketProvider> */}
             <Router>
               <NavermapsProvider
                 ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
@@ -85,7 +84,6 @@ function App() {
                 {/* <ReactQueryDevtools initialIsOpen={true} /> */}
               </NavermapsProvider>
             </Router>
-            {/* </WebSocketProvider> */}
           </CookiesProvider>
         </RecoilRoot>
       </ThemeProvider>

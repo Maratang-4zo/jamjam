@@ -42,7 +42,7 @@ const slideInRight = keyframes`
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translateX(-10%);
     opacity: 1;
   }
 `;
@@ -125,23 +125,26 @@ const FirstCut = styled.div`
 const RightCut = styled.div`
   position: ${(props) => (props.isSticky ? "sticky" : "absolute")};
   width: 50%;
-  height: 680px;
+  height: 630px; // FirstCut과 동일한 높이로 설정
   flex-shrink: 0;
-  top: ${(props) => (props.isSticky ? "10%" : "auto")};
-  animation: ${(props) => (props.animate ? slideInRight : "none")} 0.8s forwards;
-  right: 10%;
-  left: 45%;
+  top: 5%; // FirstCut과 동일한 top 값으로 설정
+  left: 200%; // 조금 더 왼쪽으로 이동
+  transform: translateX(100%); // 오른쪽에서 들어오도록 설정
   opacity: ${(props) => (props.animate ? 1 : 0)};
+  animation: ${(props) => (props.animate ? slideInRight : "none")} 0.8s forwards;
+  animation-delay: 0.5s; // FirstCut이 나타난 후에 시작하도록 딜레이 설정
+  will-change: transform; // 애니메이션 성능 최적화를 위해 추가
 `;
 
 const SecondCut = styled.div`
   position: absolute;
-  top: 0;
+  top: -60px;
   right: 0;
   background: url(${SecondCutPng}) no-repeat center center;
   background-size: contain;
   width: 850px;
-  height: 380px;
+  height: 400px;
+  margin-bottom: 50px; // ThirdCut과의 간격을 늘리기 위해 추가
   flex-shrink: 0;
 `;
 
@@ -154,6 +157,7 @@ const ThirdCut = styled.div`
   width: 700px;
   height: 350px;
   flex-shrink: 0;
+  margin-top: 0px; // SecondCut과의 간격을 늘리기 위해 추가
 `;
 
 const ComicSection = styled.div`
@@ -238,14 +242,14 @@ function NewHome() {
               console.log("second");
               setAnimate((prev) => ({
                 ...prev,
-                secondThirdCut: true,
+                secondThirdCut: true, // RightCut의 애니메이션을 시작
               }));
               setTimeout(() => {
                 setIsSticky((prev) => ({
                   ...prev,
-                  secondThirdCut: true,
+                  secondThirdCut: true, // RightCut이 화면에 고정되도록 설정
                 }));
-              }, 500);
+              }, 500); // FirstCut이 끝난 후 약간의 딜레이를 두고 실행
             }
           } else if (entry.intersectionRatio >= 0.5) {
             setVisibleSections({

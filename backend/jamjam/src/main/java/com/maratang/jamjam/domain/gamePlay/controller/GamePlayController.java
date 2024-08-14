@@ -25,6 +25,7 @@ import com.maratang.jamjam.domain.gamePlay.dto.response.session.GameSessionUpdat
 import com.maratang.jamjam.domain.gamePlay.service.GamePlayService;
 import com.maratang.jamjam.domain.gamePlay.service.GameRoundService;
 import com.maratang.jamjam.domain.gamePlay.service.GameSessionService;
+import com.maratang.jamjam.domain.room.dto.response.MainConnectingRes;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
 
@@ -98,6 +99,7 @@ public class GamePlayController {
 	public void updateSessionStation(@Payload GameSessionResultUpdateReq gameSessionResultUpdateReq, UUID roomUUID){
 		GameSessionUpdateRes res = gameSessionService.updateGameSession(gameSessionResultUpdateReq);
 		broadCastService.broadcastToRoom(roomUUID, res, BroadCastType.GAME_RESULT_APPLY);
+		broadCastService.broadcastToRoom(roomUUID, MainConnectingRes.of(true), BroadCastType.HOST_GO_MAIN);
 	}
 
 	@MessageMapping("/game/session.reset")

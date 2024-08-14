@@ -25,10 +25,12 @@ public enum BroadCastType {
 	DEPARTURE_UPDATE("참여자 출발지 변경"),
 	ROOM_CENTER_UPDATE("중심역 변경"),
 	HOST_FIND_CENTER("중심역 찾는 중"),
+	WINNER_NEXT_PAGE("다음 중심역 정하기 버튼"),
 	GAME_NEXT_ROUND("다음 라운드"),
 	ROOM_ROOT_LEAVE("방장 떠남"),
 	ROOM_ROOT_REENTRY("방장 재입장"),
-	CENTER_HISTORY("중심역 이동 기록");
+	CENTER_HISTORY("중심역 이동 기록"),
+	HOST_GO_MAIN("메인으로 가기 버튼");
 
 	private final String desc;
 }

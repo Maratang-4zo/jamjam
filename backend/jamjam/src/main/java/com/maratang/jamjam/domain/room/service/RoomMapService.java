@@ -14,6 +14,7 @@ import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.response.CenterLoadingDto;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
+import com.maratang.jamjam.domain.room.dto.response.ThreeLoadingRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
@@ -88,6 +89,7 @@ public class RoomMapService {
 
 	public List<SubwayInfo> getAroundStation(UUID roomUUID) {
 		Room room = findRoomByUUID(roomUUID);
+		broadCastService.broadcastToRoom(roomUUID, ThreeLoadingRes.of(true), BroadCastType.WINNER_NEXT_PAGE);
 		validateStartStation(room);
 
 		SubwayInfo point = subwayDataLoader.getSubwayInfoMap().get(room.getStartStation());

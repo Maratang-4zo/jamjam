@@ -11,7 +11,7 @@ export const roomAtom = atom({
     host: {},
     hostUUID: "",
     isAllHasDeparture: false, // 모두가 출발지 입력을 함
-    isCenterExist: false,
+    isCenterExist: true,
     isAllReadyToGame: false,
     centerPlace: {},
     isValid: false,

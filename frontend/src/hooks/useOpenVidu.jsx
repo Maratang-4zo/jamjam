@@ -3,35 +3,40 @@ import { OpenVidu } from "openvidu-browser";
 import axios from "axios";
 import { getCookie, setCookie } from "../utils/Cookies";
 import { useRecoilState } from "recoil";
-import { currentSpeakersAtom } from "../recoil/atoms/roomState";
-import { isMicOnAtom } from "../recoil/atoms/userState";
-
+import {
+  isOVConnectedAtom,
+  currentSpeakersAtom,
+  OVSessionAtom,
+  OVRefAtom,
+  OVPublisherAtom,
+  isMicOnAtom,
+} from "../recoil/atoms/roomState";
 const APPLICATION_SERVER_URL = "https://jjam.shop/";
 
 const useOpenVidu = () => {
-  const sessionRef = useRef(null);
-  const ovRef = useRef(null);
-  const publisherRef = useRef(null); // Publisher 객체를 저장할 ref 추가
-  const [connected, setConnected] = useState(false);
+  const [sessionRef, setSessionRef] = useRecoilState(OVSessionAtom);
+  const [ovRef, setOvRef] = useRecoilState(OVRefAtom);
+  const [publisherRef, setPublisherRef] = useRef(OVPublisherAtom); // Publisher 객체를 저장할 ref 추가
+  const [connected, setConnected] = useRecoilState(isOVConnectedAtom);
   const [currentSpeakers, setCurrentSpeakers] =
     useRecoilState(currentSpeakersAtom);
   const [isMicOn, setIsMicOn] = useRecoilState(isMicOnAtom); // 마이크 상태를 관리하는 상태 추가
 
   const leaveSession = useCallback(() => {
-    if (sessionRef.current) {
-      sessionRef.current.disconnect();
+    if (sessionRef) {
+      sessionRef.disconnect();
     }
     setConnected(false);
   }, []);
 
   const initSession = useCallback(() => {
-    if (sessionRef.current) return; // 이미 초기화되었으면 리턴
+    if (sessionRef) return; // 이미 초기화되었으면 리턴
 
     const newOv = new OpenVidu();
     const newSession = newOv.initSession();
 
-    ovRef.current = newOv;
-    sessionRef.current = newSession;
+    setOvRef(newOv);
+    setSessionRef(newSession);
 
     newSession.on("streamCreated", function (event) {
       newSession.subscribe(event.stream, "subscriber");
@@ -73,8 +78,8 @@ const useOpenVidu = () => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (sessionRef.current) {
-        sessionRef.current.disconnect();
+      if (sessionRef) {
+        sessionRef.disconnect();
       }
     };
 
@@ -82,8 +87,8 @@ const useOpenVidu = () => {
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      if (sessionRef.current) {
-        sessionRef.current.disconnect();
+      if (sessionRef) {
+        sessionRef.disconnect();
       }
     };
   }, []);
@@ -98,13 +103,18 @@ const useOpenVidu = () => {
       token = await createToken();
     }
 
-    if (sessionRef.current && ovRef.current) {
-      sessionRef.current
+    if (sessionRef && ovRef) {
+      sessionRef
         .connect(token)
         .then(() => {
-          const newPublisher = ovRef.current.initPublisher("publisher");
-          publisherRef.current = newPublisher; // Publisher 객체 저장
-          sessionRef.current.publish(newPublisher);
+          const newPublisher = ovRef.initPublisher("publisher", {
+            audioSource: undefined, // The source of audio. If undefined default audio input
+            videoSource: false, // The source of video. If undefined default video input
+            publishAudio: true, // Whether you want to start the publishing with audio unmuted or muted
+            publishVideo: false, // Whether you want to start the publishing with video enabled or disabled
+          });
+          setPublisherRef(newPublisher); // Publisher 객체 저장
+          sessionRef.publish(newPublisher);
           setConnected(true);
         })
         .catch((error) => {
@@ -118,16 +128,14 @@ const useOpenVidu = () => {
   }, [initSession, createToken]);
 
   const toggleMic = () => {
-    if (publisherRef.current) {
-      const audioEnabled = publisherRef.current.stream.audioActive;
-      publisherRef.current.publishAudio(!audioEnabled); // 마이크 상태 토글
+    if (publisherRef) {
+      const audioEnabled = publisherRef.stream.audioActive;
+      publisherRef.publishAudio(!audioEnabled); // 마이크 상태 토글
       setIsMicOn(!audioEnabled); // 마이크 상태 업데이트
     }
   };
 
   return {
-    connected,
-    currentSpeakers, // 현재 말하고 있는 사용자 상태 반환
     joinSession,
     leaveSession,
     createSession,

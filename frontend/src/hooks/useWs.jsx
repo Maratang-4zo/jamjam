@@ -38,13 +38,13 @@ import {
   isThreeStationLoadingAtom,
 } from "../recoil/atoms/loadingState";
 import useOpenVidu from "./useOpenVidu";
-import { useWebSocket } from "../context/WebsocketContext";
+import { WebSocketContext, useWebSocket } from "../context/WebsocketContext";
 
 const API_BASE_URL = "https://jjam.shop";
 
 const useWs = () => {
   const { client, setClient, connected, setConnected } =
-    useContext(useWebSocket);
+    useContext(WebSocketContext);
 
   const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);

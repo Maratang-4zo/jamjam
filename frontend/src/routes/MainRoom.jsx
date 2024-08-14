@@ -28,7 +28,7 @@ import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
 import Watching from "../components/fixed/Watching";
 import { isHostOutAtom, isPlayingGameAtom } from "../recoil/atoms/loadingState";
-import { useWebSocket } from "../context/WebsocketContext";
+import { WebSocketContext, useWebSocket } from "../context/WebsocketContext";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -64,7 +64,7 @@ function Room() {
   const { joinSession } = useOpenVidu();
   const joined = useRecoilValue(isOVConnectedAtom);
 
-  const { connected } = useContext(useWebSocket);
+  const { connected } = useContext(WebSocketContext);
 
   useEffect(() => {
     const initializeRoom = async () => {

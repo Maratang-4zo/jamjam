@@ -336,12 +336,6 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
         attendees: resData.attendees,
       }));
     } catch (error) {
-      console.error("중심찾기 실패!!!", error);
-      if (error.response.status === 404) {
-        alert("중심 지점 근처에 중심역을 찾는데 실패했어요");
-      } else if (error.response.status === 500) {
-        alert("잠시 후 다시 시도해 주세요");
-      }
     } finally {
       setIsMiddleLoading(false);
     }

@@ -14,6 +14,11 @@ export function axiosGetMiddle({ roomUUID }) {
     .catch((err) => {
       console.error("중심장소 가져오기 실패");
       console.log(err);
+      if (err.response.status === 404) {
+        alert("중심 지점 근처에 중심역을 찾는데 실패했어요");
+      } else if (err.response.status === 500) {
+        alert("잠시 후 다시 시도해 주세요");
+      }
     });
 }
 

@@ -27,6 +27,7 @@ const ChatHeader = styled.div`
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
 `;
 
 const ChatTitle = styled.h1`
@@ -49,7 +50,6 @@ const ChatMessages = styled.div`
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -274,7 +274,9 @@ function ChattingModal({ isVisible, toggleModal }) {
             ) : (
               <AlertMessage>
                 {chat.nickname}님이{" "}
-                {chat.type === "out" ? "퇴장하셨습니다." : "입장하셨습니다."}
+                {chat.alertType === "out"
+                  ? "퇴장하셨습니다."
+                  : "입장하셨습니다."}
               </AlertMessage>
             )}
           </React.Fragment>

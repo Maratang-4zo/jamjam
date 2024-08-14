@@ -14,6 +14,7 @@ import { isMainConnectingAtom } from "../../recoil/atoms/loadingState";
 import Loading from "../fixed/Loading";
 import modalBg from "../../assets/final/finalModalBg.svg";
 import { axiosGetKakaoCalendar } from "../../apis/loginApi";
+import { useWebSocket } from "../../context/WebsocketContext";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -128,7 +129,7 @@ function FinalResult() {
   const [mainClicked, setMainClicked] = useState(false);
   const [showMainModal, setShowMainModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const { sendReset, sendFinalStation } = useWs();
+  const { sendReset, sendFinalStation } = useWebSocket();
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
   const roundCenter = useRecoilValue(roundCenterAtom);
   const [isMainConnecting, setIsMainConnecting] =

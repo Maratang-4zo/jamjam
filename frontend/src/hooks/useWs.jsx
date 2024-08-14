@@ -80,85 +80,74 @@ const useWs = () => {
   const [isSubscribed, setIsSubscribed] = useRecoilState(isWsSubscribedAtom);
   const { leaveSession } = useOpenVidu();
 
-  const connect = useCallback(() => {
-    return new Promise((resolve, reject) => {
-      if (connected) {
-        console.log("Already connected");
-        return resolve();
-      }
-      if (client) {
-        client.deactivate(); // 이전 연결이 있다면 비활성화
-      }
-      const newClient = new Client({
-        webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
-        debug: (str) => {
-          console.log(str);
-        },
-        reconnectDelay: 5000,
-        heartbeatIncoming: 20000,
-        heartbeatOutgoing: 20000,
-        onConnect: () => {
-          console.log("Connected");
-          setConnected(true);
-          setClient(newClient); // 클라이언트 저장
-          resolve();
-        },
-        onStompError: (frame) => {
-          console.error(frame);
-          setConnected(false);
-          reject(frame);
-          handleStompError(frame);
-        },
-        onWebSocketError: (evt) => {
-          handleWebSocketError(evt);
-        },
-        onWebSocketClose: (evt) => {
-          handleWebSocketClose(evt);
-        },
+  const connect = useCallback(
+    (roomUUID) => {
+      return new Promise((resolve, reject) => {
+        if (connected) {
+          console.log("Already connected");
+          return resolve();
+        }
+        if (client) {
+          client.deactivate(); // 이전 연결이 있다면 비활성화
+        }
+        const newClient = new Client({
+          webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
+          debug: (str) => {
+            console.log(str);
+          },
+          reconnectDelay: 5000,
+          heartbeatIncoming: 20000,
+          heartbeatOutgoing: 20000,
+          onConnect: () => {
+            console.log("Connected");
+            setConnected(true);
+            setClient(newClient);
+            if (!isSubscribed) {
+              subscribe(roomUUID);
+            }
+            resolve();
+          },
+          onStompError: (frame) => {
+            console.error(frame);
+            setConnected(false);
+            reject(frame);
+            handleStompError(frame);
+          },
+          onWebSocketError: (evt) => {
+            handleWebSocketError(evt);
+          },
+          onWebSocketClose: (evt) => {
+            handleWebSocketClose(evt);
+          },
+        });
+        newClient.activate();
       });
-      newClient.activate();
+    },
+    [connected, client, isSubscribed],
+  );
+
+  const subscribe = (roomUUID) => {
+    client.subscribe(
+      `/sub/rooms/${roomUUID}`,
+      (message) => {
+        handleMessage(message);
+      },
+      null,
+      {},
+    );
+
+    client.subscribe(`/user/sub/errors`, (message) => {
+      alert(message.body);
     });
-  }, []);
 
-  useEffect(() => {
-    if (client && connected && !isSubscribed) {
-      console.log("subscribe", client);
-      subscribe();
-      setIsSubscribed(true);
-    }
-
-    return () => {
-      if (client) {
-        client.unsubscribe(`/sub/rooms/${roomInfo.roomUUID}`);
-        setIsSubscribed(false);
-      }
-    };
-  }, [client, connected, isSubscribed]);
-
-  const subscribe = () => {
-    if (client && roomInfo.roomUUID) {
-      client.subscribe(
-        `/sub/rooms/${roomInfo.roomUUID}`,
-        (message) => {
-          handleMessage(message);
-        },
-        null,
-        {},
-      );
-
-      client.subscribe(`/user/sub/errors`, (message) => {
-        alert(message.body);
-      });
-    } else {
-      console.error("WebSocket client is not initialized");
-    }
+    setIsSubscribed(true);
   };
 
   const disconnect = useCallback(() => {
     if (client) {
       client.deactivate();
       setConnected(false);
-      setIsSubscribed(false); // 구독 상태 초기화
+      setIsSubscribed(false);
     }
   }, [client]);
 

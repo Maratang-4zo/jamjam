@@ -38,7 +38,21 @@ import {
 } from "../recoil/atoms/loadingState";
 import useOpenVidu from "../hooks/useOpenVidu";
 
-const WebSocketContext = createContext({});
+const WebSocketContext = createContext({
+  connect: () => {},
+  connected: false,
+  disconnect: () => {},
+  sendChat: () => {},
+  sendGame: () => {},
+  sendGameRound: () => {},
+  sendRoundInfo: () => {},
+  sendNextRoundCenter: () => {},
+  sendFinalStation: () => {},
+  sendReset: () => {},
+  sendNextRound: () => {},
+  sendGoResult: () => {},
+  sendGameStart: () => {},
+});
 
 export const useWebSocket = () => useContext(WebSocketContext);
 
@@ -658,7 +672,7 @@ export const WebSocketProvider = ({ children }) => {
       sendGoResult,
       sendGameStart,
     }),
-    [connect],
+    [],
   );
 
   return (

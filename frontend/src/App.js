@@ -77,14 +77,12 @@ function App() {
           <CookiesProvider>
             <GlobalStyle />
             <Router>
-              <WebSocketProvider>
-                <NavermapsProvider
-                  ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
-                  submodules={["geocoder"]}
-                >
-                  {/* <ReactQueryDevtools initialIsOpen={true} /> */}
-                </NavermapsProvider>
-              </WebSocketProvider>
+              <NavermapsProvider
+                ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
+                submodules={["geocoder"]}
+              >
+                {/* <ReactQueryDevtools initialIsOpen={true} /> */}
+              </NavermapsProvider>
             </Router>
           </CookiesProvider>
         </RecoilRoot>

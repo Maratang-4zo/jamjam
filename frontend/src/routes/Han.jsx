@@ -429,6 +429,12 @@ function Han() {
     const setGameReset = (body) => {
         setGameLogs(prev => [...prev, "gameReset: "+body.gameSessionUUID])
     }
+    const cookietest = () => {
+        axios.get(`${API_BASE_URL}api/test/attendees/${at}`,{}).then((res)=>{
+            console.log(res)
+            alert("쉿 >.O 이건 비밀친구")
+        })
+    }
     return (
 
         <>

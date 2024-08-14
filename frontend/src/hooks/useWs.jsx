@@ -7,8 +7,10 @@ import {
   chatAtom,
   estimatedForceCloseAtAtom,
   isNextMiddleExistAtom,
+  isWsConnectedAtom,
   roomAtom,
   roomPageAtom,
+  wsClientAtom,
 } from "../recoil/atoms/roomState";
 import {
   currentRoundAtom,
@@ -43,9 +45,9 @@ const API_BASE_URL = "https://jjam.shop";
 const useWs = () => {
   const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useRecoilValue(isWsConnectedAtom);
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
-  const client = useRef(null); // 초기화 null로 변경
+  const [client, setClient] = useRecoilState(wsClientAtom); // 초기화 null로 변경
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const [players, setPlayers] = useRecoilState(playerState);
   const setSelectedGame = useSetRecoilState(selectedGameAtom);
@@ -82,10 +84,10 @@ const useWs = () => {
           console.log("Already connected");
           return resolve();
         }
-        if (client.current) {
-          client.current.deactivate(); // 이전 연결이 있다면 비활성화
+        if (client) {
+          client.deactivate(); // 이전 연결이 있다면 비활성화
         }
-        client.current = new Client({
+        const nowClient = new Client({
           webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
           debug: (str) => {
             console.log(str);
@@ -112,7 +114,8 @@ const useWs = () => {
             handleWebSocketClose(evt);
           },
         });
-        client.current.activate();
+        setClient(nowClient);
+        nowClient.activate();
       });
     },
     [connected],
@@ -727,8 +730,6 @@ const useWs = () => {
   // }, []);
 
   return {
-    connected,
-    chatLogs,
     connect,
     subscribe,
     disconnect,

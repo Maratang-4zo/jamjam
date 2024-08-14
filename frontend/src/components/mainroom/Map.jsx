@@ -93,8 +93,6 @@ function MyMap() {
 
   useEffect(() => {
     if (map) {
-      console.log("attendee", attendeeDepartures);
-      console.log("room attendee", roomInfo.attendees);
       const bounds = new navermaps.LatLngBounds();
       let hasValidLocation = false;
 

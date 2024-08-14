@@ -11,7 +11,7 @@ export const roomAtom = atom({
     host: {},
     hostUUID: "",
     isAllHasDeparture: false, // 모두가 출발지 입력을 함
-    isCenterExist: true,
+    isCenterExist: false,
     isAllReadyToGame: false,
     centerPlace: {},
     isValid: false,
@@ -55,5 +55,35 @@ export const roomPageAtom = atom({
 
 export const estimatedForceCloseAtAtom = atom({
   key: "estimatedForceCloseAt",
+  default: null,
+});
+
+export const wsClientAtom = atom({
+  key: "wsClient",
+  default: null,
+});
+
+export const isWsConnectedAtom = atom({
+  key: "isWsConnected",
+  default: false,
+});
+
+export const isOVConnectedAtom = atom({
+  key: "isOVConnected",
+  default: false,
+});
+
+export const OVSessionAtom = atom({
+  key: "OVSession",
+  default: null,
+});
+
+export const OVRefAtom = atom({
+  key: "OVRef",
+  default: null,
+});
+
+export const OVPublisherAtom = atom({
+  key: "OVPublisher",
   default: null,
 });

@@ -68,6 +68,11 @@ export const isWsConnectedAtom = atom({
   default: false,
 });
 
+export const isWsSubscribedAtom = atom({
+  key: "isWsSubscribed",
+  default: false,
+});
+
 export const isOVConnectedAtom = atom({
   key: "isOVConnected",
   default: false,

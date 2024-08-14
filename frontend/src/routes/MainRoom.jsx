@@ -12,6 +12,7 @@ import {
   estimatedForceCloseAtAtom,
   isOVConnectedAtom,
   isWsConnectedAtom,
+  isWsSubscribedAtom,
   roomAtom,
   roomPageAtom,
 } from "../recoil/atoms/roomState";
@@ -58,10 +59,11 @@ function Room() {
   const [isHostOut, setIsHostOut] = useRecoilState(isHostOutAtom);
   const [isPlayingGame, setIsPlayingGame] = useRecoilState(isPlayingGameAtom);
   const estimatedClosedAt = useRecoilValue(estimatedForceCloseAtAtom);
-  const { connect } = useWs();
+  const { connect, subscribe } = useWs();
   const { joinSession } = useOpenVidu();
   const connected = useRecoilValue(isWsConnectedAtom);
   const joined = useRecoilValue(isOVConnectedAtom);
+  const subscribed = useRecoilValue(isWsSubscribedAtom);
 
   useEffect(() => {
     const initializeRoom = async () => {
@@ -138,7 +140,11 @@ function Room() {
           }));
 
           if (!connected) {
-            await connect(roomUUID);
+            await connect();
+          }
+
+          if (!subscribed) {
+            await subscribe();
           }
 
           if (!joined) {

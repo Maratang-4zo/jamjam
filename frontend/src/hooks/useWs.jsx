@@ -8,6 +8,7 @@ import {
   estimatedForceCloseAtAtom,
   isNextMiddleExistAtom,
   isWsConnectedAtom,
+  isWsSubscribedAtom,
   roomAtom,
   roomPageAtom,
   wsClientAtom,
@@ -76,60 +77,59 @@ const useWs = () => {
   const setIsPlayingGame = useSetRecoilState(isPlayingGameAtom);
   const setEstimatedForceCloseAt = useSetRecoilState(estimatedForceCloseAtAtom);
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
+  const [isSubscribed, setIsSubscribed] = useRecoilState(isWsSubscribedAtom);
   const { leaveSession } = useOpenVidu();
 
-  const connect = useCallback(
-    (roomUUID) => {
-      return new Promise((resolve, reject) => {
-        if (connected) {
-          console.log("Already connected");
-          return resolve();
-        }
-        if (client) {
-          client.deactivate(); // 이전 연결이 있다면 비활성화
-        }
-        const nowClient = new Client({
-          webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
-          debug: (str) => {
-            console.log(str);
-          },
-          reconnectDelay: 5000,
-          heartbeatIncoming: 20000,
-          heartbeatOutgoing: 20000,
-          onConnect: () => {
-            console.log("Connected");
-            setConnected(true);
-            setClient(nowClient); // 클라이언트 저장
-            resolve();
-          },
-          onStompError: (frame) => {
-            console.error(frame);
-            setConnected(false);
-            reject(frame);
-            handleStompError(frame);
-          },
-          onWebSocketError: (evt) => {
-            handleWebSocketError(evt);
-          },
-          onWebSocketClose: (evt) => {
-            handleWebSocketClose(evt);
-          },
-        });
-        nowClient.activate();
+  const connect = useCallback(() => {
+    return new Promise((resolve, reject) => {
+      if (connected) {
+        console.log("Already connected");
+        return resolve();
+      }
+      if (client) {
+        client.deactivate(); // 이전 연결이 있다면 비활성화
+      }
+      const newClient = new Client({
+        webSocketFactory: () => new SockJS(API_BASE_URL + "/api/ws"),
+        debug: (str) => {
+          console.log(str);
+        },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 20000,
+        heartbeatOutgoing: 20000,
+        onConnect: () => {
+          console.log("Connected");
+          setConnected(true);
+          setClient(newClient); // 클라이언트 저장
+          resolve();
+        },
+        onStompError: (frame) => {
+          console.error(frame);
+          setConnected(false);
+          reject(frame);
+          handleStompError(frame);
+        },
+        onWebSocketError: (evt) => {
+          handleWebSocketError(evt);
+        },
+        onWebSocketClose: (evt) => {
+          handleWebSocketClose(evt);
+        },
       });
-    },
-    [connected, client],
-  );
+      newClient.activate();
+    });
+  }, []);
 
   useEffect(() => {
-    if (client && connected) {
-      // client와 연결이 완료된 후 구독 시작
+    // 구독이 이미 되었는지 체크하고, 되지 않았다면 구독
+    if (client && connected && !isSubscribed) {
       subscribe();
+      setIsSubscribed(true); // 구독 완료로 상태 변경
     }
-  }, [client, connected]);
+  }, [connected]);
 
   const subscribe = () => {
-    if (client) {
+    if (client && roomInfo.roomUUID) {
       client.subscribe(
         `/sub/rooms/${roomInfo.roomUUID}`,
         (message) => {
@@ -151,6 +151,7 @@ const useWs = () => {
     if (client) {
       client.deactivate();
       setConnected(false);
+      setIsSubscribed(false); // 구독 상태 초기화
     }
   }, [client]);
 
@@ -741,8 +742,8 @@ const useWs = () => {
 
   return {
     connect,
-    subscribe,
     disconnect,
+    subscribe,
     handleMessage,
     sendChat,
     sendGame,

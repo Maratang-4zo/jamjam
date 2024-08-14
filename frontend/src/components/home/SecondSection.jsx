@@ -10,7 +10,7 @@ const Section = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem;
+  font-size: 70px;
   font-family: "DungGeunMo";
   background-color: #ffe845;
   position: relative;
@@ -64,9 +64,9 @@ const IMG = styled.img`
 const TextContainer = styled.div`
   width: 55%;
   position: absolute;
-  left: 0;
+  left: 5%;
   text-align: left;
-  font-size: 90px;
+  font-size: 70px;
   line-height: 1; /* 줄 사이 간격 줄이기 */
   color: #000;
 `;

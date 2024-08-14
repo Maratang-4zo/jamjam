@@ -17,14 +17,13 @@ import JamHi8 from "../assets/intro/JamHi8.PNG";
 
 import SecondSection from "../components/home/SecondSection";
 import ThirdSection from "../components/home/ThirdSection";
+import FourthSection from "../components/home/FourthSection";
+import FifthSection from "../components/home/FifthSection";
 import SixthSection from "../components/home/SixthSection";
 
 import FirstCutPng from "../assets/intro/comic/FirstCut.png";
 import SecondCutPng from "../assets/intro/comic/SecondCut.png";
 import ThirdCutPng from "../assets/intro/comic/ThirdCut.png";
-
-import jamGame from "../assets/intro/jamGame.GIF";
-import jamSmile from "../assets/intro/jamSmile.PNG";
 
 const slideInLeft = keyframes`
   from {
@@ -82,6 +81,7 @@ const Section = styled.div`
   box-sizing: border-box;
   overflow-x: hidden;
   opacity: ${(props) => (props.isVisible ? 1 : 0)};
+  /* transition: opacity 0.1s ease-in-out; */
   transition: ${(props) =>
     props.id === "section6" && props.isVisible
       ? "opacity 0.7s ease-in-out"
@@ -98,20 +98,6 @@ const FirstSection = styled.div`
   box-sizing: border-box;
   background-color: none;
   position: relative;
-`;
-
-const CombinedSection = styled.div`
-  width: 100%;
-  height: 200vh;
-  scroll-snap-align: start;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-  font-family: "DungGeunMo";
-  background-color: none;
-  position: relative;
-  overflow: hidden;
 `;
 
 const Image = styled.img`
@@ -143,15 +129,15 @@ const FirstCut = styled.div`
 const RightCut = styled.div`
   position: ${(props) => (props.isSticky ? "sticky" : "absolute")};
   width: 50%;
-  height: 630px;
+  height: 630px; // FirstCut과 동일한 높이로 설정
   flex-shrink: 0;
-  top: 5%;
-  left: 200%;
-  transform: translateX(100%);
+  top: 5%; // FirstCut과 동일한 top 값으로 설정
+  left: 200%; // 조금 더 왼쪽으로 이동
+  transform: translateX(100%); // 오른쪽에서 들어오도록 설정
   opacity: ${(props) => (props.animate ? 1 : 0)};
   animation: ${(props) => (props.animate ? slideInRight : "none")} 0.8s forwards;
-  animation-delay: 0.5s;
-  will-change: transform;
+  animation-delay: 0.5s; // FirstCut이 나타난 후에 시작하도록 딜레이 설정
+  will-change: transform; // 애니메이션 성능 최적화를 위해 추가
 `;
 
 const SecondCut = styled.div`
@@ -162,7 +148,7 @@ const SecondCut = styled.div`
   background-size: contain;
   width: 850px;
   height: 400px;
-  margin-bottom: 50px;
+  margin-bottom: 50px; // ThirdCut과의 간격을 늘리기 위해 추가
   flex-shrink: 0;
 `;
 
@@ -175,7 +161,7 @@ const ThirdCut = styled.div`
   width: 700px;
   height: 350px;
   flex-shrink: 0;
-  margin-top: 0px;
+  margin-top: 0px; // SecondCut과의 간격을 늘리기 위해 추가
 `;
 
 const ComicSection = styled.div`
@@ -222,11 +208,7 @@ function NewHome() {
     JamHi7,
     JamHi8,
   ];
-
-  const combinedImages = [jamGame, jamSmile]; // CombinedSection에서 사용할 이미지 배열
-
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [combinedImageIndex, setCombinedImageIndex] = useState(0); // CombinedSection의 이미지 인덱스 관리
 
   const initialState = {
     section1: false,
@@ -248,6 +230,7 @@ function NewHome() {
               entry.intersectionRatio >= 0.1 &&
               entry.intersectionRatio < 0.35
             ) {
+              console.log("first");
               setAnimate((prev) => ({
                 ...prev,
                 firstCut: true,
@@ -260,16 +243,17 @@ function NewHome() {
               }, 500);
             }
             if (entry.intersectionRatio >= 0.35) {
+              console.log("second");
               setAnimate((prev) => ({
                 ...prev,
-                secondThirdCut: true,
+                secondThirdCut: true, // RightCut의 애니메이션을 시작
               }));
               setTimeout(() => {
                 setIsSticky((prev) => ({
                   ...prev,
-                  secondThirdCut: true,
+                  secondThirdCut: true, // RightCut이 화면에 고정되도록 설정
                 }));
-              }, 500);
+              }, 500); // FirstCut이 끝난 후 약간의 딜레이를 두고 실행
             }
           } else if (entry.intersectionRatio >= 0.5) {
             setVisibleSections({
@@ -326,23 +310,6 @@ function NewHome() {
       );
       setCurrentImageIndex(newImageIndex);
     }
-
-    // CombinedSection에서 스크롤 위치를 기준으로 이미지 변경
-    const combinedSection = sectionRefs.current[4];
-    const combinedSectionTop = combinedSection.offsetTop;
-    const combinedSectionHeight = combinedSection.clientHeight;
-
-    if (
-      scrollPosition >= combinedSectionTop &&
-      scrollPosition <= combinedSectionTop + combinedSectionHeight / 2
-    ) {
-      setCombinedImageIndex(0); // 첫 번째 이미지로 설정
-    } else if (
-      scrollPosition >
-      combinedSectionTop + combinedSectionHeight / 2
-    ) {
-      setCombinedImageIndex(1); // 두 번째 이미지로 변경
-    }
   };
 
   return (
@@ -383,18 +350,20 @@ function NewHome() {
         >
           <ThirdSection animate={visibleSections.section3} />
         </Section>
-
-        <CombinedSection
+        <Section
           ref={(el) => (sectionRefs.current[4] = el)}
           id="section4"
           isVisible={visibleSections.section4}
         >
-          <Image
-            src={combinedImages[combinedImageIndex]} // 스크롤에 따라 이미지 전환
-            alt={`Combined ${combinedImageIndex + 1}`}
-          />
-        </CombinedSection>
-
+          <FourthSection animate={visibleSections.section4} />
+        </Section>
+        <Section
+          ref={(el) => (sectionRefs.current[5] = el)}
+          id="section5"
+          isVisible={visibleSections.section5}
+        >
+          <FifthSection animate={visibleSections.section5} />
+        </Section>
         <Section
           ref={(el) => (sectionRefs.current[6] = el)}
           id="section6"

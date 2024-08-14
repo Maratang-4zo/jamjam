@@ -16,7 +16,7 @@ const APPLICATION_SERVER_URL = "https://jjam.shop/";
 const useOpenVidu = () => {
   const [sessionRef, setSessionRef] = useRecoilState(OVSessionAtom);
   const [ovRef, setOvRef] = useRecoilState(OVRefAtom);
-  const [publisherRef, setPublisherRef] = useRef(OVPublisherAtom); // Publisher 객체를 저장할 ref 추가
+  const [publisherRef, setPublisherRef] = useRecoilState(OVPublisherAtom); // Publisher 객체를 저장할 ref 추가
   const [connected, setConnected] = useRecoilState(isOVConnectedAtom);
   const [currentSpeakers, setCurrentSpeakers] =
     useRecoilState(currentSpeakersAtom);

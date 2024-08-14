@@ -5,6 +5,7 @@ import { useRecoilValue } from "recoil";
 import { chatAtom, roomAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import sendIcon from "../../assets/icons/sendIcon.png";
+import { useWebSocket } from "../../context/WebsocketContext";
 
 const SideModal = styled.div`
   position: fixed;
@@ -175,7 +176,7 @@ const AlertMessage = styled.div`
 `;
 
 function ChattingModal({ isVisible, toggleModal }) {
-  const { sendChat } = useWs();
+  const { sendChat } = useWebSocket();
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const chatLogs = useRecoilValue(chatAtom);

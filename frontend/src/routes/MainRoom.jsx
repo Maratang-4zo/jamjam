@@ -60,7 +60,7 @@ function Room() {
   const [isHostOut, setIsHostOut] = useRecoilState(isHostOutAtom);
   const [isPlayingGame, setIsPlayingGame] = useRecoilState(isPlayingGameAtom);
   const estimatedClosedAt = useRecoilValue(estimatedForceCloseAtAtom);
-  const { connect, connected, subscribed, subscribe } = useWs();
+  const { connect, connected } = useWebSocket();
   const { joinSession } = useOpenVidu();
   const joined = useRecoilValue(isOVConnectedAtom);
 
@@ -140,10 +140,6 @@ function Room() {
 
           if (!connected) {
             await connect();
-          }
-
-          if (!subscribed) {
-            await subscribe();
           }
 
           if (!joined) {

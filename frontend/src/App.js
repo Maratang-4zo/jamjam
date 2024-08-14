@@ -5,6 +5,7 @@ import { NavermapsProvider } from "react-naver-maps";
 import { CookiesProvider } from "react-cookie";
 import { RecoilRoot } from "recoil"; // RecoilRoot import
 import SnapshotDebugger from "./utils/SnapShot";
+import { WebSocketProvider } from "./context/WebsocketContext";
 // 기본 CSS 초기화하는 세팅
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -74,14 +75,17 @@ function App() {
         <RecoilRoot>
           <SnapshotDebugger />
           <CookiesProvider>
-            <NavermapsProvider
-              ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
-              submodules={["geocoder"]}
-            >
-              <GlobalStyle />
-              <Router />
-              {/* <ReactQueryDevtools initialIsOpen={true} /> */}
-            </NavermapsProvider>
+            <GlobalStyle />
+            <Router>
+              <WebSocketProvider>
+                <NavermapsProvider
+                  ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
+                  submodules={["geocoder"]}
+                >
+                  {/* <ReactQueryDevtools initialIsOpen={true} /> */}
+                </NavermapsProvider>
+              </WebSocketProvider>
+            </Router>
           </CookiesProvider>
         </RecoilRoot>
       </ThemeProvider>

@@ -21,6 +21,7 @@ import { userColor } from "../../utils/userColor";
 import ColorThief from "colorthief";
 import Spinner from "./Spinner";
 import useWs from "../../hooks/useWs";
+import { useWebSocket } from "../../context/WebsocketContext";
 
 const bounceAnimation = keyframes`
   0%, 100% {
@@ -119,7 +120,7 @@ function NavBarLeft() {
   const navigate = useNavigate();
   const isMicOn = useRecoilValue(isMicOnAtom);
   const prevChatLogsLength = useRef(chatLogs.length);
-  const { disconnect } = useWs();
+  const { disconnect } = useWebSocket();
   //
 
   //

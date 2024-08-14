@@ -12,6 +12,7 @@ import {
 } from "../../recoil/atoms/gameState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import useWs from "../../hooks/useWs";
+import { useWebSocket } from "../../context/WebsocketContext";
 
 const WavyAni = keyframes`
     0% {
@@ -123,7 +124,7 @@ function GameChoice() {
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const setPlayerState = useSetRecoilState(playerState);
-  const { sendRoundInfo } = useWs();
+  const { sendRoundInfo } = useWebSocket();
   const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
   const currentRound = useRecoilValue(currentRoundAtom);
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);

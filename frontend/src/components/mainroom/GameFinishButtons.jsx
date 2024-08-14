@@ -29,6 +29,7 @@ import {
   isThreeStationLoadingAtom,
 } from "../../recoil/atoms/loadingState";
 import { getCookie } from "../../utils/Cookies";
+import { useWebSocket } from "../../context/WebsocketContext";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -164,7 +165,7 @@ function GameFinishButtons() {
   const [isFinalLoading, setIsFinalLoading] =
     useRecoilState(isHistoryLoadingAtom);
   const [isWinner, setIsWinner] = useRecoilState(isWinnerAtom);
-  const { sendNextRound, sendGoResult, sendNextRoundCenter } = useWs();
+  const { sendNextRound, sendGoResult, sendNextRoundCenter } = useWebSocket();
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
   const gameRoundUUID = useRecoilValue(currentRoundUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);

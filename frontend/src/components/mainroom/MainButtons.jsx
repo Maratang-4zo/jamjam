@@ -19,6 +19,7 @@ import { axiosGetMiddle } from "../../apis/mapApi";
 import useWs from "../../hooks/useWs";
 import { totalRoundAtom } from "../../recoil/atoms/gameState";
 import { axiosGetKakaoCalendar } from "../../apis/loginApi";
+import { useWebSocket } from "../../context/WebsocketContext";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -296,7 +297,7 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const [address, setAddress] = useState(null);
   const [confirmAddressOpen, setConfirmAddressOpen] = useState(false);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false); // 스크립트 로드 상태 추가
-  const { sendGameRound } = useWs();
+  const { sendGameRound } = useWebSocket();
 
   useEffect(() => {
     const script = document.createElement("script");

@@ -94,7 +94,7 @@ function Room() {
           const roomData = roomResponse.data;
 
           console.log(roomData);
-          // subscribe();
+          console.log("연결?", connected);
 
           const { myUUID } = userInfo;
           const myAttendeeInfo = roomData.attendees.find(
@@ -141,7 +141,11 @@ function Room() {
           }));
 
           if (!connected) {
-            await connect();
+            try {
+              await connect(roomUUID); // roomUUID를 인자로 전달
+            } catch (error) {
+              console.error("WebSocket 연결 실패:", error);
+            }
           }
 
           if (!joined) {

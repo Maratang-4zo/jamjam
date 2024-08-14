@@ -94,6 +94,7 @@ export const WebSocketProvider = ({ children }) => {
   const { leaveSession } = useOpenVidu();
 
   const connect = (roomUUID) => {
+    console.log("Attempting to connect with roomUUID:", roomUUID);
     return new Promise((resolve, reject) => {
       if (connected.current) {
         console.log("Already connected");
@@ -660,7 +661,7 @@ export const WebSocketProvider = ({ children }) => {
   const handlers = useMemo(
     () => ({
       connect,
-      connected,
+      connected: connected.current, // connected.current를 사용,
       disconnect,
       sendChat,
       sendGame,

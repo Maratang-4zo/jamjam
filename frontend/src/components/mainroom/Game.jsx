@@ -50,6 +50,7 @@ const ContentWrapper = styled.div`
   width: calc(100% - 250px);
   height: 100%;
 `;
+
 const StyledButton = styled.button`
   font-family: "OldGalmuri";
   background-color: ${(props) =>
@@ -78,7 +79,7 @@ function Game() {
   const { selectedGame } = location.state || {};
   const handleClick = useRef(() => {});
   // 나중에 websocket 연결하고 나서 false 로 바꿀겁니다
-  const [showButton, setShowButton] = useState(true);
+  const [showButton, setShowButton] = useState(false);
   const roomInfo = useRecoilValue(roomAtom);
   const isWinner = useRecoilValue(isWinnerAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);

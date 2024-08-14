@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import {
   aroundStationsAtom,
   chatAtom,
@@ -46,7 +46,7 @@ const useWs = () => {
   const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);
   const [connected, setConnected] = useRecoilState(isWsConnectedAtom);
-  const [client, setClient] = useRecoilState(wsClientAtom); // 초기화 null로 변경
+  const [client, setClient] = useRecoilState(wsClientAtom);
 
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
@@ -99,7 +99,7 @@ const useWs = () => {
           onConnect: () => {
             console.log("Connected");
             setConnected(true);
-            subscribe(roomUUID);
+            setClient(nowClient); // 클라이언트 저장
             resolve();
           },
           onStompError: (frame) => {
@@ -115,12 +115,44 @@ const useWs = () => {
             handleWebSocketClose(evt);
           },
         });
-        setClient(nowClient);
         nowClient.activate();
       });
     },
-    [connected],
+    [connected, client],
   );
+
+  useEffect(() => {
+    if (client && connected) {
+      // client와 연결이 완료된 후 구독 시작
+      subscribe();
+    }
+  }, [client, connected]);
+
+  const subscribe = () => {
+    if (client) {
+      client.subscribe(
+        `/sub/rooms/${roomInfo.roomUUID}`,
+        (message) => {
+          handleMessage(message);
+        },
+        null,
+        {},
+      );
+
+      client.subscribe(`/user/sub/errors`, (message) => {
+        alert(message.body);
+      });
+    } else {
+      console.error("WebSocket client is not initialized");
+    }
+  };
+
+  const disconnect = useCallback(() => {
+    if (client) {
+      client.deactivate();
+      setConnected(false);
+    }
+  }, [client]);
 
   const handleStompError = (frame) => {
     if (frame.headers && frame.headers["message"]) {
@@ -129,7 +161,9 @@ const useWs = () => {
       alert("Handshake 실패: 알 수 없는 오류");
     }
     // 재연결 시도 중지
-    client.deactivate();
+    if (client) {
+      client.deactivate();
+    }
   };
 
   const handleWebSocketClose = (event) => {
@@ -137,39 +171,23 @@ const useWs = () => {
       // 비정상적인 종료 코드
       alert("WebSocket 연결이 비정상적으로 종료되었습니다.");
       // 재연결 시도 중지
-      client.deactivate();
+      if (client) {
+        client.deactivate();
+      }
     }
     alert(event.code);
-    client.deactivate();
+    if (client) {
+      client.deactivate();
+    }
   };
 
   const handleWebSocketError = (error) => {
     alert("WebSocket 연결에 실패했습니다.");
     // 재연결 시도 중지
-    client.deactivate();
-  };
-
-  const subscribe = (roomUUID) => {
-    client.subscribe(
-      `/sub/rooms/${roomUUID}`,
-      (message) => {
-        handleMessage(message);
-      },
-      null,
-      {},
-    );
-
-    client.subscribe(`/user/sub/errors`, (message) => {
-      alert(message.body);
-    });
-  };
-
-  const disconnect = useCallback(() => {
     if (client) {
       client.deactivate();
-      setConnected(false);
     }
-  }, []);
+  };
 
   const handleMessage = useCallback((message) => {
     console.log("Received message:", message);
@@ -720,15 +738,6 @@ const useWs = () => {
       });
     }
   }, []);
-
-  // useEffect(() => {
-  //   connect().catch((error) => {
-  //     console.error("WebSocket connection failed:", error);
-  //   });
-  //   return () => {
-  //     disconnect();
-  //   };
-  // }, []);
 
   return {
     connect,

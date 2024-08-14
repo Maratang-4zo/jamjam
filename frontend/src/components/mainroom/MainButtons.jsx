@@ -317,13 +317,14 @@ function MainButtons({ onOpenEditModal, onOpenShareModal, onAddressSelect }) {
   const handleFindCenter = async () => {
     setIsMiddleLoading(true);
     try {
-      const res = await axiosGetMiddle({ roomUUId: roomState.roomUUID });
-      const data = res.data;
+      const res = await axiosGetMiddle({ roomUUID: roomState.roomUUID });
+      const resData = res.data;
+      console.log(resData);
       setRoomState((prev) => ({
         ...prev,
-        centerPlace: data.roomCenterStart,
+        centerPlace: resData.roomCenterStart,
         isCenterExist: true,
-        attendees: data.attendees,
+        attendees: resData.attendees,
       }));
     } catch (error) {
       console.error("중심찾기 실패!!!", error);

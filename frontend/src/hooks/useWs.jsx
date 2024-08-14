@@ -45,7 +45,7 @@ const API_BASE_URL = "https://jjam.shop";
 const useWs = () => {
   const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);
-  const [connected, setConnected] = useRecoilValue(isWsConnectedAtom);
+  const [connected, setConnected] = useRecoilState(isWsConnectedAtom);
   const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
   const [client, setClient] = useRecoilState(wsClientAtom); // 초기화 null로 변경
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);

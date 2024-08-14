@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
-import wavebutton from "../assets/wavebutton.svg";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { axiosAttendRoom } from "../apis/roomApi";
 import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
-import useWs from "../hooks/useWs";
-import useOpenVidu from "../hooks/useOpenVidu";
-import axios from "axios";
 import Cookies from "js-cookie";
-// import Jam from "../assets/JoinRoomJam.gif";
 
 const LeftSection = styled.div`
   width: 66.67%;
@@ -82,18 +77,8 @@ const EnterForm = styled.div`
   border-left: 3px solid ${(props) => props.theme.accentColor};
   padding-left: 40px;
   padding-right: 40px;
+  overflow: hidden;
 `;
-
-// const SectionTitle = styled.h3`
-//   margin: 0;
-//   margin-bottom: 30px;
-//   margin-left: 120px;
-//   font-family: "pixel", Helvetica;
-//   font-size: 22px;
-//   color: #000000aa;
-//   text-align: left;
-//   align-self: flex-start; /* 버튼 및 입력 폼의 왼쪽 상단에 위치 */
-// `;
 
 const WavyAni = keyframes`
     0% {
@@ -223,6 +208,11 @@ const NicknameInput = styled.div`
     background-color: transparent;
     color: #000;
   }
+  input:focus {
+    outline: none;
+    background-color: #ffffff50;
+    transition: 0.2s;
+  }
 `;
 
 const CharCount = styled.span`
@@ -255,6 +245,7 @@ const EnterButton = styled.button`
 
   &:hover {
     background-color: ${(props) => props.theme.infoColorHover};
+    transition: 0.15s;
   }
 `;
 

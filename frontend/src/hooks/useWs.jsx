@@ -169,7 +169,7 @@ const useWs = () => {
   }, []);
 
   const handleMessage = useCallback((message) => {
-    console.log(message);
+    console.log("Received message:", message);
     const messageBody = JSON.parse(message.body);
     switch (message.headers.type) {
       case "CHAT_RECEIVED":

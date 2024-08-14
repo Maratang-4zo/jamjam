@@ -1,11 +1,10 @@
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { defaultTheme } from "./theme";
 import Router from "./Router";
-import { ReactQueryDevtools } from "react-query/devtools";
 import { NavermapsProvider } from "react-naver-maps";
 import { CookiesProvider } from "react-cookie";
 import { RecoilRoot } from "recoil"; // RecoilRoot import
-
+import SnapshotDebugger from "./utils/SnapShot";
 // 기본 CSS 초기화하는 세팅
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -73,6 +72,7 @@ function App() {
     <>
       <ThemeProvider theme={defaultTheme}>
         <RecoilRoot>
+          <SnapshotDebugger />
           <CookiesProvider>
             <NavermapsProvider
               ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}

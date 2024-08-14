@@ -431,12 +431,32 @@ const useWs = () => {
     setSelectedGame(0);
     setPlayers([]);
     setIsMainConnecting(false);
+
+    // 기존의 roomInfo.attendees를 업데이트
+    setRoomInfo((prev) => {
+      const updatedAttendees = prev.attendees.map((attendee) => {
+        // 기존에 WAITING 상태였던 참가자의 상태를 ENTERED로 변경
+        if (attendee.attendeeStatus === "WAITING") {
+          return {
+            ...attendee,
+            attendeeStatus: "ENTERED",
+          };
+        }
+        // 나머지 참여자는 그대로 유지
+        return attendee;
+      });
+
+      return {
+        ...prev,
+        attendees: updatedAttendees, // 업데이트된 attendees 배열로 설정
+      };
+    });
   };
 
   const handleGameResultApply = ({
     gameSessionUUID,
     roomCenterStart,
-    attendees,
+    attendees, // 게임에 참여한 사람들의 정보
   }) => {
     setIsMainConnecting(false);
     setRoomPage("main");
@@ -450,11 +470,41 @@ const useWs = () => {
     setIsWinner(false);
     setSelectedGame(0);
     setPlayers([]);
-    setRoomInfo((prev) => ({
-      ...prev,
-      centerPlace: roomCenterStart,
-      attendees,
-    }));
+
+    // 기존의 roomInfo.attendees를 업데이트
+    setRoomInfo((prev) => {
+      // 기존의 attendees에서 게임에 참여하지 않은 사람들만 필터링
+      const updatedAttendees = prev.attendees.map((existingAttendee) => {
+        const updatedAttendee = attendees.find(
+          (attendee) => attendee.attendeeUUID === existingAttendee.attendeeUUID,
+        );
+
+        // 만약 현재 존재하는 attendee가 게임에 참여한 사람이라면
+        if (updatedAttendee) {
+          return {
+            ...updatedAttendee, // 새로 받은 정보로 업데이트
+            attendeeStatus: "ENTERED", // 상태를 ENTERED로 바꿔줌
+          };
+        }
+
+        // 게임에 참여하지 않았던 사람은 그대로 유지, 상태만 변경
+        if (existingAttendee.attendeeStatus === "WAITING") {
+          return {
+            ...existingAttendee,
+            attendeeStatus: "ENTERED",
+          };
+        }
+
+        // 그렇지 않은 경우는 그대로 유지
+        return existingAttendee;
+      });
+
+      return {
+        ...prev,
+        centerPlace: roomCenterStart, // 새로운 centerPlace로 업데이트
+        attendees: updatedAttendees, // 업데이트된 attendees 배열로 설정
+      };
+    });
   };
 
   // 최종 장소 기록에 반영

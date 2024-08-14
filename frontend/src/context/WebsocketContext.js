@@ -162,14 +162,6 @@ export const WebSocketProvider = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => {
-    const handleData = () => {
-      console.log("최신", roomInfo);
-    };
-
-    handleData();
-  }, [roomInfo]);
-
   const handleMessage = (message) => {
     console.log(message);
     const messageBody = JSON.parse(message.body);
@@ -555,8 +547,6 @@ export const WebSocketProvider = ({ children }) => {
         const attendant = currentRoomInfo.attendees.find(
           (attendee) => attendee.attendeeUUID === attendeeUUID,
         );
-
-        console.log("메시지받는곳", message, attendant, currentRoomInfo);
 
         const nickname = attendant ? attendant.nickname : "Unknown";
         const newChatLog = {

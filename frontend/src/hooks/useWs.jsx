@@ -27,7 +27,6 @@ import {
 } from "../recoil/atoms/gameState";
 import { useNavigate } from "react-router-dom";
 import { userInfoAtom } from "../recoil/atoms/userState";
-import { axiosPatchNextMiddle } from "../apis/mapApi";
 import {
   isCenterMoveLoadingAtom,
   isFindCenterLoadingAtom,
@@ -612,25 +611,22 @@ const useWs = () => {
     }
   }, []);
 
-  const handleChatLogs = useCallback(
-    (message) => {
-      const { attendeeUUID, content, createdAt } = message;
-      const attendant = roomInfo.attendees.find(
-        (attendee) => attendee.attendeeUUID === attendeeUUID,
-      );
-      const nickname = attendant ? attendant.nickname : "Unknown";
-      const newChatLog = {
-        type: "chat",
-        attendeeUUID,
-        nickname,
-        content,
-        createdAt,
-      };
-      setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
-      console.log(message);
-    },
-    [roomInfo.attendees, setChatLogs],
-  );
+  const handleChatLogs = useCallback((message) => {
+    const { attendeeUUID, content, createdAt } = message;
+    const attendant = roomInfo.attendees.find(
+      (attendee) => attendee.attendeeUUID === attendeeUUID,
+    );
+    const nickname = attendant ? attendant.nickname : "Unknown";
+    const newChatLog = {
+      type: "chat",
+      attendeeUUID,
+      nickname,
+      content,
+      createdAt,
+    };
+    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
+    console.log(message);
+  }, []);
 
   const updateRoomStatus = useCallback((message) => {
     console.log("Room status updated:", message);

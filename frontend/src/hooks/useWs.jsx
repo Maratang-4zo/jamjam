@@ -102,7 +102,7 @@ const useWs = () => {
             console.log("Connected");
             setConnected(true);
             setClient(newClient);
-            if (!isSubscribed) {
+            if (!isSubscribed && client) {
               subscribe(roomUUID);
             }
             resolve();
@@ -125,6 +125,12 @@ const useWs = () => {
     },
     [connected, client, isSubscribed],
   );
+
+  useEffect(() => {
+    if (client && !isSubscribed) {
+      subscribe(roomInfo.roomUUID);
+    }
+  }, [client]);
 
   const subscribe = (roomUUID) => {
     client.subscribe(

@@ -43,6 +43,8 @@ public class CommonTokenProvider {
 				.setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
 				.parseClaimsJws(token).getBody();
 
+			log.info(claims.toString());
+
 			if(!claims.getSubject().equals(tokenType.name())) {
 				throw new AuthenticationException(ErrorCode.NOT_ACCESS_TOKEN);
 			}

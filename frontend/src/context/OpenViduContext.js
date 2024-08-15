@@ -59,10 +59,12 @@ export const OpenViduProvider = ({ children }) => {
     sessionRef.current = newSession;
 
     newSession.on("streamCreated", function (event) {
+      console.log("연결했다는", event);
       newSession.subscribe(event.stream, "subscriber");
     });
 
     newSession.on("publisherStartSpeaking", (event) => {
+      console.log("말하는중", event);
       setCurrentSpeakers((prevSpeakers) => [
         ...prevSpeakers,
         event.connection.data.attendeeUUID,

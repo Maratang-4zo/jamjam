@@ -37,20 +37,10 @@ export const OpenViduProvider = ({ children }) => {
 
   //테스트용
   useEffect(() => {
-    console.log("OpenVidu context state:", {
-      sessionRef: sessionRef.current,
-      ovRef: ovRef.current,
-      publisherRef: publisherRef.current,
-      joined: joined.current,
-      isMicOn,
+    console.log("말하고 있음:", {
+      currentSpeakers,
     });
-  }, [
-    sessionRef.current,
-    ovRef.current,
-    publisherRef.current,
-    joined.current,
-    isMicOn,
-  ]);
+  }, [currentSpeakers]);
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {

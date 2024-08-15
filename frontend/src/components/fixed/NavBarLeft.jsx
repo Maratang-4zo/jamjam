@@ -56,6 +56,7 @@ const Avatar = styled.img`
   border-radius: 30%;
   box-shadow: ${(props) => (props.isSpeaking ? "0 0 7px 2px #ffffff" : "none")};
   cursor: pointer;
+  transition: 0.2s;
 `;
 
 const Btns = styled.div`
@@ -112,9 +113,6 @@ function NavBarLeft() {
   const navigate = useNavigate();
   const prevChatLogsLength = useRef(chatLogs.length);
   const { leaveFn } = useLeave();
-  const openViduContext = useOpenVidu();
-
-  console.log("OpenVidu context:", openViduContext);
 
   useEffect(() => {
     const loadImages = async () => {

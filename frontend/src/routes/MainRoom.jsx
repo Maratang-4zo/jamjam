@@ -58,6 +58,7 @@ function Room() {
   const [isHostOut, setIsHostOut] = useRecoilState(isHostOutAtom);
   const [isPlayingGame, setIsPlayingGame] = useRecoilState(isPlayingGameAtom);
   const setChatLogs = useSetRecoilState(chatAtom);
+  const setRoomPage = useSetRecoilState(roomPage);
   const [estimatedClosedAt, setEstimatedClosedAt] = useRecoilState(
     estimatedForceCloseAtAtom,
   );
@@ -139,6 +140,7 @@ function Room() {
           }));
 
           setChatLogs([]);
+          setRoomPage("main");
 
           setUserInfo((prev) => ({
             ...prev,

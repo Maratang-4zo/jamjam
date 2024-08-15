@@ -441,6 +441,7 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const handleGameCountdown = ({ gameRoundUUID, countdown }) => {
+    console.log("카운트값 제대로 들어갔니..??", countdown);
     setGameCount(countdown);
   };
 

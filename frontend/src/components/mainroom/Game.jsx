@@ -105,8 +105,9 @@ const WinMessage = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 48px;
+  font-family: "pixel";
   font-weight: bold;
-  color: #ff0000;
+  color: black;
   display: ${(props) => (props.show ? "block" : "none")};
   padding: 20px; // 텍스트 주변 여백 추가
   z-index: 1; // 텍스트가 배경 위에 위치하도록 z-index 설정
@@ -117,9 +118,9 @@ const WinMessage = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 130%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.8); // 직사각형 배경색
+    background-color: rgba(255, 255, 255, 1); // 직사각형 배경색
     border-radius: 10px; // 모서리 둥글게
     z-index: -1; // 배경이 텍스트 뒤에 오도록 설정
   }
@@ -132,6 +133,7 @@ const Countdown = styled.div`
   transform: translate(-50%, -50%);
   font-size: 64px;
   font-weight: bold;
+  font-family: "DungGeunMo";
   color: #000;
 `;
 

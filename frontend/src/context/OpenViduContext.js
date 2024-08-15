@@ -76,6 +76,12 @@ export const OpenViduProvider = ({ children }) => {
           undefined,
         );
         subscriber.subscribeToAudio(true);
+
+        // 오디오 요소 생성 및 연결
+        const audioElement = document.createElement("audio");
+        subscriber.addVideoElement(audioElement);
+        document.body.appendChild(audioElement);
+
         setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
         console.log("Subscriber added:", subscriber);
         console.log(
@@ -162,7 +168,7 @@ export const OpenViduProvider = ({ children }) => {
       try {
         await sessionRef.current.connect(token);
 
-        const newPublisher = ovRef.current.initPublisher("publisher", {
+        const newPublisher = ovRef.current.initPublisher(undefined, {
           audioSource: undefined,
           videoSource: false,
           publishAudio: true,
@@ -176,6 +182,25 @@ export const OpenViduProvider = ({ children }) => {
 
         await sessionRef.current.publish(newPublisher);
         console.log("Successfully published to session");
+
+        // 기존 참가자들의 스트림 구독
+        sessionRef.current.streamManagers.forEach((streamManager) => {
+          if (streamManager !== newPublisher) {
+            const subscriber = sessionRef.current.subscribe(
+              streamManager.stream,
+              undefined,
+            );
+            subscriber.subscribeToAudio(true);
+            setSubscribers((prevSubscribers) => [
+              ...prevSubscribers,
+              subscriber,
+            ]);
+            console.log(
+              "Subscribed to existing stream:",
+              streamManager.stream.streamId,
+            );
+          }
+        });
 
         joined.current = true;
         console.log("Successfully joined session", sessionId);

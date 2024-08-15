@@ -66,6 +66,11 @@ function Game1({ handleClick, onWin }) {
   const gameState = useRecoilValue(gameStateAtom);
 
   useEffect(() => {
+    console.log("카운트다운:", countdown);
+    console.log("플레이어들:", players);
+  }, [countdown, players]);
+
+  useEffect(() => {
     if (countdown === 0) {
       handleClick.current = () => {
         if (!win && !winner) {
@@ -98,7 +103,7 @@ function Game1({ handleClick, onWin }) {
       {countdown === 0 ? (
         <>
           <BlockContainer>
-            {players.map((player, index) => (
+            {players.map((player) => (
               <Block
                 key={player.attendeeUUID}
                 bottom={player.bottom}

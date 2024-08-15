@@ -138,6 +138,8 @@ function GameChoice() {
         bottom: 0,
       }));
     setPlayerState(initialPlayers);
+    console.log(playerState);
+    console.log(initialPlayers);
   }, [roomInfo, userInfo, setPlayerState]);
 
   const handlePlayButtonClick = () => {

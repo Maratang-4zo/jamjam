@@ -28,10 +28,10 @@ public class CommonTokenProvider {
 
 	public String createToken(TokenType tokenType, Map<String, Object> claims, Date expireTime, String tokenSecret) {
 		return Jwts.builder()
-			.setSubject(tokenType.name())
+			.setClaims(claims)
+			.setSubject(tokenType.toString())
 			.setIssuedAt(new Date())
 			.setExpiration(expireTime)
-			.setClaims(claims)
 			.signWith(SignatureAlgorithm.HS512, tokenSecret.getBytes(StandardCharsets.UTF_8))
 			.setHeaderParam("typ", "JWT")
 			.compact();

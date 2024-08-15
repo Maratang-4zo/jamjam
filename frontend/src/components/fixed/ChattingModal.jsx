@@ -172,6 +172,7 @@ const AlertMessage = styled.div`
   text-align: center;
   font-family: "NewGalmuriBold";
   font-size: 18px;
+  margin: 5px 0;
 `;
 
 function ChattingModal({ isVisible, toggleModal }) {

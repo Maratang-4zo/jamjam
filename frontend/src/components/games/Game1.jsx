@@ -93,7 +93,7 @@ function Game1({ handleClick, onWin }) {
     <>
       {countdown === 99 ? <Countdown>READY</Countdown> : null}
       {countdown > 0 && countdown < 99 ? (
-        <Countdown>{countdown === 1 ? "START" : countdown - 1}</Countdown>
+        <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>
       ) : null}
       {countdown === 0 ? (
         <>

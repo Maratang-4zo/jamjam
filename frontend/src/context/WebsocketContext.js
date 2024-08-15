@@ -71,25 +71,23 @@ export const WebSocketProvider = ({ children }) => {
 
   const navigate = useNavigate();
   const setRoomPage = useSetRecoilState(roomPageAtom);
-  const [chatLogs, setChatLogs] = useRecoilState(chatAtom);
+  const setChatLogs = useSetRecoilState(chatAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
-  const [players, setPlayers] = useRecoilState(playerState);
+  const setPlayers = useSetRecoilState(playerState);
   const setSelectedGame = useSetRecoilState(selectedGameAtom);
   const setIsWinner = useSetRecoilState(isWinnerAtom);
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
   const setTotalRound = useSetRecoilState(totalRoundAtom);
-  const [gameSessionUUID, setGameSessionUUID] =
-    useRecoilState(gameSessionUUIDAtom);
+  const setGameSessionUUID = useSetRecoilState(gameSessionUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);
-  const [currentRoundUUID, setCurrentRoundUUID] =
-    useRecoilState(currentRoundUUIDAtom);
+  const setCurrentRoundUUID = useSetRecoilState(currentRoundUUIDAtom);
   const setGameState = useSetRecoilState(gameStateAtom);
   const setWinnerUUID = useSetRecoilState(winnerUUIDAtom);
   const setWinnerNickname = useSetRecoilState(winnerNicknameAtom);
   const setGameCount = useSetRecoilState(gameCountAtom);
   const setCurrentRound = useSetRecoilState(currentRoundAtom);
-  const [roundCenter, setRoundCenter] = useRecoilState(roundCenterAtom);
+  const setRoundCenter = useSetRecoilState(roundCenterAtom);
   const setIsCenterMoveLoading = useSetRecoilState(isCenterMoveLoadingAtom);
   const setIsFindCenterLoading = useSetRecoilState(isFindCenterLoadingAtom);
   const setIsThreeStationLoading = useSetRecoilState(isThreeStationLoadingAtom);
@@ -254,8 +252,11 @@ export const WebSocketProvider = ({ children }) => {
       nickname,
       lat,
       lon,
-      isRoot,
+      root,
       profileImageUrl,
+      route,
+      duration,
+      attendeeStatus,
     } = message;
 
     const newAttendee = {
@@ -265,9 +266,12 @@ export const WebSocketProvider = ({ children }) => {
       attendeeUUID,
       nickname,
       profileImageUrl,
+      route,
+      duration,
+      attendeeStatus,
     };
 
-    if (isRoot) {
+    if (root) {
       setIsHostOut(false);
       setEstimatedForceCloseAt(null);
     }
@@ -276,7 +280,7 @@ export const WebSocketProvider = ({ children }) => {
     if (userInfo.myUUID === attendeeUUID) {
       setUserInfo((prev) => ({
         ...prev,
-        isHost: isRoot,
+        isHost: root,
         nickname,
         departure: {
           address,
@@ -290,7 +294,7 @@ export const WebSocketProvider = ({ children }) => {
     setRoomInfo((prevRoomInfo) => ({
       ...prevRoomInfo,
       attendees: [...prevRoomInfo.attendees, newAttendee],
-      hostUUID: isRoot ? attendeeUUID : prevRoomInfo.hostUUID,
+      hostUUID: root ? attendeeUUID : prevRoomInfo.hostUUID,
     }));
 
     // 채팅로그에 추가
@@ -337,14 +341,6 @@ export const WebSocketProvider = ({ children }) => {
     }));
 
     setEstimatedForceCloseAt(estimatedForceCloseAt);
-
-    const newChatLog = {
-      type: "alert",
-      alertType: "out",
-      attendeeUUID,
-      nickname,
-    };
-    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
   };
 
   const handleRoomExit = () => {
@@ -463,25 +459,33 @@ export const WebSocketProvider = ({ children }) => {
     setRoomPage("gamefinish");
   };
 
-  const handleGameWinner = ({ gameRoundUUID, attendeeUUID }) => {
-    // winnerUUID 설정
-    setWinnerUUID(attendeeUUID);
+  const handleGameWinner = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async ({ gameRoundUUID, attendeeUUID }) => {
+        // winnerUUID 설정
+        set(winnerUUIDAtom, attendeeUUID);
 
-    // attendees 배열에서 attendeeUUID와 일치하는 사람을 찾기
-    const winner = roomInfo.attendees.find(
-      (attendee) => attendee.attendeeUUID === attendeeUUID,
-    );
+        // 최신 roomInfo 가져오기
+        const currentRoomInfo = await snapshot.getPromise(roomAtom);
+        const userInfo = await snapshot.getPromise(userInfoAtom);
 
-    // 해당 유저가 있으면 그 사람의 닉네임을 winnerNicknameAtom에 저장
-    if (winner) {
-      setWinnerNickname(winner.nickname);
-    }
+        // attendees 배열에서 attendeeUUID와 일치하는 사람을 찾기
+        const winner = currentRoomInfo.attendees.find(
+          (attendee) => attendee.attendeeUUID === attendeeUUID,
+        );
 
-    // 현재 유저가 승자인지 확인하고 isWinner 상태 업데이트
-    if (userInfo.myUUID === attendeeUUID) {
-      setIsWinner(true);
-    }
-  };
+        // 해당 유저가 있으면 그 사람의 닉네임을 winnerNicknameAtom에 저장
+        if (winner) {
+          set(winnerNicknameAtom, winner.nickname);
+        }
+
+        // 현재 유저가 승자인지 확인하고 isWinner 상태 업데이트
+        if (userInfo.myUUID === attendeeUUID) {
+          set(isWinnerAtom, true);
+        }
+      },
+    [],
+  );
 
   const handleGameCenterUpdate = ({ roundCenterStation }) => {
     setRoundCenter(roundCenterStation);
@@ -531,14 +535,6 @@ export const WebSocketProvider = ({ children }) => {
       roomName: name,
       roomPurpose: purpose,
     }));
-  };
-
-  const formatTime = (createdAt) => {
-    const chatTime = new Date(createdAt);
-    const hours = chatTime.getUTCHours() + 9; // UTC 시간에 9시간 더하기
-    const adjustedHours = hours % 24; // 24시간 형식으로 변환
-    const minutes = chatTime.getUTCMinutes().toString().padStart(2, "0");
-    return `${adjustedHours.toString().padStart(2, "0")}:${minutes}`;
   };
 
   const handleChatLogs = useRecoilCallback(

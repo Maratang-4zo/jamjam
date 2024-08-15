@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useLeave } from "../../hooks/useLeave";
 
 const Wrapper = styled.div`
   font-family: "DungGeunMo";
@@ -29,7 +30,7 @@ const Wrapper = styled.div`
 `;
 
 function Loading({ message, estimatedForceCloseAt }) {
-  const navigate = useNavigate();
+  const { leaveFn } = useLeave();
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
@@ -43,11 +44,11 @@ function Loading({ message, estimatedForceCloseAt }) {
       if (difference > 0) {
         const minutes = Math.floor(difference / 1000 / 60);
         const seconds = Math.floor((difference / 1000) % 60);
-        setTimeLeft(`${minutes}분 ${seconds}초 남았습니다.`);
+        setTimeLeft(`방 종료까지 ${minutes}분 ${seconds}초 남았습니다.`);
       } else if (difference <= 0 && difference > -10) {
         setTimeLeft("방이 종료되었습니다.");
       } else {
-        navigate("/");
+        leaveFn();
         alert("방이 종료되었습니다");
       }
     };

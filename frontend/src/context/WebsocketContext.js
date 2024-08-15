@@ -454,6 +454,7 @@ export const WebSocketProvider = ({ children }) => {
   const handleGameSessionReady = ({ gameSessionUUID, roundCnt }) => {
     setTotalRound(roundCnt);
     setGameSessionUUID(gameSessionUUID);
+    setRoomPage("gamechoice");
   };
 
   const handleGetAroundStations = ({ aroundStations }) => {

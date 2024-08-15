@@ -32,6 +32,7 @@ const GameScreen = styled.div`
   flex-shrink: 0;
   border-radius: 30px;
   background: #fff;
+  /* background-image: url(${gameBg}); */
   position: relative; // Position relative to contain the absolute positioning of Block and WinMessage
   display: flex;
   align-items: center;
@@ -73,8 +74,8 @@ const StyledButton = styled.button`
 `;
 
 function Game() {
-  // const location = useLocation();
-  // const { selectedGame } = location.state || {};
+  const location = useLocation();
+  const { selectedGame } = location.state || {};
   const handleClick = useRef(() => {});
   const [showButton, setShowButton] = useState(false);
   const roomInfo = useRecoilValue(roomAtom);
@@ -121,7 +122,6 @@ function Game() {
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
         <GameScreen onClick={() => handleClick.current()}>
-          <Game1 handleClick={handleClick} onWin={handleWin} />
           {/* {selectedGame === 1 && (
             <>
               {console.log("Game1 렌더링됨")}
@@ -130,6 +130,8 @@ function Game() {
           )}
           {selectedGame === 2 && <Game2 />}
           {selectedGame === 3 && <Game3 />} */}
+          <Game1 handleClick={handleClick} onWin={handleWin} />
+
           <StyledButton
             disabled={!isWinner}
             show={showButton}

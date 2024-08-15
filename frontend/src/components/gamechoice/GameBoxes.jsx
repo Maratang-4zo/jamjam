@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import YellowChatBubble from "../../assets/YellowChatBubble.svg";
 import SecondCardBg from "../../assets/2ndImg.png";
@@ -189,17 +189,22 @@ const Middle2 = styled.div`
   font-family: "NewGalmuriBold", sans-serif;
 `;
 
-function GameBoxes() {
+function GameBoxes({ selectedGame, setSelectedGame }) {
   const userInfo = useRecoilValue(userInfoAtom);
   const isHost = userInfo.isHost;
-  const [selected, setSelected] = useState(false); // 로컬 상태로 카드 선택 여부 관리
+
+  const handleClick = (gameId) => {
+    if (isHost && setSelectedGame) {
+      setSelectedGame(gameId);
+    }
+  };
 
   return (
     <GamesContainer>
       <GameCard1
-        selected={selected} // 선택 상태에 따라 border 스타일이 변경됨
+        selected={selectedGame === 1}
+        onClick={() => handleClick(1)}
         disabled={!isHost}
-        onClick={() => setSelected(true)} // 클릭 시 카드가 선택된 상태로 변경
       >
         <Middle className="middle" top="50%">
           <TextAboveBubble>

@@ -77,7 +77,6 @@ function Game() {
   const location = useLocation();
   const { selectedGame } = location.state || {};
   const handleClick = useRef(() => {});
-  // 나중에 websocket 연결하고 나서 false 로 바꿀겁니다
   const [showButton, setShowButton] = useState(false);
   const roomInfo = useRecoilValue(roomAtom);
   const isWinner = useRecoilValue(isWinnerAtom);

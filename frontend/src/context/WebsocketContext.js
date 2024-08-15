@@ -322,30 +322,36 @@ export const WebSocketProvider = ({ children }) => {
     setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
   };
 
-  const handleRoomRootLeave = ({
-    attendeeUUID,
-    estimatedForceCloseAt,
-    nickname,
-  }) => {
-    setIsHostOut(true);
+  const handleRoomRootLeave = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async ({ attendeeUUID, estimatedForceCloseAt, nickname }) => {
+        // 최신 roomInfo 가져오기
+        const currentRoomInfo = await snapshot.getPromise(roomAtom);
+        const userInfo = await snapshot.getPromise(userInfoAtom);
 
-    setRoomInfo((prevRoomInfo) => ({
-      ...prevRoomInfo,
-      attendees: prevRoomInfo.attendees.filter(
-        (attendee) => attendee.attendeeUUID !== attendeeUUID,
-      ),
-    }));
+        // attendees 배열에서 attendeeUUID와 일치하는 사람을 제외한 새로운 배열 생성
+        const updatedAttendees = currentRoomInfo.attendees.filter(
+          (attendee) => attendee.attendeeUUID !== attendeeUUID,
+        );
 
-    setEstimatedForceCloseAt(estimatedForceCloseAt);
+        // roomInfo 업데이트
+        set(roomAtom, {
+          ...currentRoomInfo,
+          attendees: updatedAttendees,
+        });
 
-    const newChatLog = {
-      type: "alert",
-      alertType: "out",
-      attendeeUUID,
-      nickname,
-    };
-    setChatLogs((prevChatLogs) => [...prevChatLogs, newChatLog]);
-  };
+        // 현재 유저가 호스트인지 확인
+        if (userInfo.isHost) {
+          // isHost가 true라면 setIsHostOut(true)와 setEstimatedForceCloseAt(estimatedForceCloseAt) 실행 안 함
+          console.log("현재 유저가 호스트이므로 상태 변경이 생략되었습니다.");
+        } else {
+          // isHost가 false라면, 호스트가 나간 상태를 true로 설정하고, 추정 강제 종료 시간 설정
+          set(isHostOutAtom, true);
+          set(estimatedForceCloseAtAtom, estimatedForceCloseAt);
+        }
+      },
+    [],
+  );
 
   const handleRoomExit = () => {
     setIsHostOut(false); // 호스트가 나간 상태를 false로 설정
@@ -430,6 +436,7 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const handleGameCountdown = ({ gameRoundUUID, countdown }) => {
+    console.log("카운트값 제대로 들어갔니..??", countdown);
     setGameCount(countdown);
   };
 

@@ -9,6 +9,7 @@ import {
   isWinnerAtom,
   playerState,
   winnerNicknameAtom,
+  currentRoundUUIDAtom,
 } from "../../recoil/atoms/gameState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import { axiosGetAroundStores, axiosGetThreeStations } from "../../apis/mapApi";
@@ -130,7 +131,7 @@ function Game() {
   const isWinner = useRecoilValue(isWinnerAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const myUUID = userInfo.myUUID;
-
+  const gameRoundUUID = useRecoilValue(currentRoundUUIDAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
 
   const [isLoading, setIsLoading] = useRecoilState(isThreeStationLoadingAtom);
@@ -178,6 +179,7 @@ function Game() {
 
   useEffect(() => {
     console.log("Player들의 정보 배열입니다", players);
+    console.log("라운드 아이디", gameRoundUUID);
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         console.log("지금 현재 접속해 있는 사람의 UUID:", myUUID);
@@ -189,15 +191,15 @@ function Game() {
               console.log(
                 `위치 변경 ${player.nickname}: ${player.bottom} -> ${newBottom}`,
               );
-              sendGame({ myUUID, bottom: newBottom });
+              sendGame(gameRoundUUID);
               return { ...player, bottom: newBottom };
             }
             return player;
           });
-          console.log("Updated players:", updatedPlayers);
+          // console.log("Updated players:", updatedPlayers);
           return updatedPlayers;
         });
-        console.log("Players state updated:", players);
+        // console.log("Players state updated:", players);
       };
 
       handleClick.current = handleBlockClick; // handleClick에 이벤트 등록

@@ -59,7 +59,6 @@ export const OpenViduProvider = ({ children }) => {
     sessionRef.current = newSession;
 
     newSession.on("streamCreated", function (event) {
-      console.log("연결했다는", event);
       newSession.subscribe(event.stream, "subscriber");
     });
 
@@ -67,13 +66,13 @@ export const OpenViduProvider = ({ children }) => {
       console.log("말하는중", event);
       setCurrentSpeakers((prevSpeakers) => [
         ...prevSpeakers,
-        event.connection.data.attendeeUUID,
+        event.connection.data,
       ]);
     });
 
     newSession.on("publisherStopSpeaking", (event) => {
       setCurrentSpeakers((prevSpeakers) =>
-        prevSpeakers.filter((id) => id !== event.connection.data.attendeeUUID),
+        prevSpeakers.filter((id) => id !== event.connection.data),
       );
     });
   }, []);

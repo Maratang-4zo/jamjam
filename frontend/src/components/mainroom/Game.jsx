@@ -174,6 +174,8 @@ function Game() {
   };
 
   useEffect(() => {
+    console.log("player 리코일입니다!!!!!!", players);
+    console.log("player의 bottom입니다!!!!", bottom);
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         setPlayers((prevPlayers) => {

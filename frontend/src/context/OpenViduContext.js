@@ -50,7 +50,7 @@ export const OpenViduProvider = ({ children }) => {
   }, [currentSpeakers, sessionId, subscribers]);
 
   const leaveSession = useCallback(() => {
-    if (!sessionRef.current || !joined.current) return; // 가드 추가
+    if (!sessionRef.current || !joined.current) return;
 
     console.log("Leaving session");
     subscribers.forEach((subscriber) => {
@@ -59,7 +59,11 @@ export const OpenViduProvider = ({ children }) => {
     if (publisherRef.current) {
       sessionRef.current.unpublish(publisherRef.current);
     }
-    sessionRef.current.disconnect();
+
+    // disconnect 호출을 조건부로 변경
+    if (sessionRef.current.connection) {
+      sessionRef.current.disconnect();
+    }
 
     setSubscribers([]);
     publisherRef.current = null;
@@ -76,14 +80,18 @@ export const OpenViduProvider = ({ children }) => {
 
       newSession.on("sessionDisconnected", (event) => {
         console.log("Session disconnected:", event);
-        leaveSession();
+        // leaveSession 호출 제거
+        setSubscribers([]);
+        publisherRef.current = null;
+        joined.current = false;
+        setSessionId(null);
       });
 
       ovRef.current = newOv;
       sessionRef.current = newSession;
       resolve();
     });
-  }, [leaveSession]);
+  }, []);
 
   const createSession = useCallback(async () => {
     try {
@@ -218,10 +226,21 @@ export const OpenViduProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (publisherRef.current) {
-      setIsMicOn(publisherRef.current.stream.audioActive);
-    }
-  }, [publisherRef.current]);
+    const handleBeforeUnload = () => {
+      if (joined.current) {
+        leaveSession();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      if (joined.current) {
+        leaveSession();
+      }
+    };
+  }, [leaveSession]);
 
   const contextValue = useMemo(
     () => ({

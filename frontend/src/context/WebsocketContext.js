@@ -99,23 +99,6 @@ export const WebSocketProvider = ({ children }) => {
   const setIsNextMiddleExist = useSetRecoilState(isNextMiddleExistAtom);
   const { leaveSession } = useOpenVidu();
 
-  //테스트용
-  useEffect(() => {
-    console.log("OpenVidu context state:", {
-      sessionRef: sessionRef.current,
-      ovRef: ovRef.current,
-      publisherRef: publisherRef.current,
-      joined: joined.current,
-      isMicOn,
-    });
-  }, [
-    sessionRef.current,
-    ovRef.current,
-    publisherRef.current,
-    joined.current,
-    isMicOn,
-  ]);
-
   const connect = (roomUUID) => {
     console.log("Attempting to connect with roomUUID:", roomUUID);
     return new Promise((resolve, reject) => {

@@ -28,7 +28,7 @@ public class CommonTokenProvider {
 
 	public String createToken(TokenType tokenType, Map<String, Object> claims, Date expireTime, String tokenSecret) {
 		return Jwts.builder()
-			.setClaims(claims)
+			.addClaims(claims)
 			.setSubject(tokenType.toString())
 			.setIssuedAt(new Date())
 			.setExpiration(expireTime)

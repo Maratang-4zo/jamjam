@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import YellowChatBubble from "../../assets/YellowChatBubble.svg";
 import SecondCardBg from "../../assets/2ndImg.png";
@@ -192,16 +192,15 @@ const Middle2 = styled.div`
 function GameBoxes() {
   const userInfo = useRecoilValue(userInfoAtom);
   const isHost = userInfo.isHost;
-
-  // const handleClick = () => {
-  //   if (isHost) {
-
-  //   }
-  // };
+  const [selected, setSelected] = useState(false); // 로컬 상태로 카드 선택 여부 관리
 
   return (
     <GamesContainer>
-      <GameCard1 disabled={!isHost}>
+      <GameCard1
+        selected={selected} // 선택 상태에 따라 border 스타일이 변경됨
+        disabled={!isHost}
+        onClick={() => setSelected(true)} // 클릭 시 카드가 선택된 상태로 변경
+      >
         <Middle className="middle" top="50%">
           <TextAboveBubble>
             마우스 클릭으로 가장 먼저 위로 올라가는 사람이 승리!

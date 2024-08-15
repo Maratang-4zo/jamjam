@@ -131,7 +131,11 @@ function GameChoice() {
   useEffect(() => {
     console.log(roomInfo);
     const initialPlayers = roomInfo.attendees
-      .filter((attendee) => attendee.attendeeStatus === "ENTERED")
+      .filter(
+        (attendee) =>
+          attendee.attendeeStatus === "ENTERED" ||
+          attendee.attendeeStatus === "CREATED",
+      )
       .map((attendee) => ({
         nickname: attendee.nickname,
         attendeeUUID: attendee.attendeeUUID,

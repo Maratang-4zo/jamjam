@@ -37,6 +37,7 @@ export const OpenViduProvider = ({ children }) => {
   const [currentSpeakers, setCurrentSpeakers] = useState([]);
   const [isMicOn, setIsMicOn] = useState(true);
   const [sessionId, setSessionId] = useState(null);
+  const [subscribers, setSubscribers] = useState([]);
 
   useEffect(() => {
     console.log("오픈비두 정보들:", {
@@ -62,9 +63,16 @@ export const OpenViduProvider = ({ children }) => {
     ovRef.current = newOv;
     sessionRef.current = newSession;
 
-    newSession.on("streamCreated", function (event) {
+    newSession.on("streamCreated", (event) => {
       console.log("신입받아라");
-      newSession.subscribe(event.stream, "subscriber");
+      const subscriber = newSession.subscribe(event.stream, "subscriber");
+      setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+    });
+
+    newSession.on("streamDestroyed", (event) => {
+      setSubscribers((prevSubscribers) =>
+        prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
+      );
     });
 
     newSession.on("publisherStartSpeaking", (event) => {
@@ -151,11 +159,6 @@ export const OpenViduProvider = ({ children }) => {
         await sessionRef.current.publish(newPublisher);
         console.log("Successfully published to session");
 
-        sessionRef.current.on("streamCreated", (event) => {
-          console.log("New stream created:", event.stream.streamId);
-          sessionRef.current.subscribe(event.stream, "subscriber");
-        });
-
         joined.current = true;
         console.log("Successfully joined session", sessionId);
       } catch (error) {
@@ -219,6 +222,7 @@ export const OpenViduProvider = ({ children }) => {
       isMicOn,
       sessionId,
       setSessionId,
+      subscribers,
     }),
     [
       currentSpeakers,
@@ -229,6 +233,7 @@ export const OpenViduProvider = ({ children }) => {
       createToken,
       toggleMic,
       sessionId,
+      subscribers,
     ],
   );
 

@@ -8,6 +8,10 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
 `;
+/* Rectangle 1844 */
+
+
+
 
 const Info = styled.div`
   display: flex;
@@ -16,17 +20,9 @@ const Info = styled.div`
   flex-direction: column;
   flex: 1;
   align-self: stretch;
-  border-right: 3px solid #000000;
+  //border-right: 3px solid #000000;
 `;
 
-const WinningRate = styled.div`
-  flex: 4;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
 
 function InfoBox() {
   return (
@@ -34,9 +30,7 @@ function InfoBox() {
       <Info>
         <ProfileBox />
       </Info>
-      <WinningRate>
-        <GameBox />
-      </WinningRate>
+
     </Container>
   );
 }

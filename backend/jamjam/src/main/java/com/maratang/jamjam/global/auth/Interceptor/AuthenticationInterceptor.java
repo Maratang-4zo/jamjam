@@ -40,7 +40,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		log.info("refreshToken나오나요? "+refreshToken);
 
 		accessToken = loginTokenManager.validateAndRefreshTokenIfNeeded(accessToken, refreshToken, request, response);
-
 		// 3. 토큰 타입
 		String email = loginTokenManager.getMemberEmail(accessToken);
 

@@ -72,7 +72,6 @@ public class LoginController {
 		String accessToken = tokens.get("access_token");
 		String refreshToken = tokens.get("refresh_token");
 
-
 		// 액세스 토큰을 이용해 로그인 처리
 		LoginRes loginRes = loginService.oauthLogin(accessToken, refreshToken);
 

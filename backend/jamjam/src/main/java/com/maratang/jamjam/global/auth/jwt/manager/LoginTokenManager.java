@@ -79,7 +79,7 @@ public class LoginTokenManager {
 			} else {
 				CookieUtils.removeCookie(request, response, "accessToken");
 				CookieUtils.removeCookie(request, response, "refreshToken");
-				throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
+				throw new AuthenticationException(ErrorCode.REFRESH_TOKEN_EXPIRED);
 			}
 		}
 		return accessToken;

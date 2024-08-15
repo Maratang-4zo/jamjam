@@ -49,6 +49,7 @@ public class CommonTokenProvider {
 			if(!claims.getSubject().equals(tokenType.name())) {
 				throw new AuthenticationException(ErrorCode.NOT_ACCESS_TOKEN);
 			}
+
 			return true;
 		} catch (ExpiredJwtException e) {
 			log.info("{} 만료", tokenType.name(), e);

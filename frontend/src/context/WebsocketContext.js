@@ -247,12 +247,6 @@ export const WebSocketProvider = ({ children }) => {
     }
   };
 
-  setRoomInfo((prevRoomInfo) => ({
-    ...prevRoomInfo,
-    attendees: [...prevRoomInfo.attendees, newAttendee],
-    hostUUID: root ? attendeeUUID : prevRoomInfo.hostUUID,
-  }));
-
   const handleGamePlay = (message) => {
     setWinnerUUID(message.winnerUUID);
 

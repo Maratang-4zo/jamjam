@@ -189,23 +189,19 @@ const Middle2 = styled.div`
   font-family: "NewGalmuriBold", sans-serif;
 `;
 
-function GameBoxes({ selectedGame, setSelectedGame }) {
+function GameBoxes() {
   const userInfo = useRecoilValue(userInfoAtom);
   const isHost = userInfo.isHost;
 
-  const handleClick = (gameId) => {
-    if (isHost && setSelectedGame) {
-      setSelectedGame(gameId);
-    }
-  };
+  // const handleClick = () => {
+  //   if (isHost) {
+
+  //   }
+  // };
 
   return (
     <GamesContainer>
-      <GameCard1
-        selected={selectedGame === 1}
-        onClick={() => handleClick(1)}
-        disabled={!isHost}
-      >
+      <GameCard1 disabled={!isHost}>
         <Middle className="middle" top="50%">
           <TextAboveBubble>
             마우스 클릭으로 가장 먼저 위로 올라가는 사람이 승리!

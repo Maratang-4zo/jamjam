@@ -158,10 +158,7 @@ function GameChoice() {
     <>
       <ContentContainer>
         <Header>Choose The Game</Header>
-        <GameBoxes
-        // selectedGame={selectedGame}
-        // setSelectedGame={userInfo.isHost ? setSelectedGame : null}
-        ></GameBoxes>
+        <GameBoxes></GameBoxes>
         <PlayButton disabled={!userInfo.isHost} onClick={handlePlayButtonClick}>
           <PlayButtonText>PLAY</PlayButtonText>
         </PlayButton>

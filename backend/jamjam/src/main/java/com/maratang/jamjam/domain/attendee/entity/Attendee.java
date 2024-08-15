@@ -1,31 +1,19 @@
 package com.maratang.jamjam.domain.attendee.entity;
 
-import java.util.Random;
-import java.util.UUID;
-
 import com.maratang.jamjam.domain.attendee.dto.request.AttendeeUpdateReq;
-import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.gamePlay.entity.MemberRoundRecord;
+import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.global.auditing.BaseTimeEntity;
 import com.maratang.jamjam.global.auth.room.constant.ProfileType;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Random;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -50,6 +38,7 @@ public class Attendee extends BaseTimeEntity {
 	@Column(nullable = false, unique = true, updatable = false)
 	private UUID attendeeUUID;
 
+	@Column(name = "attendee_status")
 	@Enumerated(EnumType.STRING)
 	private AttendeeStatus attendeeStatus;
 

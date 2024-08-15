@@ -3,7 +3,9 @@ package com.maratang.jamjam.global.util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CookieUtils {
 
 	private CookieUtils(){}
@@ -27,6 +29,7 @@ public class CookieUtils {
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals(cookieName)) {
+					log.info("여길 들어왔을까"+cookieName);
 					cookie.setMaxAge(0);
 					response.addCookie(cookie);
 					return;

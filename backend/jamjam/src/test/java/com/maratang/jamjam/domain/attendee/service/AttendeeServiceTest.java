@@ -22,7 +22,7 @@ import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
-import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
+import com.maratang.jamjam.global.auth.room.RoomTokenManager;
 import com.maratang.jamjam.global.auth.room.constant.ProfileType;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 
@@ -34,15 +34,15 @@ class AttendeeServiceTest extends IntegrationTestConfig {
 	private final RoomRepository roomRepository;
 	private final AttendeeRepository attendeeRepository;
 	private final AttendeeService attendeeService;
-	private final RoomTokenProvider roomTokenProvider;
+	private final RoomTokenManager roomTokenManager;
 
 	@Autowired
 	public AttendeeServiceTest(RoomRepository roomRepository, AttendeeRepository attendeeRepository,
-		AttendeeService attendeeService, RoomTokenProvider roomTokenProvider) {
+		AttendeeService attendeeService, RoomTokenManager roomTokenManager) {
 		this.roomRepository = roomRepository;
 		this.attendeeRepository = attendeeRepository;
 		this.attendeeService = attendeeService;
-		this.roomTokenProvider = roomTokenProvider;
+		this.roomTokenManager = roomTokenManager;
 	}
 
 	private Room room;
@@ -132,9 +132,9 @@ class AttendeeServiceTest extends IntegrationTestConfig {
 				.attendeeUUID(attendee.getAttendeeUUID())
 				.build();
 
-			String roomToken = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims).getRoomToken();
+			String roomToken = roomTokenManager.createRoomJwtToken(roomJwtTokenClaims).getRoomToken();
 
-			Claims claims = roomTokenProvider.getTokenClaims(roomToken);
+			Claims claims = roomTokenManager.getTokenClaims(roomToken);
 
 			//when
 			attendeeService.updateAttendee(

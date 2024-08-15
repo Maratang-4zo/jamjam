@@ -7,7 +7,7 @@ import com.maratang.jamjam.domain.login.dto.response.LoginRes;
 import com.maratang.jamjam.domain.member.entity.Member;
 import com.maratang.jamjam.domain.member.service.MemberService;
 import com.maratang.jamjam.global.auth.jwt.dto.JwtTokenDto;
-import com.maratang.jamjam.global.auth.jwt.manager.TokenManager;
+import com.maratang.jamjam.global.auth.jwt.manager.LoginTokenManager;
 import com.maratang.jamjam.global.auth.oauth.kakao.service.SocialLoginApiServiceFactory;
 import com.maratang.jamjam.global.auth.oauth.model.OAuthAttributes;
 import com.maratang.jamjam.global.auth.oauth.service.SocialLoginApiService;
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginService {
 
 	private final MemberService memberService;
-	private final TokenManager tokenManager;
+	private final LoginTokenManager loginTokenManager;
 
 	public LoginRes oauthLogin(String accessToken, String refreshToken) {
 
@@ -40,12 +40,12 @@ public class LoginService {
 		if (optionalMember == null) { // 신규 회원가입
 			Member oauthMember = userInfo.toMemberEntity();
 			oauthMember = memberService.registerMember(oauthMember);
-			jwtTokenDto = tokenManager.createJwtToken(oauthMember.getEmail(), oauthMember.getNickname());
+			jwtTokenDto = loginTokenManager.createJwtToken(oauthMember.getEmail(), oauthMember.getNickname());
 			oauthMember.updateRefreshToken(jwtTokenDto);
 			oauthMember.updateTokens(accessToken, refreshToken);
 			log.info("신규회원: "+oauthMember.getNickname() + " " + oauthMember.getEmail());
 		} else {// 기존 회원일 경우
-			jwtTokenDto = tokenManager.createJwtToken(optionalMember.getEmail(), optionalMember.getNickname());
+			jwtTokenDto = loginTokenManager.createJwtToken(optionalMember.getEmail(), optionalMember.getNickname());
 			optionalMember.updateRefreshToken(jwtTokenDto);
 			optionalMember.updateTokens(accessToken, refreshToken);
 			log.info("기존회원: " + optionalMember.getNickname() + " " + optionalMember.getEmail());

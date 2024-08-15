@@ -126,7 +126,7 @@ public class LoginController {
 				log.info("scope:"+responseBody.get("scope"));
 				return tokens;
 			} else {
-				log.info("여기 에러임"+response.getStatusCode().toString());
+				log.info("여기 에러임"+response.getStatusCode());
 				throw new AuthenticationException(ErrorCode.ACCESS_TOKEN_NOT_FOUND_SEND_ERROR);
 			}
 		} catch (Exception e) {

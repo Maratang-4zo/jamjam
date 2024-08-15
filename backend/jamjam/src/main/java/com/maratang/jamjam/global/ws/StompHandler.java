@@ -11,7 +11,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 
 import com.maratang.jamjam.domain.room.service.RoomService;
-import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
+import com.maratang.jamjam.global.auth.room.RoomTokenManager;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class StompHandler implements ChannelInterceptor {
 
 	@Lazy private final RoomService roomService;
-	private final RoomTokenProvider roomTokenProvider;
+	private final RoomTokenManager roomTokenManager;
 
 	@Override
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -44,7 +44,7 @@ public class StompHandler implements ChannelInterceptor {
 	void handleConnectCommand(StompHeaderAccessor accessor){
 		// 연결시 토큰 검증
 		String token = accessor.getSessionAttributes().get("roomToken").toString();
-		RoomJwtTokenClaims claims = roomTokenProvider.getUUIDs(token);
+		RoomJwtTokenClaims claims = roomTokenManager.getUUIDs(token);
 
 		Map<String ,Object> attributes =  accessor.getSessionAttributes();
 		attributes.put("roomUUID", claims.getRoomUUID());

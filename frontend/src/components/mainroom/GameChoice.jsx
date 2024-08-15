@@ -129,6 +129,7 @@ function GameChoice() {
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
 
   useEffect(() => {
+    console.log(roomInfo);
     const initialPlayers = roomInfo.attendees
       .filter((attendee) => attendee.attendeeStatus === "ENTERED")
       .map((attendee) => ({

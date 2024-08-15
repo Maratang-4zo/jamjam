@@ -609,6 +609,7 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const sendGame = ({ newBottom }) => {
+    console.log("Sending game data:", newBottom);
     if (client.current) {
       client.current.publish({
         destination: `/pub/game/updatePosition`,

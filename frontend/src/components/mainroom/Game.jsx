@@ -169,7 +169,7 @@ function Game() {
   };
 
   useEffect(() => {
-    console.log("player 리코일입니다!!!!!!", players);
+    console.log("handleBlockClick called");
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         console.log("클릭하기전", players);
@@ -177,6 +177,9 @@ function Game() {
           const updatedPlayers = prevPlayers.map((player) => {
             if (player.attendeeUUID === attendeeUUID) {
               const newBottom = player.bottom + 10;
+              console.log(
+                `Updating bottom for ${player.nickname}: ${player.bottom} -> ${newBottom}`,
+              );
               if (newBottom >= 480) {
                 handleWin();
               }
@@ -185,14 +188,18 @@ function Game() {
             }
             return player;
           });
+          console.log("Updated players:", updatedPlayers);
           return updatedPlayers;
         });
-        console.log("클릭한후", players);
       };
 
       handleClick.current = handleBlockClick; // handleClick에 이벤트 등록
     }
   }, [countdown, win, winner, attendeeUUID, sendGame, players]);
+
+  useEffect(() => {
+    console.log("Current attendeeUUID:", attendeeUUID);
+  }, [attendeeUUID]);
 
   return (
     <Wrapper>

@@ -38,6 +38,7 @@ const GameScreen = styled.div`
   justify-content: center;
   color: black;
   font-size: 40px;
+  background-image: url(${gameBg});
 `;
 
 const ContentWrapper = styled.div`
@@ -71,9 +72,9 @@ const StyledButton = styled.button`
   display: ${(props) => (props.show ? "flex" : "none")};
 `;
 
-const Container = styled.div`
-  background-image: url(${gameBg});
-`;
+// const Container = styled.div`
+//   background-image: url(${gameBg});
+// `;
 
 const BlockContainer = styled.div`
   display: flex;
@@ -198,28 +199,26 @@ function Game() {
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
         <GameScreen onClick={() => handleBlockClick.current()}>
-          <Container>
-            {countdown === 99 ? <Countdown>READY</Countdown> : null}
-            {countdown > 0 && countdown < 99 ? (
-              <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>
-            ) : null}
-            {countdown === 0 ? (
-              <>
-                <BlockContainer>
-                  {players.map((player) => (
-                    <Block
-                      key={player.attendeeUUID}
-                      bottom={player.bottom}
-                      profileImageUrl={player.profileImageUrl}
-                    />
-                  ))}
-                </BlockContainer>
-                <WinMessage show={gameState === "end"}>
-                  {winner && `${winner} WIN!!!`}
-                </WinMessage>
-              </>
-            ) : null}
-          </Container>
+          {countdown === 99 ? <Countdown>READY</Countdown> : null}
+          {countdown > 0 && countdown < 99 ? (
+            <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>
+          ) : null}
+          {countdown === 0 ? (
+            <>
+              <BlockContainer>
+                {players.map((player) => (
+                  <Block
+                    key={player.attendeeUUID}
+                    bottom={player.bottom}
+                    profileImageUrl={player.profileImageUrl}
+                  />
+                ))}
+              </BlockContainer>
+              <WinMessage show={gameState === "end"}>
+                {winner && `${winner} WIN!!!`}
+              </WinMessage>
+            </>
+          ) : null}
           <StyledButton
             disabled={!isWinner}
             show={showButton}

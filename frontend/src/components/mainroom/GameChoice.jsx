@@ -133,8 +133,7 @@ function GameChoice() {
     const initialPlayers = roomInfo.attendees
       .filter(
         (attendee) =>
-          attendee.attendeeStatus === "ENTERED" ||
-          attendee.attendeeStatus === "CREATED",
+          attendee.status === "ENTERED" || attendee.status === "CREATED",
       )
       .map((attendee) => ({
         nickname: attendee.nickname,

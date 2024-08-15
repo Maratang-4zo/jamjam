@@ -59,8 +59,6 @@ function Room() {
   const [estimatedClosedAt, setEstimatedClosedAt] = useRecoilState(
     estimatedForceCloseAtAtom,
   );
-  const setRoomPage = useSetRecoilState(roomPageAtom);
-  const setSelectedGame = useSetRecoilState(selectedGameAtom);
 
   const { connect, connected } = useWebSocket();
   const { joinSession, joined } = useOpenVidu();
@@ -167,7 +165,12 @@ function Room() {
           }
 
           if (!joined) {
-            await joinSession();
+            try {
+              await joinSession();
+              console.log("OpenVidu session joined successfully");
+            } catch (error) {
+              console.error("Failed to join OpenVidu session:", error);
+            }
           }
         }
       } catch (error) {

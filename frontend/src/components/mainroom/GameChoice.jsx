@@ -2,16 +2,15 @@ import GameBoxes from "../gamechoice/GameBoxes";
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import wavebutton from "../../assets/wavebutton.svg";
 import { roomAtom } from "../../recoil/atoms/roomState";
 import {
   currentRoundAtom,
   gameSessionUUIDAtom,
   playerState,
+  roundCenterAtom,
   selectedGameAtom,
 } from "../../recoil/atoms/gameState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
-import useWs from "../../hooks/useWs";
 import { useWebSocket } from "../../context/WebsocketContext";
 
 const WavyAni = keyframes`
@@ -123,6 +122,7 @@ function GameChoice() {
   const [localSelectedGame, setLocalSelectedGame] = useState(null);
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
+  const roundCenter = useRecoilValue(roundCenterAtom);
   const setPlayerState = useSetRecoilState(playerState);
   const { sendRoundInfo } = useWebSocket();
   const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
@@ -147,6 +147,7 @@ function GameChoice() {
         round: currentRound,
         gameId: localSelectedGame,
         gameSessionUUID: gameSessionUUID,
+        stationName: roundCenter.name,
       });
     }
   };

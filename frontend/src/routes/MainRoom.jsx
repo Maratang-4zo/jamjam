@@ -164,7 +164,7 @@ function Room() {
             }
           }
 
-          if (!joined) {
+          if (!joined.current) {
             try {
               await joinSession();
               console.log("OpenVidu session joined successfully");

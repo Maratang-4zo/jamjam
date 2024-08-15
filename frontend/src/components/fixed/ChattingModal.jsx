@@ -201,10 +201,12 @@ function ChattingModal({ isVisible, toggleModal }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setChatContent(""); // 입력창 초기화
-    sendChat({
-      content: chatContent,
-    });
+    if (chatContent) {
+      setChatContent(""); // 입력창 초기화
+      sendChat({
+        content: chatContent,
+      });
+    }
   };
 
   const formatTime = (createdAt) => {

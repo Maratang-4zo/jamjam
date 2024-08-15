@@ -44,8 +44,9 @@ export const OpenViduProvider = ({ children }) => {
       currentSpeakers,
       sessionRef,
       sessionId,
+      subscribers,
     });
-  }, [currentSpeakers, sessionRef, sessionId]);
+  }, [sessionRef, sessionId, subscribers]);
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
@@ -64,9 +65,9 @@ export const OpenViduProvider = ({ children }) => {
     sessionRef.current = newSession;
 
     newSession.on("streamCreated", (event) => {
-      console.log("신입받아라");
       const subscriber = newSession.subscribe(event.stream, "subscriber");
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+      console.log("신입받아라", subscriber);
     });
 
     newSession.on("streamDestroyed", (event) => {
@@ -96,6 +97,7 @@ export const OpenViduProvider = ({ children }) => {
         APPLICATION_SERVER_URL + "api/wr/rooms",
       );
       const newSessionId = response.data.sessionId; // Assume the server returns the sessionId
+      console.log(response.data);
       setSessionId(newSessionId);
       return createToken(newSessionId);
     } catch (error) {

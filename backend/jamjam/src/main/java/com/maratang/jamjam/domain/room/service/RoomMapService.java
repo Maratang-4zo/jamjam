@@ -1,11 +1,5 @@
 package com.maratang.jamjam.domain.room.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
@@ -19,16 +13,23 @@ import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.map.middle.*;
-import com.maratang.jamjam.global.map.middle.client.OTPUserClient;
-import com.maratang.jamjam.global.map.middle.dto.OTPUserRes;
+import com.maratang.jamjam.global.map.middle.GeometryUtils;
+import com.maratang.jamjam.global.map.middle.GrahamScan;
+import com.maratang.jamjam.global.map.middle.HaversineDistance;
+import com.maratang.jamjam.global.map.middle.dto.GoogleDirectionsRes;
 import com.maratang.jamjam.global.map.station.Point;
 import com.maratang.jamjam.global.map.station.SubwayDataLoader;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,17 +43,18 @@ public class RoomMapService {
 	private final GeometryUtils geometryUtils;
 	private final SubwayDataLoader subwayDataLoader;
 	private final HaversineDistance haversineDistance;
-	private final OTPUserClient otpUserClient;
 	private final RoomRepository roomRepository;
 	private final BroadCastService broadCastService;
+	private final GoogleDirectionsService googleDirectionsService;
 
 	private void saveOptimalRoutesForUsersInRoom(Room room, SubwayInfo selectedStation) {
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
 		List<AttendeeDTO> attendeeList = AttendeeDTO.of(attendees);
 
 		List<AttendeeDTO> attendeesEntered = attendeeList.stream()
-			.filter(attendee -> attendee.getStatus() == AttendeeStatus.ENTERED)
-			.toList();
+				.filter(attendee -> attendee.getStatus() == AttendeeStatus.ENTERED || attendee.getStatus() == AttendeeStatus.CREATED)
+				.toList();
+
 
 		attendeesEntered.forEach(attendee -> processAttendeeRoute(attendee, selectedStation));
 
@@ -64,28 +66,34 @@ public class RoomMapService {
 		String fromPlace = attendee.getLat() + "," + attendee.getLon();
 		String toPlace = selectedStation.getLatitude() + "," + selectedStation.getLongitude();
 
-		OTPUserRes otpUserRes = otpUserClient.getFixedOTPUser(fromPlace, toPlace);
+		// Google Directions API를 호출하여 결과를 받습니다.
+		GoogleDirectionsRes googleDirectionsRes = googleDirectionsService.getFixedDirections(fromPlace, toPlace);
 
-		if (otpUserRes != null && otpUserRes.getPlan() != null) {
+		System.out.println(googleDirectionsRes.toString());
+
+		if (!googleDirectionsRes.getRoutes().isEmpty()) {
 			long totalDuration = 0;
-			List<double[]> combinedPoints = new ArrayList<>();
 
-			for (OTPUserRes.Plan.Itinerary itinerary : otpUserRes.getPlan().getItineraries()) {
-				totalDuration += itinerary.getDuration();
-				combinedPoints.addAll(itinerary.getLegs().stream()
-					.flatMap(leg -> PolylineUtils.decode(leg.getLegGeometry().getPoints()).stream())
-					.toList());
+			// 첫 번째 경로(Route)만 사용
+			GoogleDirectionsRes.Route route = googleDirectionsRes.getRoutes().getFirst();
+
+			// overview_polyline의 points 값을 가져옵니다.
+			String polylinePoints = route.getOverviewPolyline().getPoints();
+
+			// 각 경로의 legs를 순회하며 총 소요 시간 및 총 이동 거리 계산
+			for (GoogleDirectionsRes.Leg leg : route.getLegs()) {
+				totalDuration += leg.getDuration().getValue(); // 소요 시간(초 단위) 누적
 			}
 
-			String combinedPolyline = PolylineUtils.encode(combinedPoints);
-
+			// Attendee 정보를 갱신합니다.
 			Attendee attendeeEntity = attendeeRepository.findByAttendeeUUID(attendee.getAttendeeUUID())
-				.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
+					.orElseThrow(() -> new BusinessException(ErrorCode.ATTENDEE_NOT_FOUND));
 
-			attendeeEntity.updateRoute(combinedPolyline);
 			attendeeEntity.updateDuration(totalDuration);
+			attendeeEntity.updateRoute(polylinePoints);
 		}
 	}
+
 
 	public List<SubwayInfo> getAroundStation(UUID roomUUID) {
 		Room room = findRoomByUUID(roomUUID);

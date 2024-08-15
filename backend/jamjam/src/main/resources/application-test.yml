@@ -57,3 +57,9 @@ otp:
   user:
     client:
       url: ${OTP_USER_CLIENT_URL}
+
+google:
+  directions:
+    api:
+      url: ${GOOGLE_DIRECTIONS_API_URL}
+      key: ${GOOGLE_DIRECTIONS_API_KEY}

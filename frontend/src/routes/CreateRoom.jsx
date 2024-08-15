@@ -9,10 +9,11 @@ import { axiosCreateRoom } from "../apis/roomApi";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { getCookie } from "../utils/Cookies";
-import useOpenVidu from "../hooks/useOpenVidu";
+// import useOpenVidu from "../hooks/useOpenVidu";
 import { useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
+import { useOpenVidu } from "../context/OpenViduContext";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};

@@ -14,7 +14,7 @@ import {
   currentSpeakersAtom,
   roomAtom,
 } from "../../recoil/atoms/roomState";
-import useOpenVidu from "../../hooks/useOpenVidu";
+// import useOpenVidu from "../../hooks/useOpenVidu";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import UserInfoModal from "./userInfoModal";
 import { userColor } from "../../utils/userColor";
@@ -22,6 +22,7 @@ import ColorThief from "colorthief";
 import Spinner from "./Spinner";
 import useWs from "../../hooks/useWs";
 import { useWebSocket } from "../../context/WebsocketContext";
+import { useOpenVidu } from "../../context/OpenViduContext";
 
 const bounceAnimation = keyframes`
   0%, 100% {
@@ -116,14 +117,12 @@ function NavBarLeft() {
   const resetUserInfo = useResetRecoilState(userInfoAtom);
   const resetRoomInfo = useResetRecoilState(roomAtom);
   const currentSpeakers = useRecoilValue(currentSpeakersAtom);
-  const { toggleMic, leaveSession } = useOpenVidu();
+  const { toggleMic, leaveSession, isMicOn } = useOpenVidu();
   const navigate = useNavigate();
-  const isMicOn = useRecoilValue(isMicOnAtom);
+  // const isMicOn = useRecoilValue(isMicOnAtom);
   const prevChatLogsLength = useRef(chatLogs.length);
   const { disconnect } = useWebSocket();
-  //
 
-  //
   useEffect(() => {
     const loadImages = async () => {
       const loadImage = (src) =>

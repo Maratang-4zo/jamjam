@@ -81,10 +81,12 @@ export const useLeave = () => {
   const resetIsHostOut = useResetRecoilState(isHostOutAtom);
   const resetIsPlayingGame = useResetRecoilState(isPlayingGameAtom);
   const leaveFn = () => {
-    navigate("/");
     disconnect();
     leaveSession();
     resetRoomInfo();
+
+    console.log("리셋");
+
     resetChat();
     resetChatModal();
     resetIsNextMiddleExist();

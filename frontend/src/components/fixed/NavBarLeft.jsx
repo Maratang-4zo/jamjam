@@ -152,6 +152,7 @@ function NavBarLeft() {
     const confirmLeave = window.confirm("정말 나가시겠습니까?");
     if (confirmLeave) {
       leaveFn();
+      navigate("/");
     }
   };
 

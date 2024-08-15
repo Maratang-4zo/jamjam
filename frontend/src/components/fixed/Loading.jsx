@@ -31,6 +31,7 @@ const Wrapper = styled.div`
 
 function Loading({ message, estimatedForceCloseAt }) {
   const { leaveFn } = useLeave();
+  const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
@@ -49,6 +50,7 @@ function Loading({ message, estimatedForceCloseAt }) {
         setTimeLeft("방이 종료되었습니다.");
       } else {
         leaveFn();
+        navigate("/");
         alert("방이 종료되었습니다");
       }
     };

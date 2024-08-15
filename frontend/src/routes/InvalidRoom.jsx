@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import character from "../assets/character.png";
@@ -74,12 +74,6 @@ function InvalidRoom() {
   useEffect(() => {
     leaveFn();
   }, []);
-
-  const navigate = useNavigate();
-
-  const goToHome = () => {
-    navigate("/");
-  };
 
   return (
     <Wrapper>

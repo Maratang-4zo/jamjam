@@ -275,7 +275,7 @@ function Room() {
       ) : null}
       <NavBarLeft />
       {joinLoading ? <Loading message={"접속"} /> : null}
-      {isFindDepartureModalOpen && (
+      {!isHostOut && isFindDepartureModalOpen && (
         <FindDeparture
           onClose={handleCloseFindDepartureModal}
           onAddressSelect={handleAddressSelect}

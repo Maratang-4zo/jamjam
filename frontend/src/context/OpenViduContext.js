@@ -8,6 +8,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
+import { getCookie, setCookie } from "../utils/Cookies";
 
 const OpenViduContext = React.createContext({
   sessionRef: null,
@@ -23,7 +24,6 @@ const OpenViduContext = React.createContext({
   isMicOn: true,
   sessionId: null,
   setSessionId: () => {},
-  error: null,
 });
 
 export const useOpenVidu = () => useContext(OpenViduContext);
@@ -38,58 +38,66 @@ export const OpenViduProvider = ({ children }) => {
   const [isMicOn, setIsMicOn] = useState(true);
   const [sessionId, setSessionId] = useState(null);
   const [subscribers, setSubscribers] = useState([]);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     console.log("오픈비두 정보들:", {
       currentSpeakers,
-      sessionRef: sessionRef.current,
+      sessionRef,
       sessionId,
       subscribers,
     });
-  }, [currentSpeakers, sessionId, subscribers]);
+  }, [sessionRef, sessionId, subscribers]);
 
   const leaveSession = useCallback(() => {
-    if (!sessionRef.current || !joined.current) return;
-
-    console.log("Leaving session");
-    subscribers.forEach((subscriber) => {
-      sessionRef.current.unsubscribe(subscriber);
-    });
-    if (publisherRef.current) {
-      sessionRef.current.unpublish(publisherRef.current);
-    }
-
-    // disconnect 호출을 조건부로 변경
-    if (sessionRef.current.connection) {
+    if (sessionRef.current) {
       sessionRef.current.disconnect();
     }
-
-    setSubscribers([]);
-    publisherRef.current = null;
     joined.current = false;
-    setSessionId(null);
-  }, [subscribers]);
+  }, []);
 
   const initSession = useCallback(() => {
-    if (sessionRef.current) return Promise.resolve();
+    if (sessionRef.current) return;
 
-    return new Promise((resolve) => {
-      const newOv = new OpenVidu();
-      const newSession = newOv.initSession();
+    const newOv = new OpenVidu({
+      audioSource: true,
+      videoSource: false,
+    });
+    const newSession = newOv.initSession();
 
-      newSession.on("sessionDisconnected", (event) => {
-        console.log("Session disconnected:", event);
-        // leaveSession 호출 제거
-        setSubscribers([]);
-        publisherRef.current = null;
-        joined.current = false;
-        setSessionId(null);
+    ovRef.current = newOv;
+    sessionRef.current = newSession;
+
+    newSession.on("streamCreated", (event) => {
+      const subscriber = newSession.subscribe(event.stream, "subscriber", {
+        insertMode: "APPEND",
+        audioSource: undefined, // 오디오만 사용한다면
+        videoSource: false, // 비디오를 사용하지 않는다면
       });
+      subscriber.on("streamPlaying (신입받아라)", () => {
+        console.log("Stream is playing");
+        console.log("Subscriber:", subscriber);
+      });
+      setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+    });
 
-      ovRef.current = newOv;
-      sessionRef.current = newSession;
-      resolve();
+    newSession.on("streamDestroyed", (event) => {
+      setSubscribers((prevSubscribers) =>
+        prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
+      );
+    });
+
+    newSession.on("publisherStartSpeaking", (event) => {
+      console.log("말하는중", event);
+      setCurrentSpeakers((prevSpeakers) => [
+        ...prevSpeakers,
+        event.connection.data,
+      ]);
+    });
+
+    newSession.on("publisherStopSpeaking", (event) => {
+      setCurrentSpeakers((prevSpeakers) =>
+        prevSpeakers.filter((id) => id !== event.connection.data),
+      );
     });
   }, []);
 
@@ -98,85 +106,61 @@ export const OpenViduProvider = ({ children }) => {
       const response = await axios.post(
         APPLICATION_SERVER_URL + "api/wr/rooms",
       );
-      const newSessionId = response.data.sessionId;
-      if (!newSessionId) {
-        throw new Error("Server did not return a sessionId");
-      }
-      console.log("Server response:", response.data);
+      const newSessionId = response.data.sessionId; // Assume the server returns the sessionId
+      console.log(response.data);
       setSessionId(newSessionId);
-      return newSessionId;
+      return createToken(newSessionId);
     } catch (error) {
       console.error("Error creating session:", error);
-      setError("Failed to create session");
       throw error;
     }
   }, []);
 
-  const createToken = useCallback(async (sessionId) => {
-    if (!sessionId) {
-      throw new Error("No sessionId provided");
-    }
-    try {
-      const response = await axios.post(
-        APPLICATION_SERVER_URL + "api/wr/rooms/token",
-        { sessionId },
-      );
-      const token = response.data.token;
-      if (!token) {
-        throw new Error("Server did not return a token");
-      }
-      return token;
-    } catch (error) {
-      console.error("Error creating token:", error);
-      setError("Failed to create token");
-      throw error;
-    }
+  const createToken = useCallback((sessionId) => {
+    return new Promise((resolve, reject) => {
+      axios
+        .post(APPLICATION_SERVER_URL + "api/wr/rooms/token", { sessionId })
+        .then((res) => {
+          const token = res.data.token;
+          setCookie("OpenviduToken", token);
+          setCookie("OpenviduSessionId", sessionId);
+          resolve(token);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
   }, []);
 
   const joinSession = useCallback(
     async (givenSessionId = null) => {
+      initSession();
+
+      let token = getCookie("OpenviduToken");
+      let storedSessionId = getCookie("OpenviduSessionId");
+
+      if (givenSessionId) {
+        setSessionId(givenSessionId);
+      } else if (storedSessionId) {
+        setSessionId(storedSessionId);
+      }
+
+      if (!token || (givenSessionId && givenSessionId !== storedSessionId)) {
+        try {
+          token = await createToken(givenSessionId || storedSessionId);
+        } catch (error) {
+          console.error("Failed to create token:", error);
+          return;
+        }
+      }
+
       try {
-        await initSession();
-
-        const finalSessionId = givenSessionId || (await createSession());
-        setSessionId(finalSessionId);
-
-        const token = await createToken(finalSessionId);
-
         await sessionRef.current.connect(token);
-
         sessionRef.current.on("streamCreated", (event) => {
-          const subscriber = sessionRef.current.subscribe(
-            event.stream,
-            undefined,
-          );
-          setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+          console.log("New stream created:", event.stream);
         });
-
-        sessionRef.current.on("streamDestroyed", (event) => {
-          setSubscribers((prevSubscribers) =>
-            prevSubscribers.filter(
-              (sub) => sub.stream.streamId !== event.stream.streamId,
-            ),
-          );
-        });
-
-        sessionRef.current.on("publisherStartSpeaking", (event) => {
-          console.log("말하는중", event);
-          setCurrentSpeakers((prevSpeakers) => [
-            ...prevSpeakers,
-            event.connection.data,
-          ]);
-        });
-
-        sessionRef.current.on("publisherStopSpeaking", (event) => {
-          setCurrentSpeakers((prevSpeakers) =>
-            prevSpeakers.filter((id) => id !== event.connection.data),
-          );
-        });
-
         const newPublisher = ovRef.current.initPublisher("publisher", {
-          audioSource: undefined, // Use default audio input
+          audioSource: undefined,
           videoSource: false,
           publishAudio: true,
           publishVideo: false,
@@ -191,31 +175,34 @@ export const OpenViduProvider = ({ children }) => {
         console.log("Successfully published to session");
 
         joined.current = true;
-        console.log("Successfully joined session", finalSessionId);
+        console.log("Successfully joined session", sessionId);
       } catch (error) {
         console.error(
           "Error connecting to the session:",
           error.code,
           error.message,
         );
-        setError(`Failed to join session: ${error.message}`);
       }
     },
-    [createSession, createToken, initSession],
+    [createToken, initSession],
   );
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      leaveSession();
+      if (sessionRef.current) {
+        sessionRef.current.disconnect();
+      }
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      leaveSession();
+      if (sessionRef.current) {
+        sessionRef.current.disconnect();
+      }
     };
-  }, [leaveSession]);
+  }, []);
 
   const toggleMic = useCallback(() => {
     if (publisherRef.current) {
@@ -226,21 +213,14 @@ export const OpenViduProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (joined.current) {
-        leaveSession();
-      }
-    };
+    console.log("Mic state changed:", isMicOn);
+  }, [isMicOn]);
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      if (joined.current) {
-        leaveSession();
-      }
-    };
-  }, [leaveSession]);
+  useEffect(() => {
+    if (publisherRef.current) {
+      setIsMicOn(publisherRef.current.stream.audioActive);
+    }
+  }, [publisherRef.current]);
 
   const contextValue = useMemo(
     () => ({
@@ -258,7 +238,6 @@ export const OpenViduProvider = ({ children }) => {
       sessionId,
       setSessionId,
       subscribers,
-      error,
     }),
     [
       currentSpeakers,
@@ -270,7 +249,6 @@ export const OpenViduProvider = ({ children }) => {
       toggleMic,
       sessionId,
       subscribers,
-      error,
     ],
   );
 

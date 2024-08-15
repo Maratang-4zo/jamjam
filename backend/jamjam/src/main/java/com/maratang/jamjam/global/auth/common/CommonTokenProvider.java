@@ -43,6 +43,7 @@ public class CommonTokenProvider {
 				.setSigningKey(tokenSecret.getBytes(StandardCharsets.UTF_8))
 				.parseClaimsJws(token).getBody();
 
+			log.info("여기 왜 안나와"+claims.getSubject().toString());
 			log.info(claims.toString());
 
 			if(!claims.getSubject().equals(tokenType.name())) {

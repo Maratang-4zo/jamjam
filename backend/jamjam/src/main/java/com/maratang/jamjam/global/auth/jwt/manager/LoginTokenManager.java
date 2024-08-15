@@ -50,7 +50,7 @@ public class LoginTokenManager {
 		claims.put("nickname", nickname);
 
 		String accessToken = tokenProvider.createToken(TokenType.ACCESS, claims, accessTokenExpireTime, tokenSecret);
-		String refreshToken =tokenProvider. createToken(TokenType.REFRESH, claims, refreshTokenExpireTime, tokenSecret);
+		String refreshToken = tokenProvider.createToken(TokenType.REFRESH, claims, refreshTokenExpireTime, tokenSecret);
 
 		log.info(accessToken);
 		log.info(refreshToken);

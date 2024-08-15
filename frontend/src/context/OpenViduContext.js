@@ -70,6 +70,7 @@ export const OpenViduProvider = ({ children }) => {
     newSession.on("streamCreated", (event) => {
       const subscriber = newSession.subscribe(event.stream, undefined);
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+      subscriber.stream.play();
       console.log("Subscriber added:", subscriber);
       console.log(
         "isSubscribeToRemote:",
@@ -153,9 +154,7 @@ export const OpenViduProvider = ({ children }) => {
 
       try {
         await sessionRef.current.connect(token);
-        sessionRef.current.on("streamCreated", (event) => {
-          console.log("New stream created:", event.stream);
-        });
+
         const newPublisher = ovRef.current.initPublisher("publisher", {
           audioSource: undefined,
           videoSource: false,

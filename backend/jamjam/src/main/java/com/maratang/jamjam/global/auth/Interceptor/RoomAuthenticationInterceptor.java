@@ -23,7 +23,7 @@ public class RoomAuthenticationInterceptor implements HandlerInterceptor {
 	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
 		authenticateUser(request, response);
 
-		if(!request.getRequestURI().endsWith("/join") && !request.getRequestURI().endsWith("/rooms")){
+		if(!request.getRequestURI().endsWith("/join") && !request.getRequestURI().equals("/api/rooms")){
 			authenticateRoom(request);
 		}
 		return true;

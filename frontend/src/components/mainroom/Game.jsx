@@ -1,20 +1,20 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import Game1 from "../games/Game1";
-import Game2 from "../games/Game2";
-import Game3 from "../games/Game3";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { aroundStationsAtom, roomAtom } from "../../recoil/atoms/roomState";
 import {
-  aroundStationsAtom,
-  roomAtom,
-  roomPageAtom,
-} from "../../recoil/atoms/roomState";
+  gameCountAtom,
+  gameStateAtom,
+  isWinnerAtom,
+  playerState,
+  winnerNicknameAtom,
+} from "../../recoil/atoms/gameState";
 import { axiosGetAroundStores, axiosGetThreeStations } from "../../apis/mapApi";
-import gameBg from "../../assets/game/gameBg.jpg";
 import Loading from "../fixed/Loading";
-import { isWinnerAtom } from "../../recoil/atoms/gameState";
 import { isThreeStationLoadingAtom } from "../../recoil/atoms/loadingState";
+import { useWebSocket } from "../../context/WebsocketContext";
+import gameBg from "../../assets/game/gameBg.jpg";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.accentColor};
@@ -32,7 +32,7 @@ const GameScreen = styled.div`
   flex-shrink: 0;
   border-radius: 30px;
   background: #fff;
-  position: relative; // Position relative to contain the absolute positioning of Block and WinMessage
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,25 +65,81 @@ const StyledButton = styled.button`
   color: #000;
   cursor: pointer;
   position: absolute;
-  bottom: 20px; // 하단 중앙에 위치하도록 설정
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  display: ${(props) =>
-    props.show ? "flex" : "none"}; // show prop에 따라 표시 여부 결정
+  display: ${(props) => (props.show ? "flex" : "none")};
+`;
+
+const Container = styled.div`
+  background-image: url(${gameBg});
+`;
+
+const BlockContainer = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  height: 100%;
+`;
+
+const Block = styled.div`
+  width: 50px;
+  height: 50px;
+  transition: bottom 0.1s;
+  background-image: url(${(props) => props.profileImageUrl});
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: 0 10px;
+  position: relative;
+  border-radius: 50%;
+  border: 1px solid black;
+  bottom: ${(props) => `${props.bottom}px`}; // 추가된 부분
+`;
+
+const WinMessage = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  font-weight: bold;
+  color: #ff0000;
+  display: ${(props) => (props.show ? "block" : "none")};
+`;
+
+const Countdown = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 64px;
+  font-weight: bold;
+  color: #000;
 `;
 
 function Game() {
   const location = useLocation();
-  const { selectedGame } = location.state || {};
-  const handleClick = useRef(() => {});
+  const { selectedGame, roomUUID, attendeeUUID } = location.state || {};
+  const handleBlockClick = useRef(() => {});
   const [showButton, setShowButton] = useState(false);
   const roomInfo = useRecoilValue(roomAtom);
   const isWinner = useRecoilValue(isWinnerAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
+
   const [isLoading, setIsLoading] = useRecoilState(isThreeStationLoadingAtom);
+  const [bottom, setBottom] = useState(0);
+  const [win, setWin] = useRecoilState(isWinnerAtom);
+  const [countdown, setCountdown] = useRecoilState(gameCountAtom);
+  const [players, setPlayers] = useRecoilState(playerState);
+  const [winner, setWinner] = useRecoilState(winnerNicknameAtom);
+  const gameState = useRecoilValue(gameStateAtom);
+  const { sendGame } = useWebSocket();
 
   const handleWin = () => {
-    setShowButton(true); // 승리 시 버튼 표시
+    setWin(true);
+    setShowButton(true);
   };
 
   const handleNextPageBtn = async () => {
@@ -116,19 +172,54 @@ function Game() {
     }
   };
 
+  useEffect(() => {
+    if (countdown === 0 && !win && !winner) {
+      handleBlockClick.current = () => {
+        setPlayers((prevPlayers) => {
+          const updatedPlayers = prevPlayers.map((player) => {
+            if (player.attendeeUUID === attendeeUUID) {
+              const newBottom = player.bottom + 10;
+              if (newBottom >= 480) {
+                handleWin();
+              }
+              sendGame({ newBottom });
+              return { ...player, bottom: newBottom };
+            }
+            return player;
+          });
+          return updatedPlayers;
+        });
+      };
+    }
+  }, [countdown, win, winner, attendeeUUID, sendGame]);
+
   return (
     <Wrapper>
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
-        <GameScreen onClick={() => handleClick.current()}>
-          {selectedGame === 1 && (
-            <>
-              {console.log("Game1 렌더링됨")}
-              <Game1 handleClick={handleClick} onWin={handleWin} />
-            </>
-          )}
-          {selectedGame === 2 && <Game2 />}
-          {selectedGame === 3 && <Game3 />}
+        <GameScreen onClick={() => handleBlockClick.current()}>
+          <Container>
+            {countdown === 99 ? <Countdown>READY</Countdown> : null}
+            {countdown > 0 && countdown < 99 ? (
+              <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>
+            ) : null}
+            {countdown === 0 ? (
+              <>
+                <BlockContainer>
+                  {players.map((player) => (
+                    <Block
+                      key={player.attendeeUUID}
+                      bottom={player.bottom}
+                      profileImageUrl={player.profileImageUrl}
+                    />
+                  ))}
+                </BlockContainer>
+                <WinMessage show={gameState === "end"}>
+                  {winner && `${winner} WIN!!!`}
+                </WinMessage>
+              </>
+            ) : null}
+          </Container>
           <StyledButton
             disabled={!isWinner}
             show={showButton}

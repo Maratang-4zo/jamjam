@@ -25,6 +25,7 @@ import ThirdCutPng from "../assets/intro/comic/ThirdCut.png";
 
 import jamGame from "../assets/intro/jamGame.GIF";
 import jamSmile from "../assets/intro/jamSmile.PNG";
+import { useLeave } from "../hooks/useLeave";
 
 const slideInLeft = keyframes`
   from {
@@ -220,6 +221,12 @@ const ComicSection = styled.div`
 `;
 
 function NewHome() {
+  const { leaveFn } = useLeave();
+  // 모든 recoil 초기화
+  useEffect(() => {
+    leaveFn();
+  }, []);
+
   const setUserInfo = useSetRecoilState(userInfoAtom);
   const [animate, setAnimate] = useState({
     firstCut: false,

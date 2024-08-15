@@ -102,7 +102,7 @@ function Room() {
           );
 
           if (
-            myAttendeeInfo.status === "EXITED" ||
+            myAttendeeInfo.status === "EXITED" &&
             res.roomStatus === "PLAYING"
           ) {
             setIsPlayingGame(true);
@@ -112,7 +112,7 @@ function Room() {
             }));
           }
 
-          if (myAttendeeInfo.root === false || res.roomStatus === "RESERVED") {
+          if (myAttendeeInfo.root === false && res.roomStatus === "RESERVED") {
             setIsHostOut(true);
             setEstimatedClosedAt(roomData.estimatedForceCloseAt);
           }

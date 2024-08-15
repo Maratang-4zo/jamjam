@@ -93,6 +93,10 @@ const Block = styled.div`
   border-radius: 50%;
   border: 1px solid black;
   bottom: ${(props) => `${props.bottom}px`};
+  ${(props) => {
+    console.log(`Rendering Block with bottom: ${props.bottom}px`);
+    return `bottom: ${props.bottom}px;`;
+  }}
 `;
 
 const WinMessage = styled.div`
@@ -169,21 +173,20 @@ function Game() {
   };
 
   useEffect(() => {
-    console.log("handleBlockClick called");
+    console.log("player의 recoil", players);
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
-        console.log("클릭하기전", players);
+        console.log("handleBlockClick called");
+        console.log("Current attendeeUUID:", attendeeUUID);
         setPlayers((prevPlayers) => {
           const updatedPlayers = prevPlayers.map((player) => {
+            console.log("Checking player:", player.attendeeUUID);
             if (player.attendeeUUID === attendeeUUID) {
               const newBottom = player.bottom + 10;
               console.log(
                 `Updating bottom for ${player.nickname}: ${player.bottom} -> ${newBottom}`,
               );
-              if (newBottom >= 480) {
-                handleWin();
-              }
-              sendGame({ attendeeUUID, bottom: newBottom }); // WebSocket으로 새 위치 전송
+              sendGame({ attendeeUUID, bottom: newBottom });
               return { ...player, bottom: newBottom };
             }
             return player;
@@ -191,6 +194,7 @@ function Game() {
           console.log("Updated players:", updatedPlayers);
           return updatedPlayers;
         });
+        console.log("Players state updated:", players);
       };
 
       handleClick.current = handleBlockClick; // handleClick에 이벤트 등록
@@ -200,6 +204,10 @@ function Game() {
   useEffect(() => {
     console.log("Current attendeeUUID:", attendeeUUID);
   }, [attendeeUUID]);
+
+  useEffect(() => {
+    console.log("Players state changed:", players);
+  }, [players]);
 
   return (
     <Wrapper>

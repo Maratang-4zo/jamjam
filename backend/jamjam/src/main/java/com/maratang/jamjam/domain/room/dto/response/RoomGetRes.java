@@ -1,15 +1,16 @@
 package com.maratang.jamjam.domain.room.dto.response;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 import com.maratang.jamjam.domain.attendee.dto.response.AttendeeInfo;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Builder
@@ -24,6 +25,7 @@ public class RoomGetRes {
     UUID hostUUID;
     List<AttendeeInfo> attendees;
     RoomStatus roomStatus;
+    LocalDateTime estimatedForceCloseAt;
 
     public static RoomGetRes of(Room room, UUID attendeeUUID, SubwayInfo roomCenterStart){
         return RoomGetRes.builder()
@@ -37,6 +39,7 @@ public class RoomGetRes {
                .hostUUID(room.getRoot().getAttendeeUUID())
                .attendees(AttendeeInfo.of(room.getAttendees()))
                 .roomStatus(room.getRoomStatus())
+                .estimatedForceCloseAt(room.getRoomStatus() == RoomStatus.RESERVED ? room.getEstimatedForceCloseAt() : null)
                .build();
     }
 }

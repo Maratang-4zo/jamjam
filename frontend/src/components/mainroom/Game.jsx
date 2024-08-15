@@ -80,6 +80,8 @@ const BlockContainer = styled.div`
   justify-content: center;
   position: relative;
   height: 100%;
+  flex-direction: row; // row 방향으로 정렬
+  gap: 20px; // 아이콘 간의 간격
 `;
 
 const Block = styled.div`
@@ -91,14 +93,10 @@ const Block = styled.div`
   background-repeat: no-repeat;
   background-position: center;
   margin: 0 10px;
-  position: absolute;
+  position: relative; // absolute에서 relative로 변경
   border-radius: 50%;
   border: 1px solid black;
   bottom: ${(props) => `${props.bottom}px`};
-  ${(props) => {
-    console.log(`Rendering Block with bottom: ${props.bottom}px`);
-    return `bottom: ${props.bottom}px;`;
-  }}
 `;
 
 const WinMessage = styled.div`
@@ -110,6 +108,21 @@ const WinMessage = styled.div`
   font-weight: bold;
   color: #ff0000;
   display: ${(props) => (props.show ? "block" : "none")};
+  padding: 20px; // 텍스트 주변 여백 추가
+  z-index: 1; // 텍스트가 배경 위에 위치하도록 z-index 설정
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8); // 직사각형 배경색
+    border-radius: 10px; // 모서리 둥글게
+    z-index: -1; // 배경이 텍스트 뒤에 오도록 설정
+  }
 `;
 
 const Countdown = styled.div`
@@ -123,8 +136,6 @@ const Countdown = styled.div`
 `;
 
 function Game() {
-  const location = useLocation();
-  const { selectedGame, roomUUID, attendeeUUID } = location.state || {};
   const handleClick = useRef(() => {}); // handleClick 통일
   const [showButton, setShowButton] = useState(false);
   const roomInfo = useRecoilValue(roomAtom);
@@ -199,18 +210,21 @@ function Game() {
         >
           {" "}
           {/* 클릭 이벤트 수정 */}
-          {countdown === 99 || !win ? <Countdown>READY</Countdown> : null}
+          {countdown === 99 ? <Countdown>READY</Countdown> : null}
           {countdown > 0 && countdown < 99 ? (
             <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>
           ) : null}
           {countdown === 0 ? (
             <>
               <BlockContainer>
-                {players.map((player) => (
+                {players.map((player, index) => (
                   <Block
                     key={player.attendeeUUID}
                     bottom={player.bottom}
                     profileImageUrl={player.profileImageUrl}
+                    style={{
+                      left: `${(index - (players.length - 1) / 2) * 60}px`,
+                    }} // 각 플레이어를 좌우로 퍼지게 배치
                   />
                 ))}
               </BlockContainer>

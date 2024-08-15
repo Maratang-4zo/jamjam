@@ -178,41 +178,14 @@ function Game() {
   };
 
   useEffect(() => {
-    // console.log("Player들의 정보 배열입니다", players);
-    // console.log("라운드 아이디", gameRoundUUID);
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         console.log("지금 현재 접속해 있는 사람의 UUID:", myUUID);
-        setPlayers((prevPlayers) => {
-          const updatedPlayers = prevPlayers.map((player) => {
-            // console.log("Checking player:", player.attendeeUUID);
-            if (player.attendeeUUID === myUUID) {
-              const newBottom = player.bottom + 10;
-              console.log(
-                `위치 변경 ${player.nickname}: ${player.bottom} -> ${newBottom}`,
-              );
-              sendGame(gameRoundUUID);
-              return { ...player, bottom: newBottom };
-            }
-            return player;
-          });
-          // console.log("Updated players:", updatedPlayers);
-          return updatedPlayers;
-        });
-        // console.log("Players state updated:", players);
+        sendGame(gameRoundUUID);
       };
-
-      handleClick.current = handleBlockClick; // handleClick에 이벤트 등록
+      handleClick.current = handleBlockClick;
     }
-  }, [countdown, win, winner, attendeeUUID, sendGame, players]);
-
-  useEffect(() => {
-    console.log("Current attendeeUUID:", userInfo);
-  }, []);
-
-  // useEffect(() => {
-  //   console.log("Players state changed:", players);
-  // }, [players]);
+  }, [countdown, win, winner, sendGame]);
 
   return (
     <Wrapper>

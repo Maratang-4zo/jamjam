@@ -122,14 +122,14 @@ function Game() {
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
         <GameScreen onClick={() => handleClick.current()}>
-          {/* {selectedGame === 1 && (
+          {selectedGame === 1 && (
             <>
               {console.log("Game1 렌더링됨")}
               <Game1 handleClick={handleClick} onWin={handleWin} />
             </>
           )}
           {selectedGame === 2 && <Game2 />}
-          {selectedGame === 3 && <Game3 />} */}
+          {selectedGame === 3 && <Game3 />}
           <Game1 handleClick={handleClick} onWin={handleWin} />
 
           <StyledButton

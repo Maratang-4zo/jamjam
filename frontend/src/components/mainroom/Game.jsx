@@ -180,7 +180,7 @@ function Game() {
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         console.log("handleBlockClick called");
-        console.log("Current attendeeUUID:", userInfo);
+        console.log("Current attendeeUUID:", userInfo.myUUID);
         setPlayers((prevPlayers) => {
           const updatedPlayers = prevPlayers.map((player) => {
             console.log("Checking player:", player.attendeeUUID);

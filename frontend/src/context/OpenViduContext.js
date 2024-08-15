@@ -9,9 +9,6 @@ import React, {
   useEffect,
 } from "react";
 import { getCookie, setCookie } from "../utils/Cookies";
-import { useRecoilValue } from "recoil";
-import { userInfoAtom } from "../recoil/atoms/userState";
-import { roomAtom } from "../recoil/atoms/roomState";
 
 const OpenViduContext = React.createContext({
   sessionRef: null,
@@ -25,7 +22,6 @@ const OpenViduContext = React.createContext({
   createToken: () => {},
   toggleMic: () => {},
   isMicOn: true,
-  connectionMap: {},
 });
 
 export const useOpenVidu = () => useContext(OpenViduContext);
@@ -38,15 +34,23 @@ export const OpenViduProvider = ({ children }) => {
   const joined = useRef(false);
   const [currentSpeakers, setCurrentSpeakers] = useState([]);
   const [isMicOn, setIsMicOn] = useState(true);
-  const [connectionMap, setConnectionMap] = useState({});
-  const userInfo = useRecoilValue(userInfoAtom);
-  const roomInfo = useRecoilValue(roomAtom);
 
+  //테스트용
   useEffect(() => {
-    console.log("누가 말하고 있는가", {
-      currentSpeakers,
+    console.log("OpenVidu context state:", {
+      sessionRef: sessionRef.current,
+      ovRef: ovRef.current,
+      publisherRef: publisherRef.current,
+      joined: joined.current,
+      isMicOn,
     });
-  }, [currentSpeakers]);
+  }, [
+    sessionRef.current,
+    ovRef.current,
+    publisherRef.current,
+    joined.current,
+    isMicOn,
+  ]);
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
@@ -66,29 +70,21 @@ export const OpenViduProvider = ({ children }) => {
 
     newSession.on("streamCreated", function (event) {
       newSession.subscribe(event.stream, "subscriber");
-      // 새로운 참가자의 connectionId와 attendeeUUID 매핑
-      setConnectionMap((prevMap) => ({
-        ...prevMap,
-        [event.stream.connection.connectionId]:
-          roomInfo.attendees[roomInfo.attendees.length - 1].attendeeUUID,
-      }));
     });
 
     newSession.on("publisherStartSpeaking", (event) => {
       setCurrentSpeakers((prevSpeakers) => [
         ...prevSpeakers,
-        connectionMap[event.connection.connectionId],
+        event.connection.data.attendeeUUID,
       ]);
     });
 
     newSession.on("publisherStopSpeaking", (event) => {
       setCurrentSpeakers((prevSpeakers) =>
-        prevSpeakers.filter(
-          (uuid) => uuid !== connectionMap[event.connection.connectionId],
-        ),
+        prevSpeakers.filter((id) => id !== event.connection.data.attendeeUUID),
       );
     });
-  }, [connectionMap]);
+  }, []);
 
   const createSession = useCallback(async () => {
     await axios.post(APPLICATION_SERVER_URL + "api/wr/rooms");
@@ -142,13 +138,6 @@ export const OpenViduProvider = ({ children }) => {
       });
       publisherRef.current = newPublisher;
       await sessionRef.current.publish(newPublisher);
-
-      // connectionId와 attendeeUUID 매핑
-      setConnectionMap((prevMap) => ({
-        ...prevMap,
-        [newPublisher.stream.connection.connectionId]: userInfo.myUUID, // 실제 attendeeUUID로 교체해야 합니다
-      }));
-
       joined.current = true;
       console.log("Successfully joined and published to session");
     } catch (error) {
@@ -208,7 +197,6 @@ export const OpenViduProvider = ({ children }) => {
       createToken,
       toggleMic,
       isMicOn,
-      connectionMap,
     }),
     [
       currentSpeakers,
@@ -218,7 +206,6 @@ export const OpenViduProvider = ({ children }) => {
       createSession,
       createToken,
       toggleMic,
-      connectionMap,
     ],
   );
 

@@ -113,11 +113,16 @@ function Room() {
             setEstimatedClosedAt(roomData.estimatedForceCloseAt);
           }
 
-          const nowAttendees = roomData.attendees.filter(
-            (attendee) =>
-              attendee.attendeeStatus !== "EXITED" ||
-              attendee.attendeeUUID === myUUID,
-          );
+          const nowAttendees = roomData.attendees
+            .filter(
+              (attendee) =>
+                attendee.attendeeStatus !== "EXITED" ||
+                attendee.attendeeUUID === myUUID,
+            )
+            .map((attendee) => ({
+              ...attendee,
+              attendeeStatus: attendee.status,
+            }));
 
           if (
             !myAttendeeInfo ||

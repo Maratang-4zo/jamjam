@@ -147,7 +147,6 @@ function NavBarLeft() {
 
   const handleMic = () => {
     toggleMic();
-    console.log("Microphone toggled. New state:", isMicOn);
   };
 
   const handleHomeClick = () => {

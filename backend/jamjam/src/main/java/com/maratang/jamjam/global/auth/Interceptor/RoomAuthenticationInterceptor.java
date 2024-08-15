@@ -54,7 +54,7 @@ public class RoomAuthenticationInterceptor implements HandlerInterceptor {
 		String accessToken = accessCookie.getValue();
 		String refreshToken = refreshCookie.getValue();
 
-		accessToken = loginTokenManager.validateAndRefreshTokenIfNeeded(accessToken, refreshToken, response);
+		accessToken = loginTokenManager.validateAndRefreshTokenIfNeeded(accessToken, refreshToken, request, response);
 
 		// 3. 토큰 타입
 		String email = loginTokenManager.getMemberEmail(accessToken);

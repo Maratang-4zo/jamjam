@@ -10,7 +10,6 @@ import com.maratang.jamjam.domain.login.logout.service.LogoutService;
 import com.maratang.jamjam.global.util.AuthorizationHeaderUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,26 +31,7 @@ public class LogoutController {
 		AuthorizationHeaderUtils.validateAuthorization(authorization);
 		String accessToken = authorization.split(" ")[1];
 
-		logoutService.logout(accessToken);
-
-		Cookie[] cookie = httpServletRequest.getCookies();
-
-		for (int i = 0; i < cookie.length; i++) {
-			if (cookie[i].getName().equals("refreshToken")) {
-				cookie[i].setMaxAge(0);
-				cookie[i].setValue(null);
-				cookie[i].setPath("/");
-				// cookie[i].setHttpOnly(true);
-				// cookie[i].setSecure(true);
-				httpServletResponse.addCookie(cookie[i]);
-			}
-			if (cookie[i].getName().equals("accessToken")) {
-				cookie[i].setMaxAge(0);
-				cookie[i].setValue(null);
-				cookie[i].setPath("/");
-				httpServletResponse.addCookie(cookie[i]);
-			}
-		}
+		logoutService.logout(accessToken, httpServletRequest, httpServletResponse);
 
 		log.info("LOGOUT SUCCESS");
 		return ResponseEntity.status(HttpStatus.OK).build();

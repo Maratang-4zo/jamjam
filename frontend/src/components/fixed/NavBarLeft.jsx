@@ -112,6 +112,9 @@ function NavBarLeft() {
   const navigate = useNavigate();
   const prevChatLogsLength = useRef(chatLogs.length);
   const { leaveFn } = useLeave();
+  const openViduContext = useOpenVidu();
+
+  console.log("OpenVidu context:", openViduContext);
 
   useEffect(() => {
     const loadImages = async () => {
@@ -146,6 +149,7 @@ function NavBarLeft() {
 
   const handleMic = () => {
     toggleMic();
+    console.log("Microphone toggled. New state:", isMicOn);
   };
 
   const handleHomeClick = () => {

@@ -27,3 +27,8 @@
   font-family: "hangil";
   src: url("./fonts/hangil.ttf");
 }
+
+@font-face {
+  font-family: "neodgm";
+  src: url("./fonts/neodgm.ttf");
+}

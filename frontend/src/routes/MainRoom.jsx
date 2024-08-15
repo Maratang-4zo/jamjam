@@ -170,7 +170,7 @@ function Room() {
             }
           }
 
-          if (!joined) {
+          if (!joined.current) {
             try {
               await joinSession(roomUUID);
             } catch (error) {

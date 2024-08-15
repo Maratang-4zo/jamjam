@@ -5,14 +5,14 @@ import { userInfoAtom } from "../../recoil/atoms/userState";
 import { getUserInfo, updateUserNickname } from "../../apis/loginApi";
 
 const ProfileImage = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 70%;
+  height: 70%;
   border-radius: 50%;
 `;
 
 const ProfileWrapper = styled.div`
   align-items: center;
-  border: 0.7px solid #000000;
+  //border: 0.7px solid #000000;
   border-radius: 35px;
   display: flex;
   flex-direction: column;
@@ -100,6 +100,17 @@ const SaveButton = styled.button`
   cursor: pointer;
 `;
 
+const B1 = styled.div `
+  align-items: center;
+  //border: 0.7px solid #000000;
+  border-radius: 35px;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  width: 100%;
+  margin: 10px 0;
+`
+
 function ProfileBox() {
   const [modalVisible, setModalVisible] = useState(false); //닉네임 수정창 보이게
   const [modalContent, setModalContent] = useState(""); // 닉네임 수정창 내용
@@ -154,9 +165,13 @@ function ProfileBox() {
   };
   return (
     <>
+      <B1>
+
+
       <ProfileWrapper>
         <ProfileImage src={userInfo.profileImageUrl} alt="profile" />
       </ProfileWrapper>
+        <div>
       <Nickname onClick={() => handleModalOpen("닉네임 수정")}>
         {userInfo.nickname}
       </Nickname>
@@ -178,6 +193,8 @@ function ProfileBox() {
           )}
         </ModalContent>
       </ModalOverlay>
+        </div>
+      </B1>
     </>
   );
 }

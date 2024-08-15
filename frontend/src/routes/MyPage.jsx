@@ -10,6 +10,9 @@ import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { useKakaoLogout } from "../apis/loginApi";
 import "react-toastify/dist/ReactToastify.css";
+import Calendar from "react-calendar";
+import CustomCalendar from "../components/calendar/CustomCalendar";
+import GameBox from "../components/mypage/GameBox";
 
 const GlobalStyle = createGlobalStyle`
   body, html {
@@ -79,31 +82,70 @@ const Frame2 = styled.div`
   align-items: center;
   align-self: stretch;
   display: flex;
-  flex: 1;
-  flex-direction: column;
+  //flex: 1;
+  //flex-direction: column;
   gap: 7px;
   padding: 14px 50px;
   width: 100%;
 `;
 
+const Frame3 = styled.div`
+  //align-items: center;
+  //align-self: stretch;
+  display: flex;
+  //flex: 1;
+  flex-direction: column;
+  //gap: 7px;
+  //padding: 14px 50px;
+  width: 20%;
+  min-width: 300px;
+  max-width: 350px;
+  justify-content: space-between;
+  height: 100%
+`;
+
+const Frame4 = styled.div`
+  align-items: center;
+  //align-self: stretch;
+  display: flex;
+  //flex: 1;
+  flex-direction: column;
+  //gap: 7px;
+  padding: 14px 50px;
+  width: 80%;
+  max-width: 1600px;
+`;
+
 const InfoContainer = styled.div`
   align-items: center;
   align-self: stretch;
-  border: 1.4px solid #000000;
+  //border: 1.4px solid #000000;
   display: flex;
   justify-content: space-between;
-  padding: 14px;
+  //padding: 14px;
   width: 100%;
 `;
 
 const MeetingContainer = styled.div`
   align-items: center;
   align-self: stretch;
-  border: 1.4px solid #000000;
+  //border: 1.4px solid #000000;
   display: flex;
   gap: 21px;
   height: 220.5px;
-  padding: 21px;
+  //padding: 21px;
+  width: 100%;
+  overflow-x: auto;
+`;
+
+const GameContainer = styled.div`
+  align-items: center;
+  align-self: stretch;
+  //border: 1.4px solid #000000;
+  display: flex;
+  gap: 21px;
+  height: 120.5px;
+  //padding: 21px;
   width: 100%;
   overflow-x: auto;
 `;
@@ -114,6 +156,70 @@ const Subtitle = styled.h1`
   font-family: "galmuriRegular";
   text-align: left;
 `;
+
+const Subtitle2 = styled.h3`
+  color: black;
+  font-size: 30px;
+  font-family: "neodgm";
+  text-align: left;
+`;
+
+const Today = styled.h1`
+  color: #000000;
+  font-family: "neodgm", Helvetica;
+  font-size: 50px;
+  font-weight: 400;
+  text-align: start;
+  margin-bottom: 30px;
+`;
+const Frame5 = styled.div`
+`
+
+const Oneul = styled.div`
+/* Frame 1694 */
+
+box-sizing: border-box;
+  font-size: 30px;
+
+color: #FFFFFF;
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 10px 10px;
+gap: 10px;
+
+width: 120px;
+height: 50px;
+left: 50px;
+top: 50px;
+
+background: #000000;
+border: 1px solid #000000;
+box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+border-radius: 10px;
+`
+const MyBox = styled.div`
+  width: 100%;
+  height: 100%;
+right: 50px;
+top: calc(50% - 980px/2);
+  min-height: 800px;
+  padding: 30px 30px 30px;
+background: #FBFAF2;
+border: 3px solid #000000;
+
+`;
+
+const WinningRate = styled.div`
+  flex: 4;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const Mypage = () => {
   const infoBoxRef = useRef(null);
   const meetingBoxRef = useRef(null);
@@ -166,14 +272,38 @@ const Mypage = () => {
             </Btns>
           </Frame>
           <Frame2>
-            <Subtitle>INFO</Subtitle>
-            <InfoContainer ref={infoBoxRef}>
-              <InfoBox />
-            </InfoContainer>
-            <Subtitle>MEETING HISTORY</Subtitle>
-            <MeetingContainer ref={meetingBoxRef}>
-              <MeetingBox />
-            </MeetingContainer>
+            <Frame3>
+              <Frame5>
+                <Today>
+                  <Oneul>
+                    오늘은
+                  </Oneul>
+                  2024년<br/>
+                  8월 16일<br/>
+                  금요일
+                </Today>
+                <CustomCalendar></CustomCalendar>
+              </Frame5>
+              <InfoContainer ref={infoBoxRef}>
+                <InfoBox />
+              </InfoContainer>
+            </Frame3>
+            <Frame4>
+              <MyBox>
+                <div>
+                  <Subtitle2>모임 목록</Subtitle2>
+                  <MeetingContainer ref={meetingBoxRef}>
+                    <MeetingBox />
+                  </MeetingContainer>
+                </div>
+                <div>
+                  <Subtitle2>게임별 승률</Subtitle2>
+                  <MeetingContainer>
+                    <GameBox />
+                  </MeetingContainer>
+                </div>
+              </MyBox>
+            </Frame4>
           </Frame2>
         </>
         {/* )} */}

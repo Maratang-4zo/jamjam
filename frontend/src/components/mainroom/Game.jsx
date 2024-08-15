@@ -72,10 +72,6 @@ const StyledButton = styled.button`
   display: ${(props) => (props.show ? "flex" : "none")};
 `;
 
-// const Container = styled.div`
-//   background-image: url(${gameBg});
-// `;
-
 const BlockContainer = styled.div`
   display: flex;
   align-items: flex-end;
@@ -93,10 +89,10 @@ const Block = styled.div`
   background-repeat: no-repeat;
   background-position: center;
   margin: 0 10px;
-  position: relative;
+  position: absolute;
   border-radius: 50%;
   border: 1px solid black;
-  bottom: ${(props) => `${props.bottom}px`}; // 추가된 부분
+  bottom: ${(props) => `${props.bottom}px`};
 `;
 
 const WinMessage = styled.div`
@@ -123,14 +119,13 @@ const Countdown = styled.div`
 function Game() {
   const location = useLocation();
   const { selectedGame, roomUUID, attendeeUUID } = location.state || {};
-  const handleBlockClick = useRef(() => {});
+  const handleClick = useRef(() => {}); // handleClick 통일
   const [showButton, setShowButton] = useState(false);
   const roomInfo = useRecoilValue(roomAtom);
   const isWinner = useRecoilValue(isWinnerAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
 
   const [isLoading, setIsLoading] = useRecoilState(isThreeStationLoadingAtom);
-  const [bottom, setBottom] = useState(0);
   const [win, setWin] = useRecoilState(isWinnerAtom);
   const [countdown, setCountdown] = useRecoilState(gameCountAtom);
   const [players, setPlayers] = useRecoilState(playerState);
@@ -174,31 +169,50 @@ function Game() {
   };
 
   useEffect(() => {
+    console.log("handleBlockClick called");
     if (countdown === 0 && !win && !winner) {
-      handleBlockClick.current = () => {
+      const handleBlockClick = () => {
+        console.log("클릭하기전", players);
         setPlayers((prevPlayers) => {
           const updatedPlayers = prevPlayers.map((player) => {
             if (player.attendeeUUID === attendeeUUID) {
               const newBottom = player.bottom + 10;
+              console.log(
+                `Updating bottom for ${player.nickname}: ${player.bottom} -> ${newBottom}`,
+              );
               if (newBottom >= 480) {
                 handleWin();
               }
-              sendGame({ newBottom });
+              sendGame({ attendeeUUID, bottom: newBottom }); // WebSocket으로 새 위치 전송
               return { ...player, bottom: newBottom };
             }
             return player;
           });
+          console.log("Updated players:", updatedPlayers);
           return updatedPlayers;
         });
       };
+
+      handleClick.current = handleBlockClick; // handleClick에 이벤트 등록
     }
-  }, [countdown, win, winner, attendeeUUID, sendGame]);
+  }, [countdown, win, winner, attendeeUUID, sendGame, players]);
+
+  useEffect(() => {
+    console.log("Current attendeeUUID:", attendeeUUID);
+  }, [attendeeUUID]);
 
   return (
     <Wrapper>
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
-        <GameScreen onClick={() => handleBlockClick.current()}>
+        <GameScreen
+          onClick={() => {
+            console.log("Game screen clicked");
+            handleClick.current();
+          }}
+        >
+          {" "}
+          {/* 클릭 이벤트 수정 */}
           {countdown === 99 ? <Countdown>READY</Countdown> : null}
           {countdown > 0 && countdown < 99 ? (
             <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>

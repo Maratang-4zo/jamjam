@@ -3,36 +3,56 @@ import styled from "styled-components";
 import { axiosGetMeetingHistory } from "../../apis/loginApi";
 
 const MeetingHistory = styled.div`
-  align-items: center;
+  //align-items: center;
   background-color: #ffffff;
   border: 0.7px solid #000000;
-  border-radius: 14px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   gap: 7px;
   height: 152.6px;
-  justify-content: center;
   overflow: hidden;
-  padding: 10.5px 14px;
-  width: 151.2px;
+  padding: 20px 15px;
+  width: 170px;
+  justify-content: space-between;
 `;
 
 const MeetingTextWrapper = styled.div`
   color: #000000;
-  font-family: "Galmuri11-Regular", Helvetica;
+  font-family: "neodgm", Helvetica;
   font-size: 19.6px;
-  text-align: center;
 `;
 
 const Element = styled.div`
   color: #000000;
-  font-family: "Galmuri11-Regular", Helvetica;
+  font-family: "neodgm", Helvetica;
   font-size: 19.6px;
-  text-align: center;
+`;
+
+const BtmTxt = styled.div`
+  color: #000000;
+  font-family: "neodgm", Helvetica;
+  font-size: 15px;
 `;
 
 function MeetingBox() {
   const [meetingHistory, setMeetingHistory] = useState([]);
+
+  const getMeetingString = (meeting) => {
+    const dateObj = new Date(meeting);
+
+  // 연도, 월, 일 추출
+    const year = dateObj.getFullYear().toString().slice(2); // 2자리 연도
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0'); // 월 (0부터 시작하므로 +1)
+    const day = dateObj.getDate().toString().padStart(2, '0'); // 일
+
+  // 요일 배열 생성
+    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+    const dayOfWeek = weekdays[dateObj.getDay()];
+
+  // 최종 문자열 생성
+    return `${year}.${month}.${day} (${dayOfWeek})`;
+  }
 
   useEffect(() => {
     const fetchMeetingHistory = async () => {
@@ -54,17 +74,21 @@ function MeetingBox() {
   return (
     <>
       {meetingHistory.map((meeting, index) => {
-        const meetingDate = meeting.meetingDate.split("T")[0];
+        const meetingDate = getMeetingString(meeting.meetingDate)
         return (
           <MeetingHistory key={index}>
+            <div>
             <MeetingTextWrapper>{meetingDate}</MeetingTextWrapper>
-            <Element>
+              <Element>
+                {meeting.finalStation}
+              </Element>
+            </div>
+            <BtmTxt>
+              <br/>
               {meeting.name}
-              <br />
-              {meeting.finalStation}
-              <br />
-              {meeting.purpose}
-            </Element>
+              <br/>
+              for {meeting.purpose}
+            </BtmTxt>
           </MeetingHistory>
         );
       })}

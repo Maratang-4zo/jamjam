@@ -37,10 +37,11 @@ export const OpenViduProvider = ({ children }) => {
 
   //테스트용
   useEffect(() => {
-    console.log("말하고 있음:", {
+    console.log("오픈비두 정보들:", {
       currentSpeakers,
+      sessionRef,
     });
-  }, [currentSpeakers]);
+  }, [currentSpeakers, sessionRef]);
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
@@ -59,6 +60,7 @@ export const OpenViduProvider = ({ children }) => {
     sessionRef.current = newSession;
 
     newSession.on("streamCreated", function (event) {
+      console.log("신입받아라");
       newSession.subscribe(event.stream, "subscriber");
     });
 
@@ -126,11 +128,23 @@ export const OpenViduProvider = ({ children }) => {
         videoSource: false,
         publishAudio: true,
         publishVideo: false,
+        resolution: "640x480",
+        frameRate: 30,
+        insertMode: "APPEND",
+        mirror: false,
       });
       publisherRef.current = newPublisher;
+
       await sessionRef.current.publish(newPublisher);
+      console.log("Successfully published to session");
+
+      sessionRef.current.on("streamCreated", (event) => {
+        console.log("New stream created:", event.stream.streamId);
+        sessionRef.current.subscribe(event.stream, "subscriber");
+      });
+
       joined.current = true;
-      console.log("Successfully joined and published to session");
+      console.log("Successfully joined session");
     } catch (error) {
       console.error(
         "Error connecting to the session:",

@@ -188,7 +188,6 @@ function CreateRoom() {
   return (
     <Wrapper>
       <NavBarUp />
-      <Watching />
       <Content>
         <ErrorBox>
           {errors.meetingDate && (

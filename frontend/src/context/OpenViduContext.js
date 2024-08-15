@@ -35,6 +35,23 @@ export const OpenViduProvider = ({ children }) => {
   const [currentSpeakers, setCurrentSpeakers] = useState([]);
   const [isMicOn, setIsMicOn] = useState(true);
 
+  //테스트용
+  useEffect(() => {
+    console.log("OpenVidu context state:", {
+      sessionRef: sessionRef.current,
+      ovRef: ovRef.current,
+      publisherRef: publisherRef.current,
+      joined: joined.current,
+      isMicOn,
+    });
+  }, [
+    sessionRef.current,
+    ovRef.current,
+    publisherRef.current,
+    joined.current,
+    isMicOn,
+  ]);
+
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
       sessionRef.current.disconnect();

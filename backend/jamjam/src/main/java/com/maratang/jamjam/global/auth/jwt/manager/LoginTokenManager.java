@@ -17,6 +17,7 @@ import com.maratang.jamjam.global.error.exception.AuthenticationException;
 import com.maratang.jamjam.global.util.CookieUtils;
 
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,13 +70,15 @@ public class LoginTokenManager {
 		return tokenProvider.createToken(TokenType.ACCESS, claims, tokenProvider.createTokenExpireTime(accessTokenExpirationTime), tokenSecret);
 	}
 
-	public String validateAndRefreshTokenIfNeeded(String accessToken, String refreshToken, HttpServletResponse response) {
+	public String validateAndRefreshTokenIfNeeded(String accessToken, String refreshToken, HttpServletRequest request,HttpServletResponse response) {
 		if (!tokenProvider.validateToken(accessToken, TokenType.ACCESS, tokenSecret)) {
 			if (tokenProvider.validateToken(refreshToken, TokenType.REFRESH, tokenSecret)) {
 				String newAccessToken = reissueToken(refreshToken);
 				CookieUtils.createSessionCookie(response, ACCESS_TOKEN_COOKIE, newAccessToken);
 				return newAccessToken;
 			} else {
+				CookieUtils.removeCookie(request, response, "accessToken");
+				CookieUtils.removeCookie(request, response, "refreshToken");
 				throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
 			}
 		}

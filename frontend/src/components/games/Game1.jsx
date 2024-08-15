@@ -65,10 +65,10 @@ function Game1({ handleClick, onWin }) {
   const { sendGame } = useWebSocket();
   const gameState = useRecoilValue(gameStateAtom);
 
-  // useEffect(() => {
-  //   console.log("카운트다운:", countdown);
-  //   console.log("플레이어들:", players);
-  // }, [countdown, players]);
+  useEffect(() => {
+    console.log("카운트다운:", countdown);
+    console.log("플레이어들:", players);
+  }, [countdown, players]);
 
   useEffect(() => {
     console.log("player 리스트", players);

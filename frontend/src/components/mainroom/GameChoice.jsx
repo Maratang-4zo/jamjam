@@ -124,7 +124,7 @@ function GameChoice() {
   const roundCenter = useRecoilValue(roundCenterAtom);
   const setPlayerState = useSetRecoilState(playerState);
   const { sendRoundInfo } = useWebSocket();
-  const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
+  // const [selectedGame, setSelectedGame] = useRecoilState(selectedGameAtom);
   const currentRound = useRecoilValue(currentRoundAtom);
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
 
@@ -147,14 +147,11 @@ function GameChoice() {
   }, [roomInfo, userInfo, setPlayerState]);
 
   const handlePlayButtonClick = () => {
-    if (selectedGame != null) {
-      sendRoundInfo({
-        round: currentRound,
-        gameId: selectedGame,
-        gameSessionUUID: gameSessionUUID,
-        stationName: roundCenter.name,
-      });
-    }
+    sendRoundInfo({
+      round: currentRound,
+      gameSessionUUID: gameSessionUUID,
+      stationName: roundCenter.name,
+    });
   };
 
   return (
@@ -162,8 +159,8 @@ function GameChoice() {
       <ContentContainer>
         <Header>Choose The Game</Header>
         <GameBoxes
-          selectedGame={selectedGame}
-          setSelectedGame={userInfo.isHost ? setSelectedGame : null}
+        // selectedGame={selectedGame}
+        // setSelectedGame={userInfo.isHost ? setSelectedGame : null}
         ></GameBoxes>
         <PlayButton disabled={!userInfo.isHost} onClick={handlePlayButtonClick}>
           <PlayButtonText>PLAY</PlayButtonText>

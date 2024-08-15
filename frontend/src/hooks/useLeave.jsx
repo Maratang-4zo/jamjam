@@ -84,9 +84,6 @@ export const useLeave = () => {
     disconnect();
     leaveSession();
     resetRoomInfo();
-
-    console.log("리셋");
-
     resetChat();
     resetChatModal();
     resetIsNextMiddleExist();

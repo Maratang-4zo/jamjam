@@ -14,6 +14,6 @@ export const userInfoAtom = atom({
     email: null,
     winningRate: {},
     meetingHistory: [],
-    status: "",
+    attendeeStatus: "",
   },
 });

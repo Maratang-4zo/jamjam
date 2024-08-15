@@ -463,7 +463,7 @@ export const WebSocketProvider = ({ children }) => {
 
   const handleGameEnd = ({ gameRoundUUID }) => {
     setGameState("end");
-    setGameCount(99);
+    setGameCount(100);
   };
 
   const handleGameReady = ({ gameRoundUUID }) => {

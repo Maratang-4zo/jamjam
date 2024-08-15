@@ -180,24 +180,24 @@ function Game() {
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         console.log("handleBlockClick called");
-        console.log("Current attendeeUUID:", userInfo.myUUID);
+        console.log("Current attendeeUUID:", userInfo);
         setPlayers((prevPlayers) => {
           const updatedPlayers = prevPlayers.map((player) => {
             console.log("Checking player:", player.attendeeUUID);
             if (player.attendeeUUID === userInfo.myUUID) {
               const newBottom = player.bottom + 10;
-              console.log(
-                `Updating bottom for ${player.nickname}: ${player.bottom} -> ${newBottom}`,
-              );
+              // console.log(
+              //   `Updating bottom for ${player.nickname}: ${player.bottom} -> ${newBottom}`,
+              // );
               sendGame({ attendeeUUID, bottom: newBottom });
               return { ...player, bottom: newBottom };
             }
             return player;
           });
-          console.log("Updated players:", updatedPlayers);
+          // console.log("Updated players:", updatedPlayers);
           return updatedPlayers;
         });
-        console.log("Players state updated:", players);
+        // console.log("Players state updated:", players);
       };
 
       handleClick.current = handleBlockClick; // handleClick에 이벤트 등록
@@ -205,12 +205,12 @@ function Game() {
   }, [countdown, win, winner, attendeeUUID, sendGame, players]);
 
   useEffect(() => {
-    console.log("Current attendeeUUID:", userInfo.myUUID);
-  }, [attendeeUUID]);
+    console.log("Current attendeeUUID:", userInfo);
+  }, []);
 
-  useEffect(() => {
-    console.log("Players state changed:", players);
-  }, [players]);
+  // useEffect(() => {
+  //   console.log("Players state changed:", players);
+  // }, [players]);
 
   return (
     <Wrapper>

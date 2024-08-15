@@ -59,7 +59,7 @@ export const OpenViduProvider = ({ children }) => {
     if (sessionRef.current) return;
 
     const newOv = new OpenVidu({
-      audioSource: "microphone",
+      audioSource: undefined,
       videoSource: false,
     });
     const newSession = newOv.initSession();

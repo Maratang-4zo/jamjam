@@ -10,6 +10,7 @@ import {
   playerState,
   winnerNicknameAtom,
 } from "../../recoil/atoms/gameState";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 import { axiosGetAroundStores, axiosGetThreeStations } from "../../apis/mapApi";
 import Loading from "../fixed/Loading";
 import { isThreeStationLoadingAtom } from "../../recoil/atoms/loadingState";
@@ -127,6 +128,8 @@ function Game() {
   const [showButton, setShowButton] = useState(false);
   const roomInfo = useRecoilValue(roomAtom);
   const isWinner = useRecoilValue(isWinnerAtom);
+  const userInfo = useRecoilValue(userInfoAtom);
+
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
 
   const [isLoading, setIsLoading] = useRecoilState(isThreeStationLoadingAtom);
@@ -177,11 +180,11 @@ function Game() {
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         console.log("handleBlockClick called");
-        console.log("Current attendeeUUID:", attendeeUUID);
+        console.log("Current attendeeUUID:", userInfo.myUUID);
         setPlayers((prevPlayers) => {
           const updatedPlayers = prevPlayers.map((player) => {
             console.log("Checking player:", player.attendeeUUID);
-            if (player.attendeeUUID === attendeeUUID) {
+            if (player.attendeeUUID === userInfo.myUUID) {
               const newBottom = player.bottom + 10;
               console.log(
                 `Updating bottom for ${player.nickname}: ${player.bottom} -> ${newBottom}`,
@@ -202,7 +205,7 @@ function Game() {
   }, [countdown, win, winner, attendeeUUID, sendGame, players]);
 
   useEffect(() => {
-    console.log("Current attendeeUUID:", attendeeUUID);
+    console.log("Current attendeeUUID:", userInfo.myUUID);
   }, [attendeeUUID]);
 
   useEffect(() => {

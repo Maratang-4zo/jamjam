@@ -50,15 +50,17 @@ export const OpenViduProvider = ({ children }) => {
   }, [currentSpeakers, sessionId, subscribers]);
 
   const leaveSession = useCallback(() => {
-    if (sessionRef.current) {
-      subscribers.forEach((subscriber) => {
-        sessionRef.current.unsubscribe(subscriber);
-      });
-      if (publisherRef.current) {
-        sessionRef.current.unpublish(publisherRef.current);
-      }
-      sessionRef.current.disconnect();
+    if (!sessionRef.current || !joined.current) return; // 가드 추가
+
+    console.log("Leaving session");
+    subscribers.forEach((subscriber) => {
+      sessionRef.current.unsubscribe(subscriber);
+    });
+    if (publisherRef.current) {
+      sessionRef.current.unpublish(publisherRef.current);
     }
+    sessionRef.current.disconnect();
+
     setSubscribers([]);
     publisherRef.current = null;
     joined.current = false;
@@ -72,11 +74,16 @@ export const OpenViduProvider = ({ children }) => {
       const newOv = new OpenVidu();
       const newSession = newOv.initSession();
 
+      newSession.on("sessionDisconnected", (event) => {
+        console.log("Session disconnected:", event);
+        leaveSession();
+      });
+
       ovRef.current = newOv;
       sessionRef.current = newSession;
       resolve();
     });
-  }, []);
+  }, [leaveSession]);
 
   const createSession = useCallback(async () => {
     try {

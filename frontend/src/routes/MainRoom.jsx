@@ -170,10 +170,9 @@ function Room() {
             }
           }
 
-          if (!joined.current) {
+          if (!joined) {
             try {
               await joinSession(roomUUID);
-              console.log("OpenVidu session joined successfully");
             } catch (error) {
               console.error("Failed to join OpenVidu session:", error);
             }

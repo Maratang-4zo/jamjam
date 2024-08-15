@@ -46,7 +46,7 @@ export const OpenViduProvider = ({ children }) => {
       sessionId,
       subscribers,
     });
-  }, [sessionRef, sessionId, subscribers]);
+  }, [currentSpeakers, sessionId, subscribers]);
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
@@ -59,51 +59,59 @@ export const OpenViduProvider = ({ children }) => {
     if (sessionRef.current) return;
 
     const newOv = new OpenVidu({
-      audioSource: true,
+      audioSource: "microphone",
       videoSource: false,
     });
     const newSession = newOv.initSession();
 
     ovRef.current = newOv;
     sessionRef.current = newSession;
-
-    // newSession.on("streamCreated", (event) => {
-    //   const subscriber = newSession.subscribe(event.stream, undefined);
-    //   setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
-    //   console.log("Subscriber added:", subscriber);
-    //   console.log(
-    //     "isSubscribeToRemote:",
-    //     subscriber.stream.isSubscribeToRemote,
-    //   );
-    // });
-
-    // newSession.on("streamDestroyed", (event) => {
-    //   setSubscribers((prevSubscribers) =>
-    //     prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
-    //   );
-    // });
-
-    // newSession.on("publisherStartSpeaking", (event) => {
-    //   console.log("말하는중", event);
-    //   setCurrentSpeakers((prevSpeakers) => [
-    //     ...prevSpeakers,
-    //     event.connection.data,
-    //   ]);
-    // });
-
-    // newSession.on("publisherStopSpeaking", (event) => {
-    //   setCurrentSpeakers((prevSpeakers) =>
-    //     prevSpeakers.filter((id) => id !== event.connection.data),
-    //   );
-    // });
   }, []);
+
+  useEffect(() => {
+    if (sessionRef.current) {
+      sessionRef.current.on("streamCreated", (event) => {
+        const subscriber = sessionRef.current.subscribe(
+          event.stream,
+          undefined,
+        );
+        subscriber.subscribeToAudio(true);
+        setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+        console.log("Subscriber added:", subscriber);
+        console.log(
+          "isSubscribeToRemote:",
+          subscriber.stream.isSubscribeToRemote,
+        );
+      });
+
+      sessionRef.current.on("streamDestroyed", (event) => {
+        setSubscribers((prevSubscribers) =>
+          prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
+        );
+      });
+
+      sessionRef.current.on("publisherStartSpeaking", (event) => {
+        console.log("말하는중", event);
+        setCurrentSpeakers((prevSpeakers) => [
+          ...prevSpeakers,
+          event.connection.data,
+        ]);
+      });
+
+      sessionRef.current.on("publisherStopSpeaking", (event) => {
+        setCurrentSpeakers((prevSpeakers) =>
+          prevSpeakers.filter((id) => id !== event.connection.data),
+        );
+      });
+    }
+  }, [sessionRef.current]);
 
   const createSession = useCallback(async () => {
     try {
       const response = await axios.post(
         APPLICATION_SERVER_URL + "api/wr/rooms",
       );
-      const newSessionId = response.data.sessionId; // Assume the server returns the sessionId
+      const newSessionId = response.data.sessionId;
       console.log(response.data);
       setSessionId(newSessionId);
       return createToken(newSessionId);
@@ -154,40 +162,8 @@ export const OpenViduProvider = ({ children }) => {
       try {
         await sessionRef.current.connect(token);
 
-        sessionRef.current.on("streamCreated", (event) => {
-          const subscriber = sessionRef.current.subscribe(
-            event.stream,
-            undefined,
-          );
-          setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
-          console.log("Subscriber added:", subscriber);
-          console.log(
-            "isSubscribeToRemote:",
-            subscriber.stream.isSubscribeToRemote,
-          );
-        });
-
-        sessionRef.current.on("streamDestroyed", (event) => {
-          setSubscribers((prevSubscribers) =>
-            prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
-          );
-        });
-
-        sessionRef.current.on("publisherStartSpeaking", (event) => {
-          console.log("말하는중", event);
-          setCurrentSpeakers((prevSpeakers) => [
-            ...prevSpeakers,
-            event.connection.data,
-          ]);
-        });
-
-        sessionRef.current.on("publisherStopSpeaking", (event) => {
-          setCurrentSpeakers((prevSpeakers) =>
-            prevSpeakers.filter((id) => id !== event.connection.data),
-          );
-        });
         const newPublisher = ovRef.current.initPublisher("publisher", {
-          audioSource: undefined,
+          audioSource: "microphone",
           videoSource: false,
           publishAudio: true,
           publishVideo: false,

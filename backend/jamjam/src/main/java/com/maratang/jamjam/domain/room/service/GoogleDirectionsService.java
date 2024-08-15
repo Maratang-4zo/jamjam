@@ -21,6 +21,7 @@ public class GoogleDirectionsService {
     public GoogleDirectionsRes getFixedDirections(String origin, String destination) {
         String mode = "transit";
         String apiKey = googleDirectionsConfig.getApiKey();
-        return googleDirectionsClient.getDirections(origin, destination, mode, apiKey);
+        String departureTime = "1723766400";
+        return googleDirectionsClient.getDirections(origin, destination, mode, departureTime, apiKey);
     }
 }

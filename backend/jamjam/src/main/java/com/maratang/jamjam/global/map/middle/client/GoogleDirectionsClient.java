@@ -13,6 +13,7 @@ public interface GoogleDirectionsClient {
             @RequestParam("origin") String origin,
             @RequestParam("destination") String destination,
             @RequestParam("mode") String mode,
+            @RequestParam("departure_time") String departureTime,
             @RequestParam("key") String apiKey
     );
 }

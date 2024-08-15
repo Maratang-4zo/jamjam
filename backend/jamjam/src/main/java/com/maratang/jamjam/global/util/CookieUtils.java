@@ -31,6 +31,8 @@ public class CookieUtils {
 				log.info("들어오긴 했니.."+cookieName);
 				if (cookie.getName().equals(cookieName)) {
 					log.info("여길 들어왔을까"+cookieName);
+					cookie.setValue(null);
+					cookie.setPath("/");
 					cookie.setMaxAge(0);
 					response.addCookie(cookie);
 					return;

@@ -436,6 +436,7 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const handleGameStart = ({ gameRoundUUID }) => {
+    console.log("게임시작!", gameRoundUUID);
     setGameCount(0);
     setGameState("ing");
   };

@@ -1,17 +1,15 @@
 package com.maratang.jamjam.global.map.middle;
 
+import com.maratang.jamjam.domain.localInfo.repository.LocalInfoRepository;
+import com.maratang.jamjam.global.map.station.SubwayInfo;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
-
-import com.maratang.jamjam.domain.localInfo.repository.LocalInfoRepository;
-import com.maratang.jamjam.global.map.station.SubwayInfo;
-
-import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -36,7 +34,7 @@ public class HaversineDistance {
 		double longitude, double radius, String purpose) {
 
 		SubwayInfo selectedStation = null;
-		int maxCount = -1; // 스터디룸(모임목적)이 가장 많은 역의 스터디룸 개수
+		int maxCount = 0; // 스터디룸(모임목적)이 가장 많은 역의 스터디룸 개수
 
 		for (SubwayInfo info : subwayMap.values()) {
 			double distance = calculateDistance(latitude, longitude, info.getLatitude(), info.getLongitude());

@@ -179,6 +179,7 @@ function Game() {
 
   useEffect(() => {
     console.log("Player들의 정보 배열입니다", players);
+    console.log("라운드 아이디", gameRoundUUID);
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         console.log("지금 현재 접속해 있는 사람의 UUID:", myUUID);

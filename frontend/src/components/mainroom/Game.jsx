@@ -172,6 +172,7 @@ function Game() {
     console.log("player 리코일입니다!!!!!!", players);
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
+        console.log("클릭하기전", players);
         setPlayers((prevPlayers) => {
           const updatedPlayers = prevPlayers.map((player) => {
             if (player.attendeeUUID === attendeeUUID) {
@@ -186,17 +187,23 @@ function Game() {
           });
           return updatedPlayers;
         });
+        console.log("클릭한후", players);
       };
 
       handleClick.current = handleBlockClick; // handleClick에 이벤트 등록
     }
-  }, [countdown, win, winner, attendeeUUID, sendGame]);
+  }, [countdown, win, winner, attendeeUUID, sendGame, players]);
 
   return (
     <Wrapper>
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
-        <GameScreen onClick={() => handleClick.current()}>
+        <GameScreen
+          onClick={() => {
+            console.log("Game screen clicked");
+            handleClick.current();
+          }}
+        >
           {" "}
           {/* 클릭 이벤트 수정 */}
           {countdown === 99 ? <Countdown>READY</Countdown> : null}

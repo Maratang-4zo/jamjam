@@ -614,7 +614,7 @@ export const WebSocketProvider = ({ children }) => {
       client.current.publish({
         destination: "/pub/game/round.play",
         body: JSON.stringify({
-          gameRoundUUID: gameRoundUUID.current,
+          gameRoundUUID: gameRoundUUID,
           data: 10,
         }),
       });

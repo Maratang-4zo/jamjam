@@ -214,25 +214,20 @@ function NavBarLeft() {
           <>
             <Attendants>
               {roomInfo.attendees.map((attendee, index) => {
-                const key = attendee.attendeeUUID; // key 값 할당
+                const key = attendee.attendeeUUID;
+                const isSpeaking = currentSpeakers.includes(
+                  attendee.attendeeUUID,
+                );
 
                 return (
                   <Avatar
                     key={key}
                     src={attendee.profileImageUrl}
-                    isSpeaking={currentSpeakers.includes(attendee.attendeeUUID)}
+                    isSpeaking={isSpeaking}
                     onClick={() => handleAvatarClick(attendee, index)}
                   />
                 );
               })}
-              {/* {roomInfo.attendees.map((attendee, index) => (
-                <Avatar
-                  key={attendee.attendeeUUID}
-                  src={attendee.profileImageUrl}
-                  isSpeaking={currentSpeakers.includes(attendee.attendeeUUID)}
-                  onClick={() => handleAvatarClick(attendee, index)}
-                />
-              ))} */}
             </Attendants>
             <Btns>
               <Btn onClick={handleChat} className={bounce ? "bounce" : ""}>

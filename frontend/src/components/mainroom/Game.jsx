@@ -32,7 +32,6 @@ const GameScreen = styled.div`
   flex-shrink: 0;
   border-radius: 30px;
   background: #fff;
-  /* background-image: url(${gameBg}); */
   position: relative; // Position relative to contain the absolute positioning of Block and WinMessage
   display: flex;
   align-items: center;
@@ -130,8 +129,6 @@ function Game() {
           )}
           {selectedGame === 2 && <Game2 />}
           {selectedGame === 3 && <Game3 />}
-          <Game1 handleClick={handleClick} onWin={handleWin} />
-
           <StyledButton
             disabled={!isWinner}
             show={showButton}

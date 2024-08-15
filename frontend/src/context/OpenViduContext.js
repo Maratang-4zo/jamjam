@@ -34,7 +34,6 @@ export const OpenViduProvider = ({ children }) => {
   const joined = useRef(false);
   const [currentSpeakers, setCurrentSpeakers] = useState([]);
   const [isMicOn, setIsMicOn] = useState(true);
-  const [toggleMic, setToggleMic] = useState(() => () => {});
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
@@ -104,26 +103,32 @@ export const OpenViduProvider = ({ children }) => {
       }
     }
 
-    if (sessionRef.current && ovRef.current) {
-      try {
-        await sessionRef.current.connect(token);
-        const newPublisher = ovRef.current.initPublisher("publisher", {
-          audioSource: undefined,
-          videoSource: false,
-          publishAudio: true,
-          publishVideo: false,
-        });
-        publisherRef.current = newPublisher;
-        await sessionRef.current.publish(newPublisher);
-        joined.current = true;
-        console.log("Successfully joined and published to session");
-      } catch (error) {
-        console.error(
-          "Error connecting to the session:",
-          error.code,
-          error.message,
-        );
-      }
+    if (!ovRef.current) {
+      ovRef.current = new OpenVidu();
+    }
+
+    if (!sessionRef.current) {
+      sessionRef.current = ovRef.current.initSession();
+    }
+
+    try {
+      await sessionRef.current.connect(token);
+      const newPublisher = ovRef.current.initPublisher("publisher", {
+        audioSource: undefined,
+        videoSource: false,
+        publishAudio: true,
+        publishVideo: false,
+      });
+      publisherRef.current = newPublisher;
+      await sessionRef.current.publish(newPublisher);
+      joined.current = true;
+      console.log("Successfully joined and published to session");
+    } catch (error) {
+      console.error(
+        "Error connecting to the session:",
+        error.code,
+        error.message,
+      );
     }
   }, [createToken, initSession]);
 
@@ -144,17 +149,17 @@ export const OpenViduProvider = ({ children }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const toggleMicFunction = () => {
-      if (publisherRef.current) {
-        const audioEnabled = publisherRef.current.stream.audioActive;
-        publisherRef.current.publishAudio(!audioEnabled);
-        setIsMicOn(!audioEnabled);
-      }
-    };
+  const toggleMic = useCallback(() => {
+    if (publisherRef.current) {
+      const audioEnabled = publisherRef.current.stream.audioActive;
+      publisherRef.current.publishAudio(!audioEnabled);
+      setIsMicOn(!audioEnabled);
+    }
+  }, []);
 
-    setToggleMic(() => toggleMicFunction);
-  }, [publisherRef.current]);
+  useEffect(() => {
+    console.log("Mic state changed:", isMicOn);
+  }, [isMicOn]);
 
   useEffect(() => {
     if (publisherRef.current) {

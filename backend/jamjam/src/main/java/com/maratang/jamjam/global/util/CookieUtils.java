@@ -28,6 +28,7 @@ public class CookieUtils {
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
+				log.info("들어오긴 했니.."+cookieName);
 				if (cookie.getName().equals(cookieName)) {
 					log.info("여길 들어왔을까"+cookieName);
 					cookie.setMaxAge(0);

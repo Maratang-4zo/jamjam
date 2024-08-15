@@ -199,7 +199,7 @@ function Game() {
         >
           {" "}
           {/* 클릭 이벤트 수정 */}
-          {countdown === 99 ? <Countdown>READY</Countdown> : null}
+          {countdown === 99 || !win ? <Countdown>READY</Countdown> : null}
           {countdown > 0 && countdown < 99 ? (
             <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>
           ) : null}
@@ -223,7 +223,7 @@ function Game() {
               </WinMessage>
               <StyledButton
                 disabled={!isWinner}
-                show={showButton}
+                show={isWinner}
                 onClick={handleNextPageBtn}
               >
                 장소 선택하러 가기

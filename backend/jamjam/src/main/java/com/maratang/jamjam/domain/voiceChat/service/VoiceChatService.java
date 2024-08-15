@@ -58,7 +58,13 @@ public class VoiceChatService {
 		Session session = openviduClient.getActiveSession(roomUUID.toString());
 
 		if (session == null) {
-			throw new BusinessException(ErrorCode.OV_SESSION_NOT_FOUND);
+			SessionProperties properties = new SessionProperties.Builder().customSessionId(roomUUID.toString()).build();
+			try {
+				session = openviduClient.createSession(properties);
+			} catch (OpenViduException e) {
+				throw new BusinessException(ErrorCode.OV_CANNOT_CREATE_SESSION);
+			}
+			// throw new BusinessException(ErrorCode.OV_SESSION_NOT_FOUND);
 		}
 
 		ConnectionProperties properties = new ConnectionProperties.Builder().data(attendeeUUID.toString()).build();

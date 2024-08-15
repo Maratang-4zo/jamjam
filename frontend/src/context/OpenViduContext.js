@@ -163,7 +163,7 @@ export const OpenViduProvider = ({ children }) => {
         await sessionRef.current.connect(token);
 
         const newPublisher = ovRef.current.initPublisher("publisher", {
-          audioSource: "microphone",
+          audioSource: undefined,
           videoSource: false,
           publishAudio: true,
           publishVideo: false,

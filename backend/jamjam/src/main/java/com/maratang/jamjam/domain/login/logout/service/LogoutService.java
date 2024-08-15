@@ -11,25 +11,23 @@ import com.maratang.jamjam.global.auth.jwt.constant.TokenType;
 import com.maratang.jamjam.global.auth.jwt.manager.LoginTokenManager;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.AuthenticationException;
-import com.maratang.jamjam.global.util.CookieUtils;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class LogoutService {
 
 	private final MemberService memberService;
 	private final LoginTokenManager loginTokenManager;
 
 	public void logout(String accessToken, HttpServletRequest request, HttpServletResponse response) {
-
-		CookieUtils.removeCookie(request, response, "refreshToken");
-		CookieUtils.removeCookie(request, response, "accessToken");
 
 		// 1. 토큰 검증
 		Claims tokenClaims = loginTokenManager.getTokenClaims(accessToken);
@@ -42,5 +40,6 @@ public class LogoutService {
 		String memberEmail = String.valueOf(tokenClaims.get("email"));
 		Member member = memberService.findMemberByEmail(memberEmail);
 		member.expireRefreshToken(LocalDateTime.now());
+
 	}
 }

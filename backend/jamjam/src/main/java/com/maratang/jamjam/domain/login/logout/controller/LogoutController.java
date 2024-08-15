@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.login.logout.service.LogoutService;
 import com.maratang.jamjam.global.util.AuthorizationHeaderUtils;
+import com.maratang.jamjam.global.util.CookieUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +28,15 @@ public class LogoutController {
 	@Operation(summary = "로그아웃", description = "refresh token을 만료시킨다.")
 	public ResponseEntity<?> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
+		log.info("LOGOUT ing");
 		String authorization = httpServletRequest.getHeader("Authorization");
 		AuthorizationHeaderUtils.validateAuthorization(authorization);
 		String accessToken = authorization.split(" ")[1];
 
 		logoutService.logout(accessToken, httpServletRequest, httpServletResponse);
+
+		CookieUtils.removeCookie(httpServletRequest, httpServletResponse, "refreshToken");
+		CookieUtils.removeCookie(httpServletRequest, httpServletResponse, "accessToken");
 
 		log.info("LOGOUT SUCCESS");
 		return ResponseEntity.status(HttpStatus.OK).build();

@@ -25,6 +25,7 @@ import Watching from "../components/fixed/Watching";
 import { isHostOutAtom, isPlayingGameAtom } from "../recoil/atoms/loadingState";
 import { useWebSocket } from "../context/WebsocketContext";
 import { useOpenVidu } from "../context/OpenViduContext";
+import { selectedGameAtom } from "../recoil/atoms/gameState";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -55,7 +56,12 @@ function Room() {
   const [isDisabledOn, setIsDisalbedOn] = useState(false);
   const [isHostOut, setIsHostOut] = useRecoilState(isHostOutAtom);
   const [isPlayingGame, setIsPlayingGame] = useRecoilState(isPlayingGameAtom);
-  const estimatedClosedAt = useRecoilValue(estimatedForceCloseAtAtom);
+  const [estimatedClosedAt, setEstimatedClosedAt] = useRecoilState(
+    estimatedForceCloseAtAtom,
+  );
+  const setRoomPage = useSetRecoilState(roomPageAtom);
+  const setSelectedGame = useSetRecoilState(selectedGameAtom);
+
   const { connect, connected } = useWebSocket();
   const { joinSession, joined } = useOpenVidu();
 
@@ -78,25 +84,43 @@ function Room() {
           if (res.roomStatus === "ABORTED" || res.roomStatus === "FINISHED") {
             navigate("/");
             alert("종료된 방입니다.");
-          } else if (res.roomStatus === "PLAYING") {
-            setIsPlayingGame(true);
-          } else if (res.roomStatus === "RESERVED") {
-            setIsHostOut(true);
           }
+          // else if (res.roomStatus === "PLAYING") {
+          //   setIsPlayingGame(true);
+          // } else if (res.roomStatus === "RESERVED") {
+          //   setIsHostOut(true);
+          // }
           // 방 정보 가져오기
           const roomResponse = await axiosGetRoomInfo({ roomUUID });
           const roomData = roomResponse.data;
 
           console.log(roomData);
-          console.log("연결?", connected);
 
-          const { myUUID } = userInfo;
+          const myUUID = roomData.attendeeUUID;
           const myAttendeeInfo = roomData.attendees.find(
             (attendee) => attendee.attendeeUUID === myUUID,
           );
 
+          if (
+            myAttendeeInfo.status === "EXITED" ||
+            res.roomStatus === "PLAYING"
+          ) {
+            setIsPlayingGame(true);
+            setUserInfo((prev) => ({
+              ...prev,
+              status: "ENTERED",
+            }));
+          }
+
+          if (myAttendeeInfo.root === false || res.roomStatus === "RESERVED") {
+            setIsHostOut(true);
+            setEstimatedClosedAt(roomData.estimatedForceCloseAt);
+          }
+
           const nowAttendees = roomData.attendees.filter(
-            (attendee) => attendee.attendeeStatus !== "EXITED",
+            (attendee) =>
+              attendee.attendeeStatus !== "EXITED" ||
+              attendee.attendeeUUID === myUUID,
           );
 
           if (

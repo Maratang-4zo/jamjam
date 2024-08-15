@@ -8,12 +8,7 @@ import ChatOn from "../../assets/icons/chaton.png";
 import ChatOff from "../../assets/icons/chatoff.png";
 import ChattingModal from "./ChattingModal";
 import { useRecoilValue, useResetRecoilState } from "recoil";
-import {
-  chatAtom,
-  isMicOnAtom,
-  currentSpeakersAtom,
-  roomAtom,
-} from "../../recoil/atoms/roomState";
+import { chatAtom, roomAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import UserInfoModal from "./userInfoModal";
 import { userColor } from "../../utils/userColor";
@@ -21,6 +16,7 @@ import ColorThief from "colorthief";
 import Spinner from "./Spinner";
 import { useWebSocket } from "../../context/WebsocketContext";
 import { useOpenVidu } from "../../context/OpenViduContext";
+import { useLeave } from "../../hooks/useLeave";
 
 const bounceAnimation = keyframes`
   0%, 100% {
@@ -112,14 +108,10 @@ function NavBarLeft() {
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const chatLogs = useRecoilValue(chatAtom);
-  const resetUserInfo = useResetRecoilState(userInfoAtom);
-  const resetRoomInfo = useResetRecoilState(roomAtom);
-  const currentSpeakers = useRecoilValue(currentSpeakersAtom);
-  const { toggleMic, leaveSession, isMicOn } = useOpenVidu();
+  const { toggleMic, isMicOn, currentSpeakers } = useOpenVidu();
   const navigate = useNavigate();
-  // const isMicOn = useRecoilValue(isMicOnAtom);
   const prevChatLogsLength = useRef(chatLogs.length);
-  const { disconnect } = useWebSocket();
+  const { leaveFn } = useLeave();
 
   useEffect(() => {
     const loadImages = async () => {
@@ -159,11 +151,7 @@ function NavBarLeft() {
   const handleHomeClick = () => {
     const confirmLeave = window.confirm("정말 나가시겠습니까?");
     if (confirmLeave) {
-      navigate("/");
-      resetUserInfo();
-      resetRoomInfo();
-      disconnect();
-      leaveSession();
+      leaveFn();
     }
   };
 

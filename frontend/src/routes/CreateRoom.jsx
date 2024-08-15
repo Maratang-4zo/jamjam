@@ -14,6 +14,7 @@ import { useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import { roomAtom } from "../recoil/atoms/roomState";
 import { useOpenVidu } from "../context/OpenViduContext";
+import Watching from "../components/fixed/Watching";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -187,6 +188,7 @@ function CreateRoom() {
   return (
     <Wrapper>
       <NavBarUp />
+      <Watching />
       <Content>
         <ErrorBox>
           {errors.meetingDate && (

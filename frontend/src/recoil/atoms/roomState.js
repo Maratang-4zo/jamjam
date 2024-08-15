@@ -43,11 +43,6 @@ export const selectedStationAtom = atom({
   default: null,
 });
 
-export const currentSpeakersAtom = atom({
-  key: "currentSpeakers",
-  default: [],
-});
-
 export const roomPageAtom = atom({
   key: "roomPage",
   default: "main", // main, gamechoice, game, gamefinish, result
@@ -56,44 +51,4 @@ export const roomPageAtom = atom({
 export const estimatedForceCloseAtAtom = atom({
   key: "estimatedForceCloseAt",
   default: null,
-});
-
-export const wsClientAtom = atom({
-  key: "wsClient",
-  default: null,
-});
-
-export const isWsConnectedAtom = atom({
-  key: "isWsConnected",
-  default: false,
-});
-
-export const isWsSubscribedAtom = atom({
-  key: "isWsSubscribed",
-  default: false,
-});
-
-export const isOVConnectedAtom = atom({
-  key: "isOVConnected",
-  default: false,
-});
-
-export const OVSessionAtom = atom({
-  key: "OVSession",
-  default: null,
-});
-
-export const OVRefAtom = atom({
-  key: "OVRef",
-  default: null,
-});
-
-export const OVPublisherAtom = atom({
-  key: "OVPublisher",
-  default: null,
-});
-
-export const isMicOnAtom = atom({
-  key: "isMicOn",
-  default: true,
 });

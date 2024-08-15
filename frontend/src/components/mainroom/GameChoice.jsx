@@ -119,7 +119,6 @@ const PlayButtonText = styled.div`
 `;
 
 function GameChoice() {
-  const [localSelectedGame, setLocalSelectedGame] = useState(null);
   const roomInfo = useRecoilValue(roomAtom);
   const userInfo = useRecoilValue(userInfoAtom);
   const roundCenter = useRecoilValue(roundCenterAtom);
@@ -142,10 +141,10 @@ function GameChoice() {
   }, [roomInfo, userInfo, setPlayerState]);
 
   const handlePlayButtonClick = () => {
-    if (localSelectedGame != null) {
+    if (selectedGame != null) {
       sendRoundInfo({
         round: currentRound,
-        gameId: localSelectedGame,
+        gameId: selectedGame,
         gameSessionUUID: gameSessionUUID,
         stationName: roundCenter.name,
       });

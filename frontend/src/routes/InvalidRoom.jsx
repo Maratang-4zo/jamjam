@@ -1,9 +1,10 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import NavBarUp from "../components/fixed/NavBarUp";
 import character from "../assets/character.png";
 import chat from "../assets/CatChat2.png";
+import { useLeave } from "../hooks/useLeave";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -68,11 +69,11 @@ const ImgBox = styled.div`
 `;
 
 function InvalidRoom() {
-  const navigate = useNavigate();
-
-  const goToHome = () => {
-    navigate("/");
-  };
+  const { leaveFn } = useLeave();
+  // 모든 recoil 초기화
+  useEffect(() => {
+    leaveFn();
+  }, []);
 
   return (
     <Wrapper>

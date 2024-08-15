@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
-import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
+import com.maratang.jamjam.global.auth.room.RoomTokenManager;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenDto;
 import com.maratang.jamjam.global.util.CookieUtils;
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TestController {
 
-	private final RoomTokenProvider roomTokenProvider;
+	private final RoomTokenManager roomTokenManager;
 	private final AttendeeRepository attendeeRepository;
 	private final TestService testService;
 
@@ -58,7 +58,7 @@ public class TestController {
 			.roomUUID(roomUUID)
 			.attendeeUUID(attendeeUUID)
 			.build();
-		RoomJwtTokenDto roomJwtTokenDto = roomTokenProvider.createRoomJwtToken(roomJwtTokenClaims);
+		RoomJwtTokenDto roomJwtTokenDto = roomTokenManager.createRoomJwtToken(roomJwtTokenClaims);
 		CookieUtils.createSessionCookie(response, "roomToken", roomJwtTokenDto.getRoomToken());
 		CookieUtils.createSessionCookie(response, "roomUUID", roomUUID.toString());
 		return ResponseEntity.status(HttpStatus.OK).body(roomJwtTokenDto);

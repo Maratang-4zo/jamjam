@@ -4,15 +4,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.WebUtils;
 
-import com.maratang.jamjam.global.auth.jwt.manager.TokenManager;
-import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
-import com.maratang.jamjam.global.error.ErrorCode;
-import com.maratang.jamjam.global.error.exception.AuthenticationException;
-import com.maratang.jamjam.global.error.exception.BusinessException;
-import com.maratang.jamjam.global.util.CookieUtils;
+import com.maratang.jamjam.global.auth.jwt.manager.LoginTokenManager;
+import com.maratang.jamjam.global.auth.room.RoomTokenManager;
+import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,73 +16,49 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class RoomAuthenticationInterceptor implements HandlerInterceptor {
-	private final RoomTokenProvider roomTokenProvider;
-	private final TokenManager tokenManager;
+	private final RoomTokenManager roomTokenManager;
+	private final LoginTokenManager loginTokenManager;
 
 	@Override
 	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
-		if(request.getRequestURI().endsWith("/join")){
-			checkLoginToken(request, response);
-			return true;
+		authenticateUser(request, response);
+
+		if(!request.getRequestURI().endsWith("/join") && !request.getRequestURI().equals("/api/rooms")){
+			authenticateRoom(request);
 		}
-
-		String token = roomTokenProvider.resolveToken(request);
-
-		if(!roomTokenProvider.validateToken(token)){
-			throw new BusinessException(ErrorCode.UNAUTHORIZED);
-		};
-
-		Claims claims = roomTokenProvider.getTokenClaims(token);
-
-		request.setAttribute("roomUUID", claims.get("roomUUID"));
-		request.setAttribute("attendeeUUID", claims.get("attendeeUUID"));
-
-		checkLoginToken(request, response);
-
 		return true;
 	}
 
-	public void checkLoginToken(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String email = "";
-		Cookie access = WebUtils.getCookie(request, "accessToken");
-		Cookie refresh = WebUtils.getCookie(request, "refreshToken");
+	public String resolveToken(HttpServletRequest request, String tokenName){
+		Cookie cookie = WebUtils.getCookie(request, tokenName);
+		return cookie != null ? cookie.getValue() : null;
+	}
 
-		request.setAttribute("email", email);
+	private void authenticateRoom(HttpServletRequest request) {
+		String token = resolveToken(request, "roomToken");
 
-		if(access != null && refresh != null) {
-			String accessToken = access.getValue();
-			String refreshToken = refresh.getValue();
-			try {
-				String newAccessToken = null;
-				if (!tokenManager.validateAccessToken(accessToken, request, response)) {
-					if(tokenManager.validateRefreshToken(refreshToken, request, response))
-						newAccessToken = tokenManager.reissueToken(refreshToken);
-				}
+		RoomJwtTokenClaims claims = roomTokenManager.getRoomClaims(token);
+		request.setAttribute("roomUUID", claims.getRoomUUID());
+		request.setAttribute("attendeeUUID", claims.getAttendeeUUID());
+	}
 
-				if (newAccessToken != null) {
-					accessToken = newAccessToken;
-				}
+	public void authenticateUser(HttpServletRequest request, HttpServletResponse response) {
+		Cookie accessCookie = WebUtils.getCookie(request, "accessToken");
+		Cookie refreshCookie = WebUtils.getCookie(request, "refreshToken");
 
-				Claims claims = tokenManager.getTokenClaims(accessToken);
-				email = claims.get("email").toString();
-			} catch (ExpiredJwtException e){
-				String newAccessToken = null;
-
-				if(tokenManager.validateRefreshToken(refreshToken, request, response))
-					newAccessToken = tokenManager.reissueToken(refreshToken);
-
-				if (newAccessToken != null) {
-					accessToken = newAccessToken;
-					CookieUtils.createSessionCookie(response, "accessToken", accessToken);
-				}
-
-				Claims tokenClaims = tokenManager.getTokenClaims(accessToken);
-				email = tokenClaims.get("email").toString();
-
-			}catch (Exception e) {
-				throw new AuthenticationException(ErrorCode.NOT_VALID_TOKEN);
-			}
+		if (accessCookie == null || refreshCookie == null) {
+			request.setAttribute("email", "");
+			return;
 		}
+
+		String accessToken = accessCookie.getValue();
+		String refreshToken = refreshCookie.getValue();
+
+		accessToken = loginTokenManager.validateAndRefreshTokenIfNeeded(accessToken, refreshToken, response);
+
+		// 3. 토큰 타입
+		String email = loginTokenManager.getMemberEmail(accessToken);
+
 		request.setAttribute("email", email);
 	}
 }

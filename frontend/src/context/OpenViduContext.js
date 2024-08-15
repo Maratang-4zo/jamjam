@@ -96,7 +96,12 @@ export const OpenViduProvider = ({ children }) => {
     let token = getCookie("OpenviduToken");
 
     if (!token) {
-      token = await createToken();
+      try {
+        token = await createToken();
+      } catch (error) {
+        console.error("Failed to create token:", error);
+        return;
+      }
     }
 
     if (sessionRef.current && ovRef.current) {
@@ -111,8 +116,9 @@ export const OpenViduProvider = ({ children }) => {
         publisherRef.current = newPublisher;
         await sessionRef.current.publish(newPublisher);
         joined.current = true;
+        console.log("Successfully joined and published to session");
       } catch (error) {
-        console.log(
+        console.error(
           "Error connecting to the session:",
           error.code,
           error.message,

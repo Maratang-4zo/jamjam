@@ -240,9 +240,29 @@ export const WebSocketProvider = ({ children }) => {
       case "ROOM_FORCE_EXIT":
         handleRoomExit(messageBody);
         break;
+      case "GAME_PLAY":
+        handleGamePlay(messageBody);
       default:
         console.error("Unknown message type:", message.type);
     }
+  };
+
+  setRoomInfo((prevRoomInfo) => ({
+    ...prevRoomInfo,
+    attendees: [...prevRoomInfo.attendees, newAttendee],
+    hostUUID: root ? attendeeUUID : prevRoomInfo.hostUUID,
+  }));
+
+  const handleGamePlay = (message) => {
+    setWinnerUUID(message.winnerUUID);
+
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.uuid === message.attendeeUUID
+          ? { ...player, bottom: message.data }
+          : player,
+      ),
+    );
   };
 
   const handleRoomEnter = (message) => {

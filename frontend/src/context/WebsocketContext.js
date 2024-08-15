@@ -253,7 +253,7 @@ export const WebSocketProvider = ({ children }) => {
 
     setPlayers((prevPlayers) =>
       prevPlayers.map((player) =>
-        player.uuid === message.attendeeUUID
+        player.attendeeUUID === message.attendeeUUID
           ? { ...player, bottom: message.data }
           : player,
       ),

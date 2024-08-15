@@ -155,7 +155,10 @@ export const OpenViduProvider = ({ children }) => {
         await sessionRef.current.connect(token);
 
         sessionRef.current.on("streamCreated", (event) => {
-          const subscriber = newSession.subscribe(event.stream, undefined);
+          const subscriber = sessionRef.current.subscribe(
+            event.stream,
+            undefined,
+          );
           setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
           console.log("Subscriber added:", subscriber);
           console.log(

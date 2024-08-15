@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   roomAtom,
   isNextMiddleExistAtom,
   aroundStationsAtom,
   selectedStationAtom,
-  roomPageAtom,
 } from "../../recoil/atoms/roomState";
 import Loading from "../fixed/Loading";
-import { axiosPatchNextMiddle } from "../../apis/mapApi";
 import {
   gameRecordAtom,
   isWinnerAtom,
@@ -21,14 +19,9 @@ import {
   winnerUUIDAtom,
   winnerNicknameAtom,
 } from "../../recoil/atoms/gameState";
-import useWs from "../../hooks/useWs";
 import { lineColor } from "../../utils/lineColor";
 import { lineName } from "../../utils/lineName";
-import {
-  isHistoryLoadingAtom,
-  isThreeStationLoadingAtom,
-} from "../../recoil/atoms/loadingState";
-import { getCookie } from "../../utils/Cookies";
+import { isHistoryLoadingAtom } from "../../recoil/atoms/loadingState";
 import { useWebSocket } from "../../context/WebsocketContext";
 
 const BottomBtns = styled.div`

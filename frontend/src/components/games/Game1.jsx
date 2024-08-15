@@ -9,8 +9,6 @@ import {
   winnerNicknameAtom,
 } from "../../recoil/atoms/gameState";
 import { useLocation } from "react-router-dom";
-import useWs from "../../hooks/useWs";
-import minGang from "../../assets/Mingang.png";
 import { useWebSocket } from "../../context/WebsocketContext";
 
 const BlockContainer = styled.div`
@@ -64,7 +62,7 @@ function Game1({ handleClick, onWin }) {
   const [winner, setWinner] = useRecoilState(winnerNicknameAtom); // 승리자 상태 추가
   const location = useLocation();
   const { roomUUID, attendeeUUID } = location.state || {};
-  const { sendGame } = useWebSocket(); // useWs 훅 사용
+  const { sendGame } = useWebSocket();
   const gameState = useRecoilValue(gameStateAtom);
 
   useEffect(() => {

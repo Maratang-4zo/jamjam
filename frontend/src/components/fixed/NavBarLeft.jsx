@@ -14,13 +14,11 @@ import {
   currentSpeakersAtom,
   roomAtom,
 } from "../../recoil/atoms/roomState";
-// import useOpenVidu from "../../hooks/useOpenVidu";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import UserInfoModal from "./userInfoModal";
 import { userColor } from "../../utils/userColor";
 import ColorThief from "colorthief";
 import Spinner from "./Spinner";
-import useWs from "../../hooks/useWs";
 import { useWebSocket } from "../../context/WebsocketContext";
 import { useOpenVidu } from "../../context/OpenViduContext";
 

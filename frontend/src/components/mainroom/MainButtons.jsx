@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { useNavigate } from "react-router-dom";
-import {
-  roomAtom,
-  chatModalVisibleAtom,
-  roomPageAtom,
-} from "../../recoil/atoms/roomState";
+import { roomAtom, chatModalVisibleAtom } from "../../recoil/atoms/roomState";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import alertIcon from "../../assets/icons/alertIcon.png";
 import inviteIcon from "../../assets/icons/inviteIcon.png";
@@ -16,7 +11,6 @@ import TutorialModal from "./Tutorial";
 import Loading from "../fixed/Loading";
 import FindDeparture from "./Departure";
 import { axiosGetMiddle } from "../../apis/mapApi";
-import useWs from "../../hooks/useWs";
 import { totalRoundAtom } from "../../recoil/atoms/gameState";
 import { axiosGetKakaoCalendar } from "../../apis/loginApi";
 import { useWebSocket } from "../../context/WebsocketContext";

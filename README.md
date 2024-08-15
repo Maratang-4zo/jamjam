@@ -42,4 +42,4 @@
 
 ## 전체 아키텍처
 
-![전체 아키텍처 (1)](https://github.com/user-attachments/assets/4ac02560-2240-469a-b07e-1cc80854faf9)
+![전체 아키텍처 (2)](https://github.com/user-attachments/assets/43829c66-33db-4dd4-8bae-f795437040c4)

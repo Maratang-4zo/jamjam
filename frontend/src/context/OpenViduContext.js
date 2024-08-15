@@ -113,14 +113,6 @@ export const OpenViduProvider = ({ children }) => {
       }
     }
 
-    if (!ovRef.current) {
-      ovRef.current = new OpenVidu();
-    }
-
-    if (!sessionRef.current) {
-      sessionRef.current = ovRef.current.initSession();
-    }
-
     try {
       await sessionRef.current.connect(token);
       const newPublisher = ovRef.current.initPublisher("publisher", {

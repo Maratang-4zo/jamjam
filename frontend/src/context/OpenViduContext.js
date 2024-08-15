@@ -43,24 +43,10 @@ export const OpenViduProvider = ({ children }) => {
   const roomInfo = useRecoilValue(roomAtom);
 
   useEffect(() => {
-    console.log("OpenVidu context state:", {
-      sessionRef: sessionRef.current,
-      ovRef: ovRef.current,
-      publisherRef: publisherRef.current,
-      joined: joined.current,
-      isMicOn,
+    console.log("누가 말하고 있는가", {
       currentSpeakers,
-      connectionMap,
     });
-  }, [
-    sessionRef.current,
-    ovRef.current,
-    publisherRef.current,
-    joined.current,
-    isMicOn,
-    currentSpeakers,
-    connectionMap,
-  ]);
+  }, [currentSpeakers]);
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {

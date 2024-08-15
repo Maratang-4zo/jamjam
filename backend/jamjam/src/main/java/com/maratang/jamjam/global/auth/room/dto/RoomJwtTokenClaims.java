@@ -32,4 +32,11 @@ public class RoomJwtTokenClaims {
 				.attendeeUUID(res.getAttendeeUUID())
 				.build();
 	}
+
+	public static RoomJwtTokenClaims of(UUID roomUUID, UUID attendeeUUID) {
+		return RoomJwtTokenClaims.builder()
+                .roomUUID(roomUUID)
+                .attendeeUUID(attendeeUUID)
+                .build();
+	}
 }

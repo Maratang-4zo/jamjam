@@ -25,7 +25,7 @@ import com.maratang.jamjam.domain.room.dto.response.RootLeaveRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.entity.RoomStatus;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
-import com.maratang.jamjam.global.auth.room.RoomTokenProvider;
+import com.maratang.jamjam.global.auth.room.RoomTokenManager;
 import com.maratang.jamjam.global.auth.room.dto.RoomJwtTokenClaims;
 import com.maratang.jamjam.global.error.ErrorCode;
 import com.maratang.jamjam.global.error.exception.BusinessException;
@@ -34,7 +34,6 @@ import com.maratang.jamjam.global.map.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -48,7 +47,7 @@ public class RoomService {
 	private final NickRepository nickRepository;
 	private final NameRepository nameRepository;
 	private final SubwayDataLoader subwayDataLoader;
-	private final RoomTokenProvider roomTokenProvider;
+	private final RoomTokenManager roomTokenManager;
 	private final MemberService memberService;
 
 	// 방 정보 받기
@@ -74,19 +73,7 @@ public class RoomService {
 	public RoomRes isRoomExist(UUID roomUUID, HttpServletRequest request){
 		Room room = roomRepository.findByRoomUUID(roomUUID).orElseThrow(() -> new BusinessException(ErrorCode.ROOM_NOT_FOUND));
 
-		boolean hasToken = false;
-		// todo: fix.....
-		try{
-			String token = roomTokenProvider.resolveToken(request);
-			if(token != null){
-				Claims claims = roomTokenProvider.getTokenClaims(token);
-				if(roomUUID.toString().equals(claims.get("roomUUID"))){
-					hasToken = true;
-				}
-			}
-		} catch (Exception ignored){
-		}
-
+		boolean hasToken = roomTokenManager.hasRoomToken(request, roomUUID);
 
 		return RoomRes.of(room, hasToken);
 	}

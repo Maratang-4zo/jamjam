@@ -36,6 +36,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		String accessToken = extractAccessToken(authorizationHeader);
 		String refreshToken = extractRefreshToken(request);
 
+		log.info("accessToken나오나요? "+accessToken);
+		log.info("refreshToken나오나요? "+refreshToken);
+
 		accessToken = loginTokenManager.validateAndRefreshTokenIfNeeded(accessToken, refreshToken, response);
 
 		// 3. 토큰 타입

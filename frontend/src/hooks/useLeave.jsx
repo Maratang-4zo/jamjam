@@ -94,7 +94,7 @@ export const useLeave = () => {
     resetSelectedStations();
     resetRoomPage();
     resetEstimatedForceClose();
-    resetUserInfo();
+    // resetUserInfo();
     resetPlayerState();
     resetSelectedGame();
     resetIsWinner();

@@ -72,10 +72,6 @@ const StyledButton = styled.button`
   display: ${(props) => (props.show ? "flex" : "none")};
 `;
 
-// const Container = styled.div`
-//   background-image: url(${gameBg});
-// `;
-
 const BlockContainer = styled.div`
   display: flex;
   align-items: flex-end;
@@ -123,14 +119,13 @@ const Countdown = styled.div`
 function Game() {
   const location = useLocation();
   const { selectedGame, roomUUID, attendeeUUID } = location.state || {};
-  const handleBlockClick = useRef(() => {});
+  const handleClick = useRef(() => {}); // handleClick 통일
   const [showButton, setShowButton] = useState(false);
   const roomInfo = useRecoilValue(roomAtom);
   const isWinner = useRecoilValue(isWinnerAtom);
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
 
   const [isLoading, setIsLoading] = useRecoilState(isThreeStationLoadingAtom);
-  const [bottom, setBottom] = useState(0);
   const [win, setWin] = useRecoilState(isWinnerAtom);
   const [countdown, setCountdown] = useRecoilState(gameCountAtom);
   const [players, setPlayers] = useRecoilState(playerState);
@@ -175,7 +170,6 @@ function Game() {
 
   useEffect(() => {
     console.log("player 리코일입니다!!!!!!", players);
-    console.log("player의 bottom입니다!!!!", bottom);
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
         setPlayers((prevPlayers) => {
@@ -185,7 +179,7 @@ function Game() {
               if (newBottom >= 480) {
                 handleWin();
               }
-              sendGame({ newBottom }); // WebSocket으로 새 위치 전송
+              sendGame({ attendeeUUID, bottom: newBottom }); // WebSocket으로 새 위치 전송
               return { ...player, bottom: newBottom };
             }
             return player;
@@ -194,7 +188,7 @@ function Game() {
         });
       };
 
-      handleClick.current = handleBlockClick;
+      handleClick.current = handleBlockClick; // handleClick에 이벤트 등록
     }
   }, [countdown, win, winner, attendeeUUID, sendGame]);
 
@@ -202,7 +196,9 @@ function Game() {
     <Wrapper>
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
-        <GameScreen onClick={() => handleBlockClick.current()}>
+        <GameScreen onClick={() => handleClick.current()}>
+          {" "}
+          {/* 클릭 이벤트 수정 */}
           {countdown === 99 ? <Countdown>READY</Countdown> : null}
           {countdown > 0 && countdown < 99 ? (
             <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>

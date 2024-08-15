@@ -15,13 +15,13 @@ const OpenViduContext = React.createContext({
   ovRef: null,
   publisherRef: null,
   joined: false,
-  currentSpeakers: [], // 현재 말하고 있는 사용자 상태 반환
+  currentSpeakers: [],
   joinSession: () => {},
   leaveSession: () => {},
   createSession: () => {},
   createToken: () => {},
-  toggleMic: () => {}, // 마이크 토글 함수 반환
-  isMicOn: true, // 마이크 상태 반환
+  toggleMic: () => {},
+  isMicOn: true,
 });
 
 export const useOpenVidu = () => useContext(OpenViduContext);
@@ -30,20 +30,21 @@ export const OpenViduProvider = ({ children }) => {
   const APPLICATION_SERVER_URL = "https://jjam.shop/";
   const sessionRef = useRef(null);
   const ovRef = useRef(null);
-  const publisherRef = useRef(null); // Publisher 객체를 저장할 ref 추가
+  const publisherRef = useRef(null);
   const joined = useRef(false);
   const [currentSpeakers, setCurrentSpeakers] = useState([]);
-  const [isMicOn, setIsMicOn] = useState(true); // 마이크 상태를 관리하는 상태 추가
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [toggleMic, setToggleMic] = useState(() => () => {});
 
-  const leaveSession = () => {
+  const leaveSession = useCallback(() => {
     if (sessionRef.current) {
       sessionRef.current.disconnect();
     }
     joined.current = false;
-  };
+  }, []);
 
   const initSession = useCallback(() => {
-    if (sessionRef.current) return; // 이미 초기화되었으면 리턴
+    if (sessionRef.current) return;
 
     const newOv = new OpenVidu();
     const newSession = newOv.initSession();
@@ -67,14 +68,14 @@ export const OpenViduProvider = ({ children }) => {
         prevSpeakers.filter((id) => id !== event.connection.connectionId),
       );
     });
-  }, [setCurrentSpeakers]);
+  }, []);
 
-  const createSession = async () => {
+  const createSession = useCallback(async () => {
     await axios.post(APPLICATION_SERVER_URL + "api/wr/rooms");
     return createToken();
-  };
+  }, []);
 
-  const createToken = () => {
+  const createToken = useCallback(() => {
     return new Promise((resolve, reject) => {
       axios
         .post(APPLICATION_SERVER_URL + "api/wr/rooms/token")
@@ -87,7 +88,38 @@ export const OpenViduProvider = ({ children }) => {
           reject(err);
         });
     });
-  };
+  }, []);
+
+  const joinSession = useCallback(async () => {
+    initSession();
+
+    let token = getCookie("OpenviduToken");
+
+    if (!token) {
+      token = await createToken();
+    }
+
+    if (sessionRef.current && ovRef.current) {
+      try {
+        await sessionRef.current.connect(token);
+        const newPublisher = ovRef.current.initPublisher("publisher", {
+          audioSource: undefined,
+          videoSource: false,
+          publishAudio: true,
+          publishVideo: false,
+        });
+        publisherRef.current = newPublisher;
+        await sessionRef.current.publish(newPublisher);
+        joined.current = true;
+      } catch (error) {
+        console.log(
+          "Error connecting to the session:",
+          error.code,
+          error.message,
+        );
+      }
+    }
+  }, [createToken, initSession]);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -106,67 +138,51 @@ export const OpenViduProvider = ({ children }) => {
     };
   }, []);
 
-  const joinSession = async () => {
-    initSession();
+  useEffect(() => {
+    const toggleMicFunction = () => {
+      if (publisherRef.current) {
+        const audioEnabled = publisherRef.current.stream.audioActive;
+        publisherRef.current.publishAudio(!audioEnabled);
+        setIsMicOn(!audioEnabled);
+      }
+    };
 
-    let token = getCookie("OpenviduToken");
+    setToggleMic(() => toggleMicFunction);
+  }, [publisherRef.current]);
 
-    if (!token) {
-      // 쿠키에 토큰이 없을 경우 토큰을 생성하여 쿠키에 저장
-      token = await createToken();
-    }
-
-    if (sessionRef.current && ovRef.current) {
-      sessionRef.current
-        .connect(token)
-        .then(() => {
-          const newPublisher = ovRef.current.initPublisher("publisher", {
-            audioSource: undefined, // The source of audio. If undefined default audio input
-            videoSource: false, // The source of video. If undefined default video input
-            publishAudio: true, // Whether you want to start the publishing with audio unmuted or muted
-            publishVideo: false, // Whether you want to start the publishing with video enabled or disabled
-          });
-          publisherRef.current = newPublisher; // Publisher 객체 저장
-          sessionRef.current.publish(newPublisher);
-          joined.current = true;
-        })
-        .catch((error) => {
-          console.log(
-            "There was an error connecting to the session:",
-            error.code,
-            error.message,
-          );
-        });
-    }
-  };
-
-  const toggleMic = () => {
+  useEffect(() => {
     if (publisherRef.current) {
-      const audioEnabled = publisherRef.current.stream.audioActive;
-      publisherRef.current.publishAudio(!audioEnabled); // 마이크 상태 토글
-      setIsMicOn(!audioEnabled); // 마이크 상태 업데이트
+      setIsMicOn(publisherRef.current.stream.audioActive);
     }
-  };
+  }, [publisherRef.current]);
 
-  const handlers = useMemo(
+  const contextValue = useMemo(
     () => ({
-      sessionRef: sessionRef.current,
-      ovRef: ovRef.current,
-      publisherRef: publisherRef.current,
-      joined: joined.current,
-      currentSpeakers: currentSpeakers.current, // 현재 말하고 있는 사용자 상태 반환
+      sessionRef,
+      ovRef,
+      publisherRef,
+      joined,
+      currentSpeakers,
       joinSession,
       leaveSession,
       createSession,
       createToken,
-      toggleMic, // 마이크 토글 함수 반환
-      isMicOn: isMicOn.current, // 마이크 상태 반환
+      toggleMic,
+      isMicOn,
     }),
-    [],
+    [
+      currentSpeakers,
+      isMicOn,
+      joinSession,
+      leaveSession,
+      createSession,
+      createToken,
+      toggleMic,
+    ],
   );
 
   return (
-    <OpenViduContext.Provider value={handlers}>
+    <OpenViduContext.Provider value={contextValue}>
       {children}
     </OpenViduContext.Provider>
   );

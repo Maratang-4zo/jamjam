@@ -126,5 +126,10 @@ public class Room extends BaseTimeEntity {
 		this.estimatedForceCloseAt = forceClose;
 		this.roomStatus = RoomStatus.RESERVED;
 	}
+
+	public boolean isBeforeClose(){
+		return this.estimatedForceCloseAt.isAfter(LocalDateTime.now());
+	}
+
 }
 

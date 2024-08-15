@@ -157,6 +157,8 @@ public class RoomService {
 
 		if(room.getRoomStatus() == RoomStatus.PLAYING){
 			attendee.updateStatus(AttendeeStatus.WAITING);
+		} else if(room.getRoomStatus() == RoomStatus.CREATED){
+			room.updateStatus(RoomStatus.ONGOING);
 		} else {
 			attendee.updateStatus(AttendeeStatus.ENTERED);
 		}
@@ -168,7 +170,7 @@ public class RoomService {
 		System.out.println("해볼게용");
 
 		// 1-1. 나갔다 온 방장이니?
-		if(room.getRoomStatus() == RoomStatus.RESERVED && room.getEstimatedForceCloseAt().isAfter(LocalDateTime.now()) && room.getRoot().getAttendeeUUID() == attendeeUUID){
+		if(room.getRoomStatus() == RoomStatus.RESERVED && room.isBeforeClose() && room.getRoot().getAttendeeUUID().equals(attendeeUUID)){
 			room.updateStatus(RoomStatus.ONGOING);
 			roomRepository.save(room);
 			broadCastService.broadcastToRoom(roomUUID, attendeeInfo, BroadCastType.ROOM_ROOT_REENTRY);

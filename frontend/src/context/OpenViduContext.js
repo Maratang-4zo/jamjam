@@ -73,10 +73,6 @@ export const OpenViduProvider = ({ children }) => {
         audioSource: undefined, // 오디오만 사용한다면
         videoSource: false, // 비디오를 사용하지 않는다면
       });
-      subscriber.on("streamPlaying (신입받아라)", () => {
-        console.log("Stream is playing");
-        console.log("Subscriber:", subscriber);
-      });
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     });
 
@@ -155,7 +151,7 @@ export const OpenViduProvider = ({ children }) => {
       }
 
       try {
-        await sessionRef.current.connect(token, { isSubscribeToRemote: true });
+        await sessionRef.current.connect(token);
         sessionRef.current.on("streamCreated", (event) => {
           console.log("New stream created:", event.stream);
         });

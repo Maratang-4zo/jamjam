@@ -136,6 +136,39 @@ export const OpenViduProvider = ({ children }) => {
     async (givenSessionId = null) => {
       initSession();
 
+      newSession.on("streamCreated", (event) => {
+        const subscriber = newSession.subscribe(event.stream, "subscriber", {
+          insertMode: "APPEND",
+          audioSource: true, // 오디오만 사용한다면
+          videoSource: false, // 비디오를 사용하지 않는다면
+        });
+        subscriber.on("streamPlaying (신입받아라)", () => {
+          console.log("Stream is playing");
+          console.log("Subscriber:", subscriber);
+        });
+        setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+      });
+
+      newSession.on("streamDestroyed", (event) => {
+        setSubscribers((prevSubscribers) =>
+          prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
+        );
+      });
+
+      newSession.on("publisherStartSpeaking", (event) => {
+        console.log("말하는중", event);
+        setCurrentSpeakers((prevSpeakers) => [
+          ...prevSpeakers,
+          event.connection.data,
+        ]);
+      });
+
+      newSession.on("publisherStopSpeaking", (event) => {
+        setCurrentSpeakers((prevSpeakers) =>
+          prevSpeakers.filter((id) => id !== event.connection.data),
+        );
+      });
+
       let token = getCookie("OpenviduToken");
       let storedSessionId = getCookie("OpenviduSessionId");
 

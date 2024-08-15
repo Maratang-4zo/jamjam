@@ -8,6 +8,7 @@ import Reconnect from "./routes/Reconnect";
 import InvalidRoom from "./routes/InvalidRoom";
 import Han from "./routes/Han";
 import NewHome from "./routes/NewHome";
+import Test from "./routes/Test";
 import { WebSocketProvider } from "./context/WebsocketContext";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
           <Route path="/invalid-room" element={<InvalidRoom />} />
           <Route path="/newhome" element={<NewHome />} />
           <Route path="/han" element={<Han />} />
+          <Route path="/test" element={<Test />} />
         </Routes>
       </WebSocketProvider>
     </BrowserRouter>

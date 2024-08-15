@@ -436,13 +436,13 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const handleGameStart = ({ gameRoundUUID }) => {
-    console.log("게임시작!", gameRoundUUID);
+    // console.log("게임시작!", gameRoundUUID);
     setGameCount(0);
     setGameState("ing");
   };
 
   const handleGameCountdown = ({ gameRoundUUID, countdown }) => {
-    console.log("카운트값 제대로 들어갔니..??", countdown);
+    // console.log("카운트값 제대로 들어갔니..??", countdown);
     setGameCount(countdown);
   };
 

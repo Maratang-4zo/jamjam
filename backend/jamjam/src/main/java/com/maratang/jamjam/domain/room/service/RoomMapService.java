@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RoomMapService {
 
-	private static final double SEARCH_RADIUS = 5.0; // 5km
+	private static final double SEARCH_RADIUS = 2.0; // 5km
 	private static final List<String> VALID_PURPOSES = Arrays.asList("스터디룸", "식당", "카페", "호프", "헬스클럽", "도서관", "공원", "미술관", "애견카페", "셀프사진");
 
 	private final AttendeeRepository attendeeRepository;

@@ -38,8 +38,8 @@ public class RoomAuthenticationInterceptor implements HandlerInterceptor {
 		String token = resolveToken(request, "roomToken");
 
 		RoomJwtTokenClaims claims = roomTokenManager.getRoomClaims(token);
-		request.setAttribute("roomUUID", claims.getRoomUUID().toString());
-		request.setAttribute("attendeeUUID", claims.getAttendeeUUID().toString());
+		request.setAttribute("roomUUID", claims.getRoomUUID());
+		request.setAttribute("attendeeUUID", claims.getAttendeeUUID());
 	}
 
 	public void authenticateUser(HttpServletRequest request, HttpServletResponse response) {

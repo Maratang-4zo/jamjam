@@ -93,10 +93,10 @@ const Block = styled.div`
   background-repeat: no-repeat;
   background-position: center;
   margin: 0 10px;
-  position: relative;
+  position: absolute;
   border-radius: 50%;
   border: 1px solid black;
-  bottom: ${(props) => `${props.bottom}px`}; // 추가된 부분
+  bottom: ${(props) => `${props.bottom}px`};
 `;
 
 const WinMessage = styled.div`
@@ -175,7 +175,7 @@ function Game() {
 
   useEffect(() => {
     if (countdown === 0 && !win && !winner) {
-      handleBlockClick.current = () => {
+      const handleBlockClick = () => {
         setPlayers((prevPlayers) => {
           const updatedPlayers = prevPlayers.map((player) => {
             if (player.attendeeUUID === attendeeUUID) {
@@ -183,7 +183,7 @@ function Game() {
               if (newBottom >= 480) {
                 handleWin();
               }
-              sendGame({ newBottom });
+              sendGame({ newBottom }); // WebSocket으로 새 위치 전송
               return { ...player, bottom: newBottom };
             }
             return player;
@@ -191,6 +191,8 @@ function Game() {
           return updatedPlayers;
         });
       };
+
+      handleClick.current = handleBlockClick;
     }
   }, [countdown, win, winner, attendeeUUID, sendGame]);
 

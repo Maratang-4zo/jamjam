@@ -66,9 +66,9 @@ function Game1({ handleClick, onWin }) {
   const gameState = useRecoilValue(gameStateAtom);
 
   useEffect(() => {
-    console.log("카운트다운:", countdown);
-    console.log("플레이어들:", players);
-  }, [countdown, players]);
+    console.log("플레이어 상태 초기화 여부 확인:", players);
+    console.log("카운트다운 상태 초기화 여부 확인:", countdown);
+  }, []);
 
   useEffect(() => {
     console.log("player 리스트", players);

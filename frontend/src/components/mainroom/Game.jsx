@@ -32,7 +32,6 @@ const GameScreen = styled.div`
   flex-shrink: 0;
   border-radius: 30px;
   background: #fff;
-  background-image: url(${gameBg});
   position: relative; // Position relative to contain the absolute positioning of Block and WinMessage
   display: flex;
   align-items: center;

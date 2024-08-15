@@ -44,7 +44,8 @@ import {
   isPlayingGameAtom,
   isThreeStationLoadingAtom,
 } from "../recoil/atoms/loadingState";
-import useOpenVidu from "../hooks/useOpenVidu";
+// import useOpenVidu from "../hooks/useOpenVidu";
+import { useOpenVidu } from "./OpenViduContext";
 
 const WebSocketContext = React.createContext({
   connect: () => {},

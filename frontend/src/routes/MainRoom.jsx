@@ -19,8 +19,8 @@ import {
 import { axiosUpdateUserInfo } from "../apis/mapApi";
 import { useNavigate, useParams } from "react-router-dom";
 import { axiosIsRoomValid, axiosGetRoomInfo } from "../apis/roomApi";
-import useWs from "../hooks/useWs";
-import useOpenVidu from "../hooks/useOpenVidu";
+// import useWs from "../hooks/useWs";
+// import useOpenVidu from "../hooks/useOpenVidu";
 import Loading from "../components/fixed/Loading";
 import GameFinishButtons from "../components/mainroom/GameFinishButtons";
 import GameChoice from "../components/mainroom/GameChoice";
@@ -28,7 +28,8 @@ import FinalResult from "../components/mainroom/FinalResult";
 import Game from "../components/mainroom/Game";
 import Watching from "../components/fixed/Watching";
 import { isHostOutAtom, isPlayingGameAtom } from "../recoil/atoms/loadingState";
-import { WebSocketContext, useWebSocket } from "../context/WebsocketContext";
+import { useWebSocket } from "../context/WebsocketContext";
+import { useOpenVidu } from "../context/OpenViduContext";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -61,9 +62,9 @@ function Room() {
   const [isPlayingGame, setIsPlayingGame] = useRecoilState(isPlayingGameAtom);
   const estimatedClosedAt = useRecoilValue(estimatedForceCloseAtAtom);
   const { connect, connected } = useWebSocket();
-  const { joinSession } = useOpenVidu();
+  const { joinSession, joined } = useOpenVidu();
   // const { subscribe } = useWs();
-  const joined = useRecoilValue(isOVConnectedAtom);
+  // const joined = useRecoilValue(isOVConnectedAtom);
 
   useEffect(() => {
     const initializeRoom = async () => {

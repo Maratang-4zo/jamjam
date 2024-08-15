@@ -37,7 +37,7 @@ function Loading({ message, estimatedForceCloseAt }) {
 
     const updateRemainingTime = () => {
       const now = new Date();
-      const estimatedTime = new Date(estimatedForceCloseAt);
+      const estimatedTime = new Date(estimatedForceCloseAt + "Z");
       const difference = estimatedTime - now;
 
       if (difference > 0) {

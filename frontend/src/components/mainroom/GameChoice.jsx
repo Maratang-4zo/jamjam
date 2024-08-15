@@ -150,7 +150,7 @@ function GameChoice() {
     if (selectedGame != null) {
       sendRoundInfo({
         round: currentRound,
-        gameId: selectedGame,
+        gameId: 1,
         gameSessionUUID: gameSessionUUID,
         stationName: roundCenter.name,
       });

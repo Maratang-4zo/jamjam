@@ -58,16 +58,26 @@ export const OpenViduProvider = ({ children }) => {
   const initSession = useCallback(() => {
     if (sessionRef.current) return;
 
-    const newOv = new OpenVidu();
+    const newOv = new OpenVidu({
+      audioSource: true,
+      videoSource: false,
+    });
     const newSession = newOv.initSession();
 
     ovRef.current = newOv;
     sessionRef.current = newSession;
 
     newSession.on("streamCreated", (event) => {
-      const subscriber = newSession.subscribe(event.stream, "subscriber");
+      const subscriber = newSession.subscribe(event.stream, "subscriber", {
+        insertMode: "APPEND",
+        audioSource: true, // 오디오만 사용한다면
+        videoSource: false, // 비디오를 사용하지 않는다면
+      });
+      subscriber.on("streamPlaying (신입받아라)", () => {
+        console.log("Stream is playing");
+        console.log("Subscriber:", subscriber);
+      });
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
-      console.log("신입받아라", subscriber);
     });
 
     newSession.on("streamDestroyed", (event) => {
@@ -146,6 +156,9 @@ export const OpenViduProvider = ({ children }) => {
 
       try {
         await sessionRef.current.connect(token);
+        sessionRef.current.on("streamCreated", (event) => {
+          console.log("New stream created:", event.stream);
+        });
         const newPublisher = ovRef.current.initPublisher("publisher", {
           audioSource: undefined,
           videoSource: false,

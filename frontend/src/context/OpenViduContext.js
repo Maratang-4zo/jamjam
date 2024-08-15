@@ -155,7 +155,7 @@ export const OpenViduProvider = ({ children }) => {
       }
 
       try {
-        await sessionRef.current.connect(token);
+        await sessionRef.current.connect(token, { isSubscribeToRemote: true });
         sessionRef.current.on("streamCreated", (event) => {
           console.log("New stream created:", event.stream);
         });

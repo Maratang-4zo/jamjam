@@ -10,7 +10,11 @@ import {
 } from "../../recoil/atoms/gameState";
 import { useLocation } from "react-router-dom";
 import { useWebSocket } from "../../context/WebsocketContext";
+import gameBg from "../../assets/game/gameBg.jpg";
 
+const Container = styled.div`
+  background-image: url(${gameBg});
+`;
 const BlockContainer = styled.div`
   display: flex;
   align-items: flex-end;
@@ -96,7 +100,7 @@ function Game1({ handleClick, onWin }) {
   }, [countdown, handleClick, win, winner, roomUUID, attendeeUUID, onWin]);
 
   return (
-    <>
+    <Container>
       {countdown === 99 ? <Countdown>READY</Countdown> : null}
       {countdown > 0 && countdown < 99 ? (
         <Countdown>{countdown === 1 ? "START" : countdown}</Countdown>
@@ -117,7 +121,7 @@ function Game1({ handleClick, onWin }) {
           </WinMessage>
         </>
       ) : null}
-    </>
+    </Container>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import NavBarLeft from "../components/fixed/NavBarLeft";
 import Map from "../components/mainroom/Map";
@@ -10,17 +10,12 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import {
   estimatedForceCloseAtAtom,
-  isOVConnectedAtom,
-  isWsConnectedAtom,
-  isWsSubscribedAtom,
   roomAtom,
   roomPageAtom,
 } from "../recoil/atoms/roomState";
 import { axiosUpdateUserInfo } from "../apis/mapApi";
 import { useNavigate, useParams } from "react-router-dom";
 import { axiosIsRoomValid, axiosGetRoomInfo } from "../apis/roomApi";
-// import useWs from "../hooks/useWs";
-// import useOpenVidu from "../hooks/useOpenVidu";
 import Loading from "../components/fixed/Loading";
 import GameFinishButtons from "../components/mainroom/GameFinishButtons";
 import GameChoice from "../components/mainroom/GameChoice";
@@ -63,8 +58,6 @@ function Room() {
   const estimatedClosedAt = useRecoilValue(estimatedForceCloseAtAtom);
   const { connect, connected } = useWebSocket();
   const { joinSession, joined } = useOpenVidu();
-  // const { subscribe } = useWs();
-  // const joined = useRecoilValue(isOVConnectedAtom);
 
   useEffect(() => {
     const initializeRoom = async () => {

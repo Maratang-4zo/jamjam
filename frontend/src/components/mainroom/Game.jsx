@@ -13,7 +13,6 @@ import {
 import { axiosGetAroundStores, axiosGetThreeStations } from "../../apis/mapApi";
 import gameBg from "../../assets/game/gameBg.jpg";
 import Loading from "../fixed/Loading";
-import useWs from "../../hooks/useWs";
 import { isWinnerAtom } from "../../recoil/atoms/gameState";
 import { isThreeStationLoadingAtom } from "../../recoil/atoms/loadingState";
 

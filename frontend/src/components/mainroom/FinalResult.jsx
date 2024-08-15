@@ -5,7 +5,6 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import { axiosPatchNextMiddle } from "../../apis/mapApi";
 import { roomAtom } from "../../recoil/atoms/roomState";
-import useWs from "../../hooks/useWs";
 import {
   gameSessionUUIDAtom,
   roundCenterAtom,

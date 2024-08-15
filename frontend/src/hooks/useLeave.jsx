@@ -1,5 +1,11 @@
 import { useResetRecoilState } from "recoil";
-import { roomAtom } from "../recoil/atoms/roomState";
+import {
+  aroundStationsAtom,
+  chatAtom,
+  chatModalVisibleAtom,
+  isNextMiddleExistAtom,
+  roomAtom,
+} from "../recoil/atoms/roomState";
 import { useWebSocket } from "../context/WebsocketContext";
 import { useOpenVidu } from "../context/OpenViduContext";
 
@@ -8,5 +14,8 @@ export const useLeave = () => {
   const { leaveSession } = useOpenVidu();
 
   const resetRoomInfo = useResetRecoilState(roomAtom);
-  //   const
+  const resetChat = useResetRecoilState(chatAtom);
+  const resetChatModal = useResetRecoilState(chatModalVisibleAtom);
+  const resetIsNextMiddleExist = useResetRecoilState(isNextMiddleExistAtom);
+  const resetAroundStations = useResetRecoilState(aroundStationsAtom);
 };

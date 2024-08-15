@@ -581,6 +581,7 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const handleAvatarPosition = (message) => {
+    console.log("플레이어들의 위치 업데이트???", message);
     setPlayers((prevPlayers) => {
       const updatedPlayers = prevPlayers.map((player) =>
         player.attendeeUUID === message.attendeeUUID

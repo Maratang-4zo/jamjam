@@ -345,6 +345,7 @@ export const WebSocketProvider = ({ children }) => {
         });
 
         // 현재 유저가 호스트인지 확인
+        console.log(userInfo);
         if (userInfo.isHost) {
           // isHost가 true라면 setIsHostOut(true)와 setEstimatedForceCloseAt(estimatedForceCloseAt) 실행 안 함
           console.log("현재 유저가 호스트이므로 상태 변경이 생략되었습니다.");

@@ -129,6 +129,7 @@ function Game() {
   const roomInfo = useRecoilValue(roomAtom);
   const isWinner = useRecoilValue(isWinnerAtom);
   const userInfo = useRecoilValue(userInfoAtom);
+  const myUUID = userInfo.myUUID;
 
   const setAroundStations = useSetRecoilState(aroundStationsAtom);
 
@@ -176,28 +177,27 @@ function Game() {
   };
 
   useEffect(() => {
-    console.log("player의 recoil", players);
+    console.log("Player들의 정보 배열입니다", players);
     if (countdown === 0 && !win && !winner) {
       const handleBlockClick = () => {
-        console.log("handleBlockClick called");
-        console.log("Current attendeeUUID:", userInfo.myUUID);
+        console.log("지금 현재 접속해 있는 사람의 UUID:", myUUID);
         setPlayers((prevPlayers) => {
           const updatedPlayers = prevPlayers.map((player) => {
             console.log("Checking player:", player.attendeeUUID);
-            if (player.attendeeUUID === userInfo.myUUID) {
+            if (player.attendeeUUID === myUUID) {
               const newBottom = player.bottom + 10;
-              // console.log(
-              //   `Updating bottom for ${player.nickname}: ${player.bottom} -> ${newBottom}`,
-              // );
-              sendGame({ attendeeUUID, bottom: newBottom });
+              console.log(
+                `위치 변경 ${player.nickname}: ${player.bottom} -> ${newBottom}`,
+              );
+              sendGame({ myUUID, bottom: newBottom });
               return { ...player, bottom: newBottom };
             }
             return player;
           });
-          // console.log("Updated players:", updatedPlayers);
+          console.log("Updated players:", updatedPlayers);
           return updatedPlayers;
         });
-        // console.log("Players state updated:", players);
+        console.log("Players state updated:", players);
       };
 
       handleClick.current = handleBlockClick; // handleClick에 이벤트 등록

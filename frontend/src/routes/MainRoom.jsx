@@ -83,12 +83,7 @@ function Room() {
             navigate("/");
             alert("종료된 방입니다.");
           }
-          // else if (res.roomStatus === "PLAYING") {
-          //   setIsPlayingGame(true);
-          // } else if (res.roomStatus === "RESERVED") {
-          //   setIsHostOut(true);
-          // }
-          // 방 정보 가져오기
+
           const roomResponse = await axiosGetRoomInfo({ roomUUID });
           const roomData = roomResponse.data;
 

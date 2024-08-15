@@ -67,36 +67,35 @@ export const OpenViduProvider = ({ children }) => {
     ovRef.current = newOv;
     sessionRef.current = newSession;
 
-    newSession.on("streamCreated", (event) => {
-      const subscriber = newSession.subscribe(event.stream, undefined);
-      setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
-      subscriber.stream.play();
-      console.log("Subscriber added:", subscriber);
-      console.log(
-        "isSubscribeToRemote:",
-        subscriber.stream.isSubscribeToRemote,
-      );
-    });
+    // newSession.on("streamCreated", (event) => {
+    //   const subscriber = newSession.subscribe(event.stream, undefined);
+    //   setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+    //   console.log("Subscriber added:", subscriber);
+    //   console.log(
+    //     "isSubscribeToRemote:",
+    //     subscriber.stream.isSubscribeToRemote,
+    //   );
+    // });
 
-    newSession.on("streamDestroyed", (event) => {
-      setSubscribers((prevSubscribers) =>
-        prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
-      );
-    });
+    // newSession.on("streamDestroyed", (event) => {
+    //   setSubscribers((prevSubscribers) =>
+    //     prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
+    //   );
+    // });
 
-    newSession.on("publisherStartSpeaking", (event) => {
-      console.log("말하는중", event);
-      setCurrentSpeakers((prevSpeakers) => [
-        ...prevSpeakers,
-        event.connection.data,
-      ]);
-    });
+    // newSession.on("publisherStartSpeaking", (event) => {
+    //   console.log("말하는중", event);
+    //   setCurrentSpeakers((prevSpeakers) => [
+    //     ...prevSpeakers,
+    //     event.connection.data,
+    //   ]);
+    // });
 
-    newSession.on("publisherStopSpeaking", (event) => {
-      setCurrentSpeakers((prevSpeakers) =>
-        prevSpeakers.filter((id) => id !== event.connection.data),
-      );
-    });
+    // newSession.on("publisherStopSpeaking", (event) => {
+    //   setCurrentSpeakers((prevSpeakers) =>
+    //     prevSpeakers.filter((id) => id !== event.connection.data),
+    //   );
+    // });
   }, []);
 
   const createSession = useCallback(async () => {
@@ -155,6 +154,35 @@ export const OpenViduProvider = ({ children }) => {
       try {
         await sessionRef.current.connect(token);
 
+        sessionRef.current.on("streamCreated", (event) => {
+          const subscriber = newSession.subscribe(event.stream, undefined);
+          setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+          console.log("Subscriber added:", subscriber);
+          console.log(
+            "isSubscribeToRemote:",
+            subscriber.stream.isSubscribeToRemote,
+          );
+        });
+
+        sessionRef.current.on("streamDestroyed", (event) => {
+          setSubscribers((prevSubscribers) =>
+            prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
+          );
+        });
+
+        sessionRef.current.on("publisherStartSpeaking", (event) => {
+          console.log("말하는중", event);
+          setCurrentSpeakers((prevSpeakers) => [
+            ...prevSpeakers,
+            event.connection.data,
+          ]);
+        });
+
+        sessionRef.current.on("publisherStopSpeaking", (event) => {
+          setCurrentSpeakers((prevSpeakers) =>
+            prevSpeakers.filter((id) => id !== event.connection.data),
+          );
+        });
         const newPublisher = ovRef.current.initPublisher("publisher", {
           audioSource: undefined,
           videoSource: false,

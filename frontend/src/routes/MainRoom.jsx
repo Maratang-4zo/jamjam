@@ -9,6 +9,7 @@ import ShareModal from "../components/mainroom/ShareModal";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
 import {
+  chatAtom,
   estimatedForceCloseAtAtom,
   roomAtom,
   roomPageAtom,
@@ -56,6 +57,7 @@ function Room() {
   const [isDisabledOn, setIsDisalbedOn] = useState(false);
   const [isHostOut, setIsHostOut] = useRecoilState(isHostOutAtom);
   const [isPlayingGame, setIsPlayingGame] = useRecoilState(isPlayingGameAtom);
+  const setChatLogs = useSetRecoilState(chatAtom);
   const [estimatedClosedAt, setEstimatedClosedAt] = useRecoilState(
     estimatedForceCloseAtAtom,
   );
@@ -135,6 +137,8 @@ function Room() {
             roomPurpose: roomData.roomPurpose,
             hostUUID: roomData.hostUUID,
           }));
+
+          setChatLogs([]);
 
           setUserInfo((prev) => ({
             ...prev,

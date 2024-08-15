@@ -214,18 +214,22 @@ function Game() {
                   />
                 ))}
               </BlockContainer>
+            </>
+          ) : null}
+          {gameState === "end" ? (
+            <>
               <WinMessage show={gameState === "end"}>
                 {winner && `${winner} WIN!!!`}
               </WinMessage>
+              <StyledButton
+                disabled={!isWinner}
+                show={showButton}
+                onClick={handleNextPageBtn}
+              >
+                장소 선택하러 가기
+              </StyledButton>
             </>
           ) : null}
-          <StyledButton
-            disabled={!isWinner}
-            show={showButton}
-            onClick={handleNextPageBtn}
-          >
-            장소 선택하러 가기
-          </StyledButton>
         </GameScreen>
       </ContentWrapper>
     </Wrapper>

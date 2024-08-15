@@ -242,6 +242,7 @@ export const WebSocketProvider = ({ children }) => {
         break;
       case "GAME_PLAY":
         handleGamePlay(messageBody);
+        break;
       default:
         console.error("Unknown message type:", message.headers.type);
     }

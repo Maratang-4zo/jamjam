@@ -3,10 +3,16 @@ import styled from "styled-components";
 import { axiosGetMeetingHistory } from "../../apis/loginApi";
 
 const MeetingBoxContainer = styled.div`
+  background-color: #ffffff;
+  border: 0.7px solid #000000;
+  border-radius: 10px;
   display: flex;
-  flex-direction: column; /* 가로로 정렬할 MeetingHistory 아이템들을 세로로 배치 */
-  width: 22%; /* 한 줄에 4개의 아이템이 들어가도록 설정 (4개의 22%씩) */
+  flex-direction: column;
+  justify-content: space-between;
+  height: 152.6px;
+  padding: 20px 15px;
   min-width: 170px;
+  width: 100%; /* 가로 크기를 부모 그리드 셀에 맞추도록 수정 */
 `;
 
 const MeetingHistory = styled.div`

@@ -9,13 +9,13 @@ import moment from "moment";
 import {useState} from "react";
 
 
-const CustomCalendar = () => {
+const CustomCalendar = (props) => {
     const today = new Date();
     const [date, setDate] = useState(today);
     const [activeStartDate, setActiveStartDate] = useState(
         new Date()
     );
-    const attendDay = ["2023-12-03", "2023-12-13"]; // 출석한 날짜 예시
+    const attendDay = props.meetingHistory === null ? []: props.meetingHistory;
 
     const handleDateChange = (newDate) => {
         setDate(newDate);
@@ -26,6 +26,7 @@ const CustomCalendar = () => {
         setActiveStartDate(today);
         setDate(today);
     };
+
 
     return (
         <StyledCalendarWrapper>
@@ -58,7 +59,7 @@ const CustomCalendar = () => {
                         html.push(<StyledToday key={"today"}>오늘</StyledToday>);
                     }
                     if (
-                        attendDay.find((x) => x === moment(date).format("YYYY-MM-DD"))
+                        attendDay.find((x) =>   x.meetingDate.split("T")[0] === moment(date).format("YYYY-MM-DD"))
                     ) {
                         html.push(<StyledDot key={moment(date).format("YYYY-MM-DD")} />);
                     }

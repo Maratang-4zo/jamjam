@@ -47,8 +47,8 @@ const BtmTxt = styled.div`
   font-size: 15px;
 `;
 
-function MeetingBox() {
-  const [meetingHistory, setMeetingHistory] = useState([]);
+function MeetingBox(props) {
+  // const [meetingHistory, setMeetingHistory] = useState([]);
 
   const getMeetingString = (meeting) => {
     const dateObj = new Date(meeting);
@@ -66,20 +66,21 @@ function MeetingBox() {
     return `${year}.${month}.${day} (${dayOfWeek})`;
   };
 
-  useEffect(() => {
-    const fetchMeetingHistory = async () => {
-      try {
-        const history = await axiosGetMeetingHistory();
-        setMeetingHistory(history);
-      } catch (error) {
-        console.error("모임 기록 가져오기 실패", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchMeetingHistory = async () => {
+  //     try {
+  //       const history = await axiosGetMeetingHistory();
+  //       setMeetingHistory(history);
+  //       props.setMeeting(history);
+  //     } catch (error) {
+  //       console.error("모임 기록 가져오기 실패", error);
+  //     }
+  //   };
+  //
+  //   fetchMeetingHistory();
+  // }, []);
 
-    fetchMeetingHistory();
-  }, []);
-
-  if (!meetingHistory || meetingHistory.length === 0) {
+  if (!props.meetingHistory || props.meetingHistory.length === 0) {
     return <div>아직 만남이 이루어지지 않았어요ㅠㅠ</div>;
   }
 
@@ -92,7 +93,7 @@ function MeetingBox() {
     }, []);
   };
 
-  const groupedMeetings = groupMeetings(meetingHistory, 4);
+  const groupedMeetings = groupMeetings(props.meetingHistory, 4);
 
   return (
     <MeetingBoxContainer>

@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { useRecoilState } from "recoil";
 import { userInfoAtom } from "../recoil/atoms/userState";
-import { useKakaoLogout } from "../apis/loginApi";
+import {axiosGetMeetingHistory, useKakaoLogout} from "../apis/loginApi";
 import "react-toastify/dist/ReactToastify.css";
 import Calendar from "react-calendar";
 import CustomCalendar from "../components/calendar/CustomCalendar";
@@ -227,6 +227,7 @@ const WinningRate = styled.div`
 `;
 
 const Mypage = () => {
+  const [meetingHistory, setMeetingHistory] = useState([]);
   const infoBoxRef = useRef(null);
   const meetingBoxRef = useRef(null);
   const navigate = useNavigate();
@@ -241,6 +242,20 @@ const Mypage = () => {
       ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
+
+  useEffect(() => {
+    const fetchMeetingHistory = async () => {
+      try {
+        const history = await axiosGetMeetingHistory();
+        setMeetingHistory(history);
+        // props.setMeeting(history);
+      } catch (error) {
+        console.error("모임 기록 가져오기 실패", error);
+      }
+    };
+
+    fetchMeetingHistory();
+  }, []);
 
   useEffect(() => {
     const token = Cookies.get("accessToken");
@@ -290,7 +305,7 @@ const Mypage = () => {
                   <br />
                   {dayKor[today.getDay()]}요일
                 </Today>
-                <CustomCalendar></CustomCalendar>
+                <CustomCalendar meetingHistory={meetingHistory}></CustomCalendar>
               </Frame5>
               <InfoContainer ref={infoBoxRef}>
                 <InfoBox />
@@ -301,7 +316,7 @@ const Mypage = () => {
                 <div>
                   <Subtitle3>모임 목록</Subtitle3>
                   <MeetingContainer ref={meetingBoxRef}>
-                    <MeetingBox />
+                    <MeetingBox meetingHistory={meetingHistory}/>
                   </MeetingContainer>
                 </div>
                 <div>

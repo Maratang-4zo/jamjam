@@ -145,7 +145,7 @@ export const StyledToday = styled.div`
 
 /* 출석한 날짜에 점 표시 스타일 */
 export const StyledDot = styled.div`
-  background-color: ${(props) => props.theme.br_2};
+  background-color: sandybrown;
   border-radius: 50%;
   width: 0.3rem;
   height: 0.3rem;

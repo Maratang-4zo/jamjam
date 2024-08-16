@@ -9,6 +9,11 @@
 }
 
 @font-face {
+  font-family: "Galmuri11";
+  src: url("./fonts/Galmuri11.ttf");
+}
+
+@font-face {
   font-family: "NewGalmuriBold";
   src: url("./fonts/ONE(Ed.) Galmuri11 Bold.ttf");
 }

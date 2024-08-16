@@ -81,7 +81,7 @@ export const WebSocketProvider = ({ children }) => {
     useRecoilState(aroundStationsAtom);
   const setTotalRound = useSetRecoilState(totalRoundAtom);
   const setGameSessionUUID = useSetRecoilState(gameSessionUUIDAtom);
-  const setGameRecord = useSetRecoilState(gameRecordAtom);
+  const [gameRecord, setGameRecord] = useRecoilState(gameRecordAtom);
   const setCurrentRoundUUID = useSetRecoilState(currentRoundUUIDAtom);
   const [gameState, setGameState] = useRecoilState(gameStateAtom);
   const setWinnerUUID = useSetRecoilState(winnerUUIDAtom);
@@ -481,10 +481,15 @@ export const WebSocketProvider = ({ children }) => {
 
   const handleCenterHistory = ({ gameSessionUUID, roundRecordList }) => {
     setGameRecord(roundRecordList);
-    setRoomPage("finalresult");
     setIsHistoryLoading(false);
     setIsNextMiddleExist(false);
   };
+
+  useEffect(() => {
+    if (gameRecord) {
+      setRoomPage("result");
+    }
+  }, [gameRecord]);
 
   const handleGameSessionReady = ({ gameSessionUUID, roundCnt }) => {
     setTotalRound(roundCnt);

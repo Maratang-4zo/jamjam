@@ -122,7 +122,7 @@ public class RoomMapService {
 			subwayLocalInfos.add(new SubwayLocalInfo(subwayInfo, res));
 		}
 
-		broadCastService.broadcastToRoom(roomUUID, subwayLocalInfos, BroadCastType.WINNER_NEXT_PAGE);
+		broadCastService.broadcastToRoom(roomUUID, subwayLocalInfos, BroadCastType.AROUND_STATIONS);
 
 		return subwayLocalInfos;
 	}

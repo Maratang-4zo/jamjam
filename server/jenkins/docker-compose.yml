@@ -1,0 +1,96 @@
+version: '3.1'
+
+services: # container setting info
+
+  portainer-docker:
+    container_name: portainer-container
+    image: portainer/portainer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - shared-network
+    ports:
+      - "9090:9000"
+    
+  mysql-docker:
+    container_name: mysql-container
+    image: mysql:8.0
+    volumes:
+      - db-mysql:/var/lib/mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=jamjam
+      - MYSQL_DATABASE=jamjam
+      - MYSQL_USER=jamjam
+      - MYSQL_PASSWORD=jamjama604
+    command: [
+      '--wait_timeout=28800',
+      '--interactive_timeout=28800',
+      '--max_allowed_packet=1GB'
+    ]
+    networks:
+      - shared-network
+    ports:
+      - "3306:3306"
+      
+  phpmyadmin-docker:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin-container
+    restart: unless-stopped
+    environment:
+      PMA_ARBITRARY: 1
+    networks:
+      - shared-network
+    ports:
+      - "27017:80"
+
+  redis-docker:
+    container_name: redis-container
+    image: redis:7.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - db-redis:/var/lib/redis
+    networks:
+      - shared-network
+
+  spring-blue:
+    container_name: spring-blue
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - '8080:8080'
+    networks:
+      - shared-network
+    depends_on:
+      - mysql-docker
+      - redis-docker
+
+  spring-green:
+    container_name: spring-green
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - '8081:8080'
+    networks:
+      - shared-network
+    depends_on:
+      - mysql-docker
+      - redis-docker
+
+volumes:
+  db-mysql:
+  db-redis:
+  portainer_data:
+
+networks:
+  shared-network:
+    external: true
+

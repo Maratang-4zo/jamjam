@@ -4,7 +4,7 @@ import YellowChatBubble from "../../assets/YellowChatBubble.svg";
 import SecondCardBg from "../../assets/2ndImg.png";
 import { useRecoilValue } from "recoil";
 import { userInfoAtom } from "../../recoil/atoms/userState";
-
+import gameCardBg from "../../assets/gameCardBg.gif";
 const GamesContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -15,6 +15,7 @@ const GamesContainer = styled.div`
 
 const GameCard1 = styled.div`
   background-color: #ffffff;
+  background-image: url(${gameCardBg})
   border: ${(props) =>
     props.selected
       ? "9px solid #000000"

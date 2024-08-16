@@ -49,7 +49,7 @@ const Frame = styled.div`
 const TextWrapper = styled.div`
   align-self: stretch;
   color: #000000;
-  font-family: "DungGeunMo-Regular", Helvetica;
+  font-family: "DungGeunMo", Helvetica;
   font-size: 29.4px;
   font-weight: 400;
   text-align: center;
@@ -135,6 +135,17 @@ const MeetingContainer = styled.div`
   height: 220.5px;
   width: 100%;
   overflow-y: auto;
+  margin-bottom: 20px;
+`;
+
+const MeetingContainer2 = styled.div`
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  height: 220.5px;
+  width: 100%;
 `;
 
 const GameContainer = styled.div`
@@ -154,6 +165,7 @@ const Subtitle = styled.h1`
   font-size: 40px;
   font-family: "galmuriRegular";
   text-align: left;
+  margin-bottom: 20px;
 `;
 
 const Subtitle2 = styled.h3`
@@ -161,6 +173,7 @@ const Subtitle2 = styled.h3`
   font-size: 30px;
   font-family: "neodgm";
   text-align: left;
+  margin-bottom: 20px;
 `;
 
 const Today = styled.h1`
@@ -231,21 +244,21 @@ const Mypage = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const token = Cookies.get("accessToken");
-  //   if (token) {
-  //     setIsLogined(true); // accessToken이 있으면 로그인 상태로 설정
-  //   } else {
-  //     // accessToken이 없으면 팝업을 띄우고 로그인 페이지로 리다이렉트
-  //     toast.error("로그인이 필요합니다! 로그인하러 슈슝", {
-  //       position: "top-center",
-  //       autoClose: 3000,
-  //       onClose: () => {
-  //         navigate("/");
-  //       },
-  //     });
-  //   }
-  // }, [navigate]);s
+  useEffect(() => {
+    const token = Cookies.get("accessToken");
+    if (token) {
+      setIsLogined(true); // accessToken이 있으면 로그인 상태로 설정
+    } else {
+      // accessToken이 없으면 팝업을 띄우고 로그인 페이지로 리다이렉트
+      toast.error("로그인이 필요합니다! 로그인하러 슈슝", {
+        position: "top-center",
+        autoClose: 3000,
+        onClose: () => {
+          navigate("/");
+        },
+      });
+    }
+  }, [navigate]);
 
   return (
     <>
@@ -295,9 +308,9 @@ const Mypage = () => {
                 </div>
                 <div>
                   <Subtitle2>게임별 승률</Subtitle2>
-                  <MeetingContainer>
+                  <MeetingContainer2>
                     <GameBox />
-                  </MeetingContainer>
+                  </MeetingContainer2>
                 </div>
               </MyBox>
             </Frame4>

@@ -70,7 +70,7 @@ export const WebSocketProvider = ({ children }) => {
   const connected = useRef(false);
 
   const navigate = useNavigate();
-  const setRoomPage = useSetRecoilState(roomPageAtom);
+  const [roomPage, setRoomPage] = useRecoilState(roomPageAtom);
   const setChatLogs = useSetRecoilState(chatAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const setPlayers = useSetRecoilState(playerState);

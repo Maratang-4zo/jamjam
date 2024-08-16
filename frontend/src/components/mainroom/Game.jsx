@@ -67,11 +67,6 @@ const StyledButton = styled.button`
   font-weight: bold;
   color: #000;
   cursor: pointer;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: ${(props) => (props.show ? "flex" : "none")};
   &:hover {
     background-color: ${(props) =>
       props.disabled ? "gray" : props.theme.accentColor};

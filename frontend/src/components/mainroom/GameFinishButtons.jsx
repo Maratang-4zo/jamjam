@@ -23,6 +23,7 @@ import { lineColor } from "../../utils/lineColor";
 import { lineName } from "../../utils/lineName";
 import { isHistoryLoadingAtom } from "../../recoil/atoms/loadingState";
 import { useWebSocket } from "../../context/WebsocketContext";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -44,6 +45,8 @@ const BigBtn = styled.button`
   flex-shrink: 0;
   border-radius: 15px;
   border: 3px solid #000;
+  font-family: "DungGeunMo";
+  font-size: 30px;
   background-color: ${(props) => {
     if (props.isTutorialModalOpen) {
       return props.highlight ? props.theme.bgColor : "gray";
@@ -164,16 +167,18 @@ function GameFinishButtons() {
   const setGameRecord = useSetRecoilState(gameRecordAtom);
   const setWinnerUUID = useSetRecoilState(winnerUUIDAtom);
   const setWinnerNicknameUUID = useSetRecoilState(winnerNicknameAtom);
+  const userInfo = useRecoilValue(userInfoAtom);
 
   const handleStationClick = (station) => {
-    setSelectedStation(station.name);
+    console.log("여기", station);
+    setSelectedStation(station);
   };
 
   const handleDecision = async () => {
     if (selectedStation) {
       sendNextRoundCenter({
         gameRoundUUID,
-        roundStationName: selectedStation,
+        roundStationName: selectedStation.name,
       });
     } else {
       alert("역을 선택해주세요");
@@ -200,7 +205,10 @@ function GameFinishButtons() {
   };
 
   const handleClickOutside = (e) => {
-    if (e.target.closest(".station-btn") === null) {
+    if (
+      e.target.closest(".station-btn") === null &&
+      e.target.closest(".submit-btn") === null
+    ) {
       setSelectedStation(null);
     }
   };
@@ -218,17 +226,21 @@ function GameFinishButtons() {
       <BottomBtns>
         {!isNextMiddleExist ? (
           <BigBtn
+            className="submit-btn"
             onClick={handleDecision}
             disabled={!selectedStation || !isWinner}
           >
             결정
           </BigBtn>
         ) : totalRound === currentRound ? (
-          <BigBtn onClick={handleFinalResultBtnClick} disabled={!isWinner}>
+          <BigBtn
+            onClick={handleFinalResultBtnClick}
+            disabled={!userInfo.isHost}
+          >
             Final Result
           </BigBtn>
         ) : (
-          <BigBtn onClick={handleNextRoundBtnClick} disabled={!isWinner}>
+          <BigBtn onClick={handleNextRoundBtnClick} disabled={!userInfo.isHost}>
             Next Round
           </BigBtn>
         )}

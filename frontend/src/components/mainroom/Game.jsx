@@ -77,7 +77,7 @@ const StyledButton = styled.button`
   font-size: 24px;
   font-weight: bold;
   color: #000;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   &:hover {
     background-color: ${(props) =>
       props.disabled ? "gray" : props.theme.accentColor};
@@ -124,7 +124,8 @@ const Block = styled.div`
   background-repeat: no-repeat;
   background-position: center;
   border-radius: 50%;
-  border: 1px solid black;
+  border: 3px solid black;
+  bottom: ${(props) => `${props.bottom}px`};
 `;
 
 const WinMessage = styled.div`

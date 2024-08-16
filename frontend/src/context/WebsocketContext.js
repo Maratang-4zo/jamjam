@@ -70,7 +70,7 @@ export const WebSocketProvider = ({ children }) => {
   const connected = useRef(false);
 
   const navigate = useNavigate();
-  const setRoomPage = useSetRecoilState(roomPageAtom);
+  const [roomPage, setRoomPage] = useRecoilState(roomPageAtom);
   const setChatLogs = useSetRecoilState(chatAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const setPlayers = useSetRecoilState(playerState);
@@ -83,7 +83,7 @@ export const WebSocketProvider = ({ children }) => {
   const setGameSessionUUID = useSetRecoilState(gameSessionUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);
   const setCurrentRoundUUID = useSetRecoilState(currentRoundUUIDAtom);
-  const setGameState = useSetRecoilState(gameStateAtom);
+  const [gameState, setGameState] = useRecoilState(gameStateAtom);
   const setWinnerUUID = useSetRecoilState(winnerUUIDAtom);
   const setWinnerNickname = useSetRecoilState(winnerNicknameAtom);
   const setGameCount = useSetRecoilState(gameCountAtom);
@@ -401,12 +401,18 @@ export const WebSocketProvider = ({ children }) => {
   const handleNextRound = ({ next }) => {
     if (next === "nextRound") {
       setCurrentRound((prev) => (prev += 1));
+      setRoomPage("gamechoice");
     } else {
       setCurrentRound(1);
+      setRoomPage("result");
     }
-    setRoomPage(next);
-    setIsNextMiddleExist(false);
   };
+
+  useEffect(() => {
+    if (roomPage === "gamechoice" || roomPage === "result") {
+      setIsNextMiddleExist(false);
+    }
+  }, [roomPage]);
 
   const handleHostFindCenter = ({ isFindCenterLoading }) => {
     setIsFindCenterLoading(isFindCenterLoading);
@@ -531,8 +537,13 @@ export const WebSocketProvider = ({ children }) => {
     setRoundCenter(roundCenterStation);
     setIsNextMiddleExist(true);
     setGameState("before");
-    setAroundStations(null);
   };
+
+  useEffect(() => {
+    if (gameState === "before") {
+      setAroundStations(null);
+    }
+  }, [gameState]);
 
   const handleRoomCenterUpdate = ({ roomCenterStart, attendees }) => {
     setRoomInfo((prev) => ({

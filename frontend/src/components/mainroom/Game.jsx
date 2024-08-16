@@ -93,7 +93,7 @@ const BlockContainer = styled.div`
   position: relative;
   height: 100%;
   flex-direction: row; // row 방향으로 정렬
-  gap: 20px; // 아이콘 간의 간격
+  gap: 24px; // 아이콘 간의 간격
 `;
 
 const BlockWrapper = styled.div`

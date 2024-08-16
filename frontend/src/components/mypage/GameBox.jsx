@@ -9,6 +9,11 @@ const GraphContainer = styled.div`
   gap: 10px;
 `;
 
+const Text = styled.div`
+  font-family: "NewGalumuriBold";
+  font-size: 12 px;
+`;
+
 function GameBox() {
   const [winRates, setWinRates] = useState([]);
 
@@ -26,7 +31,7 @@ function GameBox() {
   }, []);
 
   if (winRates.length === 0) {
-    return <div>아직 게임을 하지 않았어요ㅠㅠ</div>;
+    return <Text>아직 게임을 하지 않았어요ㅠㅠ</Text>;
   }
 
   return (

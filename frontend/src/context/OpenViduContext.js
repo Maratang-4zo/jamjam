@@ -58,21 +58,14 @@ export const OpenViduProvider = ({ children }) => {
   const initSession = useCallback(() => {
     if (sessionRef.current) return;
 
-    const newOv = new OpenVidu({
-      audioSource: undefined,
-      videoSource: false,
-    });
+    const newOv = new OpenVidu();
     const newSession = newOv.initSession();
 
     ovRef.current = newOv;
     sessionRef.current = newSession;
 
     newSession.on("streamCreated", (event) => {
-      const subscriber = newSession.subscribe(event.stream, undefined, {
-        insertMode: "APPEND",
-        audioSource: undefined, // 오디오만 사용한다면
-        videoSource: false, // 비디오를 사용하지 않는다면
-      });
+      const subscriber = newSession.subscribe(event.stream, undefined);
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     });
 

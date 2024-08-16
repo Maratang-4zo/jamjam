@@ -120,25 +120,35 @@ function Han() {
     };
 
     const joinSession = useCallback(async (existingSessionId = null) => {
-        // initSession();
+        initSession();
 
-        // getToken(existingSessionId).then((token) => {
-        //     if (sessionRef.current && ovRef.current) {
-        //         sessionRef.current
-        //             .connect(token)
-        //             .then(() => {
-        //                 const newPublisher = ovRef.current.initPublisher("publisher");
-        //                 sessionRef.current.publish(newPublisher);
-        //             })
-        //             .catch((error) => {
-        //                 console.log(
-        //                     "There was an error connecting to the session:",
-        //                     error.code,
-        //                     error.message,
-        //                 );
-        //             });
-        //     }
-        // });
+        getToken(existingSessionId).then((token) => {
+            if (sessionRef.current && ovRef.current) {
+                sessionRef.current
+                    .connect(token)
+                    .then(() => {
+                        const newPublisher = ovRef.current.initPublisher(undefined,
+                            {
+                                audioSource: undefined, // The source of audio. If undefined default audio input
+                                videoSource: false, // The source of video. If undefined default video input
+                                publishAudio: true,     // Whether you want to start the publishing with audio unmuted or muted
+                                publishVideo: false,     // Whether you want to start the publishing with video enabled or disabled
+                                resolution: '640x480',  // The resolution of your video
+                                frameRate: 30,          // The frame rate of your video
+                                insertMode: 'APPEND',   // How the video will be inserted according to targetElement
+                                mirror: false
+                            });
+                        sessionRef.current.publish(newPublisher);
+                    })
+                    .catch((error) => {
+                        console.log(
+                            "There was an error connecting to the session:",
+                            error.code,
+                            error.message,
+                        );
+                    });
+            }
+        });
 
 
         connect();

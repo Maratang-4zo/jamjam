@@ -101,7 +101,7 @@ const Frame3 = styled.div`
   min-width: 300px;
   max-width: 350px;
   justify-content: space-between;
-  height: 100%
+  height: 100%;
 `;
 
 const Frame4 = styled.div`
@@ -127,15 +127,14 @@ const InfoContainer = styled.div`
 `;
 
 const MeetingContainer = styled.div`
-  align-items: center;
+  align-items: flex-start;
   align-self: stretch;
-  //border: 1.4px solid #000000;
   display: flex;
+  flex-direction: column;
   gap: 21px;
   height: 220.5px;
-  //padding: 21px;
   width: 100%;
-  overflow-x: auto;
+  overflow-y: auto;
 `;
 
 const GameContainer = styled.div`
@@ -172,43 +171,41 @@ const Today = styled.h1`
   text-align: start;
   margin-bottom: 30px;
 `;
-const Frame5 = styled.div`
-`
+const Frame5 = styled.div``;
 
 const Oneul = styled.div`
-/* Frame 1694 */
+  /* Frame 1694 */
 
-box-sizing: border-box;
+  box-sizing: border-box;
   font-size: 30px;
 
-color: #FFFFFF;
-display: flex;
-flex-direction: row;
-justify-content: center;
-align-items: center;
-padding: 10px 10px;
-gap: 10px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 10px;
+  gap: 10px;
 
-width: 120px;
-height: 50px;
-left: 50px;
-top: 50px;
+  width: 120px;
+  height: 50px;
+  left: 50px;
+  top: 50px;
 
-background: #000000;
-border: 1px solid #000000;
-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-border-radius: 10px;
-`
+  background: #000000;
+  border: 1px solid #000000;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+`;
 const MyBox = styled.div`
   width: 100%;
   height: 100%;
-right: 50px;
-top: calc(50% - 980px/2);
+  right: 50px;
+  top: calc(50% - 980px / 2);
   min-height: 800px;
   padding: 30px 30px 30px;
-background: #FBFAF2;
-border: 3px solid #000000;
-
+  background: #fbfaf2;
+  border: 3px solid #000000;
 `;
 
 const WinningRate = styled.div`
@@ -275,11 +272,11 @@ const Mypage = () => {
             <Frame3>
               <Frame5>
                 <Today>
-                  <Oneul>
-                    오늘은
-                  </Oneul>
-                  2024년<br/>
-                  8월 16일<br/>
+                  <Oneul>오늘은</Oneul>
+                  2024년
+                  <br />
+                  8월 16일
+                  <br />
                   금요일
                 </Today>
                 <CustomCalendar></CustomCalendar>

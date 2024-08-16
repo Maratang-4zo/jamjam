@@ -68,7 +68,7 @@ export const OpenViduProvider = ({ children }) => {
     sessionRef.current = newSession;
 
     newSession.on("streamCreated", (event) => {
-      const subscriber = newSession.subscribe(event.stream, "subscriber", {
+      const subscriber = newSession.subscribe(event.stream, undefined, {
         insertMode: "APPEND",
         audioSource: undefined, // 오디오만 사용한다면
         videoSource: false, // 비디오를 사용하지 않는다면
@@ -176,7 +176,7 @@ export const OpenViduProvider = ({ children }) => {
         sessionRef.current.on("streamCreated", (event) => {
           console.log("New stream created:", event.stream);
         });
-        const newPublisher = ovRef.current.initPublisher("publisher", {
+        const newPublisher = ovRef.current.initPublisher(undefined, {
           audioSource: undefined,
           videoSource: false,
           publishAudio: true,

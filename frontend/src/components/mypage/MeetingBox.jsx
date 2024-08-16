@@ -4,8 +4,9 @@ import { axiosGetMeetingHistory } from "../../apis/loginApi";
 
 const MeetingBoxContainer = styled.div`
   display: flex;
-  gap: 21px;
-  width: 100%;
+  flex-direction: column; /* 가로로 정렬할 MeetingHistory 아이템들을 세로로 배치 */
+  width: 22%; /* 한 줄에 4개의 아이템이 들어가도록 설정 (4개의 22%씩) */
+  min-width: 170px;
 `;
 
 const MeetingHistory = styled.div`

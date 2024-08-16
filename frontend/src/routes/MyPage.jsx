@@ -49,7 +49,7 @@ const Frame = styled.div`
 const TextWrapper = styled.div`
   align-self: stretch;
   color: #000000;
-  font-family: "DungGeunMo-Regular", Helvetica;
+  font-family: "neodgm", Helvetica;
   font-size: 29.4px;
   font-weight: 400;
   text-align: center;
@@ -153,6 +153,7 @@ const Subtitle = styled.h1`
   font-size: 40px;
   font-family: "NewGalmuriRegular";
   text-align: left;
+  margin-bottom: 20px;
 `;
 
 const Subtitle2 = styled.h3`
@@ -160,6 +161,15 @@ const Subtitle2 = styled.h3`
   font-size: 30px;
   font-family: "neodgm";
   text-align: left;
+  margin-bottom: 20px;
+`;
+
+const Subtitle3 = styled.div`
+  color: black;
+  font-size: 30px;
+  font-family: "neodgm";
+  text-align: left;
+  margin-bottom: 20px;
 `;
 
 const Today = styled.h1`
@@ -190,7 +200,7 @@ const Oneul = styled.div`
   height: 50px;
   left: 50px;
   top: 50px;
-
+  margin-bottom: 20px;
   background: #000000;
   border: 1px solid #000000;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -230,21 +240,21 @@ const Mypage = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const token = Cookies.get("accessToken");
-  //   if (token) {
-  //     setIsLogined(true); // accessToken이 있으면 로그인 상태로 설정
-  //   } else {
-  //     // accessToken이 없으면 팝업을 띄우고 로그인 페이지로 리다이렉트
-  //     toast.error("로그인이 필요합니다! 로그인하러 슈슝", {
-  //       position: "top-center",
-  //       autoClose: 3000,
-  //       onClose: () => {
-  //         navigate("/");
-  //       },
-  //     });
-  //   }
-  // }, [navigate]);s
+  useEffect(() => {
+    const token = Cookies.get("accessToken");
+    if (token) {
+      setIsLogined(true); // accessToken이 있으면 로그인 상태로 설정
+    } else {
+      // accessToken이 없으면 팝업을 띄우고 로그인 페이지로 리다이렉트
+      toast.error("로그인이 필요합니다! 로그인하러 슈슝", {
+        position: "top-center",
+        autoClose: 3000,
+        onClose: () => {
+          navigate("/");
+        },
+      });
+    }
+  }, [navigate]);
 
   return (
     <>
@@ -287,13 +297,13 @@ const Mypage = () => {
             <Frame4>
               <MyBox>
                 <div>
-                  <Subtitle2>모임 목록</Subtitle2>
+                  <Subtitle3>모임 목록</Subtitle3>
                   <MeetingContainer ref={meetingBoxRef}>
                     <MeetingBox />
                   </MeetingContainer>
                 </div>
                 <div>
-                  <Subtitle2>게임별 승률</Subtitle2>
+                  <Subtitle3>게임별 승률</Subtitle3>
                   <MeetingContainer>
                     <GameBox />
                   </MeetingContainer>

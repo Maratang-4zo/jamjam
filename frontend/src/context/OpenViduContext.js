@@ -171,9 +171,9 @@ export const OpenViduProvider = ({ children }) => {
         });
         const newPublisher = ovRef.current.initPublisher("publisher", {
           audioSource: undefined,
-          videoSource: undefined,
+          videoSource: false,
           publishAudio: true,
-          publishVideo: true,
+          publishVideo: false,
           resolution: "640x480",
           frameRate: 30,
           insertMode: "APPEND",

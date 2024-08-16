@@ -9,16 +9,23 @@ const MeetingBoxContainer = styled.div`
   width: 100%;
 `;
 
+const MeetingRow = styled.div`
+  display: flex;
+  gap: 21px;
+  width: 100%;
+`;
+
 const MeetingHistory = styled.div`
   background-color: #ffffff;
   border: 0.7px solid #000000;
   border-radius: 10px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 7px;
   height: 152.6px;
   padding: 20px 15px;
-  width: 170px;
+  width: calc(25% - 15.75px); // 4개를 균등하게 배치하기 위한 너비
+  min-width: 170px;
   justify-content: space-between;
 `;
 
@@ -76,42 +83,42 @@ function MeetingBox() {
     return <div>아직 만남이 이루어지지 않았어요ㅠㅠ</div>;
   }
 
+  const groupMeetings = (meetings, size) => {
+    return meetings.reduce((acc, _, index) => {
+      if (index % size === 0) {
+        acc.push(meetings.slice(index, index + size));
+      }
+      return acc;
+    }, []);
+  };
+
+  const groupedMeetings = groupMeetings(meetingHistory, 4);
+
   return (
     <MeetingBoxContainer>
-      {meetingHistory.map((meeting, index) => {
-        const meetingDate = getMeetingString(meeting.meetingDate);
-        return (
-          <MeetingHistory key={index}>
-            <div>
-              <MeetingTextWrapper>{meetingDate}</MeetingTextWrapper>
-              <Element>{meeting.finalStation}</Element>
-            </div>
-            <BtmTxt>
-              <br />
-              {meeting.name}
-              <br />
-              for {meeting.purpose}
-            </BtmTxt>
-          </MeetingHistory>
-        );
-      })}
+      {groupedMeetings.map((row, rowIndex) => (
+        <MeetingRow key={rowIndex}>
+          {row.map((meeting, index) => {
+            const meetingDate = getMeetingString(meeting.meetingDate);
+            return (
+              <MeetingHistory key={index}>
+                <div>
+                  <MeetingTextWrapper>{meetingDate}</MeetingTextWrapper>
+                  <Element>{meeting.finalStation}</Element>
+                </div>
+                <BtmTxt>
+                  <br />
+                  {meeting.name}
+                  <br />
+                  for {meeting.purpose}
+                </BtmTxt>
+              </MeetingHistory>
+            );
+          })}
+        </MeetingRow>
+      ))}
     </MeetingBoxContainer>
   );
 }
 
 export default MeetingBox;
-
-// const [meetingHistory, setMeetingHistory] = useState([
-//   {
-//     name: "하이",
-//     purpose: "식당",
-//     meetingDate: "2023-08-07T10:00:00",
-//     finalStation: "사당",
-//   },
-//   {
-//     name: "멍멍",
-//     purpose: "스터디",
-//     meetingDate: "2023-08-08T09:00:00",
-//     finalStation: "강남",
-//   },
-// ]);

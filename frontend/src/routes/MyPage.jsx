@@ -127,14 +127,13 @@ const InfoContainer = styled.div`
 `;
 
 const MeetingContainer = styled.div`
-  align-items: flex-start;
-  align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 21px;
-  height: 220.5px;
+  height: 380px; // 두 줄을 표시할 수 있는 높이로 조정
   width: 100%;
   overflow-y: auto;
+  margin-bottom: 20px;
 `;
 
 const GameContainer = styled.div`

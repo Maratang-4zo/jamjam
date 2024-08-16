@@ -1,13 +1,25 @@
 package com.maratang.jamjam.domain.room.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.maratang.jamjam.domain.attendee.dto.AttendeeDTO;
 import com.maratang.jamjam.domain.attendee.entity.Attendee;
 import com.maratang.jamjam.domain.attendee.entity.AttendeeStatus;
 import com.maratang.jamjam.domain.attendee.repository.AttendeeRepository;
+import com.maratang.jamjam.domain.localInfo.dto.response.LocalInfoRes;
+import com.maratang.jamjam.domain.localInfo.service.LocalInfoService;
 import com.maratang.jamjam.domain.room.dto.request.RoomMoveReq;
 import com.maratang.jamjam.domain.room.dto.response.CenterLoadingDto;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
+import com.maratang.jamjam.domain.room.dto.response.SubwayLocalInfo;
 import com.maratang.jamjam.domain.room.dto.response.ThreeLoadingRes;
 import com.maratang.jamjam.domain.room.entity.Room;
 import com.maratang.jamjam.domain.room.repository.RoomRepository;
@@ -22,14 +34,8 @@ import com.maratang.jamjam.global.map.station.SubwayDataLoader;
 import com.maratang.jamjam.global.map.station.SubwayInfo;
 import com.maratang.jamjam.global.ws.BroadCastService;
 import com.maratang.jamjam.global.ws.BroadCastType;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +52,7 @@ public class RoomMapService {
 	private final RoomRepository roomRepository;
 	private final BroadCastService broadCastService;
 	private final GoogleDirectionsService googleDirectionsService;
+	private final LocalInfoService localInfoService;
 
 	private void saveOptimalRoutesForUsersInRoom(Room room, SubwayInfo selectedStation) {
 		List<Attendee> attendees = attendeeRepository.findAllByRoomId(room.getRoomId());
@@ -95,10 +102,36 @@ public class RoomMapService {
 	}
 
 
+	public List<SubwayLocalInfo> getAroundStation2(UUID roomUUID) {
+		Room room = findRoomByUUID(roomUUID);
+		broadCastService.broadcastToRoom(roomUUID, ThreeLoadingRes.of(true), BroadCastType.WINNER_NEXT_PAGE);
+		validateStartStation(room);
+		String purpose = room.getPurpose();
+
+		SubwayInfo point = subwayDataLoader.getSubwayInfoMap().get(room.getStartStation());
+		List<SubwayInfo> aroundStations = haversineDistance.aroundStation(
+			subwayDataLoader.getSubwayInfoMap(), point.getLatitude(), point.getLongitude(), SEARCH_RADIUS, room.getPurpose());
+
+		if (aroundStations.isEmpty()) {
+			throw new BusinessException(ErrorCode.MIDDLE_NOT_FOUND_STATION_LOCATION);
+		}
+
+		List<SubwayLocalInfo> subwayLocalInfos = new ArrayList<>();
+		for(SubwayInfo subwayInfo: aroundStations) {
+			List<LocalInfoRes> res = localInfoService.getLocalInfoList(subwayInfo.getName(), purpose);
+			subwayLocalInfos.add(new SubwayLocalInfo(subwayInfo, res));
+		}
+
+		broadCastService.broadcastToRoom(roomUUID, subwayLocalInfos, BroadCastType.WINNER_NEXT_PAGE);
+
+		return subwayLocalInfos;
+	}
+
 	public List<SubwayInfo> getAroundStation(UUID roomUUID) {
 		Room room = findRoomByUUID(roomUUID);
 		broadCastService.broadcastToRoom(roomUUID, ThreeLoadingRes.of(true), BroadCastType.WINNER_NEXT_PAGE);
 		validateStartStation(room);
+		String purpose = room.getPurpose();
 
 		SubwayInfo point = subwayDataLoader.getSubwayInfoMap().get(room.getStartStation());
 		List<SubwayInfo> aroundStations = haversineDistance.aroundStation(

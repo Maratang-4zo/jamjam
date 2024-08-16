@@ -44,6 +44,8 @@ const BigBtn = styled.button`
   flex-shrink: 0;
   border-radius: 15px;
   border: 3px solid #000;
+  font-family: "DungGeunMo";
+  font-size: 30px;
   background-color: ${(props) => {
     if (props.isTutorialModalOpen) {
       return props.highlight ? props.theme.bgColor : "gray";

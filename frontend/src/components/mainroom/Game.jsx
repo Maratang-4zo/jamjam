@@ -107,7 +107,7 @@ const Block = styled.div`
   margin: 0 10px;
   position: relative; // absolute에서 relative로 변경
   border-radius: 50%;
-  border: 1px solid black;
+  border: 3px solid black;
   bottom: ${(props) => `${props.bottom}px`};
 `;
 

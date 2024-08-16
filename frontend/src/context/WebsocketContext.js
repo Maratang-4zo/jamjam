@@ -503,7 +503,7 @@ export const WebSocketProvider = ({ children }) => {
     if (
       aroundStations !== null &&
       aroundStations !== undefined &&
-      !aroundStations
+      aroundStations
     ) {
       setRoomPage("gamefinish");
     }

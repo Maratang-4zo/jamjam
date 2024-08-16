@@ -174,7 +174,7 @@ function FinalResult() {
   };
 
   const handleInfoCopyClick = () => {
-    const date = new Date(roomInfo.meetingDate);
+    const date = new Date(Date.parse(roomInfo.meetingDate));
 
     const formattedDate = new Intl.DateTimeFormat("ko", {
       year: "numeric",

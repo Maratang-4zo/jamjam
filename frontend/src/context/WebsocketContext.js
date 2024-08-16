@@ -77,7 +77,8 @@ export const WebSocketProvider = ({ children }) => {
   const setSelectedGame = useSetRecoilState(selectedGameAtom);
   const setIsWinner = useSetRecoilState(isWinnerAtom);
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
-  const setAroundStations = useSetRecoilState(aroundStationsAtom);
+  const [aroundStations, setAroundStations] =
+    useRecoilState(aroundStationsAtom);
   const setTotalRound = useSetRecoilState(totalRoundAtom);
   const setGameSessionUUID = useSetRecoilState(gameSessionUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);
@@ -488,8 +489,15 @@ export const WebSocketProvider = ({ children }) => {
   const handleGetAroundStations = ({ aroundStations }) => {
     setAroundStations(aroundStations);
     setIsThreeStationLoading(false);
-    setRoomPage("gamefinish");
+    // setRoomPage("gamefinish");
   };
+
+  useEffect(() => {
+    // aroundStations가 null이 아니고, 데이터가 존재할 때만 실행
+    if (aroundStations !== null && aroundStations !== undefined) {
+      setRoomPage("gamefinish");
+    }
+  }, [aroundStations]);
 
   const handleGameWinner = useRecoilCallback(
     ({ snapshot, set }) =>
@@ -523,6 +531,7 @@ export const WebSocketProvider = ({ children }) => {
     setRoundCenter(roundCenterStation);
     setIsNextMiddleExist(true);
     setGameState("before");
+    setAroundStations(null);
   };
 
   const handleRoomCenterUpdate = ({ roomCenterStart, attendees }) => {

@@ -15,7 +15,9 @@ import com.maratang.jamjam.domain.room.service.RoomHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/summary")
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class RoomSummaryController {
 	@GetMapping("/kakaoCalendar/{roomUUID}")
 	@Operation(summary = "카카오톡 캘린더에 일정 생성", description = "카카오톡 일정에 추가해준다.")
 	public ResponseEntity<?> getRoomKakaoCalendar(@PathVariable UUID roomUUID, HttpServletRequest request) {
+		log.info("카카오톡 캘린더 들어왔니");
 		String email = request.getAttribute("email").toString();
 		String event_id = roomHistoryService.createEventInKakaoCalendar(roomUUID, email);
 		return ResponseEntity.status(HttpStatus.OK).body(event_id);

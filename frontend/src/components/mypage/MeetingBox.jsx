@@ -2,8 +2,14 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { axiosGetMeetingHistory } from "../../apis/loginApi";
 
+const MeetingBoxContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  width: 100%;
+`;
+
 const MeetingHistory = styled.div`
-  //align-items: center;
   background-color: #ffffff;
   border: 0.7px solid #000000;
   border-radius: 10px;
@@ -11,7 +17,6 @@ const MeetingHistory = styled.div`
   flex-direction: column;
   gap: 7px;
   height: 152.6px;
-  overflow: hidden;
   padding: 20px 15px;
   width: 170px;
   justify-content: space-between;
@@ -41,18 +46,18 @@ function MeetingBox() {
   const getMeetingString = (meeting) => {
     const dateObj = new Date(meeting);
 
-  // 연도, 월, 일 추출
+    // 연도, 월, 일 추출
     const year = dateObj.getFullYear().toString().slice(2); // 2자리 연도
-    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0'); // 월 (0부터 시작하므로 +1)
-    const day = dateObj.getDate().toString().padStart(2, '0'); // 일
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, "0"); // 월 (0부터 시작하므로 +1)
+    const day = dateObj.getDate().toString().padStart(2, "0"); // 일
 
-  // 요일 배열 생성
+    // 요일 배열 생성
     const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
     const dayOfWeek = weekdays[dateObj.getDay()];
 
-  // 최종 문자열 생성
+    // 최종 문자열 생성
     return `${year}.${month}.${day} (${dayOfWeek})`;
-  }
+  };
 
   useEffect(() => {
     const fetchMeetingHistory = async () => {
@@ -72,27 +77,25 @@ function MeetingBox() {
   }
 
   return (
-    <>
+    <MeetingBoxContainer>
       {meetingHistory.map((meeting, index) => {
-        const meetingDate = getMeetingString(meeting.meetingDate)
+        const meetingDate = getMeetingString(meeting.meetingDate);
         return (
           <MeetingHistory key={index}>
             <div>
-            <MeetingTextWrapper>{meetingDate}</MeetingTextWrapper>
-              <Element>
-                {meeting.finalStation}
-              </Element>
+              <MeetingTextWrapper>{meetingDate}</MeetingTextWrapper>
+              <Element>{meeting.finalStation}</Element>
             </div>
             <BtmTxt>
-              <br/>
+              <br />
               {meeting.name}
-              <br/>
+              <br />
               for {meeting.purpose}
             </BtmTxt>
           </MeetingHistory>
         );
       })}
-    </>
+    </MeetingBoxContainer>
   );
 }
 

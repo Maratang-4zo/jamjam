@@ -500,7 +500,11 @@ export const WebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     // aroundStations가 null이 아니고, 데이터가 존재할 때만 실행
-    if (aroundStations !== null && aroundStations !== undefined) {
+    if (
+      aroundStations !== null &&
+      aroundStations !== undefined &&
+      !aroundStations
+    ) {
       setRoomPage("gamefinish");
     }
   }, [aroundStations]);

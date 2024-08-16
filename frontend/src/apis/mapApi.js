@@ -32,7 +32,7 @@ export function axiosUpdateUserInfo({ address, lat, lon }) {
 }
 
 export function axiosGetThreeStations(roomUUID) {
-  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/around`);
+  return axios.get(BASE_URL + `/api/rooms/${roomUUID}/around2`);
 }
 
 export function axiosGetAroundStores({ stationName, category }) {

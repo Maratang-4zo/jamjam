@@ -59,7 +59,7 @@ export const OpenViduProvider = ({ children }) => {
     if (sessionRef.current) return;
 
     const newOv = new OpenVidu({
-      audioSource: true,
+      audioSource: undefined,
       videoSource: false,
     });
     const newSession = newOv.initSession();
@@ -70,12 +70,8 @@ export const OpenViduProvider = ({ children }) => {
     newSession.on("streamCreated", (event) => {
       const subscriber = newSession.subscribe(event.stream, "subscriber", {
         insertMode: "APPEND",
-        audioSource: true, // 오디오만 사용한다면
+        audioSource: undefined, // 오디오만 사용한다면
         videoSource: false, // 비디오를 사용하지 않는다면
-      });
-      subscriber.on("streamPlaying (신입받아라)", () => {
-        console.log("Stream is playing");
-        console.log("Subscriber:", subscriber);
       });
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     });
@@ -156,6 +152,27 @@ export const OpenViduProvider = ({ children }) => {
 
       try {
         await sessionRef.current.connect(token);
+
+        sessionRef.current.streamManagers.forEach((streamManager) => {
+          if (
+            streamManager.stream &&
+            streamManager.stream.typeOfVideo === "CUSTOM"
+          ) {
+            const subscriber = sessionRef.current.subscribe(
+              streamManager.stream,
+              undefined,
+            );
+            setSubscribers((prevSubscribers) => [
+              ...prevSubscribers,
+              subscriber,
+            ]);
+            console.log(
+              "Subscribed to existing stream:",
+              streamManager.stream.streamId,
+            );
+          }
+        });
+
         sessionRef.current.on("streamCreated", (event) => {
           console.log("New stream created:", event.stream);
         });

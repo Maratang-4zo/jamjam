@@ -179,23 +179,6 @@ function Game() {
       setIsLoading(true);
       try {
         const data = await axiosGetThreeStations(roomInfo.roomUUID);
-        try {
-          const aroundStationsData = await Promise.all(
-            data.map(async (station) => {
-              const response = await axiosGetAroundStores({
-                stationName: station.name,
-                category: roomInfo.roomPurpose,
-              });
-              return {
-                ...station,
-                stores: response.data,
-              };
-            }),
-          );
-          setAroundStations(aroundStationsData);
-        } catch (error) {
-          console.log("역 주변 상권정보 가져오기 실패", error);
-        }
       } catch (err) {
         console.log("역 3개 가져오기 실패", err);
       }

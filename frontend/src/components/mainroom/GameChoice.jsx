@@ -87,7 +87,7 @@ const PlayButton = styled.button`
   margin-bottom: 20px; /* 아래 요소와 간격을 유지 */
   height: 100px;
   width: 270px;
-  margin: 0;
+  margin: 10px 0 0 0;
   border: none;
   font-family: "pixel";
   font-size: 24px;

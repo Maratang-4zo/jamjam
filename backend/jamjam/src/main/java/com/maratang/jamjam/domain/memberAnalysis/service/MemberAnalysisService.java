@@ -49,7 +49,12 @@ public class MemberAnalysisService {
 				.member(memberRepository.findById(memberId).get())
 				.build();
 			memberAnalysis = memberAnalysisRepository.save(createMemberAnalysis);
+		}else{
+			long cnt = memberAnalysis.getGameCount();
+			cnt++;
+			memberAnalysis.updateGameCount(cnt);
 		}
+
 		if(isWin){
 			long wincnt = memberAnalysis.getGameWinCount();
 			wincnt++;

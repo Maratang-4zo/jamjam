@@ -24,6 +24,7 @@ import com.maratang.jamjam.domain.room.dto.response.RoomJoinRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMiddleRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomMoveRes;
 import com.maratang.jamjam.domain.room.dto.response.RoomRes;
+import com.maratang.jamjam.domain.room.dto.response.SubwayLocalInfo;
 import com.maratang.jamjam.domain.room.service.RoomMapService;
 import com.maratang.jamjam.domain.room.service.RoomService;
 import com.maratang.jamjam.global.auth.room.RoomTokenManager;
@@ -103,6 +104,14 @@ public class RoomController {
 	@Operation(summary = "✨ 중심점 주변역 찾기", description = "중심점 주변 역을 찾는다.")
 	public ResponseEntity<?> getAroundStation(@PathVariable UUID roomUUID){
 		List<SubwayInfo> aroundStation = roomMapService.getAroundStation(roomUUID);
+
+		return ResponseEntity.status(HttpStatus.OK).body(aroundStation);
+	}
+
+	@GetMapping("/{roomUUID}/around2")
+	@Operation(summary = "✨ 중심점 주변역 찾기 + 주변 상권", description = "중심점 주변 역을 찾는다.")
+	public ResponseEntity<?> getAroundStation2(@PathVariable UUID roomUUID){
+		List<SubwayLocalInfo> aroundStation = roomMapService.getAroundStation2(roomUUID);
 
 		return ResponseEntity.status(HttpStatus.OK).body(aroundStation);
 	}

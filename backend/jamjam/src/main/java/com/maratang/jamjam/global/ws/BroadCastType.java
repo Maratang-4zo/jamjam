@@ -30,7 +30,8 @@ public enum BroadCastType {
 	ROOM_ROOT_LEAVE("방장 떠남"),
 	ROOM_ROOT_REENTRY("방장 재입장"),
 	CENTER_HISTORY("중심역 이동 기록"),
-	HOST_GO_MAIN("메인으로 가기 버튼");
+	HOST_GO_MAIN("메인으로 가기 버튼"),
+	AROUND_STATIONS("주변 역");
 
 	private final String desc;
 }

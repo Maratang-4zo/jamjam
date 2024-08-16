@@ -61,7 +61,8 @@ public class GamePlayService {
 		GameEngine game = gameFactory.getGame(req.getGameRoundUUID());
 
 		if(game == null){
-			throw new BusinessException(ErrorCode.INVALID_GAME_ROUND);
+			return;
+			// throw new BusinessException(ErrorCode.INVALID_GAME_ROUND);
 		}
 
 		GamePlayRes result = game.play(req, attendeeUUID);

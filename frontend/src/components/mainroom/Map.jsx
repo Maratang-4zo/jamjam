@@ -361,19 +361,21 @@ function MyMap() {
               anchor: new navermaps.Point(25, 70),
             }}
           />
-          {selectedStation.stores.map((store, index) => (
-            <Marker
-              key={index}
-              position={new navermaps.LatLng(store.latitude, store.longitude)}
-              title={store.name}
-              onClick={() =>
-                window.open(
-                  `https://map.naver.com/v5/search/${store.name}`,
-                  "_blank",
-                )
-              }
-            />
-          ))}
+          {selectedStation &&
+            selectedStation.stores &&
+            selectedStation.stores.map((store, index) => (
+              <Marker
+                key={index}
+                position={new navermaps.LatLng(store.latitude, store.longitude)}
+                title={store.name}
+                onClick={() =>
+                  window.open(
+                    `https://map.naver.com/v5/search/${store.name}`,
+                    "_blank",
+                  )
+                }
+              />
+            ))}
         </>
       )}
     </NaverMap>

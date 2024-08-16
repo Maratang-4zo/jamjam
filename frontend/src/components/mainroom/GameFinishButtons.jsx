@@ -174,7 +174,7 @@ function GameFinishButtons() {
     if (selectedStation) {
       sendNextRoundCenter({
         gameRoundUUID,
-        roundStationName: selectedStation,
+        roundStationName: selectedStation.name,
       });
     } else {
       alert("역을 선택해주세요");

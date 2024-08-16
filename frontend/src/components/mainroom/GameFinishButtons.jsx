@@ -166,6 +166,7 @@ function GameFinishButtons() {
   const setWinnerNicknameUUID = useSetRecoilState(winnerNicknameAtom);
 
   const handleStationClick = (station) => {
+    console.log("여기", station);
     setSelectedStation(station);
   };
 

@@ -100,10 +100,10 @@ const Block = styled.div`
 `;
 
 const WinMessage = styled.div`
-  position: absolute;
+  /* position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
   font-size: 48px;
   font-family: "pixel";
   font-weight: bold;
@@ -135,6 +135,17 @@ const Countdown = styled.div`
   font-weight: bold;
   font-family: "DungGeunMo";
   color: #000;
+`;
+
+const WinBox = styled.div`
+  height: 200px;
+  width: 100%;
+  background-color: #00000078;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
 `;
 
 function Game() {
@@ -233,7 +244,7 @@ function Game() {
             </>
           ) : null}
           {gameState === "end" ? (
-            <>
+            <WinBox>
               <WinMessage show={gameState === "end"}>
                 {winner && `${winner} WIN!!!`}
               </WinMessage>
@@ -244,7 +255,7 @@ function Game() {
               >
                 장소 선택하러 가기
               </StyledButton>
-            </>
+            </WinBox>
           ) : null}
         </GameScreen>
       </ContentWrapper>

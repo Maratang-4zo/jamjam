@@ -127,13 +127,13 @@ const InfoContainer = styled.div`
 `;
 
 const MeetingContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap; /* 줄 바꿈을 허용하여 한 줄에 4개씩 배치 */
-  justify-content: space-between;
-  gap: 21px;
-  height: 450px; /* 두 줄에 걸쳐서 8개의 항목을 배치할 수 있도록 설정 */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 한 줄에 4개의 아이템을 배치 */
+  grid-gap: 21px; /* 아이템 간의 간격 */
+  height: 450px; /* 두 줄을 차지할 높이 설정 */
   width: 100%;
   overflow-y: auto; /* 세로 스크롤을 허용 */
+  padding: 10px;
 `;
 
 const MeetingContainer2 = styled.div`

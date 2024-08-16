@@ -141,7 +141,7 @@ const Round3 = () => {
 
   const renderBanners = () => {
     const positions = {
-      1: ["70%"],
+      1: ["60%"],
       2: ["40%", "87%"],
       3: ["30%", "60%", "87%"],
     };

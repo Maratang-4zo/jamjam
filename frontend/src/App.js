@@ -76,6 +76,8 @@ function App() {
           <SnapshotDebugger />
           <CookiesProvider>
             <OpenViduProvider>
+              <div id="publisher"></div>
+              <div id="subscriber"></div>
               <NavermapsProvider
                 ncpClientId={process.env.REACT_APP_NAVER_MAP_CLIENT_ID}
                 submodules={["geocoder"]}

@@ -99,11 +99,15 @@ export const axiosGetMeetingHistory = async () => {
   }
 };
 
-export function axiosGetKakaoCalendar(roomUUID) {
-  const Token = getCookie("accessToken");
-  return axios.get(`api/summary/kakaoCalendar/${roomUUID}`, {
-    headers: {
-      Authorization: `Bearer ${Token}`,
-    },
-  });
-}
+export const axiosGetKakaoCalendar = async (roomUUID) => {
+  try {
+    const response = await axiosInstance.get(
+      `api/summary/kakaoCalendar/${roomUUID}`,
+    );
+    console.log(roomUUID);
+    console.log("캘린더 성공:", response);
+  } catch (error) {
+    console.error("캘린더 실패", error);
+    throw error;
+  }
+};

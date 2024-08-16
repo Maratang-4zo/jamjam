@@ -67,8 +67,10 @@ const ContentContainer = styled.div`
 const PlayButton = styled.button`
   --s: 0.5em;
   padding: 0.4em 0.5em;
-  background-color: #000;
-  color: #ffe845;
+  background-color: ${(props) =>
+    props.disabled ? "gray" : "#000"}; /* Host가 아닐 때 회색 */
+  color: ${(props) =>
+    props.disabled ? "#fff" : "#ffe845"}; /* Host가 아닐 때 텍스트 색상 */
   --_s: calc(var(--s) * 4) 51% repeat-x;
   --_r: calc(1.345 * var(--s)) at left 50%;
   --_g1: #000 99%, #0000 101%;
@@ -83,8 +85,11 @@ const PlayButton = styled.button`
       calc(50% + var(--_i, 0px)) calc(100% - var(--s)) / var(--_s);
   -webkit-mask: var(--mask);
   mask: var(--mask);
-  cursor: pointer;
-  margin-bottom: 20px; /* 아래 요소와 간격을 유지 */
+  cursor: ${(props) =>
+    props.disabled
+      ? "not-allowed"
+      : "pointer"}; /* Host가 아닐 때 not-allowed */
+  margin-bottom: 20px;
   height: 100px;
   width: 270px;
   margin: 10px 0 0 0;
@@ -94,9 +99,13 @@ const PlayButton = styled.button`
   animation: ${WavyAni} 0.3s linear infinite paused;
 
   &:hover {
-    animation-play-state: running;
-    background-color: #000;
-    color: #ffe845;
+    animation-play-state: ${(props) => (props.disabled ? "paused" : "running")};
+    background-color: ${(props) =>
+      props.disabled ? "gray" : "#000"}; /* Host가 아닐 때 색상 유지 */
+    color: ${(props) =>
+      props.disabled
+        ? "#fff"
+        : "#ffe845"}; /* Host가 아닐 때 텍스트 색상 유지 */
   }
 
   &:active {

@@ -401,12 +401,18 @@ export const WebSocketProvider = ({ children }) => {
   const handleNextRound = ({ next }) => {
     if (next === "nextRound") {
       setCurrentRound((prev) => (prev += 1));
+      setRoomPage("gamechoice");
     } else {
       setCurrentRound(1);
+      setRoomPage("result");
     }
-    setRoomPage(next);
-    setIsNextMiddleExist(false);
   };
+
+  useEffect(() => {
+    if (roomPage === "gamechoice" || roomPage === "result") {
+      setIsNextMiddleExist(false);
+    }
+  }, [roomPage]);
 
   const handleHostFindCenter = ({ isFindCenterLoading }) => {
     setIsFindCenterLoading(isFindCenterLoading);

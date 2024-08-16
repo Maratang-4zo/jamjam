@@ -23,6 +23,7 @@ import { lineColor } from "../../utils/lineColor";
 import { lineName } from "../../utils/lineName";
 import { isHistoryLoadingAtom } from "../../recoil/atoms/loadingState";
 import { useWebSocket } from "../../context/WebsocketContext";
+import { userInfoAtom } from "../../recoil/atoms/userState";
 
 const BottomBtns = styled.div`
   position: absolute;
@@ -166,6 +167,7 @@ function GameFinishButtons() {
   const setGameRecord = useSetRecoilState(gameRecordAtom);
   const setWinnerUUID = useSetRecoilState(winnerUUIDAtom);
   const setWinnerNicknameUUID = useSetRecoilState(winnerNicknameAtom);
+  const userInfo = useRecoilValue(userInfoAtom);
 
   const handleStationClick = (station) => {
     console.log("여기", station);
@@ -231,11 +233,14 @@ function GameFinishButtons() {
             결정
           </BigBtn>
         ) : totalRound === currentRound ? (
-          <BigBtn onClick={handleFinalResultBtnClick} disabled={!isWinner}>
+          <BigBtn
+            onClick={handleFinalResultBtnClick}
+            disabled={!userInfo.isHost}
+          >
             Final Result
           </BigBtn>
         ) : (
-          <BigBtn onClick={handleNextRoundBtnClick} disabled={!isWinner}>
+          <BigBtn onClick={handleNextRoundBtnClick} disabled={!userInfo.isHost}>
             Next Round
           </BigBtn>
         )}

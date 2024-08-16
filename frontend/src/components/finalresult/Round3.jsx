@@ -6,6 +6,7 @@ import { roomAtom } from "../../recoil/atoms/roomState";
 import { playerState } from "../../recoil/atoms/gameState";
 import { lineColor } from "../../utils/lineColor";
 
+import subbg from "../../assets/final/subbg.jpg";
 import profileBg from "../../assets/final/profileBg.PNG";
 import subwaybg from "../../assets/sbBG.jpg";
 import subway from "../../assets/subway.png";
@@ -21,7 +22,7 @@ const BackgroundWrapper = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 600%; /* 배경 이미지의 실제 너비 */
+  width: 300%; /*배경이미지 너비*/
   height: 100%;
   transform: ${(props) => `translateX(-${props.offset}px)`};
   transition: transform ${(props) => props.speed}s linear;
@@ -140,7 +141,7 @@ const Round3 = () => {
 
   const renderBanners = () => {
     const positions = {
-      1: ["87%"],
+      1: ["60%"],
       2: ["40%", "87%"],
       3: ["30%", "60%", "87%"],
     };
@@ -148,6 +149,8 @@ const Round3 = () => {
     const round = roundRecords.length;
 
     if (positions[round] && roundRecords.length > 0) {
+      console.log(roundRecords);
+      console.log(gameRecord);
       return roundRecords.map((record, index) => {
         const isLastBanner = index === roundRecords.length - 1;
         const positionInPx = parseFloat(positions[round][index]);

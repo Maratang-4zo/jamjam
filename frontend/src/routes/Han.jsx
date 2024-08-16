@@ -46,7 +46,7 @@ function Han() {
         sessionRef.current = newSession;
 
         newSession.on("streamCreated", function (event) {
-            newSession.subscribe(event.stream, "subscriber");
+            newSession.subscribe(event.stream, undefined);
         });
     }, []);
 
@@ -130,9 +130,9 @@ function Han() {
                         const newPublisher = ovRef.current.initPublisher(undefined,
                             {
                                 audioSource: undefined, // The source of audio. If undefined default audio input
-                                videoSource: false, // The source of video. If undefined default video input
+                                videoSource: undefined, // The source of video. If undefined default video input
                                 publishAudio: true,     // Whether you want to start the publishing with audio unmuted or muted
-                                publishVideo: false,     // Whether you want to start the publishing with video enabled or disabled
+                                publishVideo: true,     // Whether you want to start the publishing with video enabled or disabled
                                 resolution: '640x480',  // The resolution of your video
                                 frameRate: 30,          // The frame rate of your video
                                 insertMode: 'APPEND',   // How the video will be inserted according to targetElement

@@ -201,7 +201,10 @@ function GameFinishButtons() {
   };
 
   const handleClickOutside = (e) => {
-    if (e.target.closest(".station-btn") === null) {
+    if (
+      e.target.closest(".station-btn") === null &&
+      e.target.closest(".submit-btn") === null
+    ) {
       setSelectedStation(null);
     }
   };
@@ -219,6 +222,7 @@ function GameFinishButtons() {
       <BottomBtns>
         {!isNextMiddleExist ? (
           <BigBtn
+            className="submit-btn"
             onClick={handleDecision}
             disabled={!selectedStation || !isWinner}
           >

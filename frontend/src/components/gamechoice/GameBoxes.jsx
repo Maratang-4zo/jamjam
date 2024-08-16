@@ -14,8 +14,8 @@ const GamesContainer = styled.div`
 `;
 
 const GameCard1 = styled.div`
-  background-color: #ffffff;
-  background-image: url(${gameCardBg})
+  /* background-color: #ffffff; */
+  background-image: url(${gameCardBg});
   border: ${(props) =>
     props.selected
       ? "9px solid #000000"

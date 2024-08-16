@@ -49,5 +49,9 @@ public class MemberAnalysis {
 	public void updateGameWinCount(long gameWinCount){
 		this.gameWinCount = gameWinCount;
 	}
+
+	public void updateGameCount(long gameCount){
+		this.gameCount =  gameCount;
+	}
 }
 

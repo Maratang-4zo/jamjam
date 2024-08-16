@@ -254,7 +254,7 @@ const Mypage = () => {
         },
       });
     }
-  }, [navigate]);s
+  }, [navigate]);
 
   return (
     <>

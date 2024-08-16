@@ -46,7 +46,7 @@ function Han() {
         sessionRef.current = newSession;
 
         newSession.on("streamCreated", function (event) {
-            newSession.subscribe(event.stream, undefined);
+            newSession.subscribe(event.stream, "subscriber");
         });
     }, []);
 
@@ -127,7 +127,7 @@ function Han() {
                 sessionRef.current
                     .connect(token)
                     .then(() => {
-                        const newPublisher = ovRef.current.initPublisher(undefined,
+                        const newPublisher = ovRef.current.initPublisher("publisher",
                             {
                                 audioSource: undefined, // The source of audio. If undefined default audio input
                                 videoSource: undefined, // The source of video. If undefined default video input

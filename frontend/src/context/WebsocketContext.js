@@ -83,7 +83,7 @@ export const WebSocketProvider = ({ children }) => {
   const setGameSessionUUID = useSetRecoilState(gameSessionUUIDAtom);
   const setGameRecord = useSetRecoilState(gameRecordAtom);
   const setCurrentRoundUUID = useSetRecoilState(currentRoundUUIDAtom);
-  const setGameState = useSetRecoilState(gameStateAtom);
+  const [gameState, setGameState] = useRecoilState(gameStateAtom);
   const setWinnerUUID = useSetRecoilState(winnerUUIDAtom);
   const setWinnerNickname = useSetRecoilState(winnerNicknameAtom);
   const setGameCount = useSetRecoilState(gameCountAtom);
@@ -537,8 +537,13 @@ export const WebSocketProvider = ({ children }) => {
     setRoundCenter(roundCenterStation);
     setIsNextMiddleExist(true);
     setGameState("before");
-    setAroundStations(null);
   };
+
+  useEffect(() => {
+    if (gameState === "before") {
+      setAroundStations(null);
+    }
+  }, [gameState]);
 
   const handleRoomCenterUpdate = ({ roomCenterStart, attendees }) => {
     setRoomInfo((prev) => ({

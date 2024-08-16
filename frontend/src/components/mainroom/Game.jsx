@@ -28,6 +28,17 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
+const Instruction = styled.div`
+  font-family: "NewGalmuriBold";
+  font-size: 20px;
+  color: black;
+  position: absolute;
+  top: 20px; /* 상단에 위치 */
+  left: 50%; /* 가로 중앙 정렬 */
+  transform: translateX(-50%); /* 중앙 정렬 보정 */
+  z-index: 2; /* 다른 요소들보다 위에 배치되도록 설정 */
+`;
+
 const GameScreen = styled.div`
   width: 1164px;
   height: 530px;
@@ -196,6 +207,8 @@ function Game() {
     <Wrapper>
       <ContentWrapper>
         {isLoading ? <Loading message={"장소 로딩"} /> : null}
+        <Instruction>*스크린을 클릭해주세요!</Instruction>{" "}
+        {/* 중앙 상단에 텍스트 추가 */}
         <GameScreen
           onClick={() => {
             console.log("Game screen clicked");

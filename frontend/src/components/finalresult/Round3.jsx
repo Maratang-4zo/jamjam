@@ -22,7 +22,7 @@ const BackgroundWrapper = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 300%; /* 배경 이미지의 실제 너비 */
+  width: 300%; /*배경이미지 너비*/
   height: 100%;
   transform: ${(props) => `translateX(-${props.offset}px)`};
   transition: transform ${(props) => props.speed}s linear;

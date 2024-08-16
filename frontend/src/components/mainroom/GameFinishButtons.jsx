@@ -245,7 +245,7 @@ function GameFinishButtons() {
           </BigBtn>
         )}
       </BottomBtns>
-      {!isNextMiddleExist ? (
+      {!isNextMiddleExist && aroundStations ? (
         <RightBtns>
           {aroundStations.map((station, index) => (
             <StationBtn

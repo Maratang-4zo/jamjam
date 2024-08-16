@@ -486,8 +486,8 @@ export const WebSocketProvider = ({ children }) => {
     setRoomPage("gamechoice");
   };
 
-  const handleGetAroundStations = ({ aroundStations }) => {
-    setAroundStations(aroundStations);
+  const handleGetAroundStations = (messageBody) => {
+    setAroundStations(messageBody);
     setIsThreeStationLoading(false);
     // setRoomPage("gamefinish");
   };

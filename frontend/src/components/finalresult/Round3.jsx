@@ -144,7 +144,7 @@ const Round3 = () => {
       2: ["40%", "87%"],
       3: ["30%", "60%", "87%"],
     };
-    const roundRecords = gameRecord.roundRecordList || [];
+    const roundRecords = gameRecord;
     const round = roundRecords.length;
 
     if (positions[round] && roundRecords.length > 0) {

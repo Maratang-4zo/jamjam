@@ -174,7 +174,7 @@ function FinalResult() {
   };
 
   const handleInfoCopyClick = () => {
-    const date = new Date(roomAtom.meetingDate);
+    const date = new Date(roomInfo.meetingDate);
 
     const formattedDate = new Intl.DateTimeFormat("ko", {
       year: "numeric",
@@ -197,7 +197,7 @@ function FinalResult() {
 
   const handleInfoKakaoClick = async () => {
     try {
-      await axiosGetKakaoCalendar(roomAtom.roomUUID);
+      await axiosGetKakaoCalendar(roomInfo.roomUUID);
     } catch (err) {
       console.log("카카오톡 캘린더 연동 실패", err);
       alert("연동 실패! 다시 시도해 주세요");

@@ -161,7 +161,7 @@ const GameContainer = styled.div`
 const Subtitle = styled.h1`
   color: black;
   font-size: 40px;
-  font-family: "galmuriRegular";
+  font-family: "NewGalmuriRegular";
   text-align: left;
   margin-bottom: 20px;
 `;

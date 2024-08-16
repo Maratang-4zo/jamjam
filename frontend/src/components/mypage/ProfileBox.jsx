@@ -33,7 +33,7 @@ const Profile = styled.div`
 
 const Nickname = styled.label`
   color: #000000;
-  font-family: "Galmuri11-Regular", Helvetica;
+  font-family: "NewGalmuriRegular", Helvetica;
   font-size: 17.5px;
   text-decoration: underline;
   cursor: pointer;
@@ -43,7 +43,7 @@ const Email = styled.div`
   background: transparent;
   border: none;
   color: #6b6b6b;
-  font-family: "Galmuri11-Regular", Helvetica;
+  font-family: "NewGalmuriRegular", Helvetica;
   font-size: 17.5px;
   padding: 0;
   text-decoration: underline;

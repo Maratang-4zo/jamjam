@@ -98,7 +98,7 @@ const PixelChat = styled.div`
 const PixelChatText = styled.p`
   width: 100px;
   color: #000;
-  font-family: "ONE(Ed.) Galmuri11 Regular";
+  //font-family: "ONE(Ed.) Galmuri11 Regular";
   font-size: 15px;
   font-style: normal;
   font-weight: 400;

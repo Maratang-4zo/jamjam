@@ -42,7 +42,7 @@ public class WebConfig implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(authenticationInterceptor)
 			.order(1)
-			.addPathPatterns("/members/**", "/summary/kakaoCalendar/*");
+			.addPathPatterns("/members/**", "/summary/kakaoCalendar/**");
 			// .excludePathPatterns("/login", "/logout");
 
 		registry.addInterceptor(roomAuthenticationInterceptor)

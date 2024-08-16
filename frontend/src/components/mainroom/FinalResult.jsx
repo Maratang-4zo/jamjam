@@ -182,9 +182,9 @@ function FinalResult() {
       day: "numeric",
     }).format(date);
 
-    const infoText = `${roomAtom.roomName} 모임 결과\n\n- 모임 장소: ${
-      roundCenter?.name ? roundCenter.name : roomAtom.centerPlace.name
-    }\n- 모임 목적: ${roomAtom.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
+    const infoText = `${roomInfo.roomName} 모임 결과\n\n- 모임 장소: ${
+      roundCenter?.name ? roundCenter.name : roomInfo.centerPlace.name
+    }\n- 모임 목적: ${roomInfo.roomPurpose}\n- 모임 날짜: ${formattedDate}`;
     navigator.clipboard
       .writeText(infoText)
       .then(() => {
@@ -267,9 +267,7 @@ function FinalResult() {
             <ModalContent>
               {/* <ModalButton>복사하기</ModalButton>
               <ModalButton>카카오톡</ModalButton> */}
-              <ModalButton onClick={() => handleInfoCopyClick()}>
-                복사하기
-              </ModalButton>
+              <ModalButton onClick={handleInfoCopyClick}>복사하기</ModalButton>
               <ModalButton onClick={handleInfoKakaoClick}>카카오톡</ModalButton>
             </ModalContent>
           </ModalWrapper>

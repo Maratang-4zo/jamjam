@@ -110,6 +110,9 @@ const WinMessage = styled.h1`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%); */
+  width: 100%;
+  height: 40%;
+  background-color: #00000084;
   font-size: 48px;
   font-family: "pixel";
   font-weight: bold;
@@ -132,14 +135,14 @@ const Countdown = styled.div`
 `;
 
 const WinBox = styled.div`
-  height: 200px;
+  height: 100%;
   width: 100%;
-  background-color: #00000078;
+  background-color: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 0;
+  padding: 30px 0;
 `;
 
 function Game() {
@@ -242,11 +245,7 @@ function Game() {
               <WinMessage show={gameState === "end"}>
                 {winner && `${winner} WIN!!!`}
               </WinMessage>
-              <StyledButton
-                disabled={!isWinner}
-                show={isWinner}
-                onClick={handleNextPageBtn}
-              >
+              <StyledButton disabled={!isWinner} onClick={handleNextPageBtn}>
                 장소 선택하러 가기
               </StyledButton>
             </WinBox>

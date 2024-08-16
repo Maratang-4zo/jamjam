@@ -130,7 +130,7 @@ const MeetingContainer = styled.div`
   align-items: flex-start;
   align-self: stretch;
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   gap: 21px;
   height: 220.5px;
   width: 100%;

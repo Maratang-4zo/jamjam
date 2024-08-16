@@ -96,19 +96,35 @@ const BlockContainer = styled.div`
   gap: 20px; // 아이콘 간의 간격
 `;
 
+const BlockWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  bottom: ${(props) => `${props.bottom}px`};
+  left: ${(props) => props.left};
+  transition: bottom 0.1s;
+`;
+
+const Nickname = styled.div`
+  font-size: 20px;
+  color: ${(props) => (props.isCurrentUser ? "red" : "#FFE845")};
+  font-weight: 600;
+  margin-top: 2px;
+  font-family: "DungGeunMo";
+  text-shadow: -1.5px -1px 0 #000, 1.5px -1px 0 #000, -1.5px 1px 0 #000,
+    1.5px 1px 0 #000;
+`;
+
 const Block = styled.div`
   width: 50px;
   height: 50px;
-  transition: bottom 0.1s;
   background-image: url(${(props) => props.profileImageUrl});
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  margin: 0 10px;
-  position: relative; // absolute에서 relative로 변경
   border-radius: 50%;
   border: 1px solid black;
-  bottom: ${(props) => `${props.bottom}px`};
 `;
 
 const WinMessage = styled.div`
@@ -225,14 +241,16 @@ function Game() {
             <>
               <BlockContainer>
                 {players.map((player, index) => (
-                  <Block
+                  <BlockWrapper
                     key={player.attendeeUUID}
                     bottom={player.bottom}
-                    profileImageUrl={player.profileImageUrl}
-                    style={{
-                      left: `${(index - (players.length - 1) / 2) * 60}px`,
-                    }} // 각 플레이어를 좌우로 퍼지게 배치
-                  />
+                    left={`${(index - (players.length - 1) / 2) * 60}px`}
+                  >
+                    <Block profileImageUrl={player.profileImageUrl} />
+                    <Nickname isCurrentUser={player.attendeeUUID === myUUID}>
+                      {player.attendeeUUID === myUUID ? "나" : player.nickname}
+                    </Nickname>
+                  </BlockWrapper>
                 ))}
               </BlockContainer>
             </>

@@ -236,11 +236,17 @@ function GameFinishButtons() {
           <BigBtn
             onClick={handleFinalResultBtnClick}
             disabled={!userInfo.isHost}
+            style={{ fontSize: "18px" }}
           >
             Final Result
           </BigBtn>
         ) : (
-          <BigBtn onClick={handleNextRoundBtnClick} disabled={!userInfo.isHost}>
+          <BigBtn
+            style={{ fontSize: "18px" }}
+            s
+            onClick={handleNextRoundBtnClick}
+            disabled={!userInfo.isHost}
+          >
             Next Round
           </BigBtn>
         )}

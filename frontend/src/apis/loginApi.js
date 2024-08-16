@@ -103,7 +103,7 @@ export function axiosGetKakaoCalendar(roomUUID) {
   const Token = getCookie("accessToken");
   return axios.get(`api/summary/kakaoCalendar/${roomUUID}`, {
     headers: {
-      Token,
+      Authorization: `Bearer ${Token}`,
     },
   });
 }

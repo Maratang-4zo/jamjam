@@ -14,7 +14,6 @@ const MeetingHistory = styled.div`
   border: 0.7px solid #000000;
   border-radius: 10px;
   display: flex;
-  flex-direction: column;
   gap: 7px;
   height: 152.6px;
   padding: 20px 15px;

@@ -72,6 +72,12 @@ const StyledButton = styled.button`
   left: 50%;
   transform: translateX(-50%);
   display: ${(props) => (props.show ? "flex" : "none")};
+  &:hover {
+    background-color: ${(props) =>
+      props.disabled ? "gray" : props.theme.accentColor};
+    color: ${(props) => (props.disabled ? "black" : props.theme.bgColor)};
+    transition: 0.2s;
+  }
 `;
 
 const BlockContainer = styled.div`
@@ -99,7 +105,7 @@ const Block = styled.div`
   bottom: ${(props) => `${props.bottom}px`};
 `;
 
-const WinMessage = styled.div`
+const WinMessage = styled.h1`
   /* position: absolute;
   top: 50%;
   left: 50%;
@@ -109,21 +115,9 @@ const WinMessage = styled.div`
   font-weight: bold;
   color: black;
   display: ${(props) => (props.show ? "block" : "none")};
-  padding: 20px; // 텍스트 주변 여백 추가
   z-index: 1; // 텍스트가 배경 위에 위치하도록 z-index 설정
   position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 130%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 1); // 직사각형 배경색
-    border-radius: 10px; // 모서리 둥글게
-    z-index: -1; // 배경이 텍스트 뒤에 오도록 설정
-  }
+  text-align: center;
 `;
 
 const Countdown = styled.div`

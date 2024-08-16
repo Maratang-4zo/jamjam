@@ -46,7 +46,7 @@ export const OpenViduProvider = ({ children }) => {
       sessionId,
       subscribers,
     });
-  }, [currentSpeakers, sessionId, subscribers]);
+  }, [sessionRef, sessionId, subscribers]);
 
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
@@ -59,65 +59,54 @@ export const OpenViduProvider = ({ children }) => {
     if (sessionRef.current) return;
 
     const newOv = new OpenVidu({
-      audioSource: undefined,
+      audioSource: true,
       videoSource: false,
     });
     const newSession = newOv.initSession();
 
     ovRef.current = newOv;
     sessionRef.current = newSession;
+
+    newSession.on("streamCreated", (event) => {
+      const subscriber = newSession.subscribe(event.stream, "subscriber", {
+        insertMode: "APPEND",
+        audioSource: true, // 오디오만 사용한다면
+        videoSource: false, // 비디오를 사용하지 않는다면
+      });
+      subscriber.on("streamPlaying (신입받아라)", () => {
+        console.log("Stream is playing");
+        console.log("Subscriber:", subscriber);
+      });
+      setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+    });
+
+    newSession.on("streamDestroyed", (event) => {
+      setSubscribers((prevSubscribers) =>
+        prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
+      );
+    });
+
+    newSession.on("publisherStartSpeaking", (event) => {
+      console.log("말하는중", event);
+      setCurrentSpeakers((prevSpeakers) => [
+        ...prevSpeakers,
+        event.connection.data,
+      ]);
+    });
+
+    newSession.on("publisherStopSpeaking", (event) => {
+      setCurrentSpeakers((prevSpeakers) =>
+        prevSpeakers.filter((id) => id !== event.connection.data),
+      );
+    });
   }, []);
-
-  useEffect(() => {
-    if (sessionRef.current) {
-      sessionRef.current.on("streamCreated", (event) => {
-        const subscriber = sessionRef.current.subscribe(
-          event.stream,
-          undefined,
-        );
-        subscriber.subscribeToAudio(true);
-
-        // 오디오 요소 생성 및 연결
-        const audioElement = document.createElement("audio");
-        subscriber.addVideoElement(audioElement);
-        document.body.appendChild(audioElement);
-
-        setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
-        console.log("Subscriber added:", subscriber);
-        console.log(
-          "isSubscribeToRemote:",
-          subscriber.stream.isSubscribeToRemote,
-        );
-      });
-
-      sessionRef.current.on("streamDestroyed", (event) => {
-        setSubscribers((prevSubscribers) =>
-          prevSubscribers.filter((sub) => sub !== event.stream.streamManager),
-        );
-      });
-
-      sessionRef.current.on("publisherStartSpeaking", (event) => {
-        console.log("말하는중", event);
-        setCurrentSpeakers((prevSpeakers) => [
-          ...prevSpeakers,
-          event.connection.data,
-        ]);
-      });
-
-      sessionRef.current.on("publisherStopSpeaking", (event) => {
-        setCurrentSpeakers((prevSpeakers) =>
-          prevSpeakers.filter((id) => id !== event.connection.data),
-        );
-      });
-    }
-  }, [sessionRef.current]);
 
   const createSession = useCallback(async () => {
     try {
       const response = await axios.post(
         APPLICATION_SERVER_URL + "api/wr/rooms",
       );
-      const newSessionId = response.data.sessionId;
+      const newSessionId = response.data.sessionId; // Assume the server returns the sessionId
       console.log(response.data);
       setSessionId(newSessionId);
       return createToken(newSessionId);
@@ -167,8 +156,10 @@ export const OpenViduProvider = ({ children }) => {
 
       try {
         await sessionRef.current.connect(token);
-
-        const newPublisher = ovRef.current.initPublisher(undefined, {
+        sessionRef.current.on("streamCreated", (event) => {
+          console.log("New stream created:", event.stream);
+        });
+        const newPublisher = ovRef.current.initPublisher("publisher", {
           audioSource: undefined,
           videoSource: false,
           publishAudio: true,
@@ -182,25 +173,6 @@ export const OpenViduProvider = ({ children }) => {
 
         await sessionRef.current.publish(newPublisher);
         console.log("Successfully published to session");
-
-        // 기존 참가자들의 스트림 구독
-        sessionRef.current.streamManagers.forEach((streamManager) => {
-          if (streamManager !== newPublisher) {
-            const subscriber = sessionRef.current.subscribe(
-              streamManager.stream,
-              undefined,
-            );
-            subscriber.subscribeToAudio(true);
-            setSubscribers((prevSubscribers) => [
-              ...prevSubscribers,
-              subscriber,
-            ]);
-            console.log(
-              "Subscribed to existing stream:",
-              streamManager.stream.streamId,
-            );
-          }
-        });
 
         joined.current = true;
         console.log("Successfully joined session", sessionId);

@@ -233,6 +233,8 @@ const Mypage = () => {
   const [isLogined, setIsLogined] = useState(false);
   const [userInfo, setUserInfo] = useRecoilState(userInfoAtom);
   const KakaoLogout = useKakaoLogout();
+  const today = new Date();
+  const dayKor = ["일", "월", "화", "수", "목", "금", "토"];
 
   const scrollToRef = (ref) => {
     if (ref.current) {
@@ -282,11 +284,11 @@ const Mypage = () => {
               <Frame5>
                 <Today>
                   <Oneul>오늘은</Oneul>
-                  2024년
+                  {today.getFullYear()}년
                   <br />
-                  8월 16일
+                  {today.getMonth() + 1}월 {today.getDate()}일
                   <br />
-                  금요일
+                  {dayKor[today.getDay()]}요일
                 </Today>
                 <CustomCalendar></CustomCalendar>
               </Frame5>

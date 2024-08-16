@@ -166,7 +166,7 @@ function GameFinishButtons() {
   const setWinnerNicknameUUID = useSetRecoilState(winnerNicknameAtom);
 
   const handleStationClick = (station) => {
-    setSelectedStation(station.name);
+    setSelectedStation(station);
   };
 
   const handleDecision = async () => {

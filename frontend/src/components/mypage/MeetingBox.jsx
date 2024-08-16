@@ -3,16 +3,10 @@ import styled from "styled-components";
 import { axiosGetMeetingHistory } from "../../apis/loginApi";
 
 const MeetingBoxContainer = styled.div`
-  background-color: #ffffff;
-  border: 0.7px solid #000000;
-  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 152.6px;
-  padding: 20px 15px;
-  min-width: 170px;
-  width: 100%; /* 가로 크기를 부모 그리드 셀에 맞추도록 수정 */
+  gap: 21px;
+  width: 100%;
 `;
 
 const MeetingHistory = styled.div`
@@ -20,11 +14,11 @@ const MeetingHistory = styled.div`
   border: 0.7px solid #000000;
   border-radius: 10px;
   display: flex;
+  flex-direction: row;
   gap: 7px;
   height: 152.6px;
   padding: 20px 15px;
   width: 170px;
-  flex-direction: column;
   justify-content: space-between;
 `;
 
@@ -46,10 +40,6 @@ const BtmTxt = styled.div`
   font-size: 15px;
 `;
 
-const Text = styled.div`
-  font-family: "NewGalumuriBold";
-  font-size: 12 px;
-`;
 function MeetingBox() {
   const [meetingHistory, setMeetingHistory] = useState([]);
 
@@ -83,7 +73,7 @@ function MeetingBox() {
   }, []);
 
   if (!meetingHistory || meetingHistory.length === 0) {
-    return <Text>아직 만남이 이루어지지 않았어요ㅠㅠ</Text>;
+    return <div>아직 만남이 이루어지지 않았어요ㅠㅠ</div>;
   }
 
   return (

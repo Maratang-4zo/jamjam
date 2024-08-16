@@ -105,7 +105,7 @@ const Block = styled.div`
   bottom: ${(props) => `${props.bottom}px`};
 `;
 
-const WinMessage = styled.h1`
+const WinMessage = styled.div`
   /* position: absolute;
   top: 50%;
   left: 50%;
@@ -113,14 +113,20 @@ const WinMessage = styled.h1`
   width: 100%;
   height: 40%;
   background-color: #00000084;
-  font-size: 48px;
-  font-family: "pixel";
-  font-weight: bold;
-  color: black;
+
   display: ${(props) => (props.show ? "block" : "none")};
   z-index: 1; // 텍스트가 배경 위에 위치하도록 z-index 설정
   position: relative;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  span {
+    text-align: center;
+    font-size: 48px;
+    font-family: "pixel";
+    font-weight: bold;
+    color: black;
+  }
 `;
 
 const Countdown = styled.div`
@@ -243,7 +249,7 @@ function Game() {
           {gameState === "end" ? (
             <WinBox>
               <WinMessage show={gameState === "end"}>
-                {winner && `${winner} WIN!!!`}
+                <span>{winner && `${winner} WIN!!!`}</span>
               </WinMessage>
               <StyledButton disabled={!isWinner} onClick={handleNextPageBtn}>
                 장소 선택하러 가기

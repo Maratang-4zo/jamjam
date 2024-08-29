@@ -6,9 +6,6 @@ import CreateRoom from "./routes/CreateRoom";
 import JoinRoom from "./routes/JoinRoom";
 import Reconnect from "./routes/Reconnect";
 import InvalidRoom from "./routes/InvalidRoom";
-import Han from "./routes/Han";
-import NewHome from "./routes/NewHome";
-import Test from "./routes/Test";
 import { WebSocketProvider } from "./context/WebsocketContext";
 
 function Router() {
@@ -23,9 +20,6 @@ function Router() {
           <Route path="/room/:roomUUID/join" element={<JoinRoom />} />
           <Route path="/room/:roomUUID/reconnect" element={<Reconnect />} />
           <Route path="/invalid-room" element={<InvalidRoom />} />
-          <Route path="/newhome" element={<NewHome />} />
-          <Route path="/han" element={<Han />} />
-          <Route path="/test" element={<Test />} />
         </Routes>
       </WebSocketProvider>
     </BrowserRouter>

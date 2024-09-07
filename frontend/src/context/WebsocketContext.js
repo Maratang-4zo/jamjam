@@ -510,7 +510,7 @@ export const WebSocketProvider = ({ children }) => {
       aroundStations !== undefined &&
       aroundStations
     ) {
-      setRoomPage("gamefinish");
+      // setRoomPage("gamefinish");
     }
   }, [aroundStations]);
 

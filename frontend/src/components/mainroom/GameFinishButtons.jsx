@@ -170,7 +170,6 @@ function GameFinishButtons() {
   const userInfo = useRecoilValue(userInfoAtom);
 
   const handleStationClick = (station) => {
-    console.log("여기", station);
     setSelectedStation(station);
   };
 

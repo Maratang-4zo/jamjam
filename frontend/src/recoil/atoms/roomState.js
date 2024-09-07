@@ -8,6 +8,7 @@ export const roomAtom = atom({
     meetingDate: "",
     roomPurpose: "",
     attendees: [],
+    host: {},
     hostUUID: "",
     isAllHasDeparture: false, // 모두가 출발지 입력을 함
     isCenterExist: false,
@@ -40,6 +41,11 @@ export const aroundStationsAtom = atom({
 export const selectedStationAtom = atom({
   key: "selectedStation",
   default: null,
+});
+
+export const currentSpeakersAtom = atom({
+  key: "currentSpeakers",
+  default: [],
 });
 
 export const roomPageAtom = atom({

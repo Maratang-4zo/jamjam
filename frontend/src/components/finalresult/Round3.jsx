@@ -6,7 +6,6 @@ import { roomAtom } from "../../recoil/atoms/roomState";
 import { playerState } from "../../recoil/atoms/gameState";
 import { lineColor } from "../../utils/lineColor";
 
-import subbg from "../../assets/final/subbg.jpg";
 import profileBg from "../../assets/final/profileBg.PNG";
 import subwaybg from "../../assets/sbBG.jpg";
 import subway from "../../assets/subway.png";

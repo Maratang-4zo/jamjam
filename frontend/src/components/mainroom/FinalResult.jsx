@@ -14,6 +14,8 @@ import Loading from "../fixed/Loading";
 import modalBg from "../../assets/final/finalModalBg.svg";
 import { axiosGetKakaoCalendar } from "../../apis/loginApi";
 import { useWebSocket } from "../../context/WebsocketContext";
+import { useNavigate } from "react-router-dom";
+import { useLeave } from "../../hooks/useLeave";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -27,16 +29,31 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const fadeIn = keyframes`
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
+const fadeIn = (top) => keyframes`
+  0% { 
+    opacity: 0; 
+    transform: translateY(${parseInt(top) + 20}px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(${parseInt(top)}); 
+  }
+`;
+
+const fadeIn2 = (top) => keyframes`
+0% { 
+  opacity: 0; 
+}
+100% { 
+  opacity: 1; 
+}
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   gap: 20px;
   margin-top: 20px;
-  animation: ${fadeIn} 2s ease-in-out;
+  animation: ${fadeIn(0)} 2s ease-in-out;
 `;
 
 const AnimatedButton = styled.button`
@@ -48,16 +65,18 @@ const AnimatedButton = styled.button`
   border: none;
   border-radius: 15px;
   border: 2px solid black;
-  cursor: pointer;
-  background-color: ${(props) => props.theme.subBgColor};
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  background-color: ${(props) =>
+    props.disabled ? "#a9a9a9" : props.theme.subBgColor};
   color: black;
   transition: transform 0.3s;
 
   &:hover {
-    transform: scale(1.1);
+    transform: ${(props) => (props.disabled ? "none" : "scale(1.1)")};
     background-color: #a9a9a9;
-    color: white;
-    border: 2px solid white;
+    color: ${(props) => (props.disabled ? "black" : "white")};
+    border: ${(props) =>
+      props.disabled ? "2px solid black" : "2px solid white"};
   }
 `;
 
@@ -72,22 +91,20 @@ const Overlay = styled.div`
 `;
 
 const ModalWrapper = styled.div`
-  scale: 90%;
+  animation: ${(props) => fadeIn2(props.top)} 0.5s ease-in-out;
   position: absolute;
   top: ${(props) => props.top};
-  margin-top: 15px;
   left: ${(props) => props.left};
   transform: translate(-50%, -100%);
-  width: 310px;
-  height: 200px;
-  background-image: url(${modalBg});
-  background-size: cover;
+  width: 250px;
+  height: 100px;
+  background-color: #d3d3d3;
+  border: 2px solid black;
+  border-radius: 10px;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
-  flex-direction: column;
   z-index: 1000;
-  overflow: hidden; /* 모달 배경 잘리지 않도록 설정 */
 `;
 
 const ModalContent = styled.div`
@@ -123,6 +140,7 @@ const ModalButton = styled.button`
 `;
 
 function FinalResult() {
+  const navigate = useNavigate();
   const userInfo = useRecoilValue(userInfoAtom);
   const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
   const [mainClicked, setMainClicked] = useState(false);
@@ -133,6 +151,7 @@ function FinalResult() {
   const roundCenter = useRecoilValue(roundCenterAtom);
   const [isMainConnecting, setIsMainConnecting] =
     useRecoilState(isMainConnectingAtom);
+  const { leaveFn } = useLeave();
 
   const mainButtonRef = useRef(null);
   const shareButtonRef = useRef(null);
@@ -210,6 +229,9 @@ function FinalResult() {
         await axiosPatchNextMiddle({
           startStation: roomInfo.centerPlace.name,
         });
+        alert("방이 정상적으로 종료되었습니다.");
+        leaveFn();
+        navigate("/");
       } catch (err) {
         console.log("방 종료 실패", err);
       }
@@ -226,7 +248,11 @@ function FinalResult() {
         <AnimatedButton ref={shareButtonRef} onClick={handleShareClick}>
           SHARE
         </AnimatedButton>
-        <AnimatedButton ref={mainButtonRef} onClick={handleMainClick}>
+        <AnimatedButton
+          ref={mainButtonRef}
+          disabled={!userInfo.isHost}
+          onClick={handleMainClick}
+        >
           MAIN
         </AnimatedButton>
         <AnimatedButton disabled={!userInfo.isHost} onClick={handleExitBtn}>
@@ -245,10 +271,8 @@ function FinalResult() {
             }px`}
             onClick={(e) => e.stopPropagation()}
           >
-            <ModalContent>
-              <ModalButton onClick={handleKeepCenter}>유지하기</ModalButton>
-              <ModalButton onClick={handleResetCenter}>리셋하기</ModalButton>
-            </ModalContent>
+            <ModalButton onClick={handleKeepCenter}>유지하기</ModalButton>
+            <ModalButton onClick={handleResetCenter}>리셋하기</ModalButton>
           </ModalWrapper>
         </>
       )}
@@ -257,19 +281,15 @@ function FinalResult() {
         <>
           <Overlay onClick={handleOverlayClick} />
           <ModalWrapper
-            top={`${shareButtonRef.current.getBoundingClientRect().top}px`}
+            top={`${shareButtonRef.current.getBoundingClientRect().top - 25}px`}
             left={`${
               shareButtonRef.current.getBoundingClientRect().left +
               shareButtonRef.current.offsetWidth / 2
             }px`}
             onClick={(e) => e.stopPropagation()}
           >
-            <ModalContent>
-              {/* <ModalButton>복사하기</ModalButton>
-              <ModalButton>카카오톡</ModalButton> */}
-              <ModalButton onClick={handleInfoCopyClick}>복사하기</ModalButton>
-              <ModalButton onClick={handleInfoKakaoClick}>카카오톡</ModalButton>
-            </ModalContent>
+            <ModalButton onClick={handleInfoCopyClick}>복사하기</ModalButton>
+            <ModalButton onClick={handleInfoKakaoClick}>카카오톡</ModalButton>
           </ModalWrapper>
         </>
       )}

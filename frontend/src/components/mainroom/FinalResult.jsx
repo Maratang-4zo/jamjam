@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import ResultBox from "../finalresult/ResultBox";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import { axiosPatchNextMiddle } from "../../apis/mapApi";
 import { roomAtom } from "../../recoil/atoms/roomState";
@@ -11,10 +11,9 @@ import {
 } from "../../recoil/atoms/gameState";
 import { isMainConnectingAtom } from "../../recoil/atoms/loadingState";
 import Loading from "../fixed/Loading";
-import modalBg from "../../assets/final/finalModalBg.svg";
 import { axiosGetKakaoCalendar } from "../../apis/loginApi";
 import { useWebSocket } from "../../context/WebsocketContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useLeave } from "../../hooks/useLeave";
 
 const Wrapper = styled.div`
@@ -107,18 +106,6 @@ const ModalWrapper = styled.div`
   z-index: 1000;
 `;
 
-const ModalContent = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  top: 40px;
-  /* justify-content: center; */
-  align-items: center;
-  padding: 30px;
-  box-sizing: border-box;
-  flex-direction: column;
-`;
-
 const ModalButton = styled.button`
   height: 40px;
   width: 100px;
@@ -141,16 +128,15 @@ const ModalButton = styled.button`
 
 function FinalResult() {
   const navigate = useNavigate();
+  const { roomUUID } = useParams();
   const userInfo = useRecoilValue(userInfoAtom);
-  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
-  const [mainClicked, setMainClicked] = useState(false);
+  const roomInfo = useRecoilValue(roomAtom);
   const [showMainModal, setShowMainModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const { sendReset, sendFinalStation } = useWebSocket();
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
   const roundCenter = useRecoilValue(roundCenterAtom);
-  const [isMainConnecting, setIsMainConnecting] =
-    useRecoilState(isMainConnectingAtom);
+  const isMainConnecting = useRecoilValue(isMainConnectingAtom);
   const { leaveFn } = useLeave();
 
   const mainButtonRef = useRef(null);
@@ -159,6 +145,7 @@ function FinalResult() {
   const handleKeepCenter = async () => {
     try {
       await axiosPatchNextMiddle({
+        roomUUID,
         startStation: roomInfo.centerPlace.name,
       });
       sendFinalStation({

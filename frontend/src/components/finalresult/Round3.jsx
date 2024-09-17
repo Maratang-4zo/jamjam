@@ -148,8 +148,6 @@ const Round3 = () => {
     const round = roundRecords.length;
 
     if (positions[round] && roundRecords.length > 0) {
-      console.log(roundRecords);
-      console.log(gameRecord);
       return roundRecords.map((record, index) => {
         const isLastBanner = index === roundRecords.length - 1;
         const positionInPx = parseFloat(positions[round][index]);

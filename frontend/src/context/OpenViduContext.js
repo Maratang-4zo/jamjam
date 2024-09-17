@@ -39,15 +39,6 @@ export const OpenViduProvider = ({ children }) => {
   const [sessionId, setSessionId] = useState(null);
   const [subscribers, setSubscribers] = useState([]);
 
-  useEffect(() => {
-    console.log("오픈비두 정보들:", {
-      currentSpeakers,
-      sessionRef,
-      sessionId,
-      subscribers,
-    });
-  }, [sessionRef, sessionId, subscribers]);
-
   const leaveSession = useCallback(() => {
     if (sessionRef.current) {
       sessionRef.current.disconnect();
@@ -76,7 +67,6 @@ export const OpenViduProvider = ({ children }) => {
     });
 
     newSession.on("publisherStartSpeaking", (event) => {
-      console.log("말하는중", event);
       setCurrentSpeakers((prevSpeakers) => [
         ...prevSpeakers,
         event.connection.data,
@@ -95,8 +85,7 @@ export const OpenViduProvider = ({ children }) => {
       const response = await axios.post(
         APPLICATION_SERVER_URL + "api/wr/rooms",
       );
-      const newSessionId = response.data.sessionId; // Assume the server returns the sessionId
-      console.log(response.data);
+      const newSessionId = response.data.sessionId;
       setSessionId(newSessionId);
       return createToken(newSessionId);
     } catch (error) {
@@ -159,15 +148,11 @@ export const OpenViduProvider = ({ children }) => {
               ...prevSubscribers,
               subscriber,
             ]);
-            console.log(
-              "Subscribed to existing stream:",
-              streamManager.stream.streamId,
-            );
           }
         });
 
         sessionRef.current.on("streamCreated", (event) => {
-          console.log("New stream created:", event.stream);
+          // console.log("New stream created:", event.stream);
         });
         const newPublisher = ovRef.current.initPublisher("publisher", {
           audioSource: undefined,
@@ -182,10 +167,8 @@ export const OpenViduProvider = ({ children }) => {
         publisherRef.current = newPublisher;
 
         await sessionRef.current.publish(newPublisher);
-        console.log("Successfully published to session");
 
         joined.current = true;
-        console.log("Successfully joined session", sessionId);
       } catch (error) {
         console.error(
           "Error connecting to the session:",
@@ -222,9 +205,7 @@ export const OpenViduProvider = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log("Mic state changed:", isMicOn);
-  }, [isMicOn]);
+  useEffect(() => {}, [isMicOn]);
 
   useEffect(() => {
     if (publisherRef.current) {

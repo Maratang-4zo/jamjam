@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import ResultBox from "../finalresult/ResultBox";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userInfoAtom } from "../../recoil/atoms/userState";
 import { axiosPatchNextMiddle } from "../../apis/mapApi";
 import { roomAtom } from "../../recoil/atoms/roomState";
@@ -11,10 +11,9 @@ import {
 } from "../../recoil/atoms/gameState";
 import { isMainConnectingAtom } from "../../recoil/atoms/loadingState";
 import Loading from "../fixed/Loading";
+import modalBg from "../../assets/final/finalModalBg.svg";
 import { axiosGetKakaoCalendar } from "../../apis/loginApi";
 import { useWebSocket } from "../../context/WebsocketContext";
-import { useNavigate, useParams } from "react-router-dom";
-import { useLeave } from "../../hooks/useLeave";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.bgColor};
@@ -28,31 +27,16 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const fadeIn = (top) => keyframes`
-  0% { 
-    opacity: 0; 
-    transform: translateY(${parseInt(top) + 20}px); 
-  }
-  100% { 
-    opacity: 1; 
-    transform: translateY(${parseInt(top)}); 
-  }
-`;
-
-const fadeIn2 = (top) => keyframes`
-0% { 
-  opacity: 0; 
-}
-100% { 
-  opacity: 1; 
-}
+const fadeIn = keyframes`
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   gap: 20px;
   margin-top: 20px;
-  animation: ${fadeIn(0)} 2s ease-in-out;
+  animation: ${fadeIn} 2s ease-in-out;
 `;
 
 const AnimatedButton = styled.button`
@@ -64,18 +48,16 @@ const AnimatedButton = styled.button`
   border: none;
   border-radius: 15px;
   border: 2px solid black;
-  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
-  background-color: ${(props) =>
-    props.disabled ? "#a9a9a9" : props.theme.subBgColor};
+  cursor: pointer;
+  background-color: ${(props) => props.theme.subBgColor};
   color: black;
   transition: transform 0.3s;
 
   &:hover {
-    transform: ${(props) => (props.disabled ? "none" : "scale(1.1)")};
+    transform: scale(1.1);
     background-color: #a9a9a9;
-    color: ${(props) => (props.disabled ? "black" : "white")};
-    border: ${(props) =>
-      props.disabled ? "2px solid black" : "2px solid white"};
+    color: white;
+    border: 2px solid white;
   }
 `;
 
@@ -90,20 +72,34 @@ const Overlay = styled.div`
 `;
 
 const ModalWrapper = styled.div`
-  animation: ${(props) => fadeIn2(props.top)} 0.5s ease-in-out;
+  scale: 90%;
   position: absolute;
   top: ${(props) => props.top};
+  margin-top: 15px;
   left: ${(props) => props.left};
   transform: translate(-50%, -100%);
-  width: 250px;
-  height: 100px;
-  background-color: #d3d3d3;
-  border: 2px solid black;
-  border-radius: 10px;
+  width: 310px;
+  height: 200px;
+  background-image: url(${modalBg});
+  background-size: cover;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
+  flex-direction: column;
   z-index: 1000;
+  overflow: hidden; /* 모달 배경 잘리지 않도록 설정 */
+`;
+
+const ModalContent = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  top: 40px;
+  /* justify-content: center; */
+  align-items: center;
+  padding: 30px;
+  box-sizing: border-box;
+  flex-direction: column;
 `;
 
 const ModalButton = styled.button`
@@ -127,17 +123,16 @@ const ModalButton = styled.button`
 `;
 
 function FinalResult() {
-  const navigate = useNavigate();
-  const { roomUUID } = useParams();
   const userInfo = useRecoilValue(userInfoAtom);
-  const roomInfo = useRecoilValue(roomAtom);
+  const [roomInfo, setRoomInfo] = useRecoilState(roomAtom);
+  const [mainClicked, setMainClicked] = useState(false);
   const [showMainModal, setShowMainModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const { sendReset, sendFinalStation } = useWebSocket();
   const gameSessionUUID = useRecoilValue(gameSessionUUIDAtom);
   const roundCenter = useRecoilValue(roundCenterAtom);
-  const isMainConnecting = useRecoilValue(isMainConnectingAtom);
-  const { leaveFn } = useLeave();
+  const [isMainConnecting, setIsMainConnecting] =
+    useRecoilState(isMainConnectingAtom);
 
   const mainButtonRef = useRef(null);
   const shareButtonRef = useRef(null);
@@ -145,7 +140,6 @@ function FinalResult() {
   const handleKeepCenter = async () => {
     try {
       await axiosPatchNextMiddle({
-        roomUUID,
         startStation: roomInfo.centerPlace.name,
       });
       sendFinalStation({
@@ -216,9 +210,6 @@ function FinalResult() {
         await axiosPatchNextMiddle({
           startStation: roomInfo.centerPlace.name,
         });
-        alert("방이 정상적으로 종료되었습니다.");
-        leaveFn();
-        navigate("/");
       } catch (err) {
         console.log("방 종료 실패", err);
       }
@@ -235,11 +226,7 @@ function FinalResult() {
         <AnimatedButton ref={shareButtonRef} onClick={handleShareClick}>
           SHARE
         </AnimatedButton>
-        <AnimatedButton
-          ref={mainButtonRef}
-          disabled={!userInfo.isHost}
-          onClick={handleMainClick}
-        >
+        <AnimatedButton ref={mainButtonRef} onClick={handleMainClick}>
           MAIN
         </AnimatedButton>
         <AnimatedButton disabled={!userInfo.isHost} onClick={handleExitBtn}>
@@ -258,8 +245,10 @@ function FinalResult() {
             }px`}
             onClick={(e) => e.stopPropagation()}
           >
-            <ModalButton onClick={handleKeepCenter}>유지하기</ModalButton>
-            <ModalButton onClick={handleResetCenter}>리셋하기</ModalButton>
+            <ModalContent>
+              <ModalButton onClick={handleKeepCenter}>유지하기</ModalButton>
+              <ModalButton onClick={handleResetCenter}>리셋하기</ModalButton>
+            </ModalContent>
           </ModalWrapper>
         </>
       )}
@@ -268,15 +257,19 @@ function FinalResult() {
         <>
           <Overlay onClick={handleOverlayClick} />
           <ModalWrapper
-            top={`${shareButtonRef.current.getBoundingClientRect().top - 25}px`}
+            top={`${shareButtonRef.current.getBoundingClientRect().top}px`}
             left={`${
               shareButtonRef.current.getBoundingClientRect().left +
               shareButtonRef.current.offsetWidth / 2
             }px`}
             onClick={(e) => e.stopPropagation()}
           >
-            <ModalButton onClick={handleInfoCopyClick}>복사하기</ModalButton>
-            <ModalButton onClick={handleInfoKakaoClick}>카카오톡</ModalButton>
+            <ModalContent>
+              {/* <ModalButton>복사하기</ModalButton>
+              <ModalButton>카카오톡</ModalButton> */}
+              <ModalButton onClick={handleInfoCopyClick}>복사하기</ModalButton>
+              <ModalButton onClick={handleInfoKakaoClick}>카카오톡</ModalButton>
+            </ModalContent>
           </ModalWrapper>
         </>
       )}

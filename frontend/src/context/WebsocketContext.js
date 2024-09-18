@@ -161,6 +161,7 @@ export const WebSocketProvider = ({ children }) => {
 
   const handleMessage = (message) => {
     const messageBody = JSON.parse(message.body);
+    console.log(message.headers.type, messageBody);
     switch (message.headers.type) {
       case "CHAT_RECEIVED":
         handleChatLogs(messageBody);

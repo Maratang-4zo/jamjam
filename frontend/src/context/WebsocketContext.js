@@ -492,7 +492,7 @@ export const WebSocketProvider = ({ children }) => {
   const handleGetAroundStations = (messageBody) => {
     setAroundStations(messageBody);
     setIsThreeStationLoading(false);
-    // setRoomPage("gamefinish");
+    setRoomPage("gamefinish");
   };
 
   useEffect(() => {
@@ -502,7 +502,7 @@ export const WebSocketProvider = ({ children }) => {
       aroundStations !== undefined &&
       aroundStations
     ) {
-      // setRoomPage("gamefinish");
+      setRoomPage("gamefinish");
     }
   }, [aroundStations]);
 

@@ -157,29 +157,29 @@ function CreateRoom() {
 
   const createRoomFn = async (data) => {
     try {
-      // const response = await axiosCreateRoom({
-      //   purpose: data.purpose,
-      //   meetingDate: data.meetingDate.toISOString(),
-      //   nickname: data.nickname,
-      // });
+      const response = await axiosCreateRoom({
+        purpose: data.purpose,
+        meetingDate: data.meetingDate.toISOString(),
+        nickname: data.nickname,
+      });
 
-      // const { roomUUID, attendeeUUID } = response.data;
+      const { roomUUID, attendeeUUID } = response.data;
 
-      // await createSession();
-      // setUserInfo((prev) => ({
-      //   ...prev,
-      //   myUUID: attendeeUUID,
-      //   isHost: true,
-      // }));
+      await createSession();
+      setUserInfo((prev) => ({
+        ...prev,
+        myUUID: attendeeUUID,
+        isHost: true,
+      }));
 
-      // setRoomInfo((prev) => ({
-      //   ...prev,
-      //   roomUUID: roomUUID,
-      //   hostUUID: attendeeUUID,
-      // }));
+      setRoomInfo((prev) => ({
+        ...prev,
+        roomUUID: roomUUID,
+        hostUUID: attendeeUUID,
+      }));
 
-      // navigate(`/room/${roomUUID}`);
-      navigate(`/room/test`);
+      navigate(`/room/${roomUUID}`);
+      // navigate(`/room/test`);
     } catch (error) {
       console.error("An error occurred:", error);
     }

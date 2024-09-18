@@ -101,10 +101,8 @@ export const WebSocketProvider = ({ children }) => {
   const { leaveSession } = useOpenVidu();
 
   const connect = (roomUUID) => {
-    console.log("Attempting to connect with roomUUID:", roomUUID);
     return new Promise((resolve, reject) => {
       if (connected.current) {
-        console.log("Already connected");
         return resolve();
       }
       if (client.current) {
@@ -117,7 +115,6 @@ export const WebSocketProvider = ({ children }) => {
         heartbeatIncoming: 20000,
         heartbeatOutgoing: 20000,
         onConnect: () => {
-          console.log("Connected");
           connected.current = true;
           subscribe(roomUUID);
           resolve();
@@ -163,7 +160,6 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   const handleMessage = (message) => {
-    console.log(message);
     const messageBody = JSON.parse(message.body);
     switch (message.headers.type) {
       case "CHAT_RECEIVED":
@@ -361,10 +357,8 @@ export const WebSocketProvider = ({ children }) => {
         });
 
         // 현재 유저가 호스트인지 확인
-        console.log(userInfo);
         if (userInfo.isHost) {
           // isHost가 true라면 setIsHostOut(true)와 setEstimatedForceCloseAt(estimatedForceCloseAt) 실행 안 함
-          console.log("현재 유저가 호스트이므로 상태 변경이 생략되었습니다.");
         } else {
           // isHost가 false라면, 호스트가 나간 상태를 true로 설정하고, 추정 강제 종료 시간 설정
           set(isHostOutAtom, true);
@@ -420,7 +414,6 @@ export const WebSocketProvider = ({ children }) => {
 
   const handleGameReset = ({ gameSessionUUID }) => {
     setRoundCenter({});
-    setRoomPage("main");
     setGameSessionUUID("");
     setTotalRound(0);
     setCurrentRound(1);
@@ -431,6 +424,7 @@ export const WebSocketProvider = ({ children }) => {
     setSelectedGame(0);
     setPlayers([]);
     setIsMainConnecting(false);
+    setRoomPage("main");
   };
 
   const handleGameResultApply = ({
@@ -439,7 +433,6 @@ export const WebSocketProvider = ({ children }) => {
     attendees,
   }) => {
     setIsMainConnecting(false);
-    setRoomPage("main");
     setIsCenterMoveLoading(false);
     setGameSessionUUID("");
     setTotalRound(0);
@@ -455,16 +448,15 @@ export const WebSocketProvider = ({ children }) => {
       centerPlace: roomCenterStart,
       attendees,
     }));
+    setRoomPage("main");
   };
 
   const handleGameStart = ({ gameRoundUUID }) => {
-    // console.log("게임시작!", gameRoundUUID);
     setGameCount(0);
     setGameState("ing");
   };
 
   const handleGameCountdown = ({ gameRoundUUID, countdown }) => {
-    // console.log("카운트값 제대로 들어갔니..??", countdown);
     setGameCount(countdown);
   };
 
@@ -620,12 +612,9 @@ export const WebSocketProvider = ({ children }) => {
     [],
   );
 
-  const updateRoomStatus = (message) => {
-    console.log("Room status updated:", message);
-  };
+  const updateRoomStatus = (message) => {};
 
   const handleAvatarPosition = (message) => {
-    console.log("플레이어들의 위치 업데이트???", message);
     setPlayers((prevPlayers) => {
       const updatedPlayers = prevPlayers.map((player) =>
         player.attendeeUUID === message.attendeeUUID
@@ -653,7 +642,6 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const sendGame = (gameRoundUUID) => {
-    console.log("Sending game data:");
     if (client.current) {
       client.current.publish({
         destination: "/pub/game/round.play",
